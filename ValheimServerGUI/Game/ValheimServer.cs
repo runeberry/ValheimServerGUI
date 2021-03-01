@@ -1,10 +1,12 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Game
 {
@@ -17,13 +19,13 @@ namespace ValheimServerGUI.Game
         public bool Public { get; set; }
         
         public bool IsRunning => this.Process != null;
+        public readonly AppLogger Logger;
 
         private Process Process;
-        private readonly List<Action<string>> Listeners = new List<Action<string>>();
 
         public ValheimServer()
         {
-            
+            Logger = new AppLogger("Server");
         }
 
         public void Validate()
@@ -73,11 +75,6 @@ namespace ValheimServerGUI.Game
             this.Process = null;
         }
 
-        public void AddListener(Action<string> consoleListener)
-        {
-            this.Listeners.Add(consoleListener);
-        }
-
         #region Non-public methods
 
         private Process BuildProcess()
@@ -100,17 +97,19 @@ namespace ValheimServerGUI.Game
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", "892970"); // From: start_headless_server.bat
             process.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
-            process.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
+            process.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnErrorReceived);
 
             return process;
         }
 
         private void Process_OnDataReceived(object obj, DataReceivedEventArgs e)
         {
-            foreach (var listener in this.Listeners)
-            {
-                listener(e.Data);
-            }
+            Logger.LogInformation(e.Data);
+        }
+
+        private void Process_OnErrorReceived(object obj, DataReceivedEventArgs e)
+        {
+            Logger.LogError(e.Data);
         }
 
         #endregion

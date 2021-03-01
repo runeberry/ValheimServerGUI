@@ -41,7 +41,7 @@ namespace ValheimServerGUI.Forms
         private void InitializeServer()
         {
             Server = new ValheimServer();
-            Server.AddListener(this.OnServerDataReceived);
+            Server.Logger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
         }
 
         private void InitializeGameData()
@@ -58,17 +58,17 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void OnServerDataReceived(string message)
+        private void OnLogReceived(object sender, LogEvent logEvent)
         {
             // Allows cross-thread access to the TextBox
             // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<string>(OnServerDataReceived), new object[] { message });
+                this.Invoke(new Action<object, LogEvent>(OnLogReceived), new object[] { sender, logEvent });
                 return;
             }
 
-            this.AddLog(message);
+            this.AddLog(logEvent.Message);
         }
 
         #endregion

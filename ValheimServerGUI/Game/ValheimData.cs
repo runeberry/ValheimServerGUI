@@ -19,8 +19,7 @@ namespace ValheimServerGUI.Game
 
         public static List<string> GetWorldNames()
         {
-            var userProfileFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            var dataFolder = DataDirectory.Replace("%USERPROFILE%", userProfileFolder);
+            var dataFolder = Environment.ExpandEnvironmentVariables(DataDirectory);
             var worldsPath = Path.Combine(dataFolder, WorldsFolder);
 
             if (!Directory.Exists(worldsPath))

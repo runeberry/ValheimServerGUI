@@ -71,7 +71,7 @@ namespace ValheimServerGUI.Game
 
         public void Validate()
         {
-            // Ensure all required fields eixst
+            // Ensure all required fields exist
             if (string.IsNullOrWhiteSpace(this.ServerName)) throw new ArgumentException($"{nameof(ServerName)} must be defined.");
             if (string.IsNullOrWhiteSpace(this.ServerPath)) throw new ArgumentException($"{nameof(ServerPath)} must be defined.");
             if (string.IsNullOrWhiteSpace(this.ServerPassword)) throw new ArgumentException($"{nameof(ServerPassword)} must be defined.");

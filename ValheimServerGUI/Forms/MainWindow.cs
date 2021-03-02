@@ -11,26 +11,28 @@ namespace ValheimServerGUI.Forms
     {
         private ValheimServer Server;
 
+        private UserPrefs UserPrefs;
+
         public MainWindow()
         {
-            InitializeComponent();
+            InitializeComponent(); // WinForms generated code, always first
 
-            InitializeMenuItems();
+            InitializeUserPrefs();
             InitializeServer();
             InitializeGameData();
+
+            InitializeMenuItems();
+            InitializeFormFields(); // Display data back to user, always last
 
             this.SetStatusText("Loaded OK");
         }
 
         #region Initialization
 
-        private void InitializeMenuItems()
+        private void InitializeUserPrefs()
         {
-            this.MenuItemFileDirectories.Click += new EventHandler(this.MenuItemFileDirectories_Clicked);
-            this.MenuItemFileClose.Click += new EventHandler(this.MenuItemFileClose_Clicked);
-
-            this.MenuItemHelpUpdates.Click += new EventHandler(this.MenuItemHelpUpdates_Clicked);
-            this.MenuItemHelpAbout.Click += new EventHandler(this.MenuItemHelpAbout_Clicked);
+            UserPrefs = new UserPrefs();
+            UserPrefs.LoadFile();
         }
 
         private void InitializeServer()
@@ -42,7 +44,7 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeGameData()
         {
-            var worlds = ValheimData.GetWorldNames();
+            var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue("ValheimWorldsFolder"));
 
             if (!worlds.Any())
             {
@@ -52,6 +54,23 @@ namespace ValheimServerGUI.Forms
             {
                 ComboBoxWorldSelect.DataSource = worlds;
             }
+        }
+
+        private void InitializeMenuItems()
+        {
+            this.MenuItemFileDirectories.Click += new EventHandler(this.MenuItemFileDirectories_Clicked);
+            this.MenuItemFileClose.Click += new EventHandler(this.MenuItemFileClose_Clicked);
+
+            this.MenuItemHelpUpdates.Click += new EventHandler(this.MenuItemHelpUpdates_Clicked);
+            this.MenuItemHelpAbout.Click += new EventHandler(this.MenuItemHelpAbout_Clicked);
+        }
+
+        private void InitializeFormFields()
+        {
+            this.UIServerName = UserPrefs.GetValue("ServerName");
+            this.UIServerPassword = UserPrefs.GetValue("ServerPassword");
+            this.UISelectedWorld = UserPrefs.GetValue("ServerWorldName");
+            this.UICommunityServer = UserPrefs.GetFlagValue("ServerPublic");
         }
 
         private void OnLogReceived(object sender, LogEvent logEvent)
@@ -78,11 +97,11 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
-            Server.ServerPath = @"C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe";
-            Server.ServerName = this.GetServerName();
-            Server.ServerPassword = this.GetServerPassword();
-            Server.WorldName = this.GetSelectedWorldName();
-            Server.Public = this.GetPublicSelection();
+            Server.ServerPath = UserPrefs.GetEnvironmentValue("ValheimServerPath");
+            Server.ServerName = this.UIServerName;
+            Server.ServerPassword = this.UIServerPassword;
+            Server.WorldName = this.UISelectedWorld;
+            Server.Public = this.UICommunityServer;
 
             try
             {
@@ -100,6 +119,12 @@ namespace ValheimServerGUI.Forms
             }
 
             Server.Start();
+
+            UserPrefs.SetValue("ServerName", this.UIServerName);
+            UserPrefs.SetValue("ServerPassword", this.UIServerPassword);
+            UserPrefs.SetValue("ServerWorldName", this.UISelectedWorld);
+            UserPrefs.SetValue("ServerPublic", this.UICommunityServer);
+            UserPrefs.SaveFile();
         }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
@@ -147,24 +172,36 @@ namespace ValheimServerGUI.Forms
 
         #region Common Methods
 
-        private string GetServerName()
+        private string UIServerName
         {
-            return this.TextBoxServerName.Text;
+            get => this.TextBoxServerName.Text;
+            set => this.TextBoxServerName.Text = value;
         }
 
-        private string GetServerPassword()
+        private string UIServerPassword
         {
-            return this.TextBoxPassword.Text;
+            get => this.TextBoxPassword.Text;
+            set => this.TextBoxPassword.Text = value;
         }
 
-        private string GetSelectedWorldName()
+        private string UISelectedWorld
         {
-            return this.ComboBoxWorldSelect.SelectedItem.ToString();
+            get => this.ComboBoxWorldSelect.SelectedItem.ToString();
+            set
+            {
+                var worlds = this.ComboBoxWorldSelect.DataSource as IEnumerable<string>;
+                if (worlds != null && worlds.Contains(value))
+                {
+                    // Only allow value dropdown items to be set
+                    this.ComboBoxWorldSelect.SelectedItem = value;
+                }
+            }
         }
 
-        private bool GetPublicSelection()
+        private bool UICommunityServer
         {
-            return this.CheckBoxPublic.Checked;
+            get => this.CheckBoxPublic.Checked;
+            set => this.CheckBoxPublic.Checked = value;
         }
 
         private void AddLog(string message)

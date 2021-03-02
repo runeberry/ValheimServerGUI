@@ -1,11 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Game
@@ -20,12 +16,14 @@ namespace ValheimServerGUI.Game
         
         public bool IsRunning => this.Process != null;
         public readonly AppLogger Logger;
+        public readonly FilteredServerLogger FilteredLogger;
 
         private Process Process;
 
         public ValheimServer()
         {
-            Logger = new AppLogger("Server");
+            Logger = new AppLogger();
+            FilteredLogger = new FilteredServerLogger();
         }
 
         public void Validate()
@@ -105,11 +103,13 @@ namespace ValheimServerGUI.Game
         private void Process_OnDataReceived(object obj, DataReceivedEventArgs e)
         {
             Logger.LogInformation(e.Data);
+            FilteredLogger.LogInformation(e.Data);
         }
 
         private void Process_OnErrorReceived(object obj, DataReceivedEventArgs e)
         {
             Logger.LogError(e.Data);
+            FilteredLogger.LogError(e.Data);
         }
 
         #endregion

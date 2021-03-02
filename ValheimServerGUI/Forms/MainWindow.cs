@@ -1,11 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
@@ -41,7 +36,7 @@ namespace ValheimServerGUI.Forms
         private void InitializeServer()
         {
             Server = new ValheimServer();
-            Server.Logger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
+            Server.FilteredLogger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
         }
 
         private void InitializeGameData()
@@ -164,7 +159,6 @@ namespace ValheimServerGUI.Forms
 
         private void AddLog(string message)
         {
-            message = $"[{DateTime.Now:T}] {message}";
             this.TextBoxLogs.AppendLine(message);
         }
 

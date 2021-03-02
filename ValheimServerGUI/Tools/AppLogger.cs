@@ -6,21 +6,29 @@ namespace ValheimServerGUI.Tools
 {
     public class AppLogger : ILogger
     {
-        public readonly string Name;
         public event EventHandler<LogEvent> LogReceived;
         
         private const int LogBufferSize = 10000;
         private readonly Queue<LogEvent> Logs;
 
-        public AppLogger(string name)
+        public AppLogger()
         {
-            this.Name = name;
             this.Logs = new Queue<LogEvent>(LogBufferSize);
         }
 
         public IEnumerable<LogEvent> GetLogs()
         {
             return this.Logs;
+        }
+
+        protected virtual bool FilterLogEvent(LogEvent logEvent)
+        {
+            return true;
+        }
+
+        protected virtual void FormatLogEvent(LogEvent logEvent)
+        {
+            // no-op by default
         }
 
         #region ILogger implementation
@@ -46,6 +54,13 @@ namespace ValheimServerGUI.Tools
                 EventId = eventId.ToString(),
                 Message = formatter(state, exception),
             };
+
+            if (!this.FilterLogEvent(logEvent))
+            {
+                return;
+            }
+
+            FormatLogEvent(logEvent);
 
             AddLogToBuffer(logEvent);
 

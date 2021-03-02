@@ -14,7 +14,7 @@ namespace ValheimServerGUI.Tools
     {
         public event EventHandler<string> ValueChanged;
 
-        private readonly string UserPrefsFilePath = @"%USERPROFILE%\AppData\LocalLow\ValheimServerGUI\userprefs.txt";
+        private readonly string UserPrefsFilePath = @"%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt";
         private readonly Dictionary<string, string> ConfigValues = new Dictionary<string, string>();
 
         private static readonly Dictionary<string, string> ConfigDefaults = new Dictionary<string, string>

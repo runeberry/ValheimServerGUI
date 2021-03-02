@@ -21,6 +21,11 @@ namespace ValheimServerGUI.Tools
             return this.Logs;
         }
 
+        public void FlushLogs()
+        {
+            this.Logs.Clear();
+        }
+
         protected virtual bool FilterLogEvent(LogEvent logEvent)
         {
             return true;

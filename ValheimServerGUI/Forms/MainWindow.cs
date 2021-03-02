@@ -37,6 +37,7 @@ namespace ValheimServerGUI.Forms
         {
             Server = new ValheimServer();
             Server.FilteredLogger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
+            Server.StatusChanged += new EventHandler<ServerStatus>(this.OnServerStatusChanged);
         }
 
         private void InitializeGameData()
@@ -66,6 +67,11 @@ namespace ValheimServerGUI.Forms
             this.AddLog(logEvent.Message);
         }
 
+        private void OnServerStatusChanged(object sender, ServerStatus status)
+        {
+            this.SetStatusText(status.ToString());
+        }
+
         #endregion
 
         #region Form Event Handlers
@@ -93,20 +99,24 @@ namespace ValheimServerGUI.Forms
                 return;
             }
 
-            this.SetStatusText("Starting server...");
             Server.Start();
         }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
-            this.SetStatusText("Stopping server...");
-
             Server.Stop();
         }
 
         private void ButtonClearLogs_Click(object sender, EventArgs e)
         {
             this.ClearLogs();
+        }
+
+        protected override void OnFormClosing(FormClosingEventArgs e)
+        {
+            this.Server.ForceStop();
+
+            base.OnFormClosing(e);
         }
 
         #endregion
@@ -159,16 +169,34 @@ namespace ValheimServerGUI.Forms
 
         private void AddLog(string message)
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string>(AddLog), new object[] { message });
+                return;
+            }
+
             this.TextBoxLogs.AppendLine(message);
         }
 
         private void ClearLogs()
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(ClearLogs));
+                return;
+            }
+
             this.TextBoxLogs.Text = "";
         }
 
         private void SetStatusText(string message)
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<string>(SetStatusText), new object[] { message });
+                return;
+            }
+
             this.StatusStripLabel.Text = message;
         }
 

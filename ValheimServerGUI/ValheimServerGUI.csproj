@@ -7,6 +7,12 @@
     <ApplicationIcon>Assets\ApplicationIcon.ico</ApplicationIcon>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
+    <Authors>Runeberry Software, LLC</Authors>
+    <Product>ValheimServerGUI</Product>
+    <Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
+    <Copyright>2021</Copyright>
+    <PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
+    <Version>0.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>

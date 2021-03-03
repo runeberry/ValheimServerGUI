@@ -44,7 +44,7 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeGameData()
         {
-            var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue("ValheimWorldsFolder"));
+            var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimWorldsFolder));
             this.WorldSelectField.DataSource = worlds;
         }
 
@@ -59,10 +59,10 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
-            this.ServerNameField.Value = UserPrefs.GetValue("ServerName");
-            this.ServerPasswordField.Value = UserPrefs.GetValue("ServerPassword");
-            this.WorldSelectField.Value = UserPrefs.GetValue("ServerWorldName");
-            this.CommunityServerField.Value = UserPrefs.GetFlagValue("ServerPublic");
+            this.ServerNameField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerName);
+            this.ServerPasswordField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerPassword);
+            this.WorldSelectField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerWorldName);
+            this.CommunityServerField.Value = UserPrefs.GetFlagValue(UserPrefsKeys.ServerPublic);
         }
 
         private void OnLogReceived(object sender, LogEvent logEvent)
@@ -89,7 +89,7 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
-            Server.ServerPath = UserPrefs.GetEnvironmentValue("ValheimServerPath");
+            Server.ServerPath = UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimServerPath);
             Server.ServerName = this.ServerNameField.Value;
             Server.ServerPassword = this.ServerPasswordField.Value;
             Server.WorldName = this.WorldSelectField.Value;
@@ -112,10 +112,10 @@ namespace ValheimServerGUI.Forms
 
             Server.Start();
 
-            UserPrefs.SetValue("ServerName", this.ServerNameField.Value);
-            UserPrefs.SetValue("ServerPassword", this.ServerPasswordField.Value);
-            UserPrefs.SetValue("ServerWorldName", this.WorldSelectField.Value);
-            UserPrefs.SetValue("ServerPublic", this.CommunityServerField.Value);
+            UserPrefs.SetValue(UserPrefsKeys.ServerName, this.ServerNameField.Value);
+            UserPrefs.SetValue(UserPrefsKeys.ServerPassword, this.ServerPasswordField.Value);
+            UserPrefs.SetValue(UserPrefsKeys.ServerWorldName, this.WorldSelectField.Value);
+            UserPrefs.SetValue(UserPrefsKeys.ServerPublic, this.CommunityServerField.Value);
             UserPrefs.SaveFile();
         }
 

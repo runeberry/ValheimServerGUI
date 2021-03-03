@@ -14,19 +14,19 @@ namespace ValheimServerGUI.Tools
     {
         public event EventHandler<string> ValueChanged;
 
-        private readonly string UserPrefsFilePath = @"%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt";
+        public static readonly UserPrefs Default;
+
+        private static readonly string UserPrefsFilePath = @"%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt";
         private readonly Dictionary<string, string> ConfigValues = new Dictionary<string, string>();
 
-        private static readonly Dictionary<string, string> ConfigDefaults = new Dictionary<string, string>
-        {
-            { "ValheimGamePath", @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim" },
-            { "ValheimServerPath", @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe" },
-            { "ValheimWorldsFolder", @"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds" },
-        };
-
-        public UserPrefs()
+        static UserPrefs()
         {
             UserPrefsFilePath = Environment.ExpandEnvironmentVariables(UserPrefsFilePath);
+
+            Default = new UserPrefs();
+            Default.SetValue(UserPrefsKeys.ValheimGamePath, @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim");
+            Default.SetValue(UserPrefsKeys.ValheimServerPath, @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe");
+            Default.SetValue(UserPrefsKeys.ValheimWorldsFolder, @"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds");
         }
 
         #region Manage values
@@ -101,15 +101,15 @@ namespace ValheimServerGUI.Tools
         public void RestoreDefaults(bool saveNow = false)
         {
             // Set all key values to their defaults
-            foreach (var (key, value) in ConfigDefaults)
+            foreach (var (key, value) in Default.ConfigValues)
             {
                 this.SetValue(key, value);
             }
             
             // Remove any key values that are not part of the defaults
-            foreach (var (key, _) in ConfigValues)
+            foreach (var (key, _) in this.ConfigValues)
             {
-                if (!ConfigDefaults.ContainsKey(key))
+                if (!Default.ConfigValues.ContainsKey(key))
                 {
                     this.SetValue(key, null);
                 }

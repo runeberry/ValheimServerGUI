@@ -5,7 +5,7 @@ using System.Windows.Forms;
 namespace ValheimServerGUI.Forms.Controls
 {
     [Designer("System.Windows.Forms.Design.ParentControlDesigner, System.Design", typeof(IDesigner))]
-    public partial class TextFormField : UserControl
+    public partial class TextFormField : UserControl, IFormField<string>
     {
         private const char PasswordChar = '●';
         private const char PasswordCharDisabled = '\0';

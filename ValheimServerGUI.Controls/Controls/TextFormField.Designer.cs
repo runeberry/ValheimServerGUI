@@ -37,7 +37,7 @@ namespace ValheimServerGUI.Forms.Controls
             // 
             this.TextBox.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextBox.Location = new System.Drawing.Point(9, 20);
+            this.TextBox.Location = new System.Drawing.Point(9, 18);
             this.TextBox.Name = "TextBox";
             this.TextBox.Size = new System.Drawing.Size(132, 23);
             this.TextBox.TabIndex = 0;
@@ -45,7 +45,7 @@ namespace ValheimServerGUI.Forms.Controls
             // Label
             // 
             this.Label.AutoSize = true;
-            this.Label.Location = new System.Drawing.Point(9, 2);
+            this.Label.Location = new System.Drawing.Point(9, 0);
             this.Label.Name = "Label";
             this.Label.Size = new System.Drawing.Size(35, 15);
             this.Label.TabIndex = 1;
@@ -58,7 +58,7 @@ namespace ValheimServerGUI.Forms.Controls
             this.Controls.Add(this.Label);
             this.Controls.Add(this.TextBox);
             this.Name = "TextFormField";
-            this.Size = new System.Drawing.Size(150, 43);
+            this.Size = new System.Drawing.Size(150, 41);
             this.ResumeLayout(false);
             this.PerformLayout();
 

@@ -118,8 +118,12 @@ namespace ValheimServerGUI.Forms
             this.Controls.Add(this.ButtonCancel);
             this.Controls.Add(this.ServerPathField);
             this.Controls.Add(this.GamePathField);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.MaximizeBox = false;
+            this.MinimizeBox = false;
             this.Name = "DirectoriesForm";
+            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Directories";
             this.ResumeLayout(false);
 

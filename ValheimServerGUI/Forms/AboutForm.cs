@@ -1,11 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
@@ -17,6 +10,8 @@ namespace ValheimServerGUI.Forms
         public AboutForm()
         {
             InitializeComponent();
+
+            this.VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
         }
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

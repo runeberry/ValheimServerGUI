@@ -38,6 +38,7 @@ namespace ValheimServerGUI.Forms
             this.label4 = new System.Windows.Forms.Label();
             this.linkLabel2 = new System.Windows.Forms.LinkLabel();
             this.button1 = new System.Windows.Forms.Button();
+            this.VersionLabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -54,7 +55,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.label1.Location = new System.Drawing.Point(159, 12);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(212, 139);
+            this.label1.Size = new System.Drawing.Size(212, 112);
             this.label1.TabIndex = 1;
             this.label1.Text = "Valheim Dedicated Server GUI\r\n\r\n(c) 2021 Runeberry Software, LLC\r\nLicensed under " +
     "GNU GPLv3";
@@ -120,11 +121,21 @@ namespace ValheimServerGUI.Forms
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
+            // VersionLabel
+            // 
+            this.VersionLabel.Location = new System.Drawing.Point(159, 124);
+            this.VersionLabel.Name = "VersionLabel";
+            this.VersionLabel.Size = new System.Drawing.Size(212, 23);
+            this.VersionLabel.TabIndex = 8;
+            this.VersionLabel.Text = "Version: ?";
+            this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 302);
+            this.Controls.Add(this.VersionLabel);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.linkLabel2);
             this.Controls.Add(this.label4);
@@ -156,5 +167,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.LinkLabel linkLabel2;
         private System.Windows.Forms.Button button1;
+        private System.Windows.Forms.Label VersionLabel;
     }
 }

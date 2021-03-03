@@ -48,15 +48,7 @@ namespace ValheimServerGUI.Forms
         private void InitializeGameData()
         {
             var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue("ValheimWorldsFolder"));
-
-            if (!worlds.Any())
-            {
-                ComboBoxWorldSelect.DataSource = new List<string> { "(no worlds found)" };
-            }
-            else
-            {
-                ComboBoxWorldSelect.DataSource = worlds;
-            }
+            this.WorldSelectField.DataSource = worlds;
         }
 
         private void InitializeMenuItems()
@@ -70,10 +62,10 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
-            this.UIServerName = UserPrefs.GetValue("ServerName");
-            this.UIServerPassword = UserPrefs.GetValue("ServerPassword");
-            this.UISelectedWorld = UserPrefs.GetValue("ServerWorldName");
-            this.UICommunityServer = UserPrefs.GetFlagValue("ServerPublic");
+            this.ServerNameField.Value = UserPrefs.GetValue("ServerName");
+            this.ServerPasswordField.Value = UserPrefs.GetValue("ServerPassword");
+            this.WorldSelectField.Value = UserPrefs.GetValue("ServerWorldName");
+            this.CommunityServerField.Value = UserPrefs.GetFlagValue("ServerPublic");
         }
 
         private void OnLogReceived(object sender, LogEvent logEvent)
@@ -101,10 +93,10 @@ namespace ValheimServerGUI.Forms
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
             Server.ServerPath = UserPrefs.GetEnvironmentValue("ValheimServerPath");
-            Server.ServerName = this.UIServerName;
-            Server.ServerPassword = this.UIServerPassword;
-            Server.WorldName = this.UISelectedWorld;
-            Server.Public = this.UICommunityServer;
+            Server.ServerName = this.ServerNameField.Value;
+            Server.ServerPassword = this.ServerPasswordField.Value;
+            Server.WorldName = this.WorldSelectField.Value;
+            Server.Public = this.CommunityServerField.Value;
 
             try
             {
@@ -123,10 +115,10 @@ namespace ValheimServerGUI.Forms
 
             Server.Start();
 
-            UserPrefs.SetValue("ServerName", this.UIServerName);
-            UserPrefs.SetValue("ServerPassword", this.UIServerPassword);
-            UserPrefs.SetValue("ServerWorldName", this.UISelectedWorld);
-            UserPrefs.SetValue("ServerPublic", this.UICommunityServer);
+            UserPrefs.SetValue("ServerName", this.ServerNameField.Value);
+            UserPrefs.SetValue("ServerPassword", this.ServerPasswordField.Value);
+            UserPrefs.SetValue("ServerWorldName", this.WorldSelectField.Value);
+            UserPrefs.SetValue("ServerPublic", this.CommunityServerField.Value);
             UserPrefs.SaveFile();
         }
 
@@ -174,38 +166,6 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Common Methods
-
-        private string UIServerName
-        {
-            get => this.TextBoxServerName.Text;
-            set => this.TextBoxServerName.Text = value;
-        }
-
-        private string UIServerPassword
-        {
-            get => this.TextBoxPassword.Text;
-            set => this.TextBoxPassword.Text = value;
-        }
-
-        private string UISelectedWorld
-        {
-            get => this.ComboBoxWorldSelect.SelectedItem.ToString();
-            set
-            {
-                var worlds = this.ComboBoxWorldSelect.DataSource as IEnumerable<string>;
-                if (worlds != null && worlds.Contains(value))
-                {
-                    // Only allow value dropdown items to be set
-                    this.ComboBoxWorldSelect.SelectedItem = value;
-                }
-            }
-        }
-
-        private bool UICommunityServer
-        {
-            get => this.CheckBoxPublic.Checked;
-            set => this.CheckBoxPublic.Checked = value;
-        }
 
         private void AddLog(string message)
         {

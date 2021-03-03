@@ -44,13 +44,10 @@ namespace ValheimServerGUI.Forms
             this.StatusStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
-            this.CheckBoxPublic = new System.Windows.Forms.CheckBox();
-            this.LabelPassword = new System.Windows.Forms.Label();
-            this.TextBoxPassword = new System.Windows.Forms.TextBox();
-            this.LabelServerName = new System.Windows.Forms.Label();
-            this.TextBoxServerName = new System.Windows.Forms.TextBox();
-            this.LabelWorldSelect = new System.Windows.Forms.Label();
-            this.ComboBoxWorldSelect = new System.Windows.Forms.ComboBox();
+            this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.WorldSelectField = new ValheimServerGUI.Controls.DropdownFormField();
+            this.ServerPasswordField = new ValheimServerGUI.Forms.Controls.TextFormField();
+            this.ServerNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
             this.TabSettings = new System.Windows.Forms.TabPage();
@@ -135,7 +132,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.StatusStripLabel,
             this.StatusStripProgressBar});
-            this.StatusStrip.Location = new System.Drawing.Point(0, 264);
+            this.StatusStrip.Location = new System.Drawing.Point(0, 289);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(484, 22);
             this.StatusStrip.TabIndex = 1;
@@ -161,94 +158,69 @@ namespace ValheimServerGUI.Forms
             this.Tabs.Location = new System.Drawing.Point(12, 27);
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
-            this.Tabs.Size = new System.Drawing.Size(460, 234);
+            this.Tabs.Size = new System.Drawing.Size(460, 259);
             this.Tabs.TabIndex = 2;
             // 
             // TabServerControls
             // 
-            this.TabServerControls.Controls.Add(this.CheckBoxPublic);
-            this.TabServerControls.Controls.Add(this.LabelPassword);
-            this.TabServerControls.Controls.Add(this.TextBoxPassword);
-            this.TabServerControls.Controls.Add(this.LabelServerName);
-            this.TabServerControls.Controls.Add(this.TextBoxServerName);
-            this.TabServerControls.Controls.Add(this.LabelWorldSelect);
-            this.TabServerControls.Controls.Add(this.ComboBoxWorldSelect);
+            this.TabServerControls.Controls.Add(this.CommunityServerField);
+            this.TabServerControls.Controls.Add(this.WorldSelectField);
+            this.TabServerControls.Controls.Add(this.ServerPasswordField);
+            this.TabServerControls.Controls.Add(this.ServerNameField);
             this.TabServerControls.Controls.Add(this.ButtonStopServer);
             this.TabServerControls.Controls.Add(this.ButtonStartServer);
             this.TabServerControls.Location = new System.Drawing.Point(4, 24);
             this.TabServerControls.Name = "TabServerControls";
             this.TabServerControls.Padding = new System.Windows.Forms.Padding(3);
-            this.TabServerControls.Size = new System.Drawing.Size(452, 206);
+            this.TabServerControls.Size = new System.Drawing.Size(452, 231);
             this.TabServerControls.TabIndex = 0;
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
             // 
-            // CheckBoxPublic
+            // CommunityServerField
             // 
-            this.CheckBoxPublic.AutoSize = true;
-            this.CheckBoxPublic.Location = new System.Drawing.Point(3, 141);
-            this.CheckBoxPublic.Name = "CheckBoxPublic";
-            this.CheckBoxPublic.Size = new System.Drawing.Size(125, 19);
-            this.CheckBoxPublic.TabIndex = 9;
-            this.CheckBoxPublic.Text = "Community Server";
-            this.CheckBoxPublic.UseVisualStyleBackColor = true;
+            this.CommunityServerField.LabelText = "Community Server";
+            this.CommunityServerField.Location = new System.Drawing.Point(0, 141);
+            this.CommunityServerField.Name = "CommunityServerField";
+            this.CommunityServerField.Size = new System.Drawing.Size(150, 17);
+            this.CommunityServerField.TabIndex = 13;
+            this.CommunityServerField.Value = false;
             // 
-            // LabelPassword
+            // WorldSelectField
             // 
-            this.LabelPassword.AutoSize = true;
-            this.LabelPassword.Location = new System.Drawing.Point(3, 50);
-            this.LabelPassword.Name = "LabelPassword";
-            this.LabelPassword.Size = new System.Drawing.Size(92, 15);
-            this.LabelPassword.TabIndex = 8;
-            this.LabelPassword.Text = "Server Password";
+            this.WorldSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("WorldSelectField.DataSource")));
+            this.WorldSelectField.EmptyText = "(no worlds)";
+            this.WorldSelectField.LabelText = "World";
+            this.WorldSelectField.Location = new System.Drawing.Point(0, 94);
+            this.WorldSelectField.Name = "WorldSelectField";
+            this.WorldSelectField.Size = new System.Drawing.Size(243, 41);
+            this.WorldSelectField.TabIndex = 12;
+            this.WorldSelectField.Value = null;
             // 
-            // TextBoxPassword
+            // ServerPasswordField
             // 
-            this.TextBoxPassword.Location = new System.Drawing.Point(3, 68);
-            this.TextBoxPassword.Name = "TextBoxPassword";
-            this.TextBoxPassword.PasswordChar = '*';
-            this.TextBoxPassword.Size = new System.Drawing.Size(236, 23);
-            this.TextBoxPassword.TabIndex = 7;
+            this.ServerPasswordField.HideValue = true;
+            this.ServerPasswordField.LabelText = "ServerPassword";
+            this.ServerPasswordField.Location = new System.Drawing.Point(0, 47);
+            this.ServerPasswordField.Name = "ServerPasswordField";
+            this.ServerPasswordField.Size = new System.Drawing.Size(243, 41);
+            this.ServerPasswordField.TabIndex = 11;
+            this.ServerPasswordField.Value = "";
             // 
-            // LabelServerName
+            // ServerNameField
             // 
-            this.LabelServerName.AutoSize = true;
-            this.LabelServerName.Location = new System.Drawing.Point(3, 6);
-            this.LabelServerName.Name = "LabelServerName";
-            this.LabelServerName.Size = new System.Drawing.Size(74, 15);
-            this.LabelServerName.TabIndex = 6;
-            this.LabelServerName.Text = "Server Name";
-            // 
-            // TextBoxServerName
-            // 
-            this.TextBoxServerName.Location = new System.Drawing.Point(3, 24);
-            this.TextBoxServerName.Name = "TextBoxServerName";
-            this.TextBoxServerName.Size = new System.Drawing.Size(236, 23);
-            this.TextBoxServerName.TabIndex = 4;
-            // 
-            // LabelWorldSelect
-            // 
-            this.LabelWorldSelect.AutoSize = true;
-            this.LabelWorldSelect.Location = new System.Drawing.Point(3, 94);
-            this.LabelWorldSelect.Name = "LabelWorldSelect";
-            this.LabelWorldSelect.Size = new System.Drawing.Size(39, 15);
-            this.LabelWorldSelect.TabIndex = 3;
-            this.LabelWorldSelect.Text = "World";
-            // 
-            // ComboBoxWorldSelect
-            // 
-            this.ComboBoxWorldSelect.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.ComboBoxWorldSelect.FormattingEnabled = true;
-            this.ComboBoxWorldSelect.Location = new System.Drawing.Point(3, 112);
-            this.ComboBoxWorldSelect.MaxDropDownItems = 100;
-            this.ComboBoxWorldSelect.Name = "ComboBoxWorldSelect";
-            this.ComboBoxWorldSelect.Size = new System.Drawing.Size(236, 23);
-            this.ComboBoxWorldSelect.TabIndex = 2;
+            this.ServerNameField.HideValue = false;
+            this.ServerNameField.LabelText = "Server Name";
+            this.ServerNameField.Location = new System.Drawing.Point(0, 0);
+            this.ServerNameField.Name = "ServerNameField";
+            this.ServerNameField.Size = new System.Drawing.Size(243, 41);
+            this.ServerNameField.TabIndex = 10;
+            this.ServerNameField.Value = "";
             // 
             // ButtonStopServer
             // 
             this.ButtonStopServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ButtonStopServer.Location = new System.Drawing.Point(84, 180);
+            this.ButtonStopServer.Location = new System.Drawing.Point(84, 205);
             this.ButtonStopServer.Name = "ButtonStopServer";
             this.ButtonStopServer.Size = new System.Drawing.Size(75, 23);
             this.ButtonStopServer.TabIndex = 1;
@@ -259,7 +231,7 @@ namespace ValheimServerGUI.Forms
             // ButtonStartServer
             // 
             this.ButtonStartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ButtonStartServer.Location = new System.Drawing.Point(3, 180);
+            this.ButtonStartServer.Location = new System.Drawing.Point(3, 205);
             this.ButtonStartServer.Name = "ButtonStartServer";
             this.ButtonStartServer.Size = new System.Drawing.Size(75, 23);
             this.ButtonStartServer.TabIndex = 0;
@@ -272,7 +244,7 @@ namespace ValheimServerGUI.Forms
             this.TabSettings.Location = new System.Drawing.Point(4, 24);
             this.TabSettings.Name = "TabSettings";
             this.TabSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.TabSettings.Size = new System.Drawing.Size(452, 206);
+            this.TabSettings.Size = new System.Drawing.Size(452, 231);
             this.TabSettings.TabIndex = 1;
             this.TabSettings.Text = "Settings";
             this.TabSettings.UseVisualStyleBackColor = true;
@@ -283,7 +255,7 @@ namespace ValheimServerGUI.Forms
             this.TabLogs.Controls.Add(this.TextBoxLogs);
             this.TabLogs.Location = new System.Drawing.Point(4, 24);
             this.TabLogs.Name = "TabLogs";
-            this.TabLogs.Size = new System.Drawing.Size(452, 206);
+            this.TabLogs.Size = new System.Drawing.Size(452, 231);
             this.TabLogs.TabIndex = 2;
             this.TabLogs.Text = "Logs";
             this.TabLogs.UseVisualStyleBackColor = true;
@@ -310,14 +282,14 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.Name = "TextBoxLogs";
             this.TextBoxLogs.ReadOnly = true;
             this.TextBoxLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextBoxLogs.Size = new System.Drawing.Size(446, 171);
+            this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
             this.TextBoxLogs.TabIndex = 0;
             // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 286);
+            this.ClientSize = new System.Drawing.Size(484, 311);
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.StatusStrip);
             this.Controls.Add(this.MenuStrip);
@@ -331,7 +303,6 @@ namespace ValheimServerGUI.Forms
             this.StatusStrip.PerformLayout();
             this.Tabs.ResumeLayout(false);
             this.TabServerControls.ResumeLayout(false);
-            this.TabServerControls.PerformLayout();
             this.TabLogs.ResumeLayout(false);
             this.TabLogs.PerformLayout();
             this.ResumeLayout(false);
@@ -359,14 +330,11 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.TabPage TabLogs;
         private System.Windows.Forms.Button ButtonStopServer;
         private System.Windows.Forms.Button ButtonStartServer;
-        private System.Windows.Forms.Label LabelWorldSelect;
-        private System.Windows.Forms.ComboBox ComboBoxWorldSelect;
-        private System.Windows.Forms.Label LabelServerName;
-        private System.Windows.Forms.TextBox TextBoxServerName;
-        private System.Windows.Forms.Label LabelPassword;
-        private System.Windows.Forms.TextBox TextBoxPassword;
-        private System.Windows.Forms.CheckBox CheckBoxPublic;
         private System.Windows.Forms.TextBox TextBoxLogs;
         private System.Windows.Forms.Button ButtonClearLogs;
+        private ValheimServerGUI.Controls.DropdownFormField WorldSelectField;
+        private Controls.TextFormField ServerPasswordField;
+        private Controls.TextFormField ServerNameField;
+        private ValheimServerGUI.Controls.CheckboxFormField CommunityServerField;
     }
 }

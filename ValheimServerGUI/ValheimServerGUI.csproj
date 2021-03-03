@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>ApplicationIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Assets\ApplicationIcon.ico</ApplicationIcon>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

@@ -19,7 +19,6 @@ namespace ValheimServerGUI.Forms
 
             InitializeUserPrefs();
             InitializeServer();
-            InitializeGameData();
 
             InitializeMenuItems();
             InitializeFormFields(); // Display data back to user, always last
@@ -42,12 +41,6 @@ namespace ValheimServerGUI.Forms
             Server.StatusChanged += new EventHandler<ServerStatus>(this.OnServerStatusChanged);
         }
 
-        private void InitializeGameData()
-        {
-            var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimWorldsFolder));
-            this.WorldSelectField.DataSource = worlds;
-        }
-
         private void InitializeMenuItems()
         {
             this.MenuItemFileDirectories.Click += new EventHandler(this.MenuItemFileDirectories_Clicked);
@@ -59,9 +52,21 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
+            try
+            {
+                var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimWorldsFolder));
+                this.WorldSelectField.DataSource = worlds;
+                this.WorldSelectField.DropdownEnabled = worlds.Any();
+                this.WorldSelectField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerWorldName);
+            }
+            catch (System.IO.DirectoryNotFoundException)
+            {
+                this.WorldSelectField.DataSource = null;
+                this.WorldSelectField.DropdownEnabled = false;
+            }
+
             this.ServerNameField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerName);
             this.ServerPasswordField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerPassword);
-            this.WorldSelectField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerWorldName);
             this.CommunityServerField.Value = UserPrefs.GetFlagValue(UserPrefsKeys.ServerPublic);
         }
 
@@ -142,7 +147,10 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
         {
-            this.SetStatusText("Clicked Directories!");
+            var directoriesForm = new DirectoriesForm(this.UserPrefs);
+            directoriesForm.ShowDialog();
+
+            InitializeFormFields();
         }
 
         private void MenuItemFileClose_Clicked(object sender, EventArgs e)

@@ -74,6 +74,12 @@ namespace ValheimServerGUI.Controls
             }
         }
 
+        public bool DropdownEnabled
+        {
+            get => this.ComboBox.Enabled;
+            set => this.ComboBox.Enabled = value;
+        }
+
         public DropdownFormField()
         {
             InitializeComponent();

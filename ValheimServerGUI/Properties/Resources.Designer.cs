@@ -61,6 +61,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI.
+        /// </summary>
+        internal static string ApplicationGithubUrl {
+            get {
+                return ResourceManager.GetString("ApplicationGithubUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon ApplicationIcon {
@@ -71,12 +80,30 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry.
+        /// </summary>
+        internal static string OrganizationGithubUrl {
+            get {
+                return ResourceManager.GetString("OrganizationGithubUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap RuneberryLogo {
             get {
                 object obj = ResourceManager.GetObject("RuneberryLogo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://www.valheimgame.com/.
+        /// </summary>
+        internal static string ValheimGameSiteUrl {
+            get {
+                return ResourceManager.GetString("ValheimGameSiteUrl", resourceCulture);
             }
         }
     }

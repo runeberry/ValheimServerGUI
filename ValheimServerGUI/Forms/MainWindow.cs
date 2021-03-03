@@ -173,7 +173,8 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
         {
-            this.SetStatusText("Clicked About!");
+            var aboutForm = new AboutForm();
+            aboutForm.ShowDialog();
         }
 
         #endregion

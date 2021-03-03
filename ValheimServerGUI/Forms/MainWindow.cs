@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Forms
@@ -16,8 +15,6 @@ namespace ValheimServerGUI.Forms
 
         public MainWindow()
         {
-            this.Icon = Resources.ApplicationIcon;
-
             InitializeComponent(); // WinForms generated code, always first
 
             InitializeUserPrefs();

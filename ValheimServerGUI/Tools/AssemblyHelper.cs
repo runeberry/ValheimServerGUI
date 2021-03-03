@@ -1,4 +1,4 @@
-﻿using System.Diagnostics;
+﻿using System.Linq;
 using System.Reflection;
 
 namespace ValheimServerGUI.Tools
@@ -7,9 +7,11 @@ namespace ValheimServerGUI.Tools
     {
         public static string GetApplicationVersion()
         {
-            var assembly = Assembly.GetExecutingAssembly();
-            var info = FileVersionInfo.GetVersionInfo(assembly.Location);
-            return info.ProductVersion;
+            var attribute = Assembly.GetExecutingAssembly()
+                .GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
+                .FirstOrDefault() as AssemblyInformationalVersionAttribute;
+
+            return attribute?.InformationalVersion ?? "0.0.0";
         }
     }
 }

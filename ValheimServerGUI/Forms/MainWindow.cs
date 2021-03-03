@@ -20,7 +20,7 @@ namespace ValheimServerGUI.Forms
             InitializeUserPrefs();
             InitializeServer();
 
-            InitializeMenuItems();
+            InitializeFormEvents();
             InitializeFormFields(); // Display data back to user, always last
 
             this.SetStatusText("Loaded OK");
@@ -41,13 +41,15 @@ namespace ValheimServerGUI.Forms
             Server.StatusChanged += new EventHandler<ServerStatus>(this.OnServerStatusChanged);
         }
 
-        private void InitializeMenuItems()
+        private void InitializeFormEvents()
         {
             this.MenuItemFileDirectories.Click += new EventHandler(this.MenuItemFileDirectories_Clicked);
             this.MenuItemFileClose.Click += new EventHandler(this.MenuItemFileClose_Clicked);
 
             this.MenuItemHelpUpdates.Click += new EventHandler(this.MenuItemHelpUpdates_Clicked);
             this.MenuItemHelpAbout.Click += new EventHandler(this.MenuItemHelpAbout_Clicked);
+
+            this.ShowPasswordField.ValueChanged += new EventHandler<bool>(this.ShowPasswordField_Changed);
         }
 
         private void InitializeFormFields()
@@ -68,6 +70,7 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerName);
             this.ServerPasswordField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerPassword);
             this.CommunityServerField.Value = UserPrefs.GetFlagValue(UserPrefsKeys.ServerPublic);
+            this.ShowPasswordField.Value = false;
         }
 
         private void OnLogReceived(object sender, LogEvent logEvent)
@@ -132,6 +135,11 @@ namespace ValheimServerGUI.Forms
         private void ButtonClearLogs_Click(object sender, EventArgs e)
         {
             this.ClearLogs();
+        }
+
+        private void ShowPasswordField_Changed(object sender, bool value)
+        {
+            this.ServerPasswordField.HideValue = !value;
         }
 
         protected override void OnFormClosing(FormClosingEventArgs e)

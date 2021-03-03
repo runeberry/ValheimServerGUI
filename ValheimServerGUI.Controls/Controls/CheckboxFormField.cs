@@ -1,9 +1,12 @@
-﻿using System.Windows.Forms;
+﻿using System;
+using System.Windows.Forms;
 
 namespace ValheimServerGUI.Controls
 {
     public partial class CheckboxFormField : UserControl, IFormField<bool>
     {
+        public event EventHandler<bool> ValueChanged;
+
         public string LabelText
         {
             get => this.CheckBox.Text;
@@ -13,12 +16,23 @@ namespace ValheimServerGUI.Controls
         public bool Value
         {
             get => this.CheckBox.Checked;
-            set => this.CheckBox.Checked = value;
+            set
+            {
+                if (value == this.Value) return;
+                this.CheckBox.Checked = value;
+            }
         }
 
         public CheckboxFormField()
         {
             InitializeComponent();
+
+            this.CheckBox.CheckedChanged += new EventHandler(this.CheckBox_Changed);
+        }
+
+        private void CheckBox_Changed(object sender, EventArgs e)
+        {
+            this.ValueChanged?.Invoke(this, this.Value);
         }
     }
 }

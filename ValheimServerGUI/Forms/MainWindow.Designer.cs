@@ -51,7 +51,6 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
-            this.TabSettings = new System.Windows.Forms.TabPage();
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
@@ -153,7 +152,6 @@ namespace ValheimServerGUI.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Tabs.Controls.Add(this.TabServerControls);
-            this.Tabs.Controls.Add(this.TabSettings);
             this.Tabs.Controls.Add(this.TabLogs);
             this.Tabs.Location = new System.Drawing.Point(12, 27);
             this.Tabs.Name = "Tabs";
@@ -250,16 +248,6 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.UseVisualStyleBackColor = true;
             this.ButtonStartServer.Click += new System.EventHandler(this.ButtonStartServer_Click);
             // 
-            // TabSettings
-            // 
-            this.TabSettings.Location = new System.Drawing.Point(4, 24);
-            this.TabSettings.Name = "TabSettings";
-            this.TabSettings.Padding = new System.Windows.Forms.Padding(3);
-            this.TabSettings.Size = new System.Drawing.Size(452, 231);
-            this.TabSettings.TabIndex = 1;
-            this.TabSettings.Text = "Settings";
-            this.TabSettings.UseVisualStyleBackColor = true;
-            // 
             // TabLogs
             // 
             this.TabLogs.Controls.Add(this.ButtonClearLogs);
@@ -338,7 +326,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripProgressBar StatusStripProgressBar;
         private System.Windows.Forms.TabControl Tabs;
         private System.Windows.Forms.TabPage TabServerControls;
-        private System.Windows.Forms.TabPage TabSettings;
         private System.Windows.Forms.TabPage TabLogs;
         private System.Windows.Forms.Button ButtonStopServer;
         private System.Windows.Forms.Button ButtonStartServer;

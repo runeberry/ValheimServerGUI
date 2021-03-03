@@ -44,6 +44,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
+            this.ShowPasswordField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.WorldSelectField = new ValheimServerGUI.Controls.DropdownFormField();
             this.ServerPasswordField = new ValheimServerGUI.Forms.Controls.TextFormField();
@@ -54,7 +55,6 @@ namespace ValheimServerGUI.Forms
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
-            this.ShowPasswordField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -84,7 +84,6 @@ namespace ValheimServerGUI.Forms
             // 
             // MenuItemFileDirectories
             // 
-            this.MenuItemFileDirectories.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemFileDirectories.Image")));
             this.MenuItemFileDirectories.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MenuItemFileDirectories.Name = "MenuItemFileDirectories";
             this.MenuItemFileDirectories.Size = new System.Drawing.Size(158, 22);
@@ -178,6 +177,15 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.TabIndex = 0;
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
+            // 
+            // ShowPasswordField
+            // 
+            this.ShowPasswordField.LabelText = "Show Password";
+            this.ShowPasswordField.Location = new System.Drawing.Point(234, 68);
+            this.ShowPasswordField.Name = "ShowPasswordField";
+            this.ShowPasswordField.Size = new System.Drawing.Size(150, 17);
+            this.ShowPasswordField.TabIndex = 14;
+            this.ShowPasswordField.Value = false;
             // 
             // CommunityServerField
             // 
@@ -287,15 +295,6 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
             this.TextBoxLogs.TabIndex = 0;
-            // 
-            // ShowPasswordField
-            // 
-            this.ShowPasswordField.LabelText = "Show Password";
-            this.ShowPasswordField.Location = new System.Drawing.Point(234, 68);
-            this.ShowPasswordField.Name = "ShowPasswordField";
-            this.ShowPasswordField.Size = new System.Drawing.Size(150, 17);
-            this.ShowPasswordField.TabIndex = 14;
-            this.ShowPasswordField.Value = false;
             // 
             // MainWindow
             // 

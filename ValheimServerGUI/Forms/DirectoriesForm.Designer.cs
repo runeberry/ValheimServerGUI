@@ -30,37 +30,13 @@ namespace ValheimServerGUI.Forms
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(DirectoriesForm));
-            this.GamePathField = new ValheimServerGUI.Forms.Controls.TextFormField();
-            this.ServerPathField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
             this.ButtonDefaults = new System.Windows.Forms.Button();
-            this.WorldsFolderField = new ValheimServerGUI.Forms.Controls.TextFormField();
+            this.GamePathField = new ValheimServerGUI.Controls.FilenameFormField();
+            this.ServerPathField = new ValheimServerGUI.Controls.FilenameFormField();
+            this.WorldsFolderField = new ValheimServerGUI.Controls.FilenameFormField();
             this.SuspendLayout();
-            // 
-            // GamePathField
-            // 
-            this.GamePathField.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GamePathField.HideValue = false;
-            this.GamePathField.LabelText = "Valheim Game Location";
-            this.GamePathField.Location = new System.Drawing.Point(12, 12);
-            this.GamePathField.Name = "GamePathField";
-            this.GamePathField.Size = new System.Drawing.Size(335, 41);
-            this.GamePathField.TabIndex = 0;
-            this.GamePathField.Value = "";
-            // 
-            // ServerPathField
-            // 
-            this.ServerPathField.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ServerPathField.HideValue = false;
-            this.ServerPathField.LabelText = "Valheim Server Location";
-            this.ServerPathField.Location = new System.Drawing.Point(12, 59);
-            this.ServerPathField.Name = "ServerPathField";
-            this.ServerPathField.Size = new System.Drawing.Size(335, 41);
-            this.ServerPathField.TabIndex = 1;
-            this.ServerPathField.Value = "";
             // 
             // ButtonCancel
             // 
@@ -95,16 +71,37 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults.UseVisualStyleBackColor = true;
             this.ButtonDefaults.Click += new System.EventHandler(this.ButtonDefaults_Click);
             // 
+            // GamePathField
+            // 
+            this.GamePathField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.SingleFile;
+            this.GamePathField.LabelText = "Valheim Game .EXE";
+            this.GamePathField.Location = new System.Drawing.Point(12, 12);
+            this.GamePathField.MultiFileSeparator = "; ";
+            this.GamePathField.Name = "GamePathField";
+            this.GamePathField.Size = new System.Drawing.Size(335, 41);
+            this.GamePathField.TabIndex = 6;
+            this.GamePathField.Value = "";
+            // 
+            // ServerPathField
+            // 
+            this.ServerPathField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.SingleFile;
+            this.ServerPathField.LabelText = "Valheim Server .EXE";
+            this.ServerPathField.Location = new System.Drawing.Point(12, 59);
+            this.ServerPathField.MultiFileSeparator = "; ";
+            this.ServerPathField.Name = "ServerPathField";
+            this.ServerPathField.Size = new System.Drawing.Size(335, 41);
+            this.ServerPathField.TabIndex = 7;
+            this.ServerPathField.Value = "";
+            // 
             // WorldsFolderField
             // 
-            this.WorldsFolderField.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.WorldsFolderField.HideValue = false;
+            this.WorldsFolderField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.Directory;
             this.WorldsFolderField.LabelText = "Valheim Worlds Folder";
             this.WorldsFolderField.Location = new System.Drawing.Point(12, 106);
+            this.WorldsFolderField.MultiFileSeparator = "; ";
             this.WorldsFolderField.Name = "WorldsFolderField";
             this.WorldsFolderField.Size = new System.Drawing.Size(335, 41);
-            this.WorldsFolderField.TabIndex = 2;
+            this.WorldsFolderField.TabIndex = 8;
             this.WorldsFolderField.Value = "";
             // 
             // DirectoriesForm
@@ -113,11 +110,11 @@ namespace ValheimServerGUI.Forms
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(359, 217);
             this.Controls.Add(this.WorldsFolderField);
+            this.Controls.Add(this.ServerPathField);
+            this.Controls.Add(this.GamePathField);
             this.Controls.Add(this.ButtonDefaults);
             this.Controls.Add(this.ButtonOK);
             this.Controls.Add(this.ButtonCancel);
-            this.Controls.Add(this.ServerPathField);
-            this.Controls.Add(this.GamePathField);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
@@ -130,12 +127,11 @@ namespace ValheimServerGUI.Forms
         }
 
         #endregion
-
-        private Controls.TextFormField GamePathField;
-        private Controls.TextFormField ServerPathField;
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOK;
         private System.Windows.Forms.Button ButtonDefaults;
-        private Controls.TextFormField WorldsFolderField;
+        private ValheimServerGUI.Controls.FilenameFormField GamePathField;
+        private ValheimServerGUI.Controls.FilenameFormField ServerPathField;
+        private ValheimServerGUI.Controls.FilenameFormField WorldsFolderField;
     }
 }

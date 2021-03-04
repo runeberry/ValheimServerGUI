@@ -32,6 +32,9 @@ namespace ValheimServerGUI.Forms
             this.GamePathField.Value = this.UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimGamePath);
             this.ServerPathField.Value = this.UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimServerPath);
             this.WorldsFolderField.Value = this.UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimWorldsFolder);
+
+            this.GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
+            this.ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)

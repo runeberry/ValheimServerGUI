@@ -29,6 +29,11 @@ namespace ValheimServerGUI.Tools
             Default.SetValue(UserPrefsKeys.ValheimWorldsFolder, @"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds");
         }
 
+        public UserPrefs()
+        {
+            this.LoadFile();
+        }
+
         #region Manage values
 
         /// <summary>

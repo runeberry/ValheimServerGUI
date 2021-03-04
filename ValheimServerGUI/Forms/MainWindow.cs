@@ -9,15 +9,21 @@ namespace ValheimServerGUI.Forms
 {
     public partial class MainWindow : Form
     {
-        private ValheimServer Server;
+        private readonly IFormProvider FormProvider;
+        private readonly UserPrefs UserPrefs;
+        private readonly ValheimServer Server;
 
-        private UserPrefs UserPrefs;
-
-        public MainWindow()
+        public MainWindow(
+            IFormProvider formProvider,
+            UserPrefs userPrefs, 
+            ValheimServer server)
         {
+            this.FormProvider = formProvider;
+            this.UserPrefs = userPrefs;
+            this.Server = server;
+
             InitializeComponent(); // WinForms generated code, always first
 
-            InitializeUserPrefs();
             InitializeServer();
 
             InitializeFormEvents();
@@ -28,17 +34,10 @@ namespace ValheimServerGUI.Forms
 
         #region Initialization
 
-        private void InitializeUserPrefs()
-        {
-            UserPrefs = new UserPrefs();
-            UserPrefs.LoadFile();
-        }
-
         private void InitializeServer()
         {
-            Server = new ValheimServer();
-            Server.FilteredLogger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
-            Server.StatusChanged += new EventHandler<ServerStatus>(this.OnServerStatusChanged);
+            this.Server.FilteredLogger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
+            this.Server.StatusChanged += new EventHandler<ServerStatus>(this.OnServerStatusChanged);
         }
 
         private void InitializeFormEvents()
@@ -155,7 +154,7 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
         {
-            var directoriesForm = new DirectoriesForm(this.UserPrefs);
+            var directoriesForm = FormProvider.GetForm<DirectoriesForm>();
             directoriesForm.ShowDialog();
 
             InitializeFormFields();
@@ -173,7 +172,7 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
         {
-            var aboutForm = new AboutForm();
+            var aboutForm = FormProvider.GetForm<AboutForm>();
             aboutForm.ShowDialog();
         }
 

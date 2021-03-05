@@ -23,6 +23,7 @@ namespace ValheimServerGUI.Game
 
         public bool IsStarting { get; private set; }
         public bool IsStopping { get; private set; }
+        public bool IsRestarting { get; private set; }
         public bool IsRunning => this.ProcessProvider.IsProcessRunning(ProcessKeys.ValheimServer);
 
         public readonly AppLogger Logger;
@@ -55,11 +56,18 @@ namespace ValheimServerGUI.Game
 
         private void InitializeStatusBasedActions()
         {
-            this.StatusChanged += BuildStatusHandler(ServerStatus.StartRequested, () => this.IsStarting = true);
             this.StatusChanged += BuildStatusHandler(ServerStatus.Started, () => this.IsStarting = false);
-            this.StatusChanged += BuildStatusHandler(ServerStatus.StopRequested, () => this.IsStopping = true);
             this.StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () => this.IsStopping = false);
-            this.StatusChanged += BuildStatusHandler(ServerStatus.ProcessExited, () => this.IsStopping = false);
+            this.StatusChanged += BuildStatusHandler(ServerStatus.ProcessExited, () => 
+            {
+                this.IsStopping = false;
+
+                if (this.IsRestarting)
+                {
+                    this.IsRestarting = false;
+                    this.Start();
+                }
+            });
         }
 
         private static EventHandler<ServerStatus> BuildStatusHandler(ServerStatus status, Action action)
@@ -105,7 +113,7 @@ namespace ValheimServerGUI.Game
             this.Validate();
 
             var publicFlag = this.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 2456 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}";
+            var processArgs = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 24560 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}";
             var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, this.ServerPath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
@@ -115,6 +123,7 @@ namespace ValheimServerGUI.Game
 
             process.StartIO();
 
+            this.IsStarting = true;
             PublishStatus(ServerStatus.StartRequested);
         }
 
@@ -122,12 +131,20 @@ namespace ValheimServerGUI.Game
         {
             if (!this.IsRunning || this.IsStopping) return;
 
-            // The valheim_server background process can be gracefully killed by sending CTRL+C in the command line.
-            // But our only option for stopping a process in .NET is to call Process.Kill, which does NOT safely shut it down.
-            // So we're going to spin up another process and "taskkill" the server process, which triggers a graceful shutdown.
+            this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
+
+            this.IsStopping = true;
+            PublishStatus(ServerStatus.StopRequested);
+        }
+
+        public void Restart()
+        {
+            if (!this.IsRunning || this.IsStarting || this.IsStopping) return;
 
             this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
 
+            this.IsStopping = true;
+            this.IsRestarting = true;
             PublishStatus(ServerStatus.StopRequested);
         }
 

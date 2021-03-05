@@ -119,6 +119,7 @@ namespace ValheimServerGUI.Forms
 
             Server.Start();
 
+            // User preferences are saved each time the server is started
             UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
             UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
             UserPrefs.SetValue(PrefKeys.ServerWorldName, this.WorldSelectField.Value);
@@ -129,6 +130,11 @@ namespace ValheimServerGUI.Forms
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
             Server.Stop();
+        }
+
+        private void ButtonRestartServer_Click(object sender, EventArgs e)
+        {
+            Server.Restart();
         }
 
         private void ButtonClearLogs_Click(object sender, EventArgs e)

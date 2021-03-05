@@ -54,6 +54,7 @@ namespace ValheimServerGUI.Forms
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
+            this.ButtonRestartServer = new System.Windows.Forms.Button();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -161,6 +162,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabServerControls
             // 
+            this.TabServerControls.Controls.Add(this.ButtonRestartServer);
             this.TabServerControls.Controls.Add(this.ShowPasswordField);
             this.TabServerControls.Controls.Add(this.CommunityServerField);
             this.TabServerControls.Controls.Add(this.WorldSelectField);
@@ -229,9 +231,9 @@ namespace ValheimServerGUI.Forms
             // ButtonStopServer
             // 
             this.ButtonStopServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ButtonStopServer.Location = new System.Drawing.Point(84, 205);
+            this.ButtonStopServer.Location = new System.Drawing.Point(205, 205);
             this.ButtonStopServer.Name = "ButtonStopServer";
-            this.ButtonStopServer.Size = new System.Drawing.Size(75, 23);
+            this.ButtonStopServer.Size = new System.Drawing.Size(95, 23);
             this.ButtonStopServer.TabIndex = 1;
             this.ButtonStopServer.Text = "Stop Server";
             this.ButtonStopServer.UseVisualStyleBackColor = true;
@@ -242,7 +244,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ButtonStartServer.Location = new System.Drawing.Point(3, 205);
             this.ButtonStartServer.Name = "ButtonStartServer";
-            this.ButtonStartServer.Size = new System.Drawing.Size(75, 23);
+            this.ButtonStartServer.Size = new System.Drawing.Size(95, 23);
             this.ButtonStartServer.TabIndex = 0;
             this.ButtonStartServer.Text = "Start Server";
             this.ButtonStartServer.UseVisualStyleBackColor = true;
@@ -283,6 +285,16 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
             this.TextBoxLogs.TabIndex = 0;
+            // 
+            // ButtonRestartServer
+            // 
+            this.ButtonRestartServer.Location = new System.Drawing.Point(104, 205);
+            this.ButtonRestartServer.Name = "ButtonRestartServer";
+            this.ButtonRestartServer.Size = new System.Drawing.Size(95, 23);
+            this.ButtonRestartServer.TabIndex = 15;
+            this.ButtonRestartServer.Text = "Restart Server";
+            this.ButtonRestartServer.UseVisualStyleBackColor = true;
+            this.ButtonRestartServer.Click += new System.EventHandler(this.ButtonRestartServer_Click);
             // 
             // MainWindow
             // 
@@ -336,5 +348,6 @@ namespace ValheimServerGUI.Forms
         private Controls.TextFormField ServerNameField;
         private ValheimServerGUI.Controls.CheckboxFormField CommunityServerField;
         private ValheimServerGUI.Controls.CheckboxFormField ShowPasswordField;
+        private System.Windows.Forms.Button ButtonRestartServer;
     }
 }

@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Game
@@ -115,7 +116,7 @@ namespace ValheimServerGUI.Game
                 },
             };
 
-            process.StartInfo.EnvironmentVariables.Add("SteamAppId", "892970"); // From: start_headless_server.bat
+            process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
             process.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
             process.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnErrorReceived);
             process.Exited += new EventHandler(this.Process_OnExited);

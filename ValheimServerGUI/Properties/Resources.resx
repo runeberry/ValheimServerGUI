@@ -133,4 +133,8 @@
   <data name="ValheimGameSiteUrl" xml:space="preserve">
     <value>https://www.valheimgame.com/</value>
   </data>
+  <data name="ValheimSteamAppId" xml:space="preserve">
+    <value>892970</value>
+    <comment>From start_headless_server.bat</comment>
+  </data>
 </root>

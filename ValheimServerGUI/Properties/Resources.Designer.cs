@@ -106,5 +106,14 @@ namespace ValheimServerGUI.Properties {
                 return ResourceManager.GetString("ValheimGameSiteUrl", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 892970.
+        /// </summary>
+        internal static string ValheimSteamAppId {
+            get {
+                return ResourceManager.GetString("ValheimSteamAppId", resourceCulture);
+            }
+        }
     }
 }

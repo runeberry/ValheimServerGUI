@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Game
 {
@@ -22,16 +23,19 @@ namespace ValheimServerGUI.Game
 
         public bool IsStarting { get; private set; }
         public bool IsStopping { get; private set; }
-        public bool IsRunning => this.Process != null;
+        public bool IsRunning => this.ProcessProvider.IsProcessRunning(ProcessKeys.ValheimServer);
 
         public readonly AppLogger Logger;
         public readonly FilteredServerLogger FilteredLogger;
-
-        private Process Process;
         private readonly Dictionary<string, Action> LogBasedActions = new Dictionary<string, Action>();
 
-        public ValheimServer()
+        private readonly IProcessProvider ProcessProvider;
+        private Process ServerProcess => this.ProcessProvider.GetProcess(ProcessKeys.ValheimServer);
+
+        public ValheimServer(IProcessProvider processProvider)
         {
+            this.ProcessProvider = processProvider;
+
             Logger = new AppLogger();
             FilteredLogger = new FilteredServerLogger();
 
@@ -101,31 +105,15 @@ namespace ValheimServerGUI.Game
             this.Validate();
 
             var publicFlag = this.Public ? 1 : 0;
-
-            var process = new Process
-            {
-                EnableRaisingEvents = true,
-                StartInfo =
-                {
-                    FileName = this.ServerPath,
-                    Arguments = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 2456 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}",
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                },
-            };
+            var processArgs = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 2456 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}";
+            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, this.ServerPath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
             process.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
             process.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnErrorReceived);
             process.Exited += new EventHandler(this.Process_OnExited);
 
-            this.Process = process;
-            
-            this.Process.Start();
-            this.Process.BeginOutputReadLine();
-            this.Process.BeginErrorReadLine();
+            process.StartIO();
 
             PublishStatus(ServerStatus.StartRequested);
         }
@@ -138,28 +126,7 @@ namespace ValheimServerGUI.Game
             // But our only option for stopping a process in .NET is to call Process.Kill, which does NOT safely shut it down.
             // So we're going to spin up another process and "taskkill" the server process, which triggers a graceful shutdown.
 
-            // todo: Validate that taskkill exists on the system and that the user can access it
-            var shutdownProcess = new Process
-            {
-                EnableRaisingEvents = true,
-                StartInfo =
-                {
-                    FileName = "taskkill",
-                    Arguments = $"/pid {this.Process.Id}",
-                    CreateNoWindow = true,
-                    UseShellExecute = false,
-                    RedirectStandardError = true,
-                    RedirectStandardOutput = true,
-                }
-            };
-
-            // todo: Move these out of server logs and into application logs
-            shutdownProcess.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
-            shutdownProcess.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnErrorReceived);
-
-            shutdownProcess.Start();
-            shutdownProcess.BeginOutputReadLine();
-            shutdownProcess.BeginErrorReadLine();
+            this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
 
             PublishStatus(ServerStatus.StopRequested);
         }
@@ -170,7 +137,7 @@ namespace ValheimServerGUI.Game
 
             if (this.IsRunning || this.IsStopping)
             {
-                this.Process.WaitForExit();
+                this.ServerProcess.WaitForExit();
             }
         }
 
@@ -192,9 +159,6 @@ namespace ValheimServerGUI.Game
 
         private void Process_OnExited(object obj, EventArgs e)
         {
-            this.Process.Dispose();
-            this.Process = null;
-
             PublishStatus(ServerStatus.ProcessExited);
         }
 

@@ -5,6 +5,7 @@ using ValheimServerGUI.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Preferences;
+using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI
 {
@@ -37,6 +38,7 @@ namespace ValheimServerGUI
                 return userPreferences;
             });
             services.AddSingleton<IFormProvider, FormProvider>();
+            services.AddSingleton<IProcessProvider, ProcessProvider>();
 
             // Game & server data
             services.AddSingleton<ValheimServer>();

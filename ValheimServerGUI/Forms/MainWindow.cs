@@ -1,21 +1,21 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI.Forms
 {
     public partial class MainWindow : Form
     {
         private readonly IFormProvider FormProvider;
-        private readonly UserPrefs UserPrefs;
+        private readonly IUserPreferences UserPrefs;
         private readonly ValheimServer Server;
 
         public MainWindow(
             IFormProvider formProvider,
-            UserPrefs userPrefs, 
+            IUserPreferences userPrefs, 
             ValheimServer server)
         {
             this.FormProvider = formProvider;
@@ -55,10 +55,10 @@ namespace ValheimServerGUI.Forms
         {
             try
             {
-                var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimWorldsFolder));
+                var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue(PrefKeys.ValheimWorldsFolder));
                 this.WorldSelectField.DataSource = worlds;
                 this.WorldSelectField.DropdownEnabled = worlds.Any();
-                this.WorldSelectField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerWorldName);
+                this.WorldSelectField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
             }
             catch (System.IO.DirectoryNotFoundException)
             {
@@ -66,9 +66,9 @@ namespace ValheimServerGUI.Forms
                 this.WorldSelectField.DropdownEnabled = false;
             }
 
-            this.ServerNameField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerName);
-            this.ServerPasswordField.Value = UserPrefs.GetValue(UserPrefsKeys.ServerPassword);
-            this.CommunityServerField.Value = UserPrefs.GetFlagValue(UserPrefsKeys.ServerPublic);
+            this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
+            this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
+            this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
             this.ShowPasswordField.Value = false;
         }
 
@@ -96,7 +96,7 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
-            Server.ServerPath = UserPrefs.GetEnvironmentValue(UserPrefsKeys.ValheimServerPath);
+            Server.ServerPath = UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath);
             Server.ServerName = this.ServerNameField.Value;
             Server.ServerPassword = this.ServerPasswordField.Value;
             Server.WorldName = this.WorldSelectField.Value;
@@ -119,10 +119,10 @@ namespace ValheimServerGUI.Forms
 
             Server.Start();
 
-            UserPrefs.SetValue(UserPrefsKeys.ServerName, this.ServerNameField.Value);
-            UserPrefs.SetValue(UserPrefsKeys.ServerPassword, this.ServerPasswordField.Value);
-            UserPrefs.SetValue(UserPrefsKeys.ServerWorldName, this.WorldSelectField.Value);
-            UserPrefs.SetValue(UserPrefsKeys.ServerPublic, this.CommunityServerField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerWorldName, this.WorldSelectField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
             UserPrefs.SaveFile();
         }
 

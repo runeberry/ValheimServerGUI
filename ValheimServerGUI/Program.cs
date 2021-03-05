@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using ValheimServerGUI.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI
 {
@@ -29,7 +30,12 @@ namespace ValheimServerGUI
         private static void ConfigureServices(IServiceCollection services)
         {
             // Tools
-            services.AddSingleton<UserPrefs>();
+            services.AddSingleton<IUserPreferences>((_) =>
+            {
+                var userPreferences = new UserPreferences();
+                userPreferences.LoadFile();
+                return userPreferences;
+            });
             services.AddSingleton<IFormProvider, FormProvider>();
 
             // Game & server data

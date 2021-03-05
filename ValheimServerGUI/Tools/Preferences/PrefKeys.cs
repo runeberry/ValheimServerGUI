@@ -1,6 +1,6 @@
-﻿namespace ValheimServerGUI.Tools
+﻿namespace ValheimServerGUI.Tools.Preferences
 {
-    public static class UserPrefsKeys
+    public static class PrefKeys
     {
         public const string ValheimGamePath = "ValheimGamePath";
         public const string ValheimServerPath = "ValheimServerPath";

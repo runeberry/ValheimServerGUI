@@ -113,7 +113,7 @@ namespace ValheimServerGUI.Game
             this.Validate();
 
             var publicFlag = this.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 24560 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}";
+            var processArgs = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 2456 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}";
             var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, this.ServerPath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);

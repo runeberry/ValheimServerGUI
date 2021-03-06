@@ -1,16 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Tools.Preferences
 {
     public static class UserPreferencesExtensions
     {
-        private static readonly string UserPrefsFilePath = @"%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt";
+        private static readonly string UserPrefsFilePath;
 
         static UserPreferencesExtensions()
         {
-            UserPrefsFilePath = Environment.ExpandEnvironmentVariables(UserPrefsFilePath);
+            UserPrefsFilePath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePath);
         }
 
         /// <summary>

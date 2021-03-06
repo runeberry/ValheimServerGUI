@@ -142,6 +142,9 @@
   <data name="RuneberryLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Assets\RuneberryLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="UserPrefsFilePath" xml:space="preserve">
+    <value>%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt</value>
+  </data>
   <data name="ValheimGameSiteUrl" xml:space="preserve">
     <value>https://www.valheimgame.com/</value>
   </data>

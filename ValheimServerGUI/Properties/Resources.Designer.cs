@@ -135,6 +135,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt.
+        /// </summary>
+        internal static string UserPrefsFilePath {
+            get {
+                return ResourceManager.GetString("UserPrefsFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://www.valheimgame.com/.
         /// </summary>
         internal static string ValheimGameSiteUrl {

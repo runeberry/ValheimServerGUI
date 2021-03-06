@@ -43,15 +43,27 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormEvents()
         {
+            // Menu items
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
-
             this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
-            this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
-
+            // Tray icon
             this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
+            this.TrayContextMenuStart.Click += this.ButtonStartServer_Click;
+            this.TrayContextMenuRestart.Click += this.ButtonRestartServer_Click;
+            this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
+            this.TrayContextMenuClose.Click += this.MenuItemFileClose_Clicked;
+
+            // Buttons
+            this.ButtonStartServer.Click += this.ButtonStartServer_Click;
+            this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
+            this.ButtonStopServer.Click += this.ButtonStopServer_Click;
+            this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
+
+            // Form fields
+            this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
         }
 
         private void InitializeFormFields()
@@ -268,9 +280,12 @@ namespace ValheimServerGUI.Forms
 
         private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
         {
-            if (this.WindowState == FormWindowState.Minimized)
+            if (e.Button == MouseButtons.Left)
             {
-                this.WindowState = FormWindowState.Normal;
+                if (this.WindowState == FormWindowState.Minimized)
+                {
+                    this.WindowState = FormWindowState.Normal;
+                }
             }
         }
 
@@ -330,8 +345,13 @@ namespace ValheimServerGUI.Forms
 
             // You can only start the server when it's stopped
             this.ButtonStartServer.Enabled = this.Server.CanStart;
-            this.ButtonStopServer.Enabled = this.Server.CanStop;
             this.ButtonRestartServer.Enabled = this.Server.CanRestart;
+            this.ButtonStopServer.Enabled = this.Server.CanStop;
+
+            // Tray items are enabled based on their button equivalents
+            this.TrayContextMenuStart.Enabled = this.ButtonStartServer.Enabled;
+            this.TrayContextMenuRestart.Enabled = this.ButtonRestartServer.Enabled;
+            this.TrayContextMenuStop.Enabled = this.ButtonStopServer.Enabled;
         }
 
         private void CloseApplicationOnServerStopped()

@@ -57,11 +57,18 @@ namespace ValheimServerGUI.Forms
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
+            this.TrayContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.TrayContextMenuStart = new System.Windows.Forms.ToolStripMenuItem();
+            this.TrayContextMenuRestart = new System.Windows.Forms.ToolStripMenuItem();
+            this.TrayContextMenuStop = new System.Windows.Forms.ToolStripMenuItem();
+            this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
             this.TabServerControls.SuspendLayout();
             this.TabLogs.SuspendLayout();
+            this.TrayContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
             // 
             // MenuStrip
@@ -196,7 +203,6 @@ namespace ValheimServerGUI.Forms
             this.ButtonRestartServer.TabIndex = 15;
             this.ButtonRestartServer.Text = "Restart Server";
             this.ButtonRestartServer.UseVisualStyleBackColor = true;
-            this.ButtonRestartServer.Click += new System.EventHandler(this.ButtonRestartServer_Click);
             // 
             // ShowPasswordField
             // 
@@ -259,7 +265,6 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer.TabIndex = 1;
             this.ButtonStopServer.Text = "Stop Server";
             this.ButtonStopServer.UseVisualStyleBackColor = true;
-            this.ButtonStopServer.Click += new System.EventHandler(this.ButtonStopServer_Click);
             // 
             // ButtonStartServer
             // 
@@ -270,7 +275,6 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.TabIndex = 0;
             this.ButtonStartServer.Text = "Start Server";
             this.ButtonStartServer.UseVisualStyleBackColor = true;
-            this.ButtonStartServer.Click += new System.EventHandler(this.ButtonStartServer_Click);
             // 
             // TabLogs
             // 
@@ -291,7 +295,6 @@ namespace ValheimServerGUI.Forms
             this.ButtonClearLogs.TabIndex = 1;
             this.ButtonClearLogs.Text = "Clear Logs";
             this.ButtonClearLogs.UseVisualStyleBackColor = true;
-            this.ButtonClearLogs.Click += new System.EventHandler(this.ButtonClearLogs_Click);
             // 
             // TextBoxLogs
             // 
@@ -310,9 +313,53 @@ namespace ValheimServerGUI.Forms
             // 
             // NotifyIcon
             // 
+            this.NotifyIcon.ContextMenuStrip = this.TrayContextMenuStrip;
             this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
             this.NotifyIcon.Text = "ValheimServerGUI";
             this.NotifyIcon.Visible = true;
+            // 
+            // TrayContextMenuStrip
+            // 
+            this.TrayContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TrayContextMenuStart,
+            this.TrayContextMenuRestart,
+            this.TrayContextMenuStop,
+            this.TrayContextMenuSeparator1,
+            this.TrayContextMenuClose});
+            this.TrayContextMenuStrip.Name = "TrayContextMenuStrip";
+            this.TrayContextMenuStrip.Size = new System.Drawing.Size(146, 98);
+            // 
+            // TrayContextMenuStart
+            // 
+            this.TrayContextMenuStart.Enabled = false;
+            this.TrayContextMenuStart.Name = "TrayContextMenuStart";
+            this.TrayContextMenuStart.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuStart.Text = "Start Server";
+            // 
+            // TrayContextMenuRestart
+            // 
+            this.TrayContextMenuRestart.Enabled = false;
+            this.TrayContextMenuRestart.Name = "TrayContextMenuRestart";
+            this.TrayContextMenuRestart.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuRestart.Text = "Restart Server";
+            // 
+            // TrayContextMenuStop
+            // 
+            this.TrayContextMenuStop.Enabled = false;
+            this.TrayContextMenuStop.Name = "TrayContextMenuStop";
+            this.TrayContextMenuStop.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuStop.Text = "Stop Server";
+            // 
+            // TrayContextMenuSeparator1
+            // 
+            this.TrayContextMenuSeparator1.Name = "TrayContextMenuSeparator1";
+            this.TrayContextMenuSeparator1.Size = new System.Drawing.Size(142, 6);
+            // 
+            // TrayContextMenuClose
+            // 
+            this.TrayContextMenuClose.Name = "TrayContextMenuClose";
+            this.TrayContextMenuClose.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuClose.Text = "Close";
             // 
             // MainWindow
             // 
@@ -336,6 +383,7 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TabLogs.PerformLayout();
+            this.TrayContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -369,5 +417,11 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonRestartServer;
         private ValheimServerGUI.Controls.NumericFormField ServerPortField;
         private System.Windows.Forms.NotifyIcon NotifyIcon;
+        private System.Windows.Forms.ContextMenuStrip TrayContextMenuStrip;
+        private System.Windows.Forms.ToolStripMenuItem TrayContextMenuStart;
+        private System.Windows.Forms.ToolStripMenuItem TrayContextMenuRestart;
+        private System.Windows.Forms.ToolStripMenuItem TrayContextMenuStop;
+        private System.Windows.Forms.ToolStripSeparator TrayContextMenuSeparator1;
+        private System.Windows.Forms.ToolStripMenuItem TrayContextMenuClose;
     }
 }

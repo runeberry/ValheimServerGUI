@@ -14,8 +14,6 @@ namespace ValheimServerGUI.Forms
         private readonly IUserPreferences UserPrefs;
         private readonly ValheimServer Server;
 
-        private bool IsUserClosing;
-
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferences userPrefs, 

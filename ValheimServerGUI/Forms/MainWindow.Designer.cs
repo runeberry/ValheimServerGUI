@@ -29,6 +29,7 @@ namespace ValheimServerGUI.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.MenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,6 +56,7 @@ namespace ValheimServerGUI.Forms
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
+            this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -187,6 +189,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ButtonRestartServer
             // 
+            this.ButtonRestartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ButtonRestartServer.Location = new System.Drawing.Point(104, 205);
             this.ButtonRestartServer.Name = "ButtonRestartServer";
             this.ButtonRestartServer.Size = new System.Drawing.Size(95, 23);
@@ -305,6 +308,12 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
             this.TextBoxLogs.TabIndex = 0;
             // 
+            // NotifyIcon
+            // 
+            this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
+            this.NotifyIcon.Text = "ValheimServerGUI";
+            this.NotifyIcon.Visible = true;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -315,6 +324,7 @@ namespace ValheimServerGUI.Forms
             this.Controls.Add(this.MenuStrip);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuStrip;
+            this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(500, 325);
             this.Name = "MainWindow";
             this.Text = "(Unofficial) Valheim Dedicated Server GUI";
@@ -358,5 +368,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.CheckboxFormField ShowPasswordField;
         private System.Windows.Forms.Button ButtonRestartServer;
         private ValheimServerGUI.Controls.NumericFormField ServerPortField;
+        private System.Windows.Forms.NotifyIcon NotifyIcon;
     }
 }

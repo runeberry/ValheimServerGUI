@@ -50,6 +50,8 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
+
+            this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
         }
 
         private void InitializeFormFields()
@@ -127,6 +129,20 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region MainWindow Events
+
+        protected override void OnResize(EventArgs e)
+        {
+            base.OnResize(e);
+
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.ShowInTaskbar = false;
+            }
+            else
+            {
+                this.ShowInTaskbar = true;
+            }
+        }
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
@@ -248,6 +264,14 @@ namespace ValheimServerGUI.Forms
         private void ShowPasswordField_Changed(object sender, bool value)
         {
             this.ServerPasswordField.HideValue = !value;
+        }
+
+        private void NotifyIcon_MouseClick(object sender, MouseEventArgs e)
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
         }
 
         #endregion

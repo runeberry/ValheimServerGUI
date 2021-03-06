@@ -14,6 +14,8 @@ namespace ValheimServerGUI.Forms
         private readonly IUserPreferences UserPrefs;
         private readonly ValheimServer Server;
 
+        private bool IsUserClosing;
+
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferences userPrefs, 
@@ -37,19 +39,19 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeServer()
         {
-            this.Server.FilteredLogger.LogReceived += new EventHandler<LogEvent>(this.OnLogReceived);
-            this.Server.StatusChanged += new EventHandler<ServerStatus>(this.OnServerStatusChanged);
+            this.Server.FilteredLogger.LogReceived += this.OnLogReceived;
+            this.Server.StatusChanged += this.OnServerStatusChanged;
         }
 
         private void InitializeFormEvents()
         {
-            this.MenuItemFileDirectories.Click += new EventHandler(this.MenuItemFileDirectories_Clicked);
-            this.MenuItemFileClose.Click += new EventHandler(this.MenuItemFileClose_Clicked);
+            this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
+            this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
 
-            this.MenuItemHelpUpdates.Click += new EventHandler(this.MenuItemHelpUpdates_Clicked);
-            this.MenuItemHelpAbout.Click += new EventHandler(this.MenuItemHelpAbout_Clicked);
+            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
+            this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
-            this.ShowPasswordField.ValueChanged += new EventHandler<bool>(this.ShowPasswordField_Changed);
+            this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
         }
 
         private void InitializeFormFields()
@@ -159,9 +161,63 @@ namespace ValheimServerGUI.Forms
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
-            this.Server.ForceStop();
-
             base.OnFormClosing(e);
+
+            if (e.CloseReason == CloseReason.UserClosing)
+            {
+                if (this.Server.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running))
+                {
+                    // Server is still running, prompt the user to confirm they want to stop it
+
+                    var result = MessageBox.Show(
+                        "The Valheim server is still running. Do you want to stop the server " +
+                        "and close this application?",
+                        "Warning",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        this.Server.Stop();
+                        this.CloseApplicationOnServerStopped();
+                    }
+
+                    // Cancel the form close regardless of the user's choice
+                    e.Cancel = true;
+                }
+                else if (this.Server.IsAnyStatus(ServerStatus.Stopping))
+                {
+                    var result = MessageBox.Show(
+                        "The Valheim server is currently shutting down. Close anyway?" + Environment.NewLine +
+                        "This could result in a loss of save data!",
+                        "Warning",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+                    
+                    if (result == DialogResult.No)
+                    {
+                        // Cancel the form close event, keep running the app
+                        e.Cancel = true;
+                        return;
+                    }
+
+                    // Otherwise, close out this window anyway
+                }
+
+                // Otherwise, the server is stopped, so we can safely close out this window
+            }
+            else if (e.CloseReason == CloseReason.WindowsShutDown)
+            {
+                // Try to stop the server, and keep the app running until we're sure it's stopped
+                this.Server.Stop();
+                this.CloseApplicationOnServerStopped();
+                e.Cancel = true;
+            }
+            else
+            {
+                // Try to stop the server, but don't wait around for the results
+                this.Server.Stop();
+            }
         }
 
         #endregion
@@ -178,7 +234,7 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemFileClose_Clicked(object sender, EventArgs e)
         {
-            this.CloseApplication();
+            this.Close();
         }
 
         private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
@@ -252,10 +308,21 @@ namespace ValheimServerGUI.Forms
             this.ButtonRestartServer.Enabled = this.Server.CanRestart;
         }
 
-        private void CloseApplication()
+        private void CloseApplicationOnServerStopped()
         {
-            Server.Stop();
-            Application.Exit();
+            if (this.Server.IsAnyStatus(ServerStatus.Stopped))
+            {
+                Application.Exit();
+                return;
+            }
+
+            this.Server.StatusChanged += (_, status) =>
+            {
+                if (status == ServerStatus.Stopped)
+                {
+                    Application.Exit();
+                }
+            };
         }
 
         #endregion

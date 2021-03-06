@@ -141,18 +141,6 @@ namespace ValheimServerGUI.Game
             this.Status = ServerStatus.Stopping;
         }
 
-        public void ForceStop()
-        {
-            this.Stop();
-
-            if (!this.IsAnyStatus(ServerStatus.Stopped))
-            {
-                // todo: replace this with something that isn't as likely to hang
-                // Maybe remove this method altogether and build something better in the UI?
-                this.ServerProcess.WaitForExit();
-            }
-        }
-
         public bool IsAnyStatus(params ServerStatus[] statuses)
         {
             return statuses.Any(s => s == this.Status);

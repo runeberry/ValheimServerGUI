@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Tools.Preferences
 {
@@ -17,10 +18,10 @@ namespace ValheimServerGUI.Tools.Preferences
         static UserPreferences()
         {
             Default = new UserPreferences();
-            Default.SetValue(PrefKeys.ValheimGamePath, @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim");
-            Default.SetValue(PrefKeys.ValheimServerPath, @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe");
-            Default.SetValue(PrefKeys.ValheimWorldsFolder, @"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds");
-            Default.SetValue(PrefKeys.ServerPort, 2456);
+            Default.SetValue(PrefKeys.ValheimGamePath, Resources.DefaultGamePath);
+            Default.SetValue(PrefKeys.ValheimServerPath, Resources.DefaultServerPath);
+            Default.SetValue(PrefKeys.ValheimWorldsFolder, Resources.DefaultWorldsFolder);
+            Default.SetValue(PrefKeys.ServerPort, Resources.DefaultServerPort);
         }
 
         #region IUserPreferencesProvider implementation

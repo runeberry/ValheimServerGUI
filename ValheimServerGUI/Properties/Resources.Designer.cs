@@ -80,6 +80,42 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to %ProgramFiles(x86)%\Steam\steamapps\common\Valheim.
+        /// </summary>
+        internal static string DefaultGamePath {
+            get {
+                return ResourceManager.GetString("DefaultGamePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe.
+        /// </summary>
+        internal static string DefaultServerPath {
+            get {
+                return ResourceManager.GetString("DefaultServerPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 2456.
+        /// </summary>
+        internal static string DefaultServerPort {
+            get {
+                return ResourceManager.GetString("DefaultServerPort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds.
+        /// </summary>
+        internal static string DefaultWorldsFolder {
+            get {
+                return ResourceManager.GetString("DefaultWorldsFolder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry.
         /// </summary>
         internal static string OrganizationGithubUrl {

@@ -15,7 +15,7 @@ namespace ValheimServerGUI.Game
 
         public bool Public { get; set; }
 
-        public ushort Port { get; set; }
+        public int Port { get; set; }
 
         public void Validate()
         {
@@ -39,6 +39,9 @@ namespace ValheimServerGUI.Game
             if (this.Password.Length < 5) throw new ArgumentException($"{nameof(Password)} must be at least 5 characters.");
             if (this.Password.Contains(this.Name)) throw new ArgumentException($"{nameof(Password)} cannot contain your {nameof(Name)} ({this.Name}).");
             if (this.Password.Contains(this.WorldName)) throw new ArgumentException($"{nameof(Password)} cannot contain your {nameof(WorldName)} ({this.WorldName}).");
+
+            // Port validation
+            if (this.Port < 1 || this.Port > 65535) throw new ArgumentException($"{nameof(Port)} must be between 1 - 65535");
         }
     }
 
@@ -54,6 +57,6 @@ namespace ValheimServerGUI.Game
 
         bool Public { get; }
 
-        ushort Port { get; set; }
+        int Port { get; set; }
     }
 }

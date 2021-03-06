@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Preferences;
 
@@ -67,6 +68,7 @@ namespace ValheimServerGUI.Forms
             }
 
             this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
+            this.ServerPortField.Value = UserPrefs.GetNumberValue(PrefKeys.ServerPort, int.Parse(Resources.DefaultServerPort));
             this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
             this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
             this.ShowPasswordField.Value = false;
@@ -107,11 +109,12 @@ namespace ValheimServerGUI.Forms
                 Password = this.ServerPasswordField.Value,
                 WorldName = this.WorldSelectField.Value,
                 Public = this.CommunityServerField.Value,
-                Port = 2456,
+                Port = this.ServerPortField.Value,
             };
 
             try
             {
+                options.Validate();
                 Server.Start(options);
             }
             catch (Exception exception)
@@ -121,15 +124,16 @@ namespace ValheimServerGUI.Forms
                     "Server Configuration Error",
                     MessageBoxButtons.OK, 
                     MessageBoxIcon.Error);
-
                 return;
             }
 
             // User preferences are saved each time the server is started
             UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerPort, this.ServerPortField.Value);
             UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
             UserPrefs.SetValue(PrefKeys.ServerWorldName, this.WorldSelectField.Value);
             UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
+            
             UserPrefs.SaveFile();
         }
 
@@ -237,6 +241,7 @@ namespace ValheimServerGUI.Forms
             bool allowServerChanges = this.Server.Status == ServerStatus.Stopped;
 
             this.ServerNameField.Enabled = allowServerChanges;
+            this.ServerPortField.Enabled = allowServerChanges;
             this.ServerPasswordField.Enabled = allowServerChanges;
             this.WorldSelectField.Enabled = allowServerChanges;
             this.CommunityServerField.Enabled = allowServerChanges;

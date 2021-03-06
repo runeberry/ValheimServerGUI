@@ -55,6 +55,7 @@ namespace ValheimServerGUI.Forms
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
+            this.ServerPortField = new ValheimServerGUI.Controls.NumericFormField();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -162,6 +163,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabServerControls
             // 
+            this.TabServerControls.Controls.Add(this.ServerPortField);
             this.TabServerControls.Controls.Add(this.ButtonRestartServer);
             this.TabServerControls.Controls.Add(this.ShowPasswordField);
             this.TabServerControls.Controls.Add(this.CommunityServerField);
@@ -298,6 +300,18 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
             this.TextBoxLogs.TabIndex = 0;
             // 
+            // ServerPortField
+            // 
+            this.ServerPortField.LabelText = "Port";
+            this.ServerPortField.Location = new System.Drawing.Point(234, 0);
+            this.ServerPortField.Maximum = 65535;
+            this.ServerPortField.Minimum = 1;
+            this.ServerPortField.Name = "ServerPortField";
+            this.ServerPortField.Size = new System.Drawing.Size(75, 41);
+            this.ServerPortField.TabIndex = 16;
+            this.ServerPortField.TabStop = false;
+            this.ServerPortField.Value = 1;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -351,5 +365,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.CheckboxFormField CommunityServerField;
         private ValheimServerGUI.Controls.CheckboxFormField ShowPasswordField;
         private System.Windows.Forms.Button ButtonRestartServer;
+        private ValheimServerGUI.Controls.NumericFormField ServerPortField;
     }
 }

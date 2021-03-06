@@ -98,64 +98,35 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
-        #region Form Event Handlers
+        #region Menu Items
 
-        private void ButtonStartServer_Click(object sender, EventArgs e)
+        private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
         {
-            var options = new ValheimServerOptions
-            {
-                ExePath = UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath),
-                Name = this.ServerNameField.Value,
-                Password = this.ServerPasswordField.Value,
-                WorldName = this.WorldSelectField.Value,
-                Public = this.CommunityServerField.Value,
-                Port = this.ServerPortField.Value,
-            };
+            var directoriesForm = FormProvider.GetForm<DirectoriesForm>();
+            directoriesForm.ShowDialog();
 
-            try
-            {
-                options.Validate();
-                Server.Start(options);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(
-                    exception.Message,
-                    "Server Configuration Error",
-                    MessageBoxButtons.OK, 
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            // User preferences are saved each time the server is started
-            UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPort, this.ServerPortField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerWorldName, this.WorldSelectField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
-            
-            UserPrefs.SaveFile();
+            InitializeFormFields();
         }
 
-        private void ButtonStopServer_Click(object sender, EventArgs e)
+        private void MenuItemFileClose_Clicked(object sender, EventArgs e)
         {
-            Server.Stop();
+            this.Close();
         }
 
-        private void ButtonRestartServer_Click(object sender, EventArgs e)
+        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
         {
-            Server.Restart();
+            this.SetStatusText("Clicked Updates!");
         }
 
-        private void ButtonClearLogs_Click(object sender, EventArgs e)
+        private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
         {
-            this.ClearLogs();
+            var aboutForm = FormProvider.GetForm<AboutForm>();
+            aboutForm.ShowDialog();
         }
 
-        private void ShowPasswordField_Changed(object sender, bool value)
-        {
-            this.ServerPasswordField.HideValue = !value;
-        }
+        #endregion
+
+        #region MainWindow Events
 
         protected override void OnFormClosing(FormClosingEventArgs e)
         {
@@ -191,7 +162,7 @@ namespace ValheimServerGUI.Forms
                         "Warning",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
-                    
+
                     if (result == DialogResult.No)
                     {
                         // Cancel the form close event, keep running the app
@@ -220,30 +191,63 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
-        #region Menu Items
+        #region Form Field Events
 
-        private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
+        private void ButtonStartServer_Click(object sender, EventArgs e)
         {
-            var directoriesForm = FormProvider.GetForm<DirectoriesForm>();
-            directoriesForm.ShowDialog();
+            var options = new ValheimServerOptions
+            {
+                ExePath = UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath),
+                Name = this.ServerNameField.Value,
+                Password = this.ServerPasswordField.Value,
+                WorldName = this.WorldSelectField.Value,
+                Public = this.CommunityServerField.Value,
+                Port = this.ServerPortField.Value,
+            };
 
-            InitializeFormFields();
+            try
+            {
+                options.Validate();
+                Server.Start(options);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(
+                    exception.Message,
+                    "Server Configuration Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            // User preferences are saved each time the server is started
+            UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerPort, this.ServerPortField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerWorldName, this.WorldSelectField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
+
+            UserPrefs.SaveFile();
         }
 
-        private void MenuItemFileClose_Clicked(object sender, EventArgs e)
+        private void ButtonStopServer_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Server.Stop();
         }
 
-        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
+        private void ButtonRestartServer_Click(object sender, EventArgs e)
         {
-            this.SetStatusText("Clicked Updates!");
+            Server.Restart();
         }
 
-        private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
+        private void ButtonClearLogs_Click(object sender, EventArgs e)
         {
-            var aboutForm = FormProvider.GetForm<AboutForm>();
-            aboutForm.ShowDialog();
+            this.ClearLogs();
+        }
+
+        private void ShowPasswordField_Changed(object sender, bool value)
+        {
+            this.ServerPasswordField.HideValue = !value;
         }
 
         #endregion

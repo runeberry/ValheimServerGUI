@@ -41,7 +41,9 @@ namespace ValheimServerGUI
             services.AddSingleton<IProcessProvider, ProcessProvider>();
 
             // Game & server data
-            services.AddSingleton<ValheimServer>();
+            services
+                .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
+                .AddSingleton<ValheimServer>();
 
             // Forms
             services

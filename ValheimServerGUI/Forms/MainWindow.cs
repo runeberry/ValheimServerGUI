@@ -12,15 +12,18 @@ namespace ValheimServerGUI.Forms
     {
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
+        private readonly IValheimFileProvider FileProvider;
         private readonly ValheimServer Server;
 
         public MainWindow(
             IFormProvider formProvider,
-            IUserPreferences userPrefs, 
+            IUserPreferences userPrefs,
+            IValheimFileProvider fileProvider,
             ValheimServer server)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
+            this.FileProvider = fileProvider;
             this.Server = server;
 
             InitializeComponent(); // WinForms generated code, always first
@@ -70,12 +73,12 @@ namespace ValheimServerGUI.Forms
         {
             try
             {
-                var worlds = ValheimData.GetWorldNames(UserPrefs.GetEnvironmentValue(PrefKeys.ValheimWorldsFolder));
+                var worlds = this.FileProvider.GetWorldNames();
                 this.WorldSelectField.DataSource = worlds;
                 this.WorldSelectField.DropdownEnabled = worlds.Any();
                 this.WorldSelectField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
             }
-            catch (System.IO.DirectoryNotFoundException)
+            catch
             {
                 this.WorldSelectField.DataSource = null;
                 this.WorldSelectField.DropdownEnabled = false;

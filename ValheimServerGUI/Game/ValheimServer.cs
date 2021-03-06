@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using ValheimServerGUI.Properties;
@@ -13,19 +12,31 @@ namespace ValheimServerGUI.Game
 {
     public class ValheimServer : IDisposable
     {
-        public string ServerPath { get; set; }
-        public string ServerName { get; set; }
-        public string ServerPassword { get; set; }
-        public string WorldName { get; set; }
-        public bool Public { get; set; }
+        /// <summary>
+        /// Options for the currently running server.
+        /// </summary>        
+        public IValheimServerOptions Options { get; private set; } = new ValheimServerOptions();
 
+        public ServerStatus Status 
+        {
+            get => this._status;
+            private set
+            {
+                if (this._status == value) return;
+                this._status = value;
+                this.StatusChanged?.Invoke(this, value);
+            }
+        }
+        private ServerStatus _status = ServerStatus.Stopped;
         public event EventHandler<ServerStatus> StatusChanged;
 
-        public bool IsStarting { get; private set; }
-        public bool IsStopping { get; private set; }
-        public bool IsRestarting { get; private set; }
-        public bool IsRunning => this.ProcessProvider.IsProcessRunning(ProcessKeys.ValheimServer);
+        public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped);
+        public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running);
+        public bool CanRestart => this.IsAnyStatus(ServerStatus.Running);
 
+        private bool IsRestarting;
+
+        // todo: fully encapsulate the loggers in this class
         public readonly AppLogger Logger;
         public readonly FilteredServerLogger FilteredLogger;
         private readonly Dictionary<string, Action> LogBasedActions = new Dictionary<string, Action>();
@@ -37,6 +48,7 @@ namespace ValheimServerGUI.Game
         {
             this.ProcessProvider = processProvider;
 
+            // todo: dependency-inject loggers
             Logger = new AppLogger();
             FilteredLogger = new FilteredServerLogger();
 
@@ -50,22 +62,18 @@ namespace ValheimServerGUI.Game
 
         private void InitializeLogBasedActions()
         {
-            LogBasedActions.Add("Game server connected", () => this.PublishStatus(ServerStatus.Started));
-            LogBasedActions.Add("Steam manager on destroy", () => this.PublishStatus(ServerStatus.Stopped));
+            LogBasedActions.Add("Game server connected", () => this.Status = ServerStatus.Running);
+            // LogBasedActions.Add("Steam manager on destroy", () => this.Status = ServerStatus.Stopped); // Now based on process exit
         }
 
         private void InitializeStatusBasedActions()
         {
-            this.StatusChanged += BuildStatusHandler(ServerStatus.Started, () => this.IsStarting = false);
-            this.StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () => this.IsStopping = false);
-            this.StatusChanged += BuildStatusHandler(ServerStatus.ProcessExited, () => 
+            this.StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () => 
             {
-                this.IsStopping = false;
-
                 if (this.IsRestarting)
                 {
                     this.IsRestarting = false;
-                    this.Start();
+                    this.Start(this.Options);
                 }
             });
         }
@@ -82,80 +90,72 @@ namespace ValheimServerGUI.Game
 
         #region Public methods
 
-        public void Validate()
+        /// <summary>
+        /// Starts the Valheim server as a background process with the provided options.
+        /// </summary>
+        public void Start(IValheimServerOptions options)
         {
-            // Ensure all required fields exist
-            if (string.IsNullOrWhiteSpace(this.ServerName)) throw new ArgumentException($"{nameof(ServerName)} must be defined.");
-            if (string.IsNullOrWhiteSpace(this.ServerPath)) throw new ArgumentException($"{nameof(ServerPath)} must be defined.");
-            if (string.IsNullOrWhiteSpace(this.ServerPassword)) throw new ArgumentException($"{nameof(ServerPassword)} must be defined.");
-            if (string.IsNullOrWhiteSpace(this.WorldName)) throw new ArgumentException($"{nameof(WorldName)} must be defined.");
+            if (!this.CanStart) return;
 
-            // ServerPath validation
-            if (!this.ServerPath.EndsWith(".exe")) throw new ArgumentException($"{nameof(ServerPath)} must point to a valid .exe file.");
-            if (!File.Exists(this.ServerPath)) throw new FileNotFoundException($"No file found at {nameof(ServerPath)}: {this.ServerPath}");
-
-            // WorldName validation
-            // todo: Validate world exists? Or do we trust it from the UI control?
-
-            // ServerName validation
-            if (this.ServerName == this.WorldName) throw new ArgumentException($"{nameof(ServerName)} cannot be the same as your {nameof(WorldName)} ({this.WorldName}).");
-
-            // ServerPassword validation
-            if (this.ServerPassword.Length < 5) throw new ArgumentException($"{nameof(ServerPassword)} must be at least 5 characters.");
-            if (this.ServerPassword.Contains(this.ServerName)) throw new ArgumentException($"{nameof(ServerPassword)} cannot contain your {nameof(ServerName)} ({this.ServerName}).");
-            if (this.ServerPassword.Contains(this.WorldName)) throw new ArgumentException($"{nameof(ServerPassword)} cannot contain your {nameof(WorldName)} ({this.WorldName}).");
-        }
-
-        public void Start()
-        {
-            if (this.IsRunning || this.IsStarting) return;
-
-            this.Validate();
-
-            var publicFlag = this.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{this.ServerName}"" -port 2456 -world ""{this.WorldName}"" -password ""{this.ServerPassword}"" -public {publicFlag}";
-            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, this.ServerPath, processArgs);
+            var publicFlag = options.Public ? 1 : 0;
+            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag}";
+            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, options.ExePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
             process.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
             process.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnErrorReceived);
-            process.Exited += new EventHandler(this.Process_OnExited);
+            process.Exited += new EventHandler((obj, e) => this.Status = ServerStatus.Stopped);
 
             process.StartIO();
 
-            this.IsStarting = true;
-            PublishStatus(ServerStatus.StartRequested);
+            this.Options = options;
+            this.IsRestarting = false;
+            this.Status = ServerStatus.Starting;
         }
 
+        /// <summary>
+        /// Gracefully stops the Valheim server process.
+        /// </summary>
         public void Stop()
         {
-            if (!this.IsRunning || this.IsStopping) return;
+            if (!this.CanStop) return;
 
             this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
 
-            this.IsStopping = true;
-            PublishStatus(ServerStatus.StopRequested);
+            this.IsRestarting = false;
+            this.Status = ServerStatus.Stopping;
         }
 
-        public void Restart()
+        /// <summary>
+        /// Gracefully stops the Valheim server process, then starts it up again.
+        /// If no options are provided, then the existing server options will be used.
+        /// </summary>
+        public void Restart(IValheimServerOptions options = null)
         {
-            if (!this.IsRunning || this.IsStarting || this.IsStopping) return;
+            if (!this.CanRestart) return;
 
             this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
 
-            this.IsStopping = true;
+            this.Options = options ?? this.Options;
             this.IsRestarting = true;
-            PublishStatus(ServerStatus.StopRequested);
+            this.Status = ServerStatus.Stopping;
         }
 
         public void ForceStop()
         {
             this.Stop();
 
-            if (this.IsRunning || this.IsStopping)
+            if (!this.IsAnyStatus(ServerStatus.Stopped))
             {
+                // todo: replace this with something that isn't as likely to hang
+                // Maybe remove this method altogether and build something better in the UI?
                 this.ServerProcess.WaitForExit();
             }
+        }
+
+        public bool IsAnyStatus(params ServerStatus[] statuses)
+        {
+            return statuses.Any(s => s == this.Status);
         }
 
         #endregion
@@ -174,11 +174,6 @@ namespace ValheimServerGUI.Game
             FilteredLogger.LogError(e.Data);
         }
 
-        private void Process_OnExited(object obj, EventArgs e)
-        {
-            PublishStatus(ServerStatus.ProcessExited);
-        }
-
         private void Logger_OnServerLogReceived(object obj, LogEvent logEvent)
         {
             foreach (var action in this.LogBasedActions
@@ -187,15 +182,6 @@ namespace ValheimServerGUI.Game
             {
                 action();
             }
-        }
-
-        #endregion
-
-        #region Common methods
-
-        private void PublishStatus(ServerStatus status)
-        {
-            this.StatusChanged?.Invoke(this, status);
         }
 
         #endregion

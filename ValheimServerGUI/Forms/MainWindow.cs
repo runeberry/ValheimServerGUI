@@ -70,6 +70,8 @@ namespace ValheimServerGUI.Forms
             this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
             this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
             this.ShowPasswordField.Value = false;
+
+            SetFormStateForServer();
         }
 
         private void OnLogReceived(object sender, LogEvent logEvent)
@@ -88,6 +90,8 @@ namespace ValheimServerGUI.Forms
         private void OnServerStatusChanged(object sender, ServerStatus status)
         {
             this.SetStatusText(status.ToString());
+
+            this.SetFormStateForServer();
         }
 
         #endregion
@@ -96,15 +100,19 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
-            Server.ServerPath = UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath);
-            Server.ServerName = this.ServerNameField.Value;
-            Server.ServerPassword = this.ServerPasswordField.Value;
-            Server.WorldName = this.WorldSelectField.Value;
-            Server.Public = this.CommunityServerField.Value;
+            var options = new ValheimServerOptions
+            {
+                ExePath = UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath),
+                Name = this.ServerNameField.Value,
+                Password = this.ServerPasswordField.Value,
+                WorldName = this.WorldSelectField.Value,
+                Public = this.CommunityServerField.Value,
+                Port = 2456,
+            };
 
             try
             {
-                Server.Validate();
+                Server.Start(options);
             }
             catch (Exception exception)
             {
@@ -116,8 +124,6 @@ namespace ValheimServerGUI.Forms
 
                 return;
             }
-
-            Server.Start();
 
             // User preferences are saved each time the server is started
             UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
@@ -217,6 +223,28 @@ namespace ValheimServerGUI.Forms
             }
 
             this.StatusStripLabel.Text = message;
+        }
+
+        private void SetFormStateForServer()
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action(SetFormStateForServer), new object[] { });
+                return;
+            }
+
+            // Only allow form field changes when the server is stopped
+            bool allowServerChanges = this.Server.Status == ServerStatus.Stopped;
+
+            this.ServerNameField.Enabled = allowServerChanges;
+            this.ServerPasswordField.Enabled = allowServerChanges;
+            this.WorldSelectField.Enabled = allowServerChanges;
+            this.CommunityServerField.Enabled = allowServerChanges;
+
+            // You can only start the server when it's stopped
+            this.ButtonStartServer.Enabled = this.Server.CanStart;
+            this.ButtonStopServer.Enabled = this.Server.CanStop;
+            this.ButtonRestartServer.Enabled = this.Server.CanRestart;
         }
 
         private void CloseApplication()

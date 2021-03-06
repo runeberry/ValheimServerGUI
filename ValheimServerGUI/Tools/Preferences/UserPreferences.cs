@@ -20,6 +20,7 @@ namespace ValheimServerGUI.Tools.Preferences
             Default.SetValue(PrefKeys.ValheimGamePath, @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim");
             Default.SetValue(PrefKeys.ValheimServerPath, @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe");
             Default.SetValue(PrefKeys.ValheimWorldsFolder, @"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds");
+            Default.SetValue(PrefKeys.ServerPort, 2456);
         }
 
         #region IUserPreferencesProvider implementation

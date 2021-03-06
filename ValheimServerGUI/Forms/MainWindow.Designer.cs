@@ -44,6 +44,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStripProgressBar = new System.Windows.Forms.ToolStripProgressBar();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
+            this.ButtonRestartServer = new System.Windows.Forms.Button();
             this.ShowPasswordField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.WorldSelectField = new ValheimServerGUI.Controls.DropdownFormField();
@@ -54,7 +55,6 @@ namespace ValheimServerGUI.Forms
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
-            this.ButtonRestartServer = new System.Windows.Forms.Button();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -178,6 +178,16 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
             // 
+            // ButtonRestartServer
+            // 
+            this.ButtonRestartServer.Location = new System.Drawing.Point(104, 205);
+            this.ButtonRestartServer.Name = "ButtonRestartServer";
+            this.ButtonRestartServer.Size = new System.Drawing.Size(95, 23);
+            this.ButtonRestartServer.TabIndex = 15;
+            this.ButtonRestartServer.Text = "Restart Server";
+            this.ButtonRestartServer.UseVisualStyleBackColor = true;
+            this.ButtonRestartServer.Click += new System.EventHandler(this.ButtonRestartServer_Click);
+            // 
             // ShowPasswordField
             // 
             this.ShowPasswordField.LabelText = "Show Password";
@@ -213,6 +223,7 @@ namespace ValheimServerGUI.Forms
             this.ServerPasswordField.HideValue = true;
             this.ServerPasswordField.LabelText = "Server Password";
             this.ServerPasswordField.Location = new System.Drawing.Point(0, 47);
+            this.ServerPasswordField.MaxLength = 64;
             this.ServerPasswordField.Name = "ServerPasswordField";
             this.ServerPasswordField.Size = new System.Drawing.Size(243, 41);
             this.ServerPasswordField.TabIndex = 11;
@@ -223,6 +234,7 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField.HideValue = false;
             this.ServerNameField.LabelText = "Server Name";
             this.ServerNameField.Location = new System.Drawing.Point(0, 0);
+            this.ServerNameField.MaxLength = 64;
             this.ServerNameField.Name = "ServerNameField";
             this.ServerNameField.Size = new System.Drawing.Size(243, 41);
             this.ServerNameField.TabIndex = 10;
@@ -285,16 +297,6 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
             this.TextBoxLogs.TabIndex = 0;
-            // 
-            // ButtonRestartServer
-            // 
-            this.ButtonRestartServer.Location = new System.Drawing.Point(104, 205);
-            this.ButtonRestartServer.Name = "ButtonRestartServer";
-            this.ButtonRestartServer.Size = new System.Drawing.Size(95, 23);
-            this.ButtonRestartServer.TabIndex = 15;
-            this.ButtonRestartServer.Text = "Restart Server";
-            this.ButtonRestartServer.UseVisualStyleBackColor = true;
-            this.ButtonRestartServer.Click += new System.EventHandler(this.ButtonRestartServer_Click);
             // 
             // MainWindow
             // 

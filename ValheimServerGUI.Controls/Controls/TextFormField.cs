@@ -28,6 +28,12 @@ namespace ValheimServerGUI.Forms.Controls
             set => this.TextBox.PasswordChar = value ? PasswordChar : PasswordCharDisabled;
         }
 
+        public int MaxLength
+        {
+            get => this.TextBox.MaxLength;
+            set => this.TextBox.MaxLength = value;
+        }
+
         public TextFormField()
         {
             InitializeComponent();

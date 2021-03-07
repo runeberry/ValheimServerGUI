@@ -33,12 +33,11 @@ namespace ValheimServerGUI.Forms
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.linkLabel1 = new System.Windows.Forms.LinkLabel();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.linkLabel2 = new System.Windows.Forms.LinkLabel();
-            this.button1 = new System.Windows.Forms.Button();
             this.VersionLabel = new System.Windows.Forms.Label();
+            this.ButtonGitHub = new System.Windows.Forms.Button();
+            this.ButtonTwitter = new System.Windows.Forms.Button();
+            this.ButtonDonate = new System.Windows.Forms.Button();
+            this.ButtonValheimSite = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -47,15 +46,16 @@ namespace ValheimServerGUI.Forms
             this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
             this.pictureBox1.Location = new System.Drawing.Point(12, 12);
             this.pictureBox1.Name = "pictureBox1";
-            this.pictureBox1.Size = new System.Drawing.Size(141, 139);
+            this.pictureBox1.Size = new System.Drawing.Size(100, 100);
+            this.pictureBox1.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
             this.pictureBox1.TabIndex = 0;
             this.pictureBox1.TabStop = false;
             // 
             // label1
             // 
-            this.label1.Location = new System.Drawing.Point(159, 12);
+            this.label1.Location = new System.Drawing.Point(118, 12);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(212, 112);
+            this.label1.Size = new System.Drawing.Size(253, 79);
             this.label1.TabIndex = 1;
             this.label1.Text = "Valheim Dedicated Server GUI\r\n\r\n(c) 2021 Runeberry Software, LLC\r\nLicensed under " +
     "GNU GPLv3";
@@ -63,84 +63,95 @@ namespace ValheimServerGUI.Forms
             // 
             // label2
             // 
-            this.label2.Location = new System.Drawing.Point(12, 154);
+            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
+            this.label2.Location = new System.Drawing.Point(12, 115);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(359, 37);
+            this.label2.Size = new System.Drawing.Size(359, 61);
             this.label2.TabIndex = 2;
-            this.label2.Text = "NOTE: This is a fan-made project. Runeberry Software is not affiliated with Valhe" +
-    "im or Iron Gate Studio. Use at your own risk!";
+            this.label2.Text = "This is a fan-made project. Runeberry Software is not affiliated with Valheim or " +
+    "Iron Gate Studio. We are not responsible for the loss of any save data. Use at y" +
+    "our own risk!";
             this.label2.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
-            // 
-            // linkLabel1
-            // 
-            this.linkLabel1.AutoSize = true;
-            this.linkLabel1.Location = new System.Drawing.Point(247, 208);
-            this.linkLabel1.Name = "linkLabel1";
-            this.linkLabel1.Size = new System.Drawing.Size(100, 15);
-            this.linkLabel1.TabIndex = 3;
-            this.linkLabel1.TabStop = true;
-            this.linkLabel1.Text = "ValheimServerGUI";
-            this.linkLabel1.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel1_LinkClicked);
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(12, 208);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(238, 15);
-            this.label3.TabIndex = 4;
-            this.label3.Text = "Read the docs and ask for help on Github @";
-            // 
-            // label4
-            // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(12, 237);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(210, 15);
-            this.label4.TabIndex = 5;
-            this.label4.Text = "Don\'t have Valheim yet? Check out the";
-            // 
-            // linkLabel2
-            // 
-            this.linkLabel2.AutoSize = true;
-            this.linkLabel2.Location = new System.Drawing.Point(219, 237);
-            this.linkLabel2.Name = "linkLabel2";
-            this.linkLabel2.Size = new System.Drawing.Size(67, 15);
-            this.linkLabel2.TabIndex = 6;
-            this.linkLabel2.TabStop = true;
-            this.linkLabel2.Text = "official site.";
-            this.linkLabel2.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.linkLabel2_LinkClicked);
-            // 
-            // button1
-            // 
-            this.button1.Location = new System.Drawing.Point(147, 267);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 7;
-            this.button1.Text = "Close";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // VersionLabel
             // 
-            this.VersionLabel.Location = new System.Drawing.Point(159, 124);
+            this.VersionLabel.Location = new System.Drawing.Point(118, 91);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(212, 23);
+            this.VersionLabel.Size = new System.Drawing.Size(253, 23);
             this.VersionLabel.TabIndex = 8;
             this.VersionLabel.Text = "Version: ?";
             this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            // 
+            // ButtonGitHub
+            // 
+            this.ButtonGitHub.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonGitHub.Image = ((System.Drawing.Image)(resources.GetObject("ButtonGitHub.Image")));
+            this.ButtonGitHub.Location = new System.Drawing.Point(12, 216);
+            this.ButtonGitHub.Name = "ButtonGitHub";
+            this.ButtonGitHub.Size = new System.Drawing.Size(141, 23);
+            this.ButtonGitHub.TabIndex = 9;
+            this.ButtonGitHub.Text = "ValheimServerGUI";
+            this.ButtonGitHub.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ButtonGitHub.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.ButtonGitHub.UseVisualStyleBackColor = true;
+            this.ButtonGitHub.Click += new System.EventHandler(this.ButtonGitHub_Click);
+            // 
+            // ButtonTwitter
+            // 
+            this.ButtonTwitter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonTwitter.Image = ((System.Drawing.Image)(resources.GetObject("ButtonTwitter.Image")));
+            this.ButtonTwitter.Location = new System.Drawing.Point(159, 216);
+            this.ButtonTwitter.Name = "ButtonTwitter";
+            this.ButtonTwitter.Size = new System.Drawing.Size(110, 23);
+            this.ButtonTwitter.TabIndex = 10;
+            this.ButtonTwitter.Text = "@Runeberries";
+            this.ButtonTwitter.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ButtonTwitter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.ButtonTwitter.UseVisualStyleBackColor = true;
+            this.ButtonTwitter.Click += new System.EventHandler(this.ButtonTwitter_Click);
+            // 
+            // ButtonDonate
+            // 
+            this.ButtonDonate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonDonate.Image = ((System.Drawing.Image)(resources.GetObject("ButtonDonate.Image")));
+            this.ButtonDonate.Location = new System.Drawing.Point(275, 216);
+            this.ButtonDonate.Name = "ButtonDonate";
+            this.ButtonDonate.Size = new System.Drawing.Size(97, 23);
+            this.ButtonDonate.TabIndex = 11;
+            this.ButtonDonate.Text = "Donate";
+            this.ButtonDonate.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ButtonDonate.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.ButtonDonate.UseVisualStyleBackColor = true;
+            this.ButtonDonate.Click += new System.EventHandler(this.ButtonDonate_Click);
+            // 
+            // ButtonValheimSite
+            // 
+            this.ButtonValheimSite.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ButtonValheimSite.Image = ((System.Drawing.Image)(resources.GetObject("ButtonValheimSite.Image")));
+            this.ButtonValheimSite.Location = new System.Drawing.Point(12, 187);
+            this.ButtonValheimSite.Name = "ButtonValheimSite";
+            this.ButtonValheimSite.Size = new System.Drawing.Size(360, 23);
+            this.ButtonValheimSite.TabIndex = 12;
+            this.ButtonValheimSite.Text = "Don\'t have Valheim yet? Why not? Buy it here!";
+            this.ButtonValheimSite.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.ButtonValheimSite.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this.ButtonValheimSite.UseVisualStyleBackColor = true;
+            this.ButtonValheimSite.Click += new System.EventHandler(this.ButtonValheimSite_Click);
             // 
             // AboutForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(384, 302);
+            this.ClientSize = new System.Drawing.Size(384, 251);
+            this.Controls.Add(this.ButtonValheimSite);
+            this.Controls.Add(this.ButtonDonate);
+            this.Controls.Add(this.ButtonTwitter);
+            this.Controls.Add(this.ButtonGitHub);
             this.Controls.Add(this.VersionLabel);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.linkLabel2);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.linkLabel1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.pictureBox1);
@@ -153,7 +164,6 @@ namespace ValheimServerGUI.Forms
             this.Text = "About";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
@@ -162,11 +172,10 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.LinkLabel linkLabel1;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.LinkLabel linkLabel2;
-        private System.Windows.Forms.Button button1;
         private System.Windows.Forms.Label VersionLabel;
+        private System.Windows.Forms.Button ButtonGitHub;
+        private System.Windows.Forms.Button ButtonTwitter;
+        private System.Windows.Forms.Button ButtonDonate;
+        private System.Windows.Forms.Button ButtonValheimSite;
     }
 }

@@ -133,8 +133,14 @@
   <data name="DefaultWorldsFolder" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds</value>
   </data>
+  <data name="DonateLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\DonateLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="FolderInformation_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\FolderInformation_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="GitHubLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\GitHubLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="OpenWeb_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\OpenWeb_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -175,6 +181,12 @@
   <data name="Stop_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Stop_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="TwitterLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\TwitterLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="UrlDonate" xml:space="preserve">
+    <value>https://www.buymeacoffee.com/runeberry</value>
+  </data>
   <data name="UrlGithubApplication" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI</value>
   </data>
@@ -199,5 +211,8 @@
   <data name="ValheimSteamAppId" xml:space="preserve">
     <value>892970</value>
     <comment>From start_headless_server.bat</comment>
+  </data>
+  <data name="vsg_logo_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\vsg_logo_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
 </root>

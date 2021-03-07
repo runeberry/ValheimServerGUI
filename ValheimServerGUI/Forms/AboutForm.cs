@@ -14,19 +14,24 @@ namespace ValheimServerGUI.Forms
             this.VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
         }
 
-        private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void ButtonTwitter_Click(object sender, EventArgs e)
+        {
+            WebHelper.OpenWebAddress(Resources.UrlTwitter);
+        }
+
+        private void ButtonDonate_Click(object sender, EventArgs e)
+        {
+            WebHelper.OpenWebAddress(Resources.UrlDonate);
+        }
+
+        private void ButtonGitHub_Click(object sender, EventArgs e)
         {
             WebHelper.OpenWebAddress(Resources.UrlGithubApplication);
         }
 
-        private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        private void ButtonValheimSite_Click(object sender, EventArgs e)
         {
             WebHelper.OpenWebAddress(Resources.ValheimGameSiteUrl);
-        }
-
-        private void button1_Click(object sender, EventArgs e)
-        {
-            this.Close();
         }
     }
 }

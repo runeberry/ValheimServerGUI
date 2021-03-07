@@ -109,9 +109,29 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DonateLogo {
+            get {
+                object obj = ResourceManager.GetObject("DonateLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap FolderInformation_16x {
             get {
                 object obj = ResourceManager.GetObject("FolderInformation_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap GitHubLogo {
+            get {
+                object obj = ResourceManager.GetObject("GitHubLogo", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }
@@ -247,6 +267,25 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap TwitterLogo {
+            get {
+                object obj = ResourceManager.GetObject("TwitterLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://www.buymeacoffee.com/runeberry.
+        /// </summary>
+        internal static string UrlDonate {
+            get {
+                return ResourceManager.GetString("UrlDonate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI.
         /// </summary>
         internal static string UrlGithubApplication {
@@ -315,6 +354,16 @@ namespace ValheimServerGUI.Properties {
         internal static string ValheimSteamAppId {
             get {
                 return ResourceManager.GetString("ValheimSteamAppId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap vsg_logo_16 {
+            get {
+                object obj = ResourceManager.GetObject("vsg_logo_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
     }

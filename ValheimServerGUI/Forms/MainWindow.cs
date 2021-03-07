@@ -10,6 +10,8 @@ namespace ValheimServerGUI.Forms
 {
     public partial class MainWindow : Form
     {
+        private static readonly string NL = Environment.NewLine;
+
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
         private readonly IValheimFileProvider FileProvider;
@@ -27,13 +29,9 @@ namespace ValheimServerGUI.Forms
             this.Server = server;
 
             InitializeComponent(); // WinForms generated code, always first
-
             InitializeServer();
-
             InitializeFormEvents();
             InitializeFormFields(); // Display data back to user, always last
-
-            this.SetStatusText("Loaded OK");
         }
 
         #region Initialization
@@ -115,35 +113,16 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
-        #region Menu Items
-
-        private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
-        {
-            var directoriesForm = FormProvider.GetForm<DirectoriesForm>();
-            directoriesForm.ShowDialog();
-
-            InitializeFormFields();
-        }
-
-        private void MenuItemFileClose_Clicked(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
-        {
-            this.SetStatusText("Clicked Updates!");
-        }
-
-        private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
-        {
-            var aboutForm = FormProvider.GetForm<AboutForm>();
-            aboutForm.ShowDialog();
-        }
-
-        #endregion
-
         #region MainWindow Events
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
+
+            this.CheckFilePaths();
+
+            this.SetStatusText("Loaded OK");
+        }
 
         protected override void OnResize(EventArgs e)
         {
@@ -222,6 +201,33 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
+        #region Menu Items
+
+        private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
+        {
+            this.ShowDirectoriesForm();
+        }
+
+        private void MenuItemFileClose_Clicked(object sender, EventArgs e)
+        {
+            this.Close();
+        }
+
+        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
+        {
+            this.SetStatusText("Clicked Updates!");
+        }
+
+        private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
+        {
+            var aboutForm = FormProvider.GetForm<AboutForm>();
+            aboutForm.ShowDialog();
+        }
+
+        #endregion
+
+        
+
         #region Form Field Events
 
         private void ButtonStartServer_Click(object sender, EventArgs e)
@@ -294,6 +300,36 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Common Methods
+
+        private void CheckFilePaths()
+        {
+            try
+            {
+                var _ = this.FileProvider.ServerExe;
+            }
+            catch (Exception e)
+            {
+                var result = MessageBox.Show(
+                    $"{e.Message}{NL}{NL}" +
+                    $"This may occur if you do not have Valheim Dedicated Server installed, or if you have " +
+                    $"installed it in a different directory. See Help for more info.{NL}{NL}" +
+                    "Would you like to change your directories now?",
+                    "File Not Found",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    this.ShowDirectoriesForm();
+                }
+            }
+        }
+
+        private void ShowDirectoriesForm()
+        {
+            FormProvider.GetForm<DirectoriesForm>().ShowDialog();
+            InitializeFormFields();
+        }
 
         private void AddLog(string message)
         {

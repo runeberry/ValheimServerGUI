@@ -93,6 +93,7 @@ namespace ValheimServerGUI.Forms
             // 
             // MenuItemFileDirectories
             // 
+            this.MenuItemFileDirectories.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemFileDirectories.Image")));
             this.MenuItemFileDirectories.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MenuItemFileDirectories.Name = "MenuItemFileDirectories";
             this.MenuItemFileDirectories.Size = new System.Drawing.Size(158, 22);
@@ -121,6 +122,7 @@ namespace ValheimServerGUI.Forms
             // 
             // MenuItemHelpUpdates
             // 
+            this.MenuItemHelpUpdates.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemHelpUpdates.Image")));
             this.MenuItemHelpUpdates.Name = "MenuItemHelpUpdates";
             this.MenuItemHelpUpdates.Size = new System.Drawing.Size(171, 22);
             this.MenuItemHelpUpdates.Text = "Check for &Updates";
@@ -332,6 +334,7 @@ namespace ValheimServerGUI.Forms
             // TrayContextMenuStart
             // 
             this.TrayContextMenuStart.Enabled = false;
+            this.TrayContextMenuStart.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuStart.Image")));
             this.TrayContextMenuStart.Name = "TrayContextMenuStart";
             this.TrayContextMenuStart.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuStart.Text = "Start Server";
@@ -339,6 +342,7 @@ namespace ValheimServerGUI.Forms
             // TrayContextMenuRestart
             // 
             this.TrayContextMenuRestart.Enabled = false;
+            this.TrayContextMenuRestart.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuRestart.Image")));
             this.TrayContextMenuRestart.Name = "TrayContextMenuRestart";
             this.TrayContextMenuRestart.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuRestart.Text = "Restart Server";
@@ -346,6 +350,7 @@ namespace ValheimServerGUI.Forms
             // TrayContextMenuStop
             // 
             this.TrayContextMenuStop.Enabled = false;
+            this.TrayContextMenuStop.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuStop.Image")));
             this.TrayContextMenuStop.Name = "TrayContextMenuStop";
             this.TrayContextMenuStop.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuStop.Text = "Stop Server";

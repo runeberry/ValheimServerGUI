@@ -27,7 +27,7 @@ namespace ValheimServerGUI.Controls
         {
             InitializeComponent();
 
-            this.CheckBox.CheckedChanged += new EventHandler(this.CheckBox_Changed);
+            this.CheckBox.CheckedChanged += this.CheckBox_Changed;
         }
 
         private void CheckBox_Changed(object sender, EventArgs e)

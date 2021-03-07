@@ -53,7 +53,7 @@ namespace ValheimServerGUI.Game
             Logger = new AppLogger();
             FilteredLogger = new FilteredServerLogger();
 
-            Logger.LogReceived += new EventHandler<LogEvent>(this.Logger_OnServerLogReceived);
+            Logger.LogReceived += this.Logger_OnServerLogReceived;
 
             InitializeLogBasedActions();
             InitializeStatusBasedActions();
@@ -81,10 +81,10 @@ namespace ValheimServerGUI.Game
 
         private static EventHandler<ServerStatus> BuildStatusHandler(ServerStatus status, Action action)
         {
-            return new EventHandler<ServerStatus>((obj, s) =>
+            return (obj, s) =>
             {
                 if (s == status) action();
-            });
+            };
         }
 
         #endregion
@@ -104,9 +104,9 @@ namespace ValheimServerGUI.Game
             var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
-            process.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);
-            process.ErrorDataReceived += new DataReceivedEventHandler(this.Process_OnErrorReceived);
-            process.Exited += new EventHandler((obj, e) => this.Status = ServerStatus.Stopped);
+            process.OutputDataReceived += this.Process_OnDataReceived;
+            process.ErrorDataReceived += this.Process_OnErrorReceived;
+            process.Exited += (obj, e) => this.Status = ServerStatus.Stopped;
 
             process.StartIO();
 

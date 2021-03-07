@@ -16,10 +16,7 @@ namespace ValheimServerGUI.Tools.Processes
             }
 
             // Remove this process from the provider when the process exits.
-            process.Exited += new EventHandler((_, _) =>
-            {
-                this.Processes.TryRemove(key, out var _);
-            });
+            process.Exited += (_, _) => this.Processes.TryRemove(key, out var _);
         }
 
         public Process GetProcess(string key)

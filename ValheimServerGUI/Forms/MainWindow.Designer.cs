@@ -214,6 +214,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonRestartServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonRestartServer.TabIndex = 15;
             this.ButtonRestartServer.Text = "Restart Server";
+            this.ButtonRestartServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ButtonRestartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonRestartServer.UseVisualStyleBackColor = true;
             // 
@@ -278,6 +279,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonStopServer.TabIndex = 1;
             this.ButtonStopServer.Text = "Stop Server";
+            this.ButtonStopServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ButtonStopServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonStopServer.UseVisualStyleBackColor = true;
             // 
@@ -290,6 +292,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonStartServer.TabIndex = 0;
             this.ButtonStartServer.Text = "Start Server";
+            this.ButtonStartServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ButtonStartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonStartServer.UseVisualStyleBackColor = true;
             // 

@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>Assets\ApplicationIcon.ico</ApplicationIcon>
+    <ApplicationIcon>Resources\ApplicationIcon.ico</ApplicationIcon>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
     <Authors>Runeberry Software, LLC</Authors>
@@ -40,7 +40,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Assets\ApplicationIcon.ico">
+    <None Update="Resources\ApplicationIcon.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

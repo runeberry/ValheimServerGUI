@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Processes;
@@ -73,8 +74,17 @@ namespace ValheimServerGUI.Game
             {
                 if (this.IsRestarting)
                 {
-                    this.IsRestarting = false;
-                    this.Start(this.Options);
+                    // There are no more server events to listen to after it has stopped, so
+                    // we're just going to artifically delay here to allow any shutdown actions to finish
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(500);
+
+                        if (!this.IsRestarting) return;
+
+                        this.IsRestarting = false;
+                        this.Start(this.Options);
+                    });
                 }
             });
         }

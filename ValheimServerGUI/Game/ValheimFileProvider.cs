@@ -16,21 +16,26 @@ namespace ValheimServerGUI.Game
             this.UserPrefs = userPrefs;
         }
 
-        public FileInfo GameExe => this.GetFileInfo(PrefKeys.ValheimGamePath);
+        public FileInfo GameExe => this.GetFileInfo(PrefKeys.ValheimGamePath, ".exe");
 
-        public FileInfo ServerExe => this.GetFileInfo(PrefKeys.ValheimServerPath);
+        public FileInfo ServerExe => this.GetFileInfo(PrefKeys.ValheimServerPath, ".exe");
 
         public DirectoryInfo WorldsFolder => this.GetDirectoryInfo(PrefKeys.ValheimWorldsFolder);
 
         #region Non-public methods
 
-        private FileInfo GetFileInfo(string prefKey)
+        private FileInfo GetFileInfo(string prefKey, string extension = null)
         {
             var path = this.UserPrefs.GetEnvironmentValue(prefKey);
 
             if (string.IsNullOrWhiteSpace(path))
             {
                 throw new ArgumentException($"[{prefKey}] Cannot open file, path is not defined.");
+            }
+
+            if (extension != null && !Path.HasExtension(path))
+            {
+                throw new ArgumentException($"[{prefKey}] Cannot open file, must point to a valid {extension} file:{NL}{path}");
             }
 
             if (!File.Exists(path))

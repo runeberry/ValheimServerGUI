@@ -228,7 +228,6 @@ namespace ValheimServerGUI.Forms
         {
             var options = new ValheimServerOptions
             {
-                ExePath = UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath),
                 Name = this.ServerNameField.Value,
                 Password = this.ServerPasswordField.Value,
                 WorldName = this.WorldSelectField.Value,

@@ -42,11 +42,12 @@ namespace ValheimServerGUI.Game
         private readonly Dictionary<string, Action> LogBasedActions = new Dictionary<string, Action>();
 
         private readonly IProcessProvider ProcessProvider;
-        private Process ServerProcess => this.ProcessProvider.GetProcess(ProcessKeys.ValheimServer);
+        private readonly IValheimFileProvider FileProvider;
 
-        public ValheimServer(IProcessProvider processProvider)
+        public ValheimServer(IProcessProvider processProvider, IValheimFileProvider fileProvider)
         {
             this.ProcessProvider = processProvider;
+            this.FileProvider = fileProvider;
 
             // todo: dependency-inject loggers
             Logger = new AppLogger();
@@ -97,9 +98,10 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStart) return;
 
+            var exePath = this.FileProvider.ServerExe.FullName;
             var publicFlag = options.Public ? 1 : 0;
             var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag}";
-            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, options.ExePath, processArgs);
+            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
             process.OutputDataReceived += new DataReceivedEventHandler(this.Process_OnDataReceived);

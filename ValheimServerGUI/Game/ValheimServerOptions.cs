@@ -7,8 +7,6 @@ namespace ValheimServerGUI.Game
     {
         public string Name { get; set; }
 
-        public string ExePath { get; set; }
-
         public string Password { get; set; }
 
         public string WorldName { get; set; }
@@ -21,13 +19,8 @@ namespace ValheimServerGUI.Game
         {
             // Ensure all required fields exist
             if (string.IsNullOrWhiteSpace(this.Name)) throw new ArgumentException($"{nameof(Name)} must be defined.");
-            if (string.IsNullOrWhiteSpace(this.ExePath)) throw new ArgumentException($"{nameof(ExePath)} must be defined.");
             if (string.IsNullOrWhiteSpace(this.Password)) throw new ArgumentException($"{nameof(Password)} must be defined.");
             if (string.IsNullOrWhiteSpace(this.WorldName)) throw new ArgumentException($"{nameof(WorldName)} must be defined.");
-
-            // ExePath validation
-            if (!this.ExePath.EndsWith(".exe")) throw new ArgumentException($"{nameof(ExePath)} must point to a valid .exe file.");
-            if (!File.Exists(this.ExePath)) throw new FileNotFoundException($"No file found at {nameof(ExePath)}: {this.ExePath}"); // todo: move this out of validation
 
             // WorldName validation
             // todo: Validate world exists? Or do we trust it from the UI control?
@@ -48,8 +41,6 @@ namespace ValheimServerGUI.Game
     public interface IValheimServerOptions
     {
         string Name { get; }
-
-        string ExePath { get; }
 
         string Password { get; }
 

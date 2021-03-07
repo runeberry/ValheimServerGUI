@@ -16,7 +16,7 @@ namespace ValheimServerGUI.Forms
 
         private void linkLabel1_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.ApplicationGithubUrl);
+            WebHelper.OpenWebAddress(Resources.UrlGithubApplication);
         }
 
         private void linkLabel2_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

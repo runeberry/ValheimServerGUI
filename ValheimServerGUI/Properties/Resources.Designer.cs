@@ -61,15 +61,6 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI.
-        /// </summary>
-        internal static string ApplicationGithubUrl {
-            get {
-                return ResourceManager.GetString("ApplicationGithubUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon ApplicationIcon {
@@ -132,15 +123,6 @@ namespace ValheimServerGUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("OpenWeb_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to https://github.com/runeberry.
-        /// </summary>
-        internal static string OrganizationGithubUrl {
-            get {
-                return ResourceManager.GetString("OrganizationGithubUrl", resourceCulture);
             }
         }
         
@@ -261,6 +243,51 @@ namespace ValheimServerGUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("Stop_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI.
+        /// </summary>
+        internal static string UrlGithubApplication {
+            get {
+                return ResourceManager.GetString("UrlGithubApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry.
+        /// </summary>
+        internal static string UrlGithubOrganization {
+            get {
+                return ResourceManager.GetString("UrlGithubOrganization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki.
+        /// </summary>
+        internal static string UrlHelp {
+            get {
+                return ResourceManager.GetString("UrlHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://twitter.com/Runeberries.
+        /// </summary>
+        internal static string UrlTwitter {
+            get {
+                return ResourceManager.GetString("UrlTwitter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/releases.
+        /// </summary>
+        internal static string UrlUpdates {
+            get {
+                return ResourceManager.GetString("UrlUpdates", resourceCulture);
             }
         }
         

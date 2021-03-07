@@ -63,6 +63,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStop = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -113,6 +114,7 @@ namespace ValheimServerGUI.Forms
             // MenuItemHelp
             // 
             this.MenuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuItemHelpManual,
             this.MenuItemHelpUpdates,
             this.MenuItemHelpSeparator1,
             this.MenuItemHelpAbout});
@@ -366,6 +368,13 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuClose.Text = "Close";
             // 
+            // MenuItemHelpManual
+            // 
+            this.MenuItemHelpManual.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemHelpManual.Image")));
+            this.MenuItemHelpManual.Name = "MenuItemHelpManual";
+            this.MenuItemHelpManual.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpManual.Text = "Online &Manual";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -428,5 +437,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripMenuItem TrayContextMenuStop;
         private System.Windows.Forms.ToolStripSeparator TrayContextMenuSeparator1;
         private System.Windows.Forms.ToolStripMenuItem TrayContextMenuClose;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemHelpManual;
     }
 }

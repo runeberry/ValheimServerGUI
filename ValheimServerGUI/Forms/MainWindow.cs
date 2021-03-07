@@ -47,6 +47,7 @@ namespace ValheimServerGUI.Forms
             // Menu items
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
+            this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
             this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
@@ -213,9 +214,14 @@ namespace ValheimServerGUI.Forms
             this.Close();
         }
 
+        private void MenuItemHelpManual_Click(object sender, EventArgs e)
+        {
+            WebHelper.OpenWebAddress(Resources.UrlHelp);
+        }
+
         private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
         {
-            this.SetStatusText("Clicked Updates!");
+            WebHelper.OpenWebAddress(Resources.UrlUpdates);
         }
 
         private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
@@ -225,8 +231,6 @@ namespace ValheimServerGUI.Forms
         }
 
         #endregion
-
-        
 
         #region Form Field Events
 

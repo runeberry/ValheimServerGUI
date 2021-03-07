@@ -37,6 +37,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemFileClose = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
@@ -63,7 +64,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStop = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -121,6 +121,13 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelp.Name = "MenuItemHelp";
             this.MenuItemHelp.Size = new System.Drawing.Size(44, 20);
             this.MenuItemHelp.Text = "&Help";
+            // 
+            // MenuItemHelpManual
+            // 
+            this.MenuItemHelpManual.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemHelpManual.Image")));
+            this.MenuItemHelpManual.Name = "MenuItemHelpManual";
+            this.MenuItemHelpManual.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpManual.Text = "Online &Manual";
             // 
             // MenuItemHelpUpdates
             // 
@@ -201,11 +208,13 @@ namespace ValheimServerGUI.Forms
             // ButtonRestartServer
             // 
             this.ButtonRestartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ButtonRestartServer.Location = new System.Drawing.Point(104, 205);
+            this.ButtonRestartServer.Image = ((System.Drawing.Image)(resources.GetObject("ButtonRestartServer.Image")));
+            this.ButtonRestartServer.Location = new System.Drawing.Point(115, 205);
             this.ButtonRestartServer.Name = "ButtonRestartServer";
-            this.ButtonRestartServer.Size = new System.Drawing.Size(95, 23);
+            this.ButtonRestartServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonRestartServer.TabIndex = 15;
             this.ButtonRestartServer.Text = "Restart Server";
+            this.ButtonRestartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonRestartServer.UseVisualStyleBackColor = true;
             // 
             // ShowPasswordField
@@ -263,21 +272,25 @@ namespace ValheimServerGUI.Forms
             // ButtonStopServer
             // 
             this.ButtonStopServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.ButtonStopServer.Location = new System.Drawing.Point(205, 205);
+            this.ButtonStopServer.Image = ((System.Drawing.Image)(resources.GetObject("ButtonStopServer.Image")));
+            this.ButtonStopServer.Location = new System.Drawing.Point(227, 205);
             this.ButtonStopServer.Name = "ButtonStopServer";
-            this.ButtonStopServer.Size = new System.Drawing.Size(95, 23);
+            this.ButtonStopServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonStopServer.TabIndex = 1;
             this.ButtonStopServer.Text = "Stop Server";
+            this.ButtonStopServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonStopServer.UseVisualStyleBackColor = true;
             // 
             // ButtonStartServer
             // 
             this.ButtonStartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.ButtonStartServer.Image = ((System.Drawing.Image)(resources.GetObject("ButtonStartServer.Image")));
             this.ButtonStartServer.Location = new System.Drawing.Point(3, 205);
             this.ButtonStartServer.Name = "ButtonStartServer";
-            this.ButtonStartServer.Size = new System.Drawing.Size(95, 23);
+            this.ButtonStartServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonStartServer.TabIndex = 0;
             this.ButtonStartServer.Text = "Start Server";
+            this.ButtonStartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonStartServer.UseVisualStyleBackColor = true;
             // 
             // TabLogs
@@ -367,13 +380,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose.Name = "TrayContextMenuClose";
             this.TrayContextMenuClose.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuClose.Text = "Close";
-            // 
-            // MenuItemHelpManual
-            // 
-            this.MenuItemHelpManual.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemHelpManual.Image")));
-            this.MenuItemHelpManual.Name = "MenuItemHelpManual";
-            this.MenuItemHelpManual.Size = new System.Drawing.Size(171, 22);
-            this.MenuItemHelpManual.Text = "Online &Manual";
             // 
             // MainWindow
             // 

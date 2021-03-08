@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace ValheimServerGUI.Controls
@@ -11,6 +12,17 @@ namespace ValheimServerGUI.Controls
         {
             get => this.CheckBox.Text;
             set => this.CheckBox.Text = value;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
+        public string HelpText
+        {
+            get => this.HelpToolTip.GetToolTip(this.HelpLabel);
+            set
+            {
+                this.HelpToolTip.SetToolTip(this.HelpLabel, value);
+                this.HelpLabel.Visible = !string.IsNullOrWhiteSpace(value);
+            }
         }
 
         public bool Value

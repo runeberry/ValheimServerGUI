@@ -1,4 +1,5 @@
-﻿using System.Windows.Forms;
+﻿using System.ComponentModel;
+using System.Windows.Forms;
 
 namespace ValheimServerGUI.Controls
 {
@@ -8,6 +9,17 @@ namespace ValheimServerGUI.Controls
         {
             get => this.Label.Text;
             set => this.Label.Text = value;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
+        public string HelpText
+        {
+            get => this.HelpToolTip.GetToolTip(this.HelpLabel);
+            set
+            {
+                this.HelpToolTip.SetToolTip(this.HelpLabel, value);
+                this.HelpLabel.Visible = !string.IsNullOrWhiteSpace(value);
+            }
         }
 
         public int Value

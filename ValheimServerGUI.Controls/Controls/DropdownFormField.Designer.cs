@@ -29,8 +29,11 @@ namespace ValheimServerGUI.Controls
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.ComboBox = new System.Windows.Forms.ComboBox();
             this.Label = new System.Windows.Forms.Label();
+            this.HelpLabel = new System.Windows.Forms.Label();
+            this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
             this.SuspendLayout();
             // 
             // ComboBox
@@ -53,10 +56,25 @@ namespace ValheimServerGUI.Controls
             this.Label.TabIndex = 1;
             this.Label.Text = "Label";
             // 
+            // HelpLabel
+            // 
+            this.HelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.HelpLabel.AutoSize = true;
+            this.HelpLabel.Font = new System.Drawing.Font("Segoe UI", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
+            this.HelpLabel.ForeColor = System.Drawing.SystemColors.HotTrack;
+            this.HelpLabel.Location = new System.Drawing.Point(129, 0);
+            this.HelpLabel.Name = "HelpLabel";
+            this.HelpLabel.Size = new System.Drawing.Size(12, 15);
+            this.HelpLabel.TabIndex = 8;
+            this.HelpLabel.Text = "?";
+            this.HelpLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+            this.HelpLabel.Visible = false;
+            // 
             // DropdownFormField
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.Controls.Add(this.HelpLabel);
             this.Controls.Add(this.Label);
             this.Controls.Add(this.ComboBox);
             this.Name = "DropdownFormField";
@@ -70,5 +88,7 @@ namespace ValheimServerGUI.Controls
 
         private System.Windows.Forms.ComboBox ComboBox;
         private System.Windows.Forms.Label Label;
+        private System.Windows.Forms.Label HelpLabel;
+        private System.Windows.Forms.ToolTip HelpToolTip;
     }
 }

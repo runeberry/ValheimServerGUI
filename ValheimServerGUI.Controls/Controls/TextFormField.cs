@@ -1,10 +1,8 @@
 ﻿using System.ComponentModel;
-using System.ComponentModel.Design;
 using System.Windows.Forms;
 
 namespace ValheimServerGUI.Forms.Controls
 {
-    [Designer("System.Windows.Forms.Design.ParentControlDesigner, System.Design", typeof(IDesigner))]
     public partial class TextFormField : UserControl, IFormField<string>
     {
         private const char PasswordChar = '●';
@@ -14,6 +12,17 @@ namespace ValheimServerGUI.Forms.Controls
         {
             get => this.Label.Text;
             set => this.Label.Text = value;
+        }
+
+        [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
+        public string HelpText
+        {
+            get => this.HelpToolTip.GetToolTip(this.HelpLabel);
+            set
+            {
+                this.HelpToolTip.SetToolTip(this.HelpLabel, value);
+                this.HelpLabel.Visible = !string.IsNullOrWhiteSpace(value);
+            }
         }
 
         public string Value

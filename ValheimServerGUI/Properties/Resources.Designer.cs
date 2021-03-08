@@ -71,7 +71,7 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to %ProgramFiles(x86)%\Steam\steamapps\common\Valheim.
+        ///   Looks up a localized string similar to %ProgramFiles(x86)%\Steam\steamapps\common\Valheim\valheim.exe.
         /// </summary>
         internal static string DefaultGamePath {
             get {

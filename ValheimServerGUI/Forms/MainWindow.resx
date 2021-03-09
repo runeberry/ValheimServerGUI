@@ -71,7 +71,7 @@
   <data name="MenuItemHelpManual.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wAAADsABataJCQAAAXpJREFUOE+Nk79Kw1AUh/sE0ifwDQSfoXtAcMkiCB0chFLXumTJ4pRVySIIoYMO
+        vAAADrwBlbxySQAAAXpJREFUOE+Nk79Kw1AUh/sE0ifwDQSfoXtAcMkiCB0chFLXumTJ4pRVySIIoYMO
         nXSJQxc7WDoECiIkCOIQh05dj/c75ASTZujw67333HO+8+emPRFpaLvdHjttnM7bd11qHCz48m4ub+tv
         2QfSOLiAEyc5unqUg7P7vSD645wiAk0/v5s2xFQ4BQ2AM0TP77k6907jHR1eJJJlmQwGAxkOh7JYLACt
         nPoGqINvnpYCbDr/UJtVkOe5AjzP0zWOY4XUAIKvH5SssvJfl5+SpqnaJpOJhGGoAlLZg7oCy1aWpfAK
@@ -83,7 +83,7 @@
   <data name="MenuItemHelpUpdates.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vQAADr0BR/uQrQAAAXpJREFUOE+Nk79Kw1AUh/sE0ifwDQSfoXtAcMkiCB0chFLXumTJ4pRVySIIoYMO
+        vAAADrwBlbxySQAAAXpJREFUOE+Nk79Kw1AUh/sE0ifwDQSfoXtAcMkiCB0chFLXumTJ4pRVySIIoYMO
         nXSJQxc7WDoECiIkCOIQh05dj/c75ASTZujw67333HO+8+emPRFpaLvdHjttnM7bd11qHCz48m4ub+tv
         2QfSOLiAEyc5unqUg7P7vSD645wiAk0/v5s2xFQ4BQ2AM0TP77k6907jHR1eJJJlmQwGAxkOh7JYLACt
         nPoGqINvnpYCbDr/UJtVkOe5AjzP0zWOY4XUAIKvH5SssvJfl5+SpqnaJpOJhGGoAlLZg7oCy1aWpfAK
@@ -95,13 +95,20 @@
   <data name="ButtonRestartServer.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wQAADsEBuJFr7QAAARBJREFUOE+Vkz0OwjAMhXsUjtCBgbEHQOIKOQISKxIdERyAQyAY2Ni6wIaUHakz
+        vAAADrwBlbxySQAAARBJREFUOE+Vkz0OwjAMhXsUjtCBgbEHQOIKOQISKxIdERyAQyAY2Ni6wIaUHakz
         7dKydA1+UQxumlZ0+KrEP692nERN0xgPRWSeDcCmjDGRxArMdlML1vfnzayOy6+NgQ0+itHEJCiwv25b
         SSEQQzk1i7QEmMVhbs6Pk/0jwBo29jsRHRTYXNamrErbjiMh0qIq3vBxnGtHBStg4ONeaR1DhCvBmZAt
         +1vAiaRoR/qtwBCeQILSWSB/5T8BOFzvsUyS+ALIswJsQHm0T0PJAL5QCxlfHBwQ7THjThWw9R2ikmVh
         VE4kJTDC4TE6dS2doy4Sl0fUUqSPzlXGR4ho/HHUY+IFQ048ZwQhWBJ4zib6AHCk5q+A7T1yAAAAAElF
         TkSuQmCC
 </value>
+  </data>
+  <data name="CommunityServerField.HelpText" xml:space="preserve">
+    <value>If this box is checked, your server will show up in the Community Servers list within Valheim. 
+If not, other players will need to "Join by IP" to connect to your game.
+
+NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game, but it can
+take up to 15 minutes, and rarely not show up at all. You can always "Join by IP" as a fallback.</value>
   </data>
   <data name="WorldSelectField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
     <value>
@@ -114,14 +121,14 @@
   <data name="ButtonStopServer.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wAAADsABataJCQAAAClJREFUOE9jGGbg27dv/4nBUOWYACS5UI0XLx41YGQYQAyGKh8egIEBAMuiAHSi
+        vAAADrwBlbxySQAAAClJREFUOE9jGGbg27dv/4nBUOWYACS5UI0XLx41YGQYQAyGKh8egIEBAMuiAHSi
         jpx4AAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="ButtonStartServer.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        wAAADsABataJCQAAAKNJREFUOE9jQAbfvn07/+XLFwMol3QANOA/EL///v17AlSINAAyIGZexP97L+/9
+        vAAADrwBlbxySQAAAKNJREFUOE9jQAbfvn07/+XLFwMol3QANOA/EL///v17AlSINAAyIGZexP97L+/9
         //r16/z3798LQKWIAyADLLpM/rtMdPi/+8pOkGtI8xLMABju3tlJmpfQDQBhkryEzQAQJtpLuAyAYYJe
         ImRA/eZa8gwAeWH9ubXkeQEUiJceXSIvEEFOfv7mOenRSLST0QHIAJKcjA5ABgAxRZmJxOzMwAAAu3wo
         luQHKWcAAAAASUVORK5CYII=
@@ -130,7 +137,7 @@
   <data name="TrayContextMenuStart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vQAADr0BR/uQrQAAAKNJREFUOE9jQAbfvn07/+XLFwMol3QANOA/EL///v17AlSINAAyIGZexP97L+/9
+        vAAADrwBlbxySQAAAKNJREFUOE9jQAbfvn07/+XLFwMol3QANOA/EL///v17AlSINAAyIGZexP97L+/9
         //r16/z3798LQKWIAyADLLpM/rtMdPi/+8pOkGtI8xLMABju3tlJmpfQDQBhkryEzQAQJtpLuAyAYYJe
         ImRA/eZa8gwAeWH9ubXkeQEUiJceXSIvEEFOfv7mOenRSLST0QHIAJKcjA5ABgAxRZmJxOzMwAAAu3wo
         luQHKWcAAAAASUVORK5CYII=
@@ -139,7 +146,7 @@
   <data name="TrayContextMenuRestart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vgAADr4B6kKxwAAAARBJREFUOE+Vkz0OwjAMhXsUjtCBgbEHQOIKOQISKxIdERyAQyAY2Ni6wIaUHakz
+        vAAADrwBlbxySQAAARBJREFUOE+Vkz0OwjAMhXsUjtCBgbEHQOIKOQISKxIdERyAQyAY2Ni6wIaUHakz
         7dKydA1+UQxumlZ0+KrEP692nERN0xgPRWSeDcCmjDGRxArMdlML1vfnzayOy6+NgQ0+itHEJCiwv25b
         SSEQQzk1i7QEmMVhbs6Pk/0jwBo29jsRHRTYXNamrErbjiMh0qIq3vBxnGtHBStg4ONeaR1DhCvBmZAt
         +1vAiaRoR/qtwBCeQILSWSB/5T8BOFzvsUyS+ALIswJsQHm0T0PJAL5QCxlfHBwQ7THjThWw9R2ikmVh
@@ -150,7 +157,7 @@
   <data name="TrayContextMenuStop.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vQAADr0BR/uQrQAAAClJREFUOE9jGGbg27dv/4nBUOWYACS5UI0XLx41YGQYQAyGKh8egIEBAMuiAHSi
+        vAAADrwBlbxySQAAAClJREFUOE9jGGbg27dv/4nBUOWYACS5UI0XLx41YGQYQAyGKh8egIEBAMuiAHSi
         jpx4AAAAAElFTkSuQmCC
 </value>
   </data>

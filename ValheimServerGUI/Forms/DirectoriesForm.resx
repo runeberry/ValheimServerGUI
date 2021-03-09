@@ -57,6 +57,21 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="ServerPathField.HelpText" xml:space="preserve">
+    <value>The location of the Valheim Dedicated Server executable,
+usually "valheim_server.exe".
+
+NOTE: You must have Valheim Dedicated Server installed
+in order to use this application. See Help for installation
+instructions.</value>
+  </data>
+  <data name="WorldsFolderField.HelpText" xml:space="preserve">
+    <value>The location of your Valheim worlds.
+
+NOTE: This path currently cannot be changed, as Valheim
+Dedicated Server does not support loading worlds from an
+alternate path. The path is listed here for reference only.</value>
+  </data>
   <assembly alias="System.Drawing.Common" name="System.Drawing.Common, Version=5.0.0.1, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

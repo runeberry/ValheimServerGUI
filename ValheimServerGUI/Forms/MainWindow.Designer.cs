@@ -195,6 +195,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerPortField
             // 
+            this.ServerPortField.HelpText = "";
             this.ServerPortField.LabelText = "Port";
             this.ServerPortField.Location = new System.Drawing.Point(234, 0);
             this.ServerPortField.Maximum = 65535;
@@ -220,6 +221,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ShowPasswordField
             // 
+            this.ShowPasswordField.HelpText = "";
             this.ShowPasswordField.LabelText = "Show Password";
             this.ShowPasswordField.Location = new System.Drawing.Point(234, 68);
             this.ShowPasswordField.Name = "ShowPasswordField";
@@ -229,10 +231,11 @@ namespace ValheimServerGUI.Forms
             // 
             // CommunityServerField
             // 
+            this.CommunityServerField.HelpText = resources.GetString("CommunityServerField.HelpText");
             this.CommunityServerField.LabelText = "Community Server";
             this.CommunityServerField.Location = new System.Drawing.Point(0, 141);
             this.CommunityServerField.Name = "CommunityServerField";
-            this.CommunityServerField.Size = new System.Drawing.Size(150, 17);
+            this.CommunityServerField.Size = new System.Drawing.Size(142, 17);
             this.CommunityServerField.TabIndex = 13;
             this.CommunityServerField.Value = false;
             // 
@@ -241,6 +244,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("WorldSelectField.DataSource")));
             this.WorldSelectField.DropdownEnabled = true;
             this.WorldSelectField.EmptyText = "(no worlds)";
+            this.WorldSelectField.HelpText = "";
             this.WorldSelectField.LabelText = "World";
             this.WorldSelectField.Location = new System.Drawing.Point(0, 94);
             this.WorldSelectField.Name = "WorldSelectField";
@@ -250,6 +254,9 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerPasswordField
             // 
+            this.ServerPasswordField.HelpText = "Your server must be protected with a password. The password must be at least 5 ch" +
+    "aracters \r\nand must not contain the name of the server or the world that you\'re " +
+    "hosting.";
             this.ServerPasswordField.HideValue = true;
             this.ServerPasswordField.LabelText = "Server Password";
             this.ServerPasswordField.Location = new System.Drawing.Point(0, 47);
@@ -261,6 +268,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerNameField
             // 
+            this.ServerNameField.HelpText = "This is the name that will appear in the Community Servers list within Valheim.";
             this.ServerNameField.HideValue = false;
             this.ServerNameField.LabelText = "Server Name";
             this.ServerNameField.Location = new System.Drawing.Point(0, 0);

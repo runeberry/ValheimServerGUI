@@ -74,6 +74,8 @@ namespace ValheimServerGUI.Forms
             // GamePathField
             // 
             this.GamePathField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.SingleFile;
+            this.GamePathField.HelpText = "The location of the Valheim game executable, usually \"valheim.exe\".";
+            this.GamePathField.InitialPath = null;
             this.GamePathField.LabelText = "Valheim Game .EXE";
             this.GamePathField.Location = new System.Drawing.Point(12, 12);
             this.GamePathField.MultiFileSeparator = "; ";
@@ -85,6 +87,8 @@ namespace ValheimServerGUI.Forms
             // ServerPathField
             // 
             this.ServerPathField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.SingleFile;
+            this.ServerPathField.HelpText = resources.GetString("ServerPathField.HelpText");
+            this.ServerPathField.InitialPath = null;
             this.ServerPathField.LabelText = "Valheim Server .EXE";
             this.ServerPathField.Location = new System.Drawing.Point(12, 59);
             this.ServerPathField.MultiFileSeparator = "; ";
@@ -96,6 +100,8 @@ namespace ValheimServerGUI.Forms
             // WorldsFolderField
             // 
             this.WorldsFolderField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.Directory;
+            this.WorldsFolderField.HelpText = resources.GetString("WorldsFolderField.HelpText");
+            this.WorldsFolderField.InitialPath = null;
             this.WorldsFolderField.LabelText = "Valheim Worlds Folder";
             this.WorldsFolderField.Location = new System.Drawing.Point(12, 106);
             this.WorldsFolderField.MultiFileSeparator = "; ";

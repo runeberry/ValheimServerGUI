@@ -28,6 +28,10 @@ namespace ValheimServerGUI.Forms
 
             this.GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
             this.ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
+
+            // Currently valheim_server doesn't support using different world folders.
+            // Re-enable this control and properly add support in the server options if a method ever gets added to do this.
+            this.WorldsFolderField.ReadOnly = true;
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)

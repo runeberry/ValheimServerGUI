@@ -29,6 +29,16 @@ namespace ValheimServerGUI.Controls
             set => this.TextBox.Text = value;
         }
 
+        public bool ReadOnly
+        {
+            get => this.TextBox.ReadOnly;
+            set
+            {
+                this.TextBox.ReadOnly = value;
+                this.FileBrowserButton.Enabled = !value;
+            }
+        }
+
         /// <summary>
         /// Sets the initial directory that the file/folder dialog will open to.
         /// If null, will default to the directory of the current Value of this control.

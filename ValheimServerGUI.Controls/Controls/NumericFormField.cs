@@ -14,12 +14,8 @@ namespace ValheimServerGUI.Controls
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpToolTip.GetToolTip(this.HelpLabel);
-            set
-            {
-                this.HelpToolTip.SetToolTip(this.HelpLabel, value);
-                this.HelpLabel.Visible = !string.IsNullOrWhiteSpace(value);
-            }
+            get => this.HelpLabel.Text;
+            set => this.HelpLabel.Text = value;
         }
 
         public int Value

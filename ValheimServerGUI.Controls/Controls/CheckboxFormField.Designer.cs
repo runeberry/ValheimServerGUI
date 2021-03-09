@@ -31,8 +31,8 @@ namespace ValheimServerGUI.Controls
         {
             this.components = new System.ComponentModel.Container();
             this.CheckBox = new System.Windows.Forms.CheckBox();
-            this.HelpLabel = new System.Windows.Forms.Label();
             this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.HelpLabel = new ValheimServerGUI.Controls.HelpLabel();
             this.SuspendLayout();
             // 
             // CheckBox
@@ -45,19 +45,21 @@ namespace ValheimServerGUI.Controls
             this.CheckBox.Text = "Label";
             this.CheckBox.UseVisualStyleBackColor = true;
             // 
+            // HelpToolTip
+            // 
+            this.HelpToolTip.AutoPopDelay = 30000;
+            this.HelpToolTip.InitialDelay = 500;
+            this.HelpToolTip.ReshowDelay = 100;
+            // 
             // HelpLabel
             // 
             this.HelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.HelpLabel.AutoSize = true;
             this.HelpLabel.Font = new System.Drawing.Font("Segoe UI", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
             this.HelpLabel.ForeColor = System.Drawing.SystemColors.HotTrack;
-            this.HelpLabel.Location = new System.Drawing.Point(138, 1);
+            this.HelpLabel.Location = new System.Drawing.Point(138, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 9;
-            this.HelpLabel.Text = "?";
-            this.HelpLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.HelpLabel.Visible = false;
+            this.HelpLabel.TabIndex = 8;
             // 
             // CheckboxFormField
             // 
@@ -75,7 +77,7 @@ namespace ValheimServerGUI.Controls
         #endregion
 
         private System.Windows.Forms.CheckBox CheckBox;
-        private System.Windows.Forms.Label HelpLabel;
         private System.Windows.Forms.ToolTip HelpToolTip;
+        private HelpLabel HelpLabel;
     }
 }

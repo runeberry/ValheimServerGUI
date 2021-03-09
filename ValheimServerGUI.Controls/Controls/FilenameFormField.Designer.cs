@@ -29,12 +29,10 @@ namespace ValheimServerGUI.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.Label = new System.Windows.Forms.Label();
             this.TextBox = new System.Windows.Forms.TextBox();
             this.FileBrowserButton = new System.Windows.Forms.Button();
-            this.HelpLabel = new System.Windows.Forms.Label();
-            this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.HelpLabel = new ValheimServerGUI.Controls.HelpLabel();
             this.SuspendLayout();
             // 
             // Label
@@ -69,16 +67,12 @@ namespace ValheimServerGUI.Controls
             // HelpLabel
             // 
             this.HelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.HelpLabel.AutoSize = true;
             this.HelpLabel.Font = new System.Drawing.Font("Segoe UI", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
             this.HelpLabel.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.HelpLabel.Location = new System.Drawing.Point(130, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 5;
-            this.HelpLabel.Text = "?";
-            this.HelpLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.HelpLabel.Visible = false;
+            this.HelpLabel.TabIndex = 8;
             // 
             // FilenameFormField
             // 
@@ -100,7 +94,6 @@ namespace ValheimServerGUI.Controls
         private System.Windows.Forms.Label Label;
         private System.Windows.Forms.TextBox TextBox;
         private System.Windows.Forms.Button FileBrowserButton;
-        private System.Windows.Forms.Label HelpLabel;
-        private System.Windows.Forms.ToolTip HelpToolTip;
+        private HelpLabel HelpLabel;
     }
 }

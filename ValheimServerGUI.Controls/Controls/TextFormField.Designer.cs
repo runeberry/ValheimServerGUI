@@ -29,11 +29,9 @@ namespace ValheimServerGUI.Forms.Controls
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
             this.TextBox = new System.Windows.Forms.TextBox();
             this.Label = new System.Windows.Forms.Label();
-            this.HelpLabel = new System.Windows.Forms.Label();
-            this.HelpToolTip = new System.Windows.Forms.ToolTip(this.components);
+            this.HelpLabel = new ValheimServerGUI.Controls.HelpLabel();
             this.SuspendLayout();
             // 
             // TextBox
@@ -57,16 +55,12 @@ namespace ValheimServerGUI.Forms.Controls
             // HelpLabel
             // 
             this.HelpLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.HelpLabel.AutoSize = true;
             this.HelpLabel.Font = new System.Drawing.Font("Segoe UI", 9F, ((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Underline))), System.Drawing.GraphicsUnit.Point);
             this.HelpLabel.ForeColor = System.Drawing.SystemColors.HotTrack;
             this.HelpLabel.Location = new System.Drawing.Point(129, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 7;
-            this.HelpLabel.Text = "?";
-            this.HelpLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.HelpLabel.Visible = false;
+            this.HelpLabel.TabIndex = 8;
             // 
             // TextFormField
             // 
@@ -86,7 +80,6 @@ namespace ValheimServerGUI.Forms.Controls
 
         private System.Windows.Forms.TextBox TextBox;
         private System.Windows.Forms.Label Label;
-        private System.Windows.Forms.Label HelpLabel;
-        private System.Windows.Forms.ToolTip HelpToolTip;
+        private ValheimServerGUI.Controls.HelpLabel HelpLabel;
     }
 }

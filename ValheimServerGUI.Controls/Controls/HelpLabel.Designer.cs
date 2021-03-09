@@ -47,7 +47,7 @@ namespace ValheimServerGUI.Controls
             // ToolTip
             // 
             this.ToolTip.AutoPopDelay = 30000;
-            this.ToolTip.InitialDelay = 500;
+            this.ToolTip.InitialDelay = 100;
             this.ToolTip.ReshowDelay = 100;
             // 
             // HelpLabel

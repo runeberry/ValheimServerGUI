@@ -16,5 +16,13 @@ namespace ValheimServerGUI.Game
                 .Select(f => Path.GetFileNameWithoutExtension(f.FullName))
                 .ToList();
         }
+
+        public static bool IsWorldNameAvailable(this IValheimFileProvider files, string worldName)
+        {
+            if (string.IsNullOrWhiteSpace(worldName)) return false;
+
+            var path = Path.Join(files.WorldsFolder.FullName, $"{worldName}.db");
+            return !File.Exists(path);
+        }
     }
 }

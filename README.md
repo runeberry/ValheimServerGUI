@@ -58,7 +58,6 @@ You also get the following features for free:
 
 ## Features coming soon
 
-* **New worlds** - Create a new world from within the app without having to launch Valheim
 * **Worlds manager** - View, delete, or backup your worlds from within the app
 * **Online players** - Show which players are online or offline, and when they arrived/left
 * **Ban list management** - Manage your servers ban/allow lists from within the app

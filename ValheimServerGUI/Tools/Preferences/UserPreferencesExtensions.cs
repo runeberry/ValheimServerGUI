@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Tools.Preferences
@@ -102,10 +103,10 @@ namespace ValheimServerGUI.Tools.Preferences
                 foreach (var line in File.ReadAllLines(UserPrefsFilePath))
                 {
                     var parts = line.Split("=");
-                    if (parts.Length != 2) continue; // Ignore invalid lines
+                    if (parts.Length < 2) continue; // Ignore invalid lines
 
                     var key = parts[0].Trim();
-                    var value = parts[1].Trim();
+                    var value = string.Join("=", parts.Skip(1)).Trim();
 
                     prefs.SetValue(key, value);
                 }

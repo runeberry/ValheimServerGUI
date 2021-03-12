@@ -45,11 +45,15 @@ namespace ValheimServerGUI.Forms
             this.StatusStripLabel = new System.Windows.Forms.ToolStripStatusLabel();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
+            this.WorldSelectGroupBox = new System.Windows.Forms.GroupBox();
+            this.WorldSelectNewNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
+            this.WorldSelectRadioNew = new ValheimServerGUI.Controls.RadioFormField();
+            this.WorldSelectRadioExisting = new ValheimServerGUI.Controls.RadioFormField();
+            this.WorldSelectExistingNameField = new ValheimServerGUI.Controls.DropdownFormField();
             this.ServerPortField = new ValheimServerGUI.Controls.NumericFormField();
             this.ButtonRestartServer = new System.Windows.Forms.Button();
             this.ShowPasswordField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
-            this.WorldSelectField = new ValheimServerGUI.Controls.DropdownFormField();
             this.ServerPasswordField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ServerNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonStopServer = new System.Windows.Forms.Button();
@@ -68,6 +72,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
             this.TabServerControls.SuspendLayout();
+            this.WorldSelectGroupBox.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -151,7 +156,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.StatusStripLabel});
-            this.StatusStrip.Location = new System.Drawing.Point(0, 289);
+            this.StatusStrip.Location = new System.Drawing.Point(0, 310);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(484, 22);
             this.StatusStrip.TabIndex = 1;
@@ -171,16 +176,16 @@ namespace ValheimServerGUI.Forms
             this.Tabs.Location = new System.Drawing.Point(12, 27);
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
-            this.Tabs.Size = new System.Drawing.Size(460, 259);
+            this.Tabs.Size = new System.Drawing.Size(460, 280);
             this.Tabs.TabIndex = 2;
             // 
             // TabServerControls
             // 
+            this.TabServerControls.Controls.Add(this.WorldSelectGroupBox);
             this.TabServerControls.Controls.Add(this.ServerPortField);
             this.TabServerControls.Controls.Add(this.ButtonRestartServer);
             this.TabServerControls.Controls.Add(this.ShowPasswordField);
             this.TabServerControls.Controls.Add(this.CommunityServerField);
-            this.TabServerControls.Controls.Add(this.WorldSelectField);
             this.TabServerControls.Controls.Add(this.ServerPasswordField);
             this.TabServerControls.Controls.Add(this.ServerNameField);
             this.TabServerControls.Controls.Add(this.ButtonStopServer);
@@ -188,10 +193,72 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.Location = new System.Drawing.Point(4, 24);
             this.TabServerControls.Name = "TabServerControls";
             this.TabServerControls.Padding = new System.Windows.Forms.Padding(3);
-            this.TabServerControls.Size = new System.Drawing.Size(452, 231);
+            this.TabServerControls.Size = new System.Drawing.Size(452, 252);
             this.TabServerControls.TabIndex = 0;
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
+            // 
+            // WorldSelectGroupBox
+            // 
+            this.WorldSelectGroupBox.Controls.Add(this.WorldSelectNewNameField);
+            this.WorldSelectGroupBox.Controls.Add(this.WorldSelectRadioNew);
+            this.WorldSelectGroupBox.Controls.Add(this.WorldSelectRadioExisting);
+            this.WorldSelectGroupBox.Controls.Add(this.WorldSelectExistingNameField);
+            this.WorldSelectGroupBox.Location = new System.Drawing.Point(3, 117);
+            this.WorldSelectGroupBox.Name = "WorldSelectGroupBox";
+            this.WorldSelectGroupBox.Size = new System.Drawing.Size(240, 96);
+            this.WorldSelectGroupBox.TabIndex = 17;
+            this.WorldSelectGroupBox.TabStop = false;
+            this.WorldSelectGroupBox.Text = "World";
+            // 
+            // WorldSelectNewNameField
+            // 
+            this.WorldSelectNewNameField.HelpText = "";
+            this.WorldSelectNewNameField.HideValue = false;
+            this.WorldSelectNewNameField.LabelText = "New World Name";
+            this.WorldSelectNewNameField.Location = new System.Drawing.Point(6, 45);
+            this.WorldSelectNewNameField.MaxLength = 32767;
+            this.WorldSelectNewNameField.Name = "WorldSelectNewNameField";
+            this.WorldSelectNewNameField.Size = new System.Drawing.Size(234, 41);
+            this.WorldSelectNewNameField.TabIndex = 18;
+            this.WorldSelectNewNameField.Value = "";
+            this.WorldSelectNewNameField.Visible = false;
+            // 
+            // WorldSelectRadioNew
+            // 
+            this.WorldSelectRadioNew.GroupName = "WorldSelect";
+            this.WorldSelectRadioNew.HelpText = "";
+            this.WorldSelectRadioNew.LabelText = "Create New";
+            this.WorldSelectRadioNew.Location = new System.Drawing.Point(117, 22);
+            this.WorldSelectRadioNew.Name = "WorldSelectRadioNew";
+            this.WorldSelectRadioNew.Size = new System.Drawing.Size(111, 17);
+            this.WorldSelectRadioNew.TabIndex = 14;
+            this.WorldSelectRadioNew.Value = false;
+            // 
+            // WorldSelectRadioExisting
+            // 
+            this.WorldSelectRadioExisting.GroupName = "WorldSelect";
+            this.WorldSelectRadioExisting.HelpText = "";
+            this.WorldSelectRadioExisting.LabelText = "Use Existing";
+            this.WorldSelectRadioExisting.Location = new System.Drawing.Point(6, 22);
+            this.WorldSelectRadioExisting.Name = "WorldSelectRadioExisting";
+            this.WorldSelectRadioExisting.Size = new System.Drawing.Size(105, 17);
+            this.WorldSelectRadioExisting.TabIndex = 13;
+            this.WorldSelectRadioExisting.Value = false;
+            // 
+            // WorldSelectExistingNameField
+            // 
+            this.WorldSelectExistingNameField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("WorldSelectExistingNameField.DataSource")));
+            this.WorldSelectExistingNameField.DropdownEnabled = true;
+            this.WorldSelectExistingNameField.EmptyText = "(no worlds)";
+            this.WorldSelectExistingNameField.HelpText = "";
+            this.WorldSelectExistingNameField.LabelText = "Select World";
+            this.WorldSelectExistingNameField.Location = new System.Drawing.Point(6, 45);
+            this.WorldSelectExistingNameField.Name = "WorldSelectExistingNameField";
+            this.WorldSelectExistingNameField.Size = new System.Drawing.Size(234, 41);
+            this.WorldSelectExistingNameField.TabIndex = 12;
+            this.WorldSelectExistingNameField.Value = null;
+            this.WorldSelectExistingNameField.Visible = false;
             // 
             // ServerPortField
             // 
@@ -210,7 +277,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ButtonRestartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ButtonRestartServer.Image = ((System.Drawing.Image)(resources.GetObject("ButtonRestartServer.Image")));
-            this.ButtonRestartServer.Location = new System.Drawing.Point(115, 205);
+            this.ButtonRestartServer.Location = new System.Drawing.Point(115, 226);
             this.ButtonRestartServer.Name = "ButtonRestartServer";
             this.ButtonRestartServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonRestartServer.TabIndex = 15;
@@ -233,24 +300,11 @@ namespace ValheimServerGUI.Forms
             // 
             this.CommunityServerField.HelpText = resources.GetString("CommunityServerField.HelpText");
             this.CommunityServerField.LabelText = "Community Server";
-            this.CommunityServerField.Location = new System.Drawing.Point(0, 141);
+            this.CommunityServerField.Location = new System.Drawing.Point(3, 94);
             this.CommunityServerField.Name = "CommunityServerField";
             this.CommunityServerField.Size = new System.Drawing.Size(142, 17);
             this.CommunityServerField.TabIndex = 13;
             this.CommunityServerField.Value = false;
-            // 
-            // WorldSelectField
-            // 
-            this.WorldSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("WorldSelectField.DataSource")));
-            this.WorldSelectField.DropdownEnabled = true;
-            this.WorldSelectField.EmptyText = "(no worlds)";
-            this.WorldSelectField.HelpText = "";
-            this.WorldSelectField.LabelText = "World";
-            this.WorldSelectField.Location = new System.Drawing.Point(0, 94);
-            this.WorldSelectField.Name = "WorldSelectField";
-            this.WorldSelectField.Size = new System.Drawing.Size(243, 41);
-            this.WorldSelectField.TabIndex = 12;
-            this.WorldSelectField.Value = null;
             // 
             // ServerPasswordField
             // 
@@ -282,7 +336,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ButtonStopServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ButtonStopServer.Image = ((System.Drawing.Image)(resources.GetObject("ButtonStopServer.Image")));
-            this.ButtonStopServer.Location = new System.Drawing.Point(227, 205);
+            this.ButtonStopServer.Location = new System.Drawing.Point(227, 226);
             this.ButtonStopServer.Name = "ButtonStopServer";
             this.ButtonStopServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonStopServer.TabIndex = 1;
@@ -295,7 +349,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ButtonStartServer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.ButtonStartServer.Image = ((System.Drawing.Image)(resources.GetObject("ButtonStartServer.Image")));
-            this.ButtonStartServer.Location = new System.Drawing.Point(3, 205);
+            this.ButtonStartServer.Location = new System.Drawing.Point(3, 226);
             this.ButtonStartServer.Name = "ButtonStartServer";
             this.ButtonStartServer.Size = new System.Drawing.Size(106, 23);
             this.ButtonStartServer.TabIndex = 0;
@@ -310,7 +364,7 @@ namespace ValheimServerGUI.Forms
             this.TabLogs.Controls.Add(this.TextBoxLogs);
             this.TabLogs.Location = new System.Drawing.Point(4, 24);
             this.TabLogs.Name = "TabLogs";
-            this.TabLogs.Size = new System.Drawing.Size(452, 231);
+            this.TabLogs.Size = new System.Drawing.Size(452, 252);
             this.TabLogs.TabIndex = 2;
             this.TabLogs.Text = "Logs";
             this.TabLogs.UseVisualStyleBackColor = true;
@@ -396,7 +450,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(484, 311);
+            this.ClientSize = new System.Drawing.Size(484, 332);
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.StatusStrip);
             this.Controls.Add(this.MenuStrip);
@@ -412,6 +466,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStrip.PerformLayout();
             this.Tabs.ResumeLayout(false);
             this.TabServerControls.ResumeLayout(false);
+            this.WorldSelectGroupBox.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TabLogs.PerformLayout();
             this.TrayContextMenuStrip.ResumeLayout(false);
@@ -440,7 +495,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonStartServer;
         private System.Windows.Forms.TextBox TextBoxLogs;
         private System.Windows.Forms.Button ButtonClearLogs;
-        private ValheimServerGUI.Controls.DropdownFormField WorldSelectField;
+        private ValheimServerGUI.Controls.DropdownFormField WorldSelectExistingNameField;
         private Controls.TextFormField ServerPasswordField;
         private Controls.TextFormField ServerNameField;
         private ValheimServerGUI.Controls.CheckboxFormField CommunityServerField;
@@ -455,5 +510,9 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripSeparator TrayContextMenuSeparator1;
         private System.Windows.Forms.ToolStripMenuItem TrayContextMenuClose;
         private System.Windows.Forms.ToolStripMenuItem MenuItemHelpManual;
+        private System.Windows.Forms.GroupBox WorldSelectGroupBox;
+        private ValheimServerGUI.Controls.RadioFormField WorldSelectRadioNew;
+        private ValheimServerGUI.Controls.RadioFormField WorldSelectRadioExisting;
+        private Controls.TextFormField WorldSelectNewNameField;
     }
 }

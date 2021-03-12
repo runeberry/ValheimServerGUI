@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Windows.Forms;
@@ -35,6 +36,8 @@ namespace ValheimServerGUI.Controls
 
         public string GroupName { get; set; }
 
+        public IReadOnlyList<RadioFormField> RadioGroup { get; private set; }
+
         public RadioFormField()
         {
             InitializeComponent();
@@ -42,19 +45,31 @@ namespace ValheimServerGUI.Controls
             this.RadioButton.CheckedChanged += RadioButton_Changed;
         }
 
+        public void RefreshRadioGroup()
+        {
+            this.RadioGroup = this.FindForm()
+                .FindAllControls<RadioFormField>()
+                .Where(r => r.GroupName == this.GroupName)
+                .ToList();
+        }
+
+        protected override void OnVisibleChanged(EventArgs e)
+        {
+            base.OnVisibleChanged(e);
+
+            if (this.Visible && this.RadioGroup == null)
+            {
+                this.RefreshRadioGroup();
+            }
+        }
+
         private void RadioButton_Changed(object sender, EventArgs e)
         {
             this.ValueChanged?.Invoke(this, this.Value);
 
-            if (this.Value)
+            if (this.Value && this.RadioGroup != null)
             {
-                // Find any other radio buttons in this group that are checked and uncheck them
-                // todo: optimize by caching the list of related controls on form load
-                var others = this.FindForm()
-                    .FindAllControls<RadioFormField>()
-                    .Where(r => r.GroupName == this.GroupName && r.Value && r != this);
-
-                foreach (var other in others)
+                foreach (var other in this.RadioGroup.Where(r => r != this))
                 {
                     other.Value = false;
                 }

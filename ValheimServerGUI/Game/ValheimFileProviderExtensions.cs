@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ValheimServerGUI.Game
 {
@@ -12,7 +9,7 @@ namespace ValheimServerGUI.Game
         public static List<string> GetWorldNames(this IValheimFileProvider files)
         {
             return files.WorldsFolder
-                .GetFiles("*.db")
+                .GetFiles("*.fwl")
                 .Select(f => Path.GetFileNameWithoutExtension(f.FullName))
                 .ToList();
         }
@@ -21,7 +18,7 @@ namespace ValheimServerGUI.Game
         {
             if (string.IsNullOrWhiteSpace(worldName)) return false;
 
-            var path = Path.Join(files.WorldsFolder.FullName, $"{worldName}.db");
+            var path = Path.Join(files.WorldsFolder.FullName, $"{worldName}.fwl");
             return !File.Exists(path);
         }
     }

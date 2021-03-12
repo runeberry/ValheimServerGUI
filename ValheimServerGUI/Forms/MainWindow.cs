@@ -66,48 +66,22 @@ namespace ValheimServerGUI.Forms
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
+            this.WorldSelectRadioExisting.ValueChanged += this.WorldSelectRadioExisting_Changed;
+            this.WorldSelectRadioNew.ValueChanged += this.WorldSelectRadioNew_Changed;
         }
 
         private void InitializeFormFields()
         {
-            try
-            {
-                var worlds = this.FileProvider.GetWorldNames();
-                this.WorldSelectField.DataSource = worlds;
-                this.WorldSelectField.DropdownEnabled = worlds.Any();
-                this.WorldSelectField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
-            }
-            catch
-            {
-                this.WorldSelectField.DataSource = null;
-                this.WorldSelectField.DropdownEnabled = false;
-            }
+            this.RefreshWorldSelect();
 
             this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
             this.ServerPortField.Value = UserPrefs.GetNumberValue(PrefKeys.ServerPort, int.Parse(Resources.DefaultServerPort));
             this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
             this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
             this.ShowPasswordField.Value = false;
-
-            SetFormStateForServer();
-        }
-
-        private void OnLogReceived(object sender, LogEvent logEvent)
-        {
-            // Allows cross-thread access to the TextBox
-            // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<object, LogEvent>(OnLogReceived), new object[] { sender, logEvent });
-                return;
-            }
-
-            this.AddLog(logEvent.Message);
-        }
-
-        private void OnServerStatusChanged(object sender, ServerStatus status)
-        {
-            this.SetStatusText(status.ToString());
+            
+            this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
+            this.WorldSelectRadioExisting.Value = true;
 
             this.SetFormStateForServer();
         }
@@ -236,11 +210,44 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
+            string worldName;
+
+            if (this.WorldSelectRadioNew.Value)
+            {
+                // Creating a new world, ensure that the name is available
+                worldName = this.WorldSelectNewNameField.Value;
+                if (!this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    MessageBox.Show(
+                        $"A world named '{worldName}' already exists.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    this.WorldSelectRadioExisting.Value = true;
+                    return;
+                }
+            }
+            else
+            {
+                // Using an existing world, ensure that the file exists
+                worldName = this.WorldSelectExistingNameField.Value;
+                if (this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    // Don't think this is possible to hit because the name comes from a dropdown
+                    MessageBox.Show(
+                        $"No world exists with name '{worldName}'.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
             var options = new ValheimServerOptions
             {
                 Name = this.ServerNameField.Value,
                 Password = this.ServerPasswordField.Value,
-                WorldName = this.WorldSelectField.Value,
+                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
                 Public = this.CommunityServerField.Value,
                 Port = this.ServerPortField.Value,
             };
@@ -264,7 +271,7 @@ namespace ValheimServerGUI.Forms
             UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
             UserPrefs.SetValue(PrefKeys.ServerPort, this.ServerPortField.Value);
             UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerWorldName, this.WorldSelectField.Value);
+            UserPrefs.SetValue(PrefKeys.ServerWorldName, worldName);
             UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
 
             UserPrefs.SaveFile();
@@ -298,6 +305,63 @@ namespace ValheimServerGUI.Forms
                 {
                     this.WindowState = FormWindowState.Normal;
                 }
+            }
+        }
+
+        private void WorldSelectRadioExisting_Changed(object sender, bool value)
+        {
+            this.WorldSelectExistingNameField.Visible = value;
+
+            if (value)
+            {
+                // When going back to the Existing World field, select the New Name if it's already an existing world
+                this.WorldSelectExistingNameField.Value = this.WorldSelectNewNameField.Value;
+                
+                // Then, empty out the new name field
+                this.WorldSelectNewNameField.Value = null;
+            }
+        }
+
+        private void WorldSelectRadioNew_Changed(object sender, bool value)
+        {
+            this.WorldSelectNewNameField.Visible = value;
+        }
+
+        #endregion
+
+        #region Server Events
+
+        private void OnLogReceived(object sender, LogEvent logEvent)
+        {
+            // This technique allows cross-thread access to UI controls
+            // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<object, LogEvent>(OnLogReceived), new object[] { sender, logEvent });
+                return;
+            }
+
+            this.AddLog(logEvent.Message);
+        }
+
+        private void OnServerStatusChanged(object sender, ServerStatus status)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<object, ServerStatus>(OnServerStatusChanged), new object[] { sender, status });
+                return;
+            }
+
+            this.SetStatusText(status.ToString());
+
+            this.SetFormStateForServer();
+
+            if (status == ServerStatus.Running && this.WorldSelectRadioNew.Value)
+            {
+                // Once a "new world" starts running, switch back to the Existing Worlds screen
+                // and select the newly created world
+                this.RefreshWorldSelect();
+                this.WorldSelectRadioExisting.Value = true;
             }
         }
 
@@ -337,55 +401,30 @@ namespace ValheimServerGUI.Forms
 
         private void AddLog(string message)
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<string>(AddLog), new object[] { message });
-                return;
-            }
-
             this.TextBoxLogs.AppendLine(message);
         }
 
         private void ClearLogs()
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(ClearLogs));
-                return;
-            }
-
             this.TextBoxLogs.Text = "";
         }
 
         private void SetStatusText(string message)
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<string>(SetStatusText), new object[] { message });
-                return;
-            }
-
             this.StatusStripLabel.Text = message;
         }
 
         private void SetFormStateForServer()
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action(SetFormStateForServer), new object[] { });
-                return;
-            }
-
             // Only allow form field changes when the server is stopped
             bool allowServerChanges = this.Server.Status == ServerStatus.Stopped;
 
             this.ServerNameField.Enabled = allowServerChanges;
             this.ServerPortField.Enabled = allowServerChanges;
             this.ServerPasswordField.Enabled = allowServerChanges;
-            this.WorldSelectField.Enabled = allowServerChanges;
+            this.WorldSelectGroupBox.Enabled = allowServerChanges;
             this.CommunityServerField.Enabled = allowServerChanges;
 
-            // You can only start the server when it's stopped
             this.ButtonStartServer.Enabled = this.Server.CanStart;
             this.ButtonRestartServer.Enabled = this.Server.CanRestart;
             this.ButtonStopServer.Enabled = this.Server.CanStop;
@@ -394,6 +433,23 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStart.Enabled = this.ButtonStartServer.Enabled;
             this.TrayContextMenuRestart.Enabled = this.ButtonRestartServer.Enabled;
             this.TrayContextMenuStop.Enabled = this.ButtonStopServer.Enabled;
+        }
+
+        private void RefreshWorldSelect()
+        {
+            try
+            {
+                // Refresh the existing worlds list
+                var worlds = this.FileProvider.GetWorldNames();
+                this.WorldSelectExistingNameField.DataSource = worlds;
+                this.WorldSelectExistingNameField.DropdownEnabled = worlds.Any();
+            }
+            catch
+            {
+                // Show no worlds if something goes wrong
+                this.WorldSelectExistingNameField.DataSource = null;
+                this.WorldSelectExistingNameField.DropdownEnabled = false;
+            }
         }
 
         private void CloseApplicationOnServerStopped()

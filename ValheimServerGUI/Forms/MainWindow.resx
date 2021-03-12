@@ -92,6 +92,14 @@
         D/8uQJ9LMpCdAJO1wD1+nQCTcxg78e3rsCq1/gvS+wNO/eKaJR8tQgAAAABJRU5ErkJggg==
 </value>
   </data>
+  <data name="WorldSelectExistingNameField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
+    <value>
+        AAEAAAD/////AQAAAAAAAAAEAQAAAH9TeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW1N5
+        c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVi
+        bGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dAwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24GAAAI
+        CAkCAAAAAQAAAAEAAAARAgAAAAQAAAAGAwAAAAANAws=
+</value>
+  </data>
   <data name="ButtonRestartServer.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
@@ -109,14 +117,6 @@ If not, other players will need to "Join by IP" to connect to your game.
 
 NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game, but it can
 take up to 15 minutes, and rarely not show up at all. You can always "Join by IP" as a fallback.</value>
-  </data>
-  <data name="WorldSelectField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
-    <value>
-        AAEAAAD/////AQAAAAAAAAAEAQAAAH9TeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW1N5
-        c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVi
-        bGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dAwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24GAAAI
-        CAkCAAAAAQAAAAEAAAARAgAAAAQAAAAGAwAAAAANAws=
-</value>
   </data>
   <data name="ButtonStopServer.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

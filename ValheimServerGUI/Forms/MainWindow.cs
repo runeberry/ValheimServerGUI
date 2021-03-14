@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
@@ -11,6 +12,7 @@ namespace ValheimServerGUI.Forms
     public partial class MainWindow : Form
     {
         private static readonly string NL = Environment.NewLine;
+        private const string PlayerNameUnknown = "(unknown)";
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -40,6 +42,8 @@ namespace ValheimServerGUI.Forms
         {
             this.Server.FilteredLogger.LogReceived += this.OnLogReceived;
             this.Server.StatusChanged += this.OnServerStatusChanged;
+            this.Server.PlayerStatusChanged += this.OnPlayerStatusChanged;
+            this.Server.WorldSaved += this.OnWorldSaved;
         }
 
         private void InitializeFormEvents()
@@ -365,6 +369,28 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void OnPlayerStatusChanged(object sender, PlayerInfo player)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<object, PlayerInfo>(OnPlayerStatusChanged), new object[] { sender, player });
+                return;
+            }
+
+            this.UpdatePlayerStatus(player);
+        }
+
+        private void OnWorldSaved(object sender, decimal duration)
+        {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<object, decimal>(OnWorldSaved), new object[] { sender, duration });
+                return;
+            }
+
+            // todo: something
+        }
+
         #endregion
 
         #region Common Methods
@@ -412,6 +438,28 @@ namespace ValheimServerGUI.Forms
         private void SetStatusText(string message)
         {
             this.StatusStripLabel.Text = message;
+        }
+
+        private void UpdatePlayerStatus(PlayerInfo player)
+        {
+            var playerName = player.PlayerName ?? PlayerNameUnknown;
+
+            var playerListViewItem = this.PlayersListView.FindRowsWithColumnValue(1, player.SteamId).FirstOrDefault();
+
+            if (playerListViewItem == null)
+            {
+                this.PlayersListView.AddRowWithColumnValues(playerName, player.SteamId, player.PlayerStatus);
+            }
+            else
+            {
+                // If the player's name was previously unknown, but we have a name now, update the name
+                if (playerListViewItem.GetColumnText(0) == PlayerNameUnknown && playerName != PlayerNameUnknown)
+                {
+                    playerListViewItem.SetColumnText(0, playerName);
+                }
+
+                playerListViewItem.SetColumnText(2, player.PlayerStatus);
+            }
         }
 
         private void SetFormStateForServer()

@@ -58,6 +58,11 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
+            this.TabPlayers = new System.Windows.Forms.TabPage();
+            this.PlayersListView = new System.Windows.Forms.ListView();
+            this.ColumnPlayerName = new System.Windows.Forms.ColumnHeader();
+            this.ColumnPlayerSteamId = new System.Windows.Forms.ColumnHeader();
+            this.ColumnPlayerOnline = new System.Windows.Forms.ColumnHeader();
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
@@ -73,6 +78,7 @@ namespace ValheimServerGUI.Forms
             this.Tabs.SuspendLayout();
             this.TabServerControls.SuspendLayout();
             this.WorldSelectGroupBox.SuspendLayout();
+            this.TabPlayers.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
             this.SuspendLayout();
@@ -172,6 +178,7 @@ namespace ValheimServerGUI.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Tabs.Controls.Add(this.TabServerControls);
+            this.Tabs.Controls.Add(this.TabPlayers);
             this.Tabs.Controls.Add(this.TabLogs);
             this.Tabs.Location = new System.Drawing.Point(12, 27);
             this.Tabs.Name = "Tabs";
@@ -358,6 +365,49 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonStartServer.UseVisualStyleBackColor = true;
             // 
+            // TabPlayers
+            // 
+            this.TabPlayers.Controls.Add(this.PlayersListView);
+            this.TabPlayers.Location = new System.Drawing.Point(4, 24);
+            this.TabPlayers.Name = "TabPlayers";
+            this.TabPlayers.Size = new System.Drawing.Size(452, 252);
+            this.TabPlayers.TabIndex = 3;
+            this.TabPlayers.Text = "Players";
+            this.TabPlayers.UseVisualStyleBackColor = true;
+            // 
+            // PlayersListView
+            // 
+            this.PlayersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.ColumnPlayerName,
+            this.ColumnPlayerSteamId,
+            this.ColumnPlayerOnline});
+            this.PlayersListView.FullRowSelect = true;
+            this.PlayersListView.HideSelection = false;
+            this.PlayersListView.Location = new System.Drawing.Point(3, 37);
+            this.PlayersListView.Name = "PlayersListView";
+            this.PlayersListView.Size = new System.Drawing.Size(446, 212);
+            this.PlayersListView.TabIndex = 0;
+            this.PlayersListView.UseCompatibleStateImageBehavior = false;
+            this.PlayersListView.View = System.Windows.Forms.View.Details;
+            // 
+            // ColumnPlayerName
+            // 
+            this.ColumnPlayerName.Name = "ColumnPlayerName";
+            this.ColumnPlayerName.Text = "Name";
+            this.ColumnPlayerName.Width = 160;
+            // 
+            // ColumnPlayerSteamId
+            // 
+            this.ColumnPlayerSteamId.Name = "ColumnPlayerSteamId";
+            this.ColumnPlayerSteamId.Text = "Steam ID";
+            this.ColumnPlayerSteamId.Width = 160;
+            // 
+            // ColumnPlayerOnline
+            // 
+            this.ColumnPlayerOnline.Name = "ColumnPlayerOnline";
+            this.ColumnPlayerOnline.Text = "Online";
+            this.ColumnPlayerOnline.Width = 120;
+            // 
             // TabLogs
             // 
             this.TabLogs.Controls.Add(this.ButtonClearLogs);
@@ -467,6 +517,7 @@ namespace ValheimServerGUI.Forms
             this.Tabs.ResumeLayout(false);
             this.TabServerControls.ResumeLayout(false);
             this.WorldSelectGroupBox.ResumeLayout(false);
+            this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TabLogs.PerformLayout();
             this.TrayContextMenuStrip.ResumeLayout(false);
@@ -514,5 +565,10 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.RadioFormField WorldSelectRadioNew;
         private ValheimServerGUI.Controls.RadioFormField WorldSelectRadioExisting;
         private Controls.TextFormField WorldSelectNewNameField;
+        private System.Windows.Forms.TabPage TabPlayers;
+        private System.Windows.Forms.ListView PlayersListView;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerName;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerSteamId;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerOnline;
     }
 }

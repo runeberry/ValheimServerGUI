@@ -31,6 +31,12 @@ namespace ValheimServerGUI.Game
         private ServerStatus _status = ServerStatus.Stopped;
         public event EventHandler<ServerStatus> StatusChanged;
 
+        public IReadOnlyList<PlayerInfo> Players => _players;
+        private readonly List<PlayerInfo> _players = new();
+        public event EventHandler<PlayerInfo> PlayerStatusChanged;
+
+        public event EventHandler<decimal> WorldSaved;
+
         public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped);
         public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running);
         public bool CanRestart => this.IsAnyStatus(ServerStatus.Running);
@@ -40,7 +46,7 @@ namespace ValheimServerGUI.Game
         // todo: fully encapsulate the loggers in this class
         public readonly AppLogger Logger;
         public readonly FilteredServerLogger FilteredLogger;
-        private readonly Dictionary<string, Action> LogBasedActions = new Dictionary<string, Action>();
+        private readonly Dictionary<string, LogEventHandler> LogBasedActions = new();
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
@@ -64,8 +70,14 @@ namespace ValheimServerGUI.Game
 
         private void InitializeLogBasedActions()
         {
-            LogBasedActions.Add("Game server connected", () => this.Status = ServerStatus.Running);
-            // LogBasedActions.Add("Steam manager on destroy", () => this.Status = ServerStatus.Stopped); // Now based on process exit
+            LogBasedActions.Add(@"Game server connected", this.OnServerConnected);
+            
+            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
+            LogBasedActions.Add(@"Got character ZDOID from (\S+?)\s*?:\s*?(\d+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
+            LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
+            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // Technically "disconnecting" but it's the best terminator I can find
+            
+            LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", this.OnWorldSaved);
         }
 
         private void InitializeStatusBasedActions()
@@ -176,12 +188,166 @@ namespace ValheimServerGUI.Game
 
         private void Logger_OnServerLogReceived(object obj, LogEvent logEvent)
         {
-            foreach (var action in this.LogBasedActions
-                .Where(kvp => Regex.IsMatch(logEvent.Message, kvp.Key))
-                .Select(kvp => kvp.Value))
+            foreach (var kvp in this.LogBasedActions)
             {
-                action();
+                var match = Regex.Match(logEvent.Message, kvp.Key, RegexOptions.IgnoreCase);
+                if (!match.Success) continue;
+
+                try
+                {
+                    // The first capture group is the whole string, so skip that
+                    var captures = (match.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
+                    kvp.Value(this, logEvent, captures);
+                }
+                catch (Exception e)
+                {
+                    // todo: should at least log the exception or something. Need an app logger.
+                }
             }
+        }
+
+        #endregion
+
+        #region Log Message handlers
+
+        private void OnServerConnected(object sender, LogEvent logEvent, params string[] captures)
+        {
+            this.Status = ServerStatus.Running;
+        }
+
+        private void OnPlayerConnecting(object sender, LogEvent logEvent, params string[] captures)
+        {
+            var steamId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamId)) return;
+
+            var player = this.FindPlayerBySteamId(steamId, true);
+            if (player != null)
+            {
+                player.PlayerStatus = PlayerStatus.Joining;
+                player.LastStatusChange = DateTime.UtcNow;
+                this.PlayerStatusChanged?.Invoke(this, player);
+            }
+        }
+
+        private void OnPlayerConnected(object sender, LogEvent logEvent, params string[] captures)
+        {
+            var playerName = captures[0];
+            //var zdoid = captures[1]; // Seems to be a unique object id for the game session
+            //var otherNumber = captures[2]; // Not sure what this is for?
+
+            if (string.IsNullOrWhiteSpace(playerName)) return;
+
+            var player = FindJoiningPlayerByName(playerName);
+            if (player != null)
+            {
+                player.PlayerName = playerName;
+                player.PlayerStatus = PlayerStatus.Online;
+                player.LastStatusChange = DateTime.UtcNow;
+                this.PlayerStatusChanged?.Invoke(this, player);
+            }
+        }
+
+        private void OnPlayerDisconnecting(object sender, LogEvent logEvent, params string[] captures)
+        {
+            var steamId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamId)) return;
+
+            var player = this.FindPlayerBySteamId(steamId);
+            if (player != null)
+            {
+                player.PlayerStatus = PlayerStatus.Leaving;
+                player.LastStatusChange = DateTime.UtcNow;
+                this.PlayerStatusChanged?.Invoke(this, player);
+            }
+        }
+
+        private void OnPlayerDisconnected(object sender, LogEvent logEvent, params string[] captures)
+        {
+            var steamId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamId)) return;
+
+            var player = this.FindPlayerBySteamId(steamId);
+            if (player != null)
+            {
+                player.PlayerStatus = PlayerStatus.Offline;
+                player.LastStatusChange = DateTime.UtcNow;
+                this.PlayerStatusChanged?.Invoke(this, player);
+            }
+        }
+
+        private void OnWorldSaved(object sender, LogEvent logEvent, params string[] captures)
+        {
+            if (!decimal.TryParse(captures[0], out var timeMs))
+            {
+                timeMs = 0;
+            }
+
+            this.WorldSaved?.Invoke(this, timeMs);
+        }
+
+        #endregion
+
+        #region Non-public methods
+
+        private PlayerInfo FindPlayerBySteamId(string steamId, bool createNew = false)
+        {
+            // Gonna sneak a little validation in here don't tell nobody :3
+            if (string.IsNullOrWhiteSpace(steamId)) return null;
+
+            var player = this._players.FirstOrDefault(p => p.SteamId == steamId);
+
+            if (player == null && createNew)
+            {
+                player = new PlayerInfo
+                {
+                    SteamId = steamId,
+                    PlayerStatus = PlayerStatus.Offline, // Considered offline until otherwise defined
+                };
+                this._players.Add(player);
+            }
+
+            return player;
+        }
+
+        private PlayerInfo FindJoiningPlayerByName(string playerName)
+        {
+            PlayerInfo player;
+
+            // This is tricky becase we don't have the SteamID in this particular log message
+            // So consider all players that are currently connecting to the game
+            var players = this._players.Where(p => p.PlayerStatus == PlayerStatus.Joining);
+
+            if (players.Count() == 1)
+            {
+                // If there's only one player connecting, use that player, it's gotta be the same person... right?
+                player = players.Single();
+            }
+            else
+            {
+                // If there are multiple players connecting, see if any of the player records have a matching name
+                var playersByName = players.Where(p => p.PlayerName == playerName);
+
+                if (playersByName.Any())
+                {
+                    if (playersByName.Count() == 1)
+                    {
+                        // If there's a single matching record by name, assume that's the same player
+                        player = playersByName.Single();
+                    }
+                    else
+                    {
+                        // If there are multiple player records with the same name, hoo boy... return the oldest connecting one
+                        player = playersByName.OrderBy(p => p.LastStatusChange).First();
+                    }
+                }
+                else
+                {
+                    // If there's no matching name, just return the oldest connecting player
+                    player = players.OrderBy(p => p.LastStatusChange).First();
+                }
+            }
+
+            return player;
         }
 
         #endregion

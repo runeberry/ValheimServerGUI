@@ -73,7 +73,7 @@ namespace ValheimServerGUI.Game
             LogBasedActions.Add(@"Game server connected", this.OnServerConnected);
             
             LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
-            LogBasedActions.Add(@"Got character ZDOID from (\S+?)\s*?:\s*?(\d+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
+            LogBasedActions.Add(@"Got character ZDOID from (\S+?)\s*?:\s*?([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
             LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
             LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // Technically "disconnecting" but it's the best terminator I can find
             

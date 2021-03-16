@@ -307,6 +307,16 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap UnsyncedCommits_16x_Horiz {
+            get {
+                object obj = ResourceManager.GetObject("UnsyncedCommits_16x_Horiz", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://www.buymeacoffee.com/runeberry.
         /// </summary>
         internal static string UrlDonate {

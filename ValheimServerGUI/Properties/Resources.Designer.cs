@@ -139,6 +139,26 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Loading_16x {
+            get {
+                object obj = ResourceManager.GetObject("Loading_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Loading_Blue_16x {
+            get {
+                object obj = ResourceManager.GetObject("Loading_Blue_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap OpenWeb_16x {
             get {
                 object obj = ResourceManager.GetObject("OpenWeb_16x", resourceCulture);
@@ -202,6 +222,16 @@ namespace ValheimServerGUI.Properties {
         internal static System.Drawing.Bitmap StatusInformation_16x {
             get {
                 object obj = ResourceManager.GetObject("StatusInformation_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap StatusNotStarted_16x {
+            get {
+                object obj = ResourceManager.GetObject("StatusNotStarted_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

@@ -63,6 +63,7 @@ namespace ValheimServerGUI.Forms
             this.ColumnPlayerName = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerSteamId = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerOnline = new System.Windows.Forms.ColumnHeader();
+            this.ImageList = new System.Windows.Forms.ImageList(this.components);
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.TextBoxLogs = new System.Windows.Forms.TextBox();
@@ -386,6 +387,7 @@ namespace ValheimServerGUI.Forms
             this.PlayersListView.Location = new System.Drawing.Point(3, 37);
             this.PlayersListView.Name = "PlayersListView";
             this.PlayersListView.Size = new System.Drawing.Size(446, 212);
+            this.PlayersListView.SmallImageList = this.ImageList;
             this.PlayersListView.TabIndex = 0;
             this.PlayersListView.UseCompatibleStateImageBehavior = false;
             this.PlayersListView.View = System.Windows.Forms.View.Details;
@@ -407,6 +409,12 @@ namespace ValheimServerGUI.Forms
             this.ColumnPlayerOnline.Name = "ColumnPlayerOnline";
             this.ColumnPlayerOnline.Text = "Online";
             this.ColumnPlayerOnline.Width = 120;
+            // 
+            // ImageList
+            // 
+            this.ImageList.ColorDepth = System.Windows.Forms.ColorDepth.Depth32Bit;
+            this.ImageList.ImageSize = new System.Drawing.Size(16, 16);
+            this.ImageList.TransparentColor = System.Drawing.Color.Transparent;
             // 
             // TabLogs
             // 
@@ -570,5 +578,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ColumnHeader ColumnPlayerName;
         private System.Windows.Forms.ColumnHeader ColumnPlayerSteamId;
         private System.Windows.Forms.ColumnHeader ColumnPlayerOnline;
+        private System.Windows.Forms.ImageList ImageList;
     }
 }

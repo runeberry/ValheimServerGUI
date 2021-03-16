@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
@@ -31,12 +32,18 @@ namespace ValheimServerGUI.Forms
             this.Server = server;
 
             InitializeComponent(); // WinForms generated code, always first
+            InitializeImages();
             InitializeServer();
             InitializeFormEvents();
             InitializeFormFields(); // Display data back to user, always last
         }
 
         #region Initialization
+
+        private void InitializeImages()
+        {
+            this.ImageList.AddImagesFromResourceFile(typeof(Resources));
+        }
 
         private void InitializeServer()
         {
@@ -448,7 +455,7 @@ namespace ValheimServerGUI.Forms
 
             if (playerListViewItem == null)
             {
-                this.PlayersListView.AddRowWithColumnValues(playerName, player.SteamId, player.PlayerStatus);
+                playerListViewItem = this.PlayersListView.AddRowWithColumnValues(playerName, player.SteamId, player.PlayerStatus);
             }
             else
             {
@@ -460,6 +467,33 @@ namespace ValheimServerGUI.Forms
 
                 playerListViewItem.SetColumnText(2, player.PlayerStatus);
             }
+
+            // Update icon based on player status
+            var imageIndex = -1;
+            switch (player.PlayerStatus)
+            {
+                case PlayerStatus.Online:
+                    imageIndex = this.ImageList.Images.IndexOfKey(nameof(Resources.StatusOK_16x));
+                    break;
+                case PlayerStatus.Joining:
+                case PlayerStatus.Leaving:
+                    imageIndex = this.ImageList.Images.IndexOfKey(nameof(Resources.UnsyncedCommits_16x_Horiz));
+                    break;
+                case PlayerStatus.Offline:
+                    imageIndex = this.ImageList.Images.IndexOfKey(nameof(Resources.StatusNotStarted_16x));
+                    break;
+            }
+            playerListViewItem.ImageIndex = imageIndex;
+
+            // Update font based on player status
+            var color = PlayersListView.ForeColor;
+            switch (player.PlayerStatus)
+            {
+                case PlayerStatus.Offline:
+                    color = Color.Gray;
+                    break;
+            }
+            playerListViewItem.ForeColor = color;
         }
 
         private void SetFormStateForServer()

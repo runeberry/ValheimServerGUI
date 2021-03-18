@@ -69,6 +69,12 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
             this.TrayContextMenuClose.Click += this.MenuItemFileClose_Clicked;
 
+            // Timers
+            this.ServerRefreshTimer.Tick += this.ServerRefreshTimer_Tick;
+
+            // Tabs
+            this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
+
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
             this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
@@ -338,6 +344,24 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectNewNameField.Visible = value;
         }
 
+        private void TabPlayers_VisibleChanged(object sender, EventArgs e)
+        {
+            if (this.TabPlayers.Visible)
+            {
+                this.UpdatePlayerStatus();
+                this.ServerRefreshTimer.Enabled = true;
+            }
+            else
+            {
+                this.ServerRefreshTimer.Enabled = false;
+            }
+        }
+
+        private void ServerRefreshTimer_Tick(object sender, EventArgs e)
+        {
+            this.UpdatePlayerStatus();
+        }
+
         #endregion
 
         #region Server Events
@@ -447,25 +471,46 @@ namespace ValheimServerGUI.Forms
             this.StatusStripLabel.Text = message;
         }
 
+        private int GetImageIndex(string key)
+        {
+            return this.ImageList.Images.IndexOfKey(key);
+        }
+
+        private void UpdatePlayerStatus()
+        {
+            foreach (var player in this.Server.Players)
+            {
+                this.UpdatePlayerStatus(player);
+            }
+        }
+
         private void UpdatePlayerStatus(PlayerInfo player)
         {
             var playerName = player.PlayerName ?? PlayerNameUnknown;
 
-            var playerListViewItem = this.PlayersListView.FindRowsWithColumnValue(1, player.SteamId).FirstOrDefault();
+            var playerListViewItem = this.PlayersListView
+                .FindRowsWithColumnValue(this.ColumnPlayerSteamId.Index, player.SteamId)
+                .FirstOrDefault();
 
             if (playerListViewItem == null)
             {
-                playerListViewItem = this.PlayersListView.AddRowWithColumnValues(playerName, player.SteamId, player.PlayerStatus);
+                playerListViewItem = this.PlayersListView.AddRow()
+                    .SetColumnText(this.ColumnPlayerName.Index, playerName)
+                    .SetColumnText(this.ColumnPlayerStatus.Index, player.PlayerStatus)
+                    .SetColumnText(this.ColumnPlayerUpdated.Index, new TimeAgo(player.LastStatusChange))
+                    .SetColumnText(this.ColumnPlayerSteamId.Index, player.SteamId);
             }
             else
             {
                 // If the player's name was previously unknown, but we have a name now, update the name
-                if (playerListViewItem.GetColumnText(0) == PlayerNameUnknown && playerName != PlayerNameUnknown)
+                if (playerListViewItem.GetColumnText(this.ColumnPlayerName.Index) == PlayerNameUnknown && playerName != PlayerNameUnknown)
                 {
-                    playerListViewItem.SetColumnText(0, playerName);
+                    playerListViewItem.SetColumnText(this.ColumnPlayerName.Index, playerName);
                 }
 
-                playerListViewItem.SetColumnText(2, player.PlayerStatus);
+                playerListViewItem
+                    .SetColumnText(this.ColumnPlayerStatus.Index, player.PlayerStatus)
+                    .SetColumnText(this.ColumnPlayerUpdated.Index, new TimeAgo(player.LastStatusChange));
             }
 
             // Update icon based on player status
@@ -473,14 +518,14 @@ namespace ValheimServerGUI.Forms
             switch (player.PlayerStatus)
             {
                 case PlayerStatus.Online:
-                    imageIndex = this.ImageList.Images.IndexOfKey(nameof(Resources.StatusOK_16x));
+                    imageIndex = this.GetImageIndex(nameof(Resources.StatusOK_16x));
                     break;
                 case PlayerStatus.Joining:
                 case PlayerStatus.Leaving:
-                    imageIndex = this.ImageList.Images.IndexOfKey(nameof(Resources.UnsyncedCommits_16x_Horiz));
+                    imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
                     break;
                 case PlayerStatus.Offline:
-                    imageIndex = this.ImageList.Images.IndexOfKey(nameof(Resources.StatusNotStarted_16x));
+                    imageIndex = this.GetImageIndex(nameof(Resources.StatusNotStarted_16x));
                     break;
             }
             playerListViewItem.ImageIndex = imageIndex;

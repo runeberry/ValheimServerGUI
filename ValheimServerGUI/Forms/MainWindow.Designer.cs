@@ -60,9 +60,10 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer = new System.Windows.Forms.Button();
             this.TabPlayers = new System.Windows.Forms.TabPage();
             this.PlayersListView = new System.Windows.Forms.ListView();
+            this.ColumnPlayerStatus = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerName = new System.Windows.Forms.ColumnHeader();
+            this.ColumnPlayerUpdated = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerSteamId = new System.Windows.Forms.ColumnHeader();
-            this.ColumnPlayerOnline = new System.Windows.Forms.ColumnHeader();
             this.ImageList = new System.Windows.Forms.ImageList(this.components);
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
@@ -74,6 +75,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStop = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
+            this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -379,36 +381,43 @@ namespace ValheimServerGUI.Forms
             // PlayersListView
             // 
             this.PlayersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.ColumnPlayerStatus,
             this.ColumnPlayerName,
-            this.ColumnPlayerSteamId,
-            this.ColumnPlayerOnline});
+            this.ColumnPlayerUpdated,
+            this.ColumnPlayerSteamId});
             this.PlayersListView.FullRowSelect = true;
             this.PlayersListView.HideSelection = false;
-            this.PlayersListView.Location = new System.Drawing.Point(3, 37);
+            this.PlayersListView.Location = new System.Drawing.Point(3, 32);
             this.PlayersListView.Name = "PlayersListView";
-            this.PlayersListView.Size = new System.Drawing.Size(446, 212);
+            this.PlayersListView.Size = new System.Drawing.Size(446, 217);
             this.PlayersListView.SmallImageList = this.ImageList;
             this.PlayersListView.TabIndex = 0;
             this.PlayersListView.UseCompatibleStateImageBehavior = false;
             this.PlayersListView.View = System.Windows.Forms.View.Details;
             // 
+            // ColumnPlayerStatus
+            // 
+            this.ColumnPlayerStatus.DisplayIndex = 1;
+            this.ColumnPlayerStatus.Name = "ColumnPlayerStatus";
+            this.ColumnPlayerStatus.Text = "Status";
+            this.ColumnPlayerStatus.Width = 120;
+            // 
             // ColumnPlayerName
             // 
+            this.ColumnPlayerName.DisplayIndex = 0;
             this.ColumnPlayerName.Name = "ColumnPlayerName";
             this.ColumnPlayerName.Text = "Name";
             this.ColumnPlayerName.Width = 160;
             // 
+            // ColumnPlayerUpdated
+            // 
+            this.ColumnPlayerUpdated.Text = "Since";
+            this.ColumnPlayerUpdated.Width = 160;
+            // 
             // ColumnPlayerSteamId
             // 
-            this.ColumnPlayerSteamId.Name = "ColumnPlayerSteamId";
             this.ColumnPlayerSteamId.Text = "Steam ID";
-            this.ColumnPlayerSteamId.Width = 160;
-            // 
-            // ColumnPlayerOnline
-            // 
-            this.ColumnPlayerOnline.Name = "ColumnPlayerOnline";
-            this.ColumnPlayerOnline.Text = "Online";
-            this.ColumnPlayerOnline.Width = 120;
+            this.ColumnPlayerSteamId.Width = 0;
             // 
             // ImageList
             // 
@@ -504,6 +513,10 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuClose.Text = "Close";
             // 
+            // ServerRefreshTimer
+            // 
+            this.ServerRefreshTimer.Interval = 1000;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -576,8 +589,10 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.TabPage TabPlayers;
         private System.Windows.Forms.ListView PlayersListView;
         private System.Windows.Forms.ColumnHeader ColumnPlayerName;
-        private System.Windows.Forms.ColumnHeader ColumnPlayerSteamId;
-        private System.Windows.Forms.ColumnHeader ColumnPlayerOnline;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerStatus;
         private System.Windows.Forms.ImageList ImageList;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerUpdated;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerSteamId;
+        private System.Windows.Forms.Timer ServerRefreshTimer;
     }
 }

@@ -62,24 +62,29 @@ namespace ValheimServerGUI.Tools
             return matches;
         }
 
-        public static ListViewItem AddRowWithColumnValues(this ListView listView, params object[] values)
+        public static ListViewItem AddRow(this ListView listView, params object[] columnValues)
         {
-            ListViewItem item;
-
-            if (values == null || values.Length == 0)
+            var item = new ListViewItem();
+            
+            for (var i = 0; i < listView.Columns.Count; i++)
             {
-                item = new ListViewItem();
-            }
-            else
-            {
-                item = new ListViewItem(values[0].ToString());
+                string text = null;
 
-                foreach (var value in values.Skip(1))
+                if (i < columnValues?.Length)
                 {
-                    item.SubItems.Add(value?.ToString());
+                    text = columnValues[i]?.ToString();
+                }
+
+                if (i == 0)
+                {
+                    item.Text = text;
+                }
+                else
+                {
+                    item.SubItems.Add(text);
                 }
             }
-
+            
             listView.Items.Add(item);
             return item;
         }
@@ -108,7 +113,7 @@ namespace ValheimServerGUI.Tools
             return text;
         }
 
-        public static string SetColumnText(this ListViewItem listViewItem, int colIndex, object value)
+        public static ListViewItem SetColumnText(this ListViewItem listViewItem, int colIndex, object value)
         {
             string text = value?.ToString();
 
@@ -125,7 +130,7 @@ namespace ValheimServerGUI.Tools
                 }
             }
 
-            return text;
+            return listViewItem;
         }
 
         // Important note about ListView:

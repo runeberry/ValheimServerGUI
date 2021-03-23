@@ -43,6 +43,7 @@ namespace ValheimServerGUI
             // Game & server data
             services
                 .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
+                .AddSingleton<IPlayerDataProvider, PlayerDataProvider>()
                 .AddSingleton<ValheimServer>();
 
             // Forms

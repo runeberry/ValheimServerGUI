@@ -19,7 +19,7 @@ namespace ValheimServerGUI.Tools.Data
 
         public JsonLocalDataProvider(string filePath)
         {
-            this.FilePath = filePath;
+            this.FilePath = Environment.ExpandEnvironmentVariables(filePath);
         }
 
         #region ILocalDataProvider implementation
@@ -32,18 +32,33 @@ namespace ValheimServerGUI.Tools.Data
         {
             Task.Run(() =>
             {
-                if (!File.Exists(this.FilePath))
+                this.RWLock.EnterReadLock();
+
+                try
                 {
-                    File.Create(this.FilePath);
+                    if (!File.Exists(this.FilePath))
+                    {
+                        // Even if the file doesn't exist, invoke the event because the content is considered loaded
+                        this.DataLoaded?.Invoke(this, EventArgs.Empty);
+                    }
+                    else
+                    {
+                        using var streamReader = File.OpenText(this.FilePath);
+                        using var jsonReader = new JsonTextReader(streamReader);
+
+                        var dataFile = this.Serializer.Deserialize<JsonDataFile<TEntity>>(jsonReader);
+
+                        this.Entities = dataFile.Data;
+                    }
                 }
-
-                using var streamReader = File.OpenText(this.FilePath);
-                using var jsonReader = new JsonTextReader(streamReader);
-
-                var dataFile = this.Serializer.Deserialize<JsonDataFile<TEntity>>(jsonReader);
-
-                this.Entities = dataFile.Data;
-                this.DataLoaded?.Invoke(this, EventArgs.Empty);
+                catch
+                {
+                    // todo: app logger
+                }
+                finally
+                {
+                    this.RWLock.ExitReadLock();
+                }
             });
         }
 
@@ -62,6 +77,10 @@ namespace ValheimServerGUI.Tools.Data
                     this.Serializer.Serialize(jsonWriter, dataFile);
 
                     this.DataSaved?.Invoke(this, EventArgs.Empty);
+                }
+                catch
+                {
+                    // todo: app logger
                 }
                 finally
                 {

@@ -18,17 +18,20 @@ namespace ValheimServerGUI.Forms
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
         private readonly IValheimFileProvider FileProvider;
+        private readonly IPlayerDataProvider PlayerDataProvider;
         private readonly ValheimServer Server;
 
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferences userPrefs,
             IValheimFileProvider fileProvider,
+            IPlayerDataProvider playerDataProvider,
             ValheimServer server)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
             this.FileProvider = fileProvider;
+            this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
 
             InitializeComponent(); // WinForms generated code, always first
@@ -49,8 +52,9 @@ namespace ValheimServerGUI.Forms
         {
             this.Server.FilteredLogger.LogReceived += this.OnLogReceived;
             this.Server.StatusChanged += this.OnServerStatusChanged;
-            this.Server.PlayerStatusChanged += this.OnPlayerStatusChanged;
             this.Server.WorldSaved += this.OnWorldSaved;
+
+            this.PlayerDataProvider.PlayerStatusChanged += this.OnPlayerStatusChanged;
         }
 
         private void InitializeFormEvents()
@@ -89,17 +93,6 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
-            this.RefreshWorldSelect();
-
-            this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
-            this.ServerPortField.Value = UserPrefs.GetNumberValue(PrefKeys.ServerPort, int.Parse(Resources.DefaultServerPort));
-            this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
-            this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
-            this.ShowPasswordField.Value = false;
-            
-            this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
-            this.WorldSelectRadioExisting.Value = true;
-
             this.PlayersTable.AddRowBinding<PlayerInfo>(row =>
             {
                 row.AddCellBinding(this.ColumnPlayerName.Index, p => p.PlayerName ?? PlayerNameUnknown);
@@ -107,7 +100,8 @@ namespace ValheimServerGUI.Forms
                 row.AddCellBinding(this.ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
             });
 
-            this.SetFormStateForServer();
+            this.RefreshFormFields();
+            this.LoadFormValuesFromUserPrefs();
         }
 
         #endregion
@@ -396,7 +390,7 @@ namespace ValheimServerGUI.Forms
 
             this.SetStatusText(status.ToString());
 
-            this.SetFormStateForServer();
+            this.RefreshFormStateForServer();
 
             if (status == ServerStatus.Running && this.WorldSelectRadioNew.Value)
             {
@@ -459,8 +453,8 @@ namespace ValheimServerGUI.Forms
 
         private void ShowDirectoriesForm()
         {
-            FormProvider.GetForm<DirectoriesForm>().ShowDialog();
-            InitializeFormFields();
+            this.FormProvider.GetForm<DirectoriesForm>().ShowDialog();
+            this.RefreshFormFields();
         }
 
         private void AddLog(string message)
@@ -485,7 +479,7 @@ namespace ValheimServerGUI.Forms
 
         private void UpdatePlayerStatus()
         {
-            foreach (var player in this.Server.Players)
+            foreach (var player in this.PlayerDataProvider.Data)
             {
                 this.UpdatePlayerStatus(player);
             }
@@ -536,7 +530,13 @@ namespace ValheimServerGUI.Forms
             playerRow.ForeColor = color;
         }
 
-        private void SetFormStateForServer()
+        private void RefreshFormFields()
+        {
+            this.RefreshWorldSelect();
+            this.RefreshFormStateForServer();
+        }
+
+        private void RefreshFormStateForServer()
         {
             // Only allow form field changes when the server is stopped
             bool allowServerChanges = this.Server.Status == ServerStatus.Stopped;
@@ -572,6 +572,18 @@ namespace ValheimServerGUI.Forms
                 this.WorldSelectExistingNameField.DataSource = null;
                 this.WorldSelectExistingNameField.DropdownEnabled = false;
             }
+        }
+
+        private void LoadFormValuesFromUserPrefs()
+        {
+            this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
+            this.ServerPortField.Value = UserPrefs.GetNumberValue(PrefKeys.ServerPort, int.Parse(Resources.DefaultServerPort));
+            this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
+            this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
+            this.ShowPasswordField.Value = false;
+
+            this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
+            this.WorldSelectRadioExisting.Value = true;
         }
 
         private void CloseApplicationOnServerStopped()

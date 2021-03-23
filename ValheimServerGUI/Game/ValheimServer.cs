@@ -31,10 +31,6 @@ namespace ValheimServerGUI.Game
         private ServerStatus _status = ServerStatus.Stopped;
         public event EventHandler<ServerStatus> StatusChanged;
 
-        public IReadOnlyList<PlayerInfo> Players => _players;
-        private readonly List<PlayerInfo> _players = new();
-        public event EventHandler<PlayerInfo> PlayerStatusChanged;
-
         public event EventHandler<decimal> WorldSaved;
 
         public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped);
@@ -50,11 +46,16 @@ namespace ValheimServerGUI.Game
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
+        private readonly IPlayerDataProvider PlayerDataProvider;
 
-        public ValheimServer(IProcessProvider processProvider, IValheimFileProvider fileProvider)
+        public ValheimServer(
+            IProcessProvider processProvider, 
+            IValheimFileProvider fileProvider,
+            IPlayerDataProvider playerDataProvider)
         {
             this.ProcessProvider = processProvider;
             this.FileProvider = fileProvider;
+            this.PlayerDataProvider = playerDataProvider;
 
             // todo: dependency-inject loggers
             Logger = new AppLogger();
@@ -225,7 +226,7 @@ namespace ValheimServerGUI.Game
             {
                 player.PlayerStatus = PlayerStatus.Joining;
                 player.LastStatusChange = DateTime.UtcNow;
-                this.PlayerStatusChanged?.Invoke(this, player);
+                this.PlayerDataProvider.Upsert(player);
             }
         }
 
@@ -243,7 +244,7 @@ namespace ValheimServerGUI.Game
                 player.PlayerName = playerName;
                 player.PlayerStatus = PlayerStatus.Online;
                 player.LastStatusChange = DateTime.UtcNow;
-                this.PlayerStatusChanged?.Invoke(this, player);
+                this.PlayerDataProvider.Upsert(player);
             }
         }
 
@@ -257,7 +258,7 @@ namespace ValheimServerGUI.Game
             {
                 player.PlayerStatus = PlayerStatus.Leaving;
                 player.LastStatusChange = DateTime.UtcNow;
-                this.PlayerStatusChanged?.Invoke(this, player);
+                this.PlayerDataProvider.Upsert(player);
             }
         }
 
@@ -271,7 +272,7 @@ namespace ValheimServerGUI.Game
             {
                 player.PlayerStatus = PlayerStatus.Offline;
                 player.LastStatusChange = DateTime.UtcNow;
-                this.PlayerStatusChanged?.Invoke(this, player);
+                this.PlayerDataProvider.Upsert(player);
             }
         }
 
@@ -294,7 +295,7 @@ namespace ValheimServerGUI.Game
             // Gonna sneak a little validation in here don't tell nobody :3
             if (string.IsNullOrWhiteSpace(steamId)) return null;
 
-            var player = this._players.FirstOrDefault(p => p.SteamId == steamId);
+            var player = this.PlayerDataProvider.FindById(steamId);
 
             if (player == null && createNew)
             {
@@ -303,7 +304,7 @@ namespace ValheimServerGUI.Game
                     SteamId = steamId,
                     PlayerStatus = PlayerStatus.Offline, // Considered offline until otherwise defined
                 };
-                this._players.Add(player);
+                this.PlayerDataProvider.Upsert(player);
             }
 
             return player;
@@ -315,7 +316,7 @@ namespace ValheimServerGUI.Game
 
             // This is tricky becase we don't have the SteamID in this particular log message
             // So consider all players that are currently connecting to the game
-            var players = this._players.Where(p => p.PlayerStatus == PlayerStatus.Joining);
+            var players = this.PlayerDataProvider.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
 
             if (players.Count() == 1)
             {

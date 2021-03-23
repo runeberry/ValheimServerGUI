@@ -100,6 +100,13 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
             this.WorldSelectRadioExisting.Value = true;
 
+            this.PlayersTable.AddRowBinding<PlayerInfo>(row =>
+            {
+                row.AddCellBinding(this.ColumnPlayerName.Index, p => p.PlayerName ?? PlayerNameUnknown);
+                row.AddCellBinding(this.ColumnPlayerStatus.Index, p => p.PlayerStatus);
+                row.AddCellBinding(this.ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
+            });
+
             this.SetFormStateForServer();
         }
 
@@ -488,29 +495,17 @@ namespace ValheimServerGUI.Forms
         {
             var playerName = player.PlayerName ?? PlayerNameUnknown;
 
-            var playerListViewItem = this.PlayersListView
-                .FindRowsWithColumnValue(this.ColumnPlayerSteamId.Index, player.SteamId)
-                .FirstOrDefault();
+            var playerRow = this.PlayersTable
+                .GetRowsWithType<PlayerInfo>()
+                .FirstOrDefault(p => p.Entity.SteamId == player.SteamId);
 
-            if (playerListViewItem == null)
+            if (playerRow == null)
             {
-                playerListViewItem = this.PlayersListView.AddRow()
-                    .SetColumnText(this.ColumnPlayerName.Index, playerName)
-                    .SetColumnText(this.ColumnPlayerStatus.Index, player.PlayerStatus)
-                    .SetColumnText(this.ColumnPlayerUpdated.Index, new TimeAgo(player.LastStatusChange))
-                    .SetColumnText(this.ColumnPlayerSteamId.Index, player.SteamId);
+                playerRow = this.PlayersTable.AddRowFromEntity(player);
             }
             else
             {
-                // If the player's name was previously unknown, but we have a name now, update the name
-                if (playerListViewItem.GetColumnText(this.ColumnPlayerName.Index) == PlayerNameUnknown && playerName != PlayerNameUnknown)
-                {
-                    playerListViewItem.SetColumnText(this.ColumnPlayerName.Index, playerName);
-                }
-
-                playerListViewItem
-                    .SetColumnText(this.ColumnPlayerStatus.Index, player.PlayerStatus)
-                    .SetColumnText(this.ColumnPlayerUpdated.Index, new TimeAgo(player.LastStatusChange));
+                playerRow.RefreshValues();
             }
 
             // Update icon based on player status
@@ -528,17 +523,17 @@ namespace ValheimServerGUI.Forms
                     imageIndex = this.GetImageIndex(nameof(Resources.StatusNotStarted_16x));
                     break;
             }
-            playerListViewItem.ImageIndex = imageIndex;
+            playerRow.ImageIndex = imageIndex;
 
             // Update font based on player status
-            var color = PlayersListView.ForeColor;
+            var color = this.PlayersTable.ForeColor;
             switch (player.PlayerStatus)
             {
                 case PlayerStatus.Offline:
                     color = Color.Gray;
                     break;
             }
-            playerListViewItem.ForeColor = color;
+            playerRow.ForeColor = color;
         }
 
         private void SetFormStateForServer()

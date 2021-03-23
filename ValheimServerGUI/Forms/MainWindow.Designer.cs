@@ -59,11 +59,10 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
             this.TabPlayers = new System.Windows.Forms.TabPage();
-            this.PlayersListView = new System.Windows.Forms.ListView();
+            this.PlayersTable = new ValheimServerGUI.Controls.DataListView();
             this.ColumnPlayerStatus = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerName = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerUpdated = new System.Windows.Forms.ColumnHeader();
-            this.ColumnPlayerSteamId = new System.Windows.Forms.ColumnHeader();
             this.ImageList = new System.Windows.Forms.ImageList(this.components);
             this.TabLogs = new System.Windows.Forms.TabPage();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
@@ -370,7 +369,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabPlayers
             // 
-            this.TabPlayers.Controls.Add(this.PlayersListView);
+            this.TabPlayers.Controls.Add(this.PlayersTable);
             this.TabPlayers.Location = new System.Drawing.Point(4, 24);
             this.TabPlayers.Name = "TabPlayers";
             this.TabPlayers.Size = new System.Drawing.Size(452, 252);
@@ -378,34 +377,27 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.Text = "Players";
             this.TabPlayers.UseVisualStyleBackColor = true;
             // 
-            // PlayersListView
+            // PlayersTable
             // 
-            this.PlayersListView.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.PlayersTable.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColumnPlayerStatus,
             this.ColumnPlayerName,
-            this.ColumnPlayerUpdated,
-            this.ColumnPlayerSteamId});
-            this.PlayersListView.FullRowSelect = true;
-            this.PlayersListView.HideSelection = false;
-            this.PlayersListView.Location = new System.Drawing.Point(3, 32);
-            this.PlayersListView.Name = "PlayersListView";
-            this.PlayersListView.Size = new System.Drawing.Size(446, 217);
-            this.PlayersListView.SmallImageList = this.ImageList;
-            this.PlayersListView.TabIndex = 0;
-            this.PlayersListView.UseCompatibleStateImageBehavior = false;
-            this.PlayersListView.View = System.Windows.Forms.View.Details;
+            this.ColumnPlayerUpdated});
+            this.PlayersTable.Icons = this.ImageList;
+            this.PlayersTable.Location = new System.Drawing.Point(0, 36);
+            this.PlayersTable.Name = "PlayersTable";
+            this.PlayersTable.Size = new System.Drawing.Size(449, 213);
+            this.PlayersTable.TabIndex = 0;
             // 
             // ColumnPlayerStatus
             // 
             this.ColumnPlayerStatus.DisplayIndex = 1;
-            this.ColumnPlayerStatus.Name = "ColumnPlayerStatus";
             this.ColumnPlayerStatus.Text = "Status";
             this.ColumnPlayerStatus.Width = 120;
             // 
             // ColumnPlayerName
             // 
             this.ColumnPlayerName.DisplayIndex = 0;
-            this.ColumnPlayerName.Name = "ColumnPlayerName";
             this.ColumnPlayerName.Text = "Name";
             this.ColumnPlayerName.Width = 160;
             // 
@@ -413,11 +405,6 @@ namespace ValheimServerGUI.Forms
             // 
             this.ColumnPlayerUpdated.Text = "Since";
             this.ColumnPlayerUpdated.Width = 160;
-            // 
-            // ColumnPlayerSteamId
-            // 
-            this.ColumnPlayerSteamId.Text = "Steam ID";
-            this.ColumnPlayerSteamId.Width = 0;
             // 
             // ImageList
             // 
@@ -587,12 +574,11 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.RadioFormField WorldSelectRadioExisting;
         private Controls.TextFormField WorldSelectNewNameField;
         private System.Windows.Forms.TabPage TabPlayers;
-        private System.Windows.Forms.ListView PlayersListView;
-        private System.Windows.Forms.ColumnHeader ColumnPlayerName;
-        private System.Windows.Forms.ColumnHeader ColumnPlayerStatus;
         private System.Windows.Forms.ImageList ImageList;
-        private System.Windows.Forms.ColumnHeader ColumnPlayerUpdated;
-        private System.Windows.Forms.ColumnHeader ColumnPlayerSteamId;
         private System.Windows.Forms.Timer ServerRefreshTimer;
+        private ValheimServerGUI.Controls.DataListView PlayersTable;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerStatus;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerName;
+        private System.Windows.Forms.ColumnHeader ColumnPlayerUpdated;
     }
 }

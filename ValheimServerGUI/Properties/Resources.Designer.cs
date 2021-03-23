@@ -167,6 +167,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\players.json.
+        /// </summary>
+        internal static string PlayerListFilePath {
+            get {
+                return ResourceManager.GetString("PlayerListFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap Restart_16x {

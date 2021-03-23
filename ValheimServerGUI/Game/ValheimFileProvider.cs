@@ -5,6 +5,15 @@ using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI.Game
 {
+    public interface IValheimFileProvider
+    {
+        FileInfo GameExe { get; }
+
+        FileInfo ServerExe { get; }
+
+        DirectoryInfo WorldsFolder { get; }
+    }
+
     public class ValheimFileProvider : IValheimFileProvider
     {
         private static readonly string NL = Environment.NewLine;

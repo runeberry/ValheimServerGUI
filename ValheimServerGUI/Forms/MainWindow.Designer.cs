@@ -379,14 +379,16 @@ namespace ValheimServerGUI.Forms
             // 
             // PlayersTable
             // 
+            this.PlayersTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left)));
             this.PlayersTable.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColumnPlayerStatus,
             this.ColumnPlayerName,
             this.ColumnPlayerUpdated});
             this.PlayersTable.Icons = this.ImageList;
-            this.PlayersTable.Location = new System.Drawing.Point(0, 36);
+            this.PlayersTable.Location = new System.Drawing.Point(3, 32);
             this.PlayersTable.Name = "PlayersTable";
-            this.PlayersTable.Size = new System.Drawing.Size(449, 213);
+            this.PlayersTable.Size = new System.Drawing.Size(446, 217);
             this.PlayersTable.TabIndex = 0;
             // 
             // ColumnPlayerStatus
@@ -444,7 +446,7 @@ namespace ValheimServerGUI.Forms
             this.TextBoxLogs.Name = "TextBoxLogs";
             this.TextBoxLogs.ReadOnly = true;
             this.TextBoxLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextBoxLogs.Size = new System.Drawing.Size(446, 196);
+            this.TextBoxLogs.Size = new System.Drawing.Size(446, 217);
             this.TextBoxLogs.TabIndex = 0;
             // 
             // NotifyIcon

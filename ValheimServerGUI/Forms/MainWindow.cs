@@ -21,19 +21,22 @@ namespace ValheimServerGUI.Forms
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataProvider PlayerDataProvider;
         private readonly ValheimServer Server;
+        private readonly ValheimServerLogger ServerLogger;
 
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferences userPrefs,
             IValheimFileProvider fileProvider,
             IPlayerDataProvider playerDataProvider,
-            ValheimServer server)
+            ValheimServer server,
+            ValheimServerLogger serverLogger)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
+            this.ServerLogger = serverLogger;
 
             InitializeComponent(); // WinForms generated code, always first
             InitializeImages();
@@ -51,7 +54,7 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeServer()
         {
-            this.Server.FilteredLogger.LogReceived += this.OnLogReceived;
+            this.ServerLogger.LogReceived += this.OnLogReceived;
             this.Server.StatusChanged += this.OnServerStatusChanged;
             this.Server.WorldSaved += this.OnWorldSaved;
 
@@ -368,13 +371,13 @@ namespace ValheimServerGUI.Forms
 
         #region Server Events
 
-        private void OnLogReceived(object sender, LogEvent logEvent)
+        private void OnLogReceived(object sender, EventLogContext logEvent)
         {
             // This technique allows cross-thread access to UI controls
             // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<object, LogEvent>(OnLogReceived), new object[] { sender, logEvent });
+                this.Invoke(new Action<object, EventLogContext>(OnLogReceived), new object[] { sender, logEvent });
                 return;
             }
 

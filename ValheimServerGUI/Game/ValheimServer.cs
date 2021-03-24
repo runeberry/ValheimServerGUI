@@ -39,30 +39,28 @@ namespace ValheimServerGUI.Game
         public bool CanRestart => this.IsAnyStatus(ServerStatus.Running);
 
         private bool IsRestarting;
-
-        // todo: fully encapsulate the loggers in this class
-        public readonly AppLogger Logger;
-        public readonly FilteredServerLogger FilteredLogger;
         private readonly Dictionary<string, LogEventHandler> LogBasedActions = new();
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataProvider PlayerDataProvider;
-
+        private readonly ValheimServerLogger ServerLogger;
+        private readonly ApplicationLogger ApplicationLogger;
+        
         public ValheimServer(
             IProcessProvider processProvider, 
             IValheimFileProvider fileProvider,
-            IPlayerDataProvider playerDataProvider)
+            IPlayerDataProvider playerDataProvider,
+            ValheimServerLogger serverLogger,
+            ApplicationLogger appLogger)
         {
             this.ProcessProvider = processProvider;
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
+            this.ServerLogger = serverLogger;
+            this.ApplicationLogger = appLogger;
 
-            // todo: dependency-inject loggers
-            Logger = new AppLogger();
-            FilteredLogger = new FilteredServerLogger();
-
-            Logger.LogReceived += this.Logger_OnServerLogReceived;
+            this.ApplicationLogger.LogReceived += this.Logger_OnServerLogReceived;
 
             InitializeLogBasedActions();
             InitializeStatusBasedActions();
@@ -178,28 +176,26 @@ namespace ValheimServerGUI.Game
 
         private void Process_OnDataReceived(object obj, DataReceivedEventArgs e)
         {
-            Logger.LogInformation(e.Data);
-            FilteredLogger.LogInformation(e.Data);
+            ServerLogger.LogInformation(e.Data);
         }
 
         private void Process_OnErrorReceived(object obj, DataReceivedEventArgs e)
         {
-            Logger.LogError(e.Data);
-            FilteredLogger.LogError(e.Data);
+            ServerLogger.LogError(e.Data);
         }
 
-        private void Logger_OnServerLogReceived(object obj, LogEvent logEvent)
+        private void Logger_OnServerLogReceived(object obj, EventLogContext context)
         {
             foreach (var kvp in this.LogBasedActions)
             {
-                var match = Regex.Match(logEvent.Message, kvp.Key, RegexOptions.IgnoreCase);
+                var match = Regex.Match(context.Message, kvp.Key, RegexOptions.IgnoreCase);
                 if (!match.Success) continue;
 
                 try
                 {
                     // The first capture group is the whole string, so skip that
                     var captures = (match.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
-                    kvp.Value(this, logEvent, captures);
+                    kvp.Value(this, context, captures);
                 }
                 catch (Exception e)
                 {
@@ -212,12 +208,12 @@ namespace ValheimServerGUI.Game
 
         #region Log Message handlers
 
-        private void OnServerConnected(object sender, LogEvent logEvent, params string[] captures)
+        private void OnServerConnected(object sender, EventLogContext context, params string[] captures)
         {
             this.Status = ServerStatus.Running;
         }
 
-        private void OnPlayerConnecting(object sender, LogEvent logEvent, params string[] captures)
+        private void OnPlayerConnecting(object sender, EventLogContext context, params string[] captures)
         {
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
@@ -231,7 +227,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private void OnPlayerConnected(object sender, LogEvent logEvent, params string[] captures)
+        private void OnPlayerConnected(object sender, EventLogContext context, params string[] captures)
         {
             var playerName = captures[0];
             //var zdoid = captures[1]; // Seems to be a unique object id for the game session
@@ -249,7 +245,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private void OnPlayerDisconnecting(object sender, LogEvent logEvent, params string[] captures)
+        private void OnPlayerDisconnecting(object sender, EventLogContext context, params string[] captures)
         {
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
@@ -263,7 +259,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private void OnPlayerDisconnected(object sender, LogEvent logEvent, params string[] captures)
+        private void OnPlayerDisconnected(object sender, EventLogContext context, params string[] captures)
         {
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
@@ -277,7 +273,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private void OnWorldSaved(object sender, LogEvent logEvent, params string[] captures)
+        private void OnWorldSaved(object sender, EventLogContext context, params string[] captures)
         {
             if (!decimal.TryParse(captures[0], out var timeMs))
             {
@@ -285,6 +281,8 @@ namespace ValheimServerGUI.Game
             }
 
             this.WorldSaved?.Invoke(this, timeMs);
+
+            // todo: something
         }
 
         #endregion

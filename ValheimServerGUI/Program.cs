@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using ValheimServerGUI.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 using ValheimServerGUI.Tools.Preferences;
 using ValheimServerGUI.Tools.Processes;
 
@@ -39,11 +40,13 @@ namespace ValheimServerGUI
             });
             services.AddSingleton<IFormProvider, FormProvider>();
             services.AddSingleton<IProcessProvider, ProcessProvider>();
+            services.AddSingleton<ApplicationLogger>();
 
             // Game & server data
             services
                 .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
                 .AddSingleton<IPlayerDataProvider, PlayerDataProvider>()
+                .AddSingleton<ValheimServerLogger>()
                 .AddSingleton<ValheimServer>();
 
             // Forms

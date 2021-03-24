@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
@@ -22,6 +23,7 @@ namespace ValheimServerGUI.Forms
         private readonly IPlayerDataProvider PlayerDataProvider;
         private readonly ValheimServer Server;
         private readonly ValheimServerLogger ServerLogger;
+        private readonly ApplicationLogger Logger;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -29,7 +31,8 @@ namespace ValheimServerGUI.Forms
             IValheimFileProvider fileProvider,
             IPlayerDataProvider playerDataProvider,
             ValheimServer server,
-            ValheimServerLogger serverLogger)
+            ValheimServerLogger serverLogger,
+            ApplicationLogger appLogger)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
@@ -37,6 +40,7 @@ namespace ValheimServerGUI.Forms
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
             this.ServerLogger = serverLogger;
+            this.Logger = appLogger;
 
             InitializeComponent(); // WinForms generated code, always first
             InitializeImages();
@@ -112,13 +116,18 @@ namespace ValheimServerGUI.Forms
 
         #region MainWindow Events
 
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+
+            this.Logger.LogInformation($"Valheim Server GUI v{AssemblyHelper.GetApplicationVersion()} - Loaded OK");
+        }
+
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
 
             this.CheckFilePaths();
-
-            this.SetStatusText("Loaded OK");
         }
 
         protected override void OnResize(EventArgs e)

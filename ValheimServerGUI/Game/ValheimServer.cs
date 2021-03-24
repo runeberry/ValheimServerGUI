@@ -199,7 +199,7 @@ namespace ValheimServerGUI.Game
                 }
                 catch (Exception e)
                 {
-                    // todo: should at least log the exception or something. Need an app logger.
+                    this.ApplicationLogger.LogError(e, "Error parsing server log: {0}", context.Message);
                 }
             }
         }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Data;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Game
 {
@@ -16,7 +17,7 @@ namespace ValheimServerGUI.Game
 
         private Dictionary<string, PlayerStatus> PlayerStatusMap = new();
 
-        public PlayerDataProvider() : base(Resources.PlayerListFilePath)
+        public PlayerDataProvider(ApplicationLogger logger) : base(logger, Resources.PlayerListFilePath)
         {
             this.DataLoaded += this.OnDataLoaded;
             this.EntityUpdated += this.OnEntityUpdated;

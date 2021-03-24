@@ -1,24 +1,29 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Tools.Data
 {
     public class JsonLocalDataProvider<TEntity> : ILocalDataProvider<TEntity>
         where TEntity : IPrimaryKeyEntity
     {
+        protected readonly ApplicationLogger Logger;
+
         private readonly string FilePath;
         private readonly JsonSerializer Serializer = new();
         private readonly ReaderWriterLockSlim RWLock = new();
 
         private Dictionary<string, TEntity> Entities = new();
 
-        public JsonLocalDataProvider(string filePath)
+        public JsonLocalDataProvider(ApplicationLogger logger, string filePath)
         {
+            this.Logger = logger;
             this.FilePath = Environment.ExpandEnvironmentVariables(filePath);
         }
 
@@ -51,9 +56,9 @@ namespace ValheimServerGUI.Tools.Data
                         this.Entities = dataFile.Data;
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    // todo: app logger
+                    this.Logger.LogError(e, "Error loading JSON data from file: {0}", this.FilePath);
                 }
                 finally
                 {
@@ -78,9 +83,9 @@ namespace ValheimServerGUI.Tools.Data
 
                     this.DataSaved?.Invoke(this, EventArgs.Empty);
                 }
-                catch
+                catch (Exception e)
                 {
-                    // todo: app logger
+                    this.Logger.LogError(e, "Error saving JSON data to file: {0}", this.FilePath);
                 }
                 finally
                 {

@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 
-namespace ValheimServerGUI.Tools
+namespace ValheimServerGUI.Tools.Logging
 {
     public class LogEvent
     {

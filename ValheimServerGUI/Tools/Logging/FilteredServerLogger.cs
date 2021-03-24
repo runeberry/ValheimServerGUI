@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace ValheimServerGUI.Tools
+namespace ValheimServerGUI.Tools.Logging
 {
     public class FilteredServerLogger : AppLogger
     {

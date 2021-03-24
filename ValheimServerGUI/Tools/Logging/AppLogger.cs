@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ValheimServerGUI.Tools
+namespace ValheimServerGUI.Tools.Logging
 {
     public class AppLogger : ILogger
     {

@@ -220,7 +220,6 @@ namespace ValheimServerGUI.Controls
 
             public DataListViewRow<TEntity> RefreshValues()
             {
-                // TODO: FIX THIS ENUMERABLE/ARRAY BULLSHIT
                 var cellValues = this.Binding.ExtractValues(this.Entity).ToArray();
                 this.SetCellValues(cellValues);
                 return this;

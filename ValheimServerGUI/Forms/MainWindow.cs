@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI.Forms

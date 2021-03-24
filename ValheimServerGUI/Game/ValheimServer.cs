@@ -7,6 +7,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Game

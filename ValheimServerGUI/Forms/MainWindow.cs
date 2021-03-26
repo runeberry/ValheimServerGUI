@@ -327,7 +327,7 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonClearLogs_Click(object sender, EventArgs e)
         {
-            this.ClearLogs();
+            this.ClearCurrentLogView();
         }
 
         private void ShowPasswordField_Changed(object sender, bool value)
@@ -487,9 +487,9 @@ namespace ValheimServerGUI.Forms
             this.LogViewer.AddLogToView(message, viewName);
         }
 
-        private void ClearLogs()
+        private void ClearCurrentLogView()
         {
-            this.LogViewer.ClearLogs();
+            this.LogViewer.ClearLogView(this.LogViewer.LogView);
         }
 
         private void SetStatusText(string message)

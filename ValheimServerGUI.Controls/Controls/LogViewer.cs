@@ -52,9 +52,21 @@ namespace ValheimServerGUI.Controls
 
         public void ClearLogs()
         {
-            this.LogsByView.Clear();
+            this.LogsByView.Clear();            
             
             this.ClearLines();
+        }
+
+        public void ClearLogView(string viewName)
+        {
+            if (viewName == null || !this.LogsByView.TryGetValue(viewName, out var logs)) return;
+
+            logs.Clear();
+
+            if (viewName == this.LogView)
+            {
+                this.ClearLines();
+            }
         }
 
         public string GetCurrentViewText()

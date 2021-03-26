@@ -65,8 +65,9 @@ namespace ValheimServerGUI.Forms
             this.ColumnPlayerUpdated = new System.Windows.Forms.ColumnHeader();
             this.ImageList = new System.Windows.Forms.ImageList(this.components);
             this.TabLogs = new System.Windows.Forms.TabPage();
+            this.LogViewSelectField = new ValheimServerGUI.Controls.DropdownFormField();
+            this.LogViewer = new ValheimServerGUI.Controls.LogViewer();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
-            this.TextBoxLogs = new System.Windows.Forms.TextBox();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.TrayContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.TrayContextMenuStart = new System.Windows.Forms.ToolStripMenuItem();
@@ -379,8 +380,9 @@ namespace ValheimServerGUI.Forms
             // 
             // PlayersTable
             // 
-            this.PlayersTable.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
+            this.PlayersTable.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.PlayersTable.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.ColumnPlayerStatus,
             this.ColumnPlayerName,
@@ -416,8 +418,9 @@ namespace ValheimServerGUI.Forms
             // 
             // TabLogs
             // 
+            this.TabLogs.Controls.Add(this.LogViewSelectField);
+            this.TabLogs.Controls.Add(this.LogViewer);
             this.TabLogs.Controls.Add(this.ButtonClearLogs);
-            this.TabLogs.Controls.Add(this.TextBoxLogs);
             this.TabLogs.Location = new System.Drawing.Point(4, 24);
             this.TabLogs.Name = "TabLogs";
             this.TabLogs.Size = new System.Drawing.Size(452, 252);
@@ -425,29 +428,35 @@ namespace ValheimServerGUI.Forms
             this.TabLogs.Text = "Logs";
             this.TabLogs.UseVisualStyleBackColor = true;
             // 
+            // LogViewSelectField
+            // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
+            this.LogViewSelectField.DropdownEnabled = true;
+            this.LogViewSelectField.EmptyText = "";
+            this.LogViewSelectField.HelpText = "";
+            this.LogViewSelectField.LabelText = "View logs for...";
+            this.LogViewSelectField.Location = new System.Drawing.Point(-4, 4);
+            this.LogViewSelectField.Name = "LogViewSelectField";
+            this.LogViewSelectField.Size = new System.Drawing.Size(150, 41);
+            this.LogViewSelectField.TabIndex = 3;
+            this.LogViewSelectField.Value = null;
+            // 
+            // LogViewer
+            // 
+            this.LogViewer.Location = new System.Drawing.Point(3, 51);
+            this.LogViewer.LogView = "DefaultLogView";
+            this.LogViewer.Name = "LogViewer";
+            this.LogViewer.Size = new System.Drawing.Size(446, 198);
+            this.LogViewer.TabIndex = 2;
+            // 
             // ButtonClearLogs
             // 
-            this.ButtonClearLogs.Location = new System.Drawing.Point(3, 3);
+            this.ButtonClearLogs.Location = new System.Drawing.Point(374, 22);
             this.ButtonClearLogs.Name = "ButtonClearLogs";
             this.ButtonClearLogs.Size = new System.Drawing.Size(75, 23);
             this.ButtonClearLogs.TabIndex = 1;
             this.ButtonClearLogs.Text = "Clear Logs";
             this.ButtonClearLogs.UseVisualStyleBackColor = true;
-            // 
-            // TextBoxLogs
-            // 
-            this.TextBoxLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.TextBoxLogs.BackColor = System.Drawing.SystemColors.Window;
-            this.TextBoxLogs.Font = new System.Drawing.Font("Lucida Console", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.TextBoxLogs.Location = new System.Drawing.Point(3, 32);
-            this.TextBoxLogs.Multiline = true;
-            this.TextBoxLogs.Name = "TextBoxLogs";
-            this.TextBoxLogs.ReadOnly = true;
-            this.TextBoxLogs.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.TextBoxLogs.Size = new System.Drawing.Size(446, 217);
-            this.TextBoxLogs.TabIndex = 0;
             // 
             // NotifyIcon
             // 
@@ -529,7 +538,6 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.ResumeLayout(false);
             this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
-            this.TabLogs.PerformLayout();
             this.TrayContextMenuStrip.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -554,7 +562,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.TabPage TabLogs;
         private System.Windows.Forms.Button ButtonStopServer;
         private System.Windows.Forms.Button ButtonStartServer;
-        private System.Windows.Forms.TextBox TextBoxLogs;
         private System.Windows.Forms.Button ButtonClearLogs;
         private ValheimServerGUI.Controls.DropdownFormField WorldSelectExistingNameField;
         private Controls.TextFormField ServerPasswordField;
@@ -582,5 +589,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ColumnHeader ColumnPlayerStatus;
         private System.Windows.Forms.ColumnHeader ColumnPlayerName;
         private System.Windows.Forms.ColumnHeader ColumnPlayerUpdated;
+        private ValheimServerGUI.Controls.LogViewer LogViewer;
+        private ValheimServerGUI.Controls.DropdownFormField LogViewSelectField;
     }
 }

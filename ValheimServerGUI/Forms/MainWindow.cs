@@ -16,6 +16,8 @@ namespace ValheimServerGUI.Forms
     {
         private static readonly string NL = Environment.NewLine;
         private const string PlayerNameUnknown = "(unknown)";
+        private const string LogViewServer = "Server";
+        private const string LogViewApplication = "Application";
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -58,7 +60,8 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeServer()
         {
-            this.ServerLogger.LogReceived += this.OnLogReceived;
+            this.Logger.LogReceived += (_, log) => this.OnLogReceived(log.Message, LogViewApplication);
+            this.ServerLogger.LogReceived += (_, log) => this.OnLogReceived(log.Message, LogViewServer);
             this.Server.StatusChanged += this.OnServerStatusChanged;
             this.Server.WorldSaved += this.OnWorldSaved;
 
@@ -97,6 +100,7 @@ namespace ValheimServerGUI.Forms
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
             this.WorldSelectRadioExisting.ValueChanged += this.WorldSelectRadioExisting_Changed;
             this.WorldSelectRadioNew.ValueChanged += this.WorldSelectRadioNew_Changed;
+            this.LogViewSelectField.ValueChanged += this.LogViewSelectField_Changed;
         }
 
         private void InitializeFormFields()
@@ -107,6 +111,9 @@ namespace ValheimServerGUI.Forms
                 row.AddCellBinding(this.ColumnPlayerStatus.Index, p => p.PlayerStatus);
                 row.AddCellBinding(this.ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
             });
+
+            this.LogViewSelectField.DataSource = new[] { LogViewServer, LogViewApplication };
+            this.LogViewSelectField.Value = LogViewServer;
 
             this.RefreshFormFields();
             this.LoadFormValuesFromUserPrefs();
@@ -371,6 +378,11 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void LogViewSelectField_Changed(object sender, string viewName)
+        {
+            this.LogViewer.LogView = viewName;
+        }
+
         private void ServerRefreshTimer_Tick(object sender, EventArgs e)
         {
             this.UpdatePlayerStatus();
@@ -380,17 +392,17 @@ namespace ValheimServerGUI.Forms
 
         #region Server Events
 
-        private void OnLogReceived(object sender, EventLogContext logEvent)
+        private void OnLogReceived(string message, string viewName)
         {
             // This technique allows cross-thread access to UI controls
             // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<object, EventLogContext>(OnLogReceived), new object[] { sender, logEvent });
+                this.Invoke(new Action<string, string>(OnLogReceived), new object[] { message, viewName });
                 return;
             }
 
-            this.AddLog(logEvent.Message);
+            this.AddLog(message, viewName);
         }
 
         private void OnServerStatusChanged(object sender, ServerStatus status)
@@ -470,14 +482,14 @@ namespace ValheimServerGUI.Forms
             this.RefreshFormFields();
         }
 
-        private void AddLog(string message)
+        private void AddLog(string message, string viewName)
         {
-            this.TextBoxLogs.AppendLine(message);
+            this.LogViewer.AddLogToView(message, viewName);
         }
 
         private void ClearLogs()
         {
-            this.TextBoxLogs.Text = "";
+            this.LogViewer.ClearLogs();
         }
 
         private void SetStatusText(string message)

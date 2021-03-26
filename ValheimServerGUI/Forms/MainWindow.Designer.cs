@@ -430,6 +430,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -526,7 +527,7 @@ namespace ValheimServerGUI.Forms
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuStrip;
             this.MaximizeBox = false;
-            this.MinimumSize = new System.Drawing.Size(500, 325);
+            this.MinimumSize = new System.Drawing.Size(500, 371);
             this.Name = "MainWindow";
             this.Text = "(Unofficial) Valheim Dedicated Server GUI";
             this.MenuStrip.ResumeLayout(false);

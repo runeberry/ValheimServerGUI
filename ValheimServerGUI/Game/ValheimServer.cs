@@ -60,7 +60,7 @@ namespace ValheimServerGUI.Game
             this.ServerLogger = serverLogger;
             this.ApplicationLogger = appLogger;
 
-            this.ApplicationLogger.LogReceived += this.Logger_OnServerLogReceived;
+            this.ServerLogger.LogReceived += this.Logger_OnServerLogReceived;
 
             InitializeLogBasedActions();
             InitializeStatusBasedActions();

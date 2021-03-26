@@ -25,9 +25,6 @@ namespace ValheimServerGUI.Game
             // Not all log message have timestamps, but trim off any that do
             var message = Regex.Replace(context.Message, @"^\d+\/\d+\/\d+ \d+:\d+:\d+:\s+", "");
 
-            // Add a consistent timestamp to the beginning of all messages
-            message = $"[{context.Timestamp:T}] {message}";
-
             return message;
         }
     }

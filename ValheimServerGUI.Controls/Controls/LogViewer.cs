@@ -23,7 +23,10 @@ namespace ValheimServerGUI.Controls
                 this.LogViewChanged?.Invoke(this, EventArgs.Empty);
             }
         }
+
         public event EventHandler LogViewChanged;
+
+        public string TimestampFormat { get; set; }
 
         public LogViewer()
         {
@@ -39,7 +42,7 @@ namespace ValheimServerGUI.Controls
 
         public void AddLogToView(string message, string viewName)
         {
-            this.StoreLog(message, viewName);
+            message = this.StoreLog(message, viewName);
 
             if (viewName == this.LogView)
             {
@@ -61,7 +64,7 @@ namespace ValheimServerGUI.Controls
 
         #region Non-public methods
 
-        private void StoreLog(string message, string viewName)
+        private string StoreLog(string message, string viewName)
         {
             if (!this.LogsByView.TryGetValue(viewName, out var list))
             {
@@ -72,7 +75,14 @@ namespace ValheimServerGUI.Controls
                 }
             }
 
+            if (this.TimestampFormat != null)
+            {
+                message = $"[{DateTime.Now.ToString(this.TimestampFormat)}] {message}";
+            }
+
             list.Add(message);
+
+            return message;
         }
 
         private void AppendLine(string line)
@@ -100,10 +110,9 @@ namespace ValheimServerGUI.Controls
 
             if (this.LogsByView.TryGetValue(this.LogView, out var logs))
             {
-                foreach (var log in logs)
-                {
-                    this.AppendLine(log);
-                }
+                var logString = string.Join(Environment.NewLine, logs);
+
+                this.AppendLine(logString);
             }
         }
 

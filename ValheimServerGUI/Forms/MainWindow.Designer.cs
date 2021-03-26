@@ -430,7 +430,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -448,6 +447,7 @@ namespace ValheimServerGUI.Forms
             this.LogViewer.Name = "LogViewer";
             this.LogViewer.Size = new System.Drawing.Size(446, 198);
             this.LogViewer.TabIndex = 2;
+            this.LogViewer.TimestampFormat = "T";
             // 
             // ButtonClearLogs
             // 

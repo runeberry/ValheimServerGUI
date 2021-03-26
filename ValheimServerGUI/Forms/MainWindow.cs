@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
@@ -95,6 +96,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
             this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
+            this.ButtonSaveLogs.Click += this.ButtonSaveLogs_Click;
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
@@ -328,6 +330,38 @@ namespace ValheimServerGUI.Forms
         private void ButtonClearLogs_Click(object sender, EventArgs e)
         {
             this.ClearCurrentLogView();
+        }
+
+        private void ButtonSaveLogs_Click(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(this.LogViewer.GetCurrentViewText()))
+            {
+                this.Logger.LogWarning("No logs to save!");
+                return;
+            }
+
+            var dialog = new SaveFileDialog
+            {
+                FileName = $"{this.LogViewer.LogView}Logs-{DateTime.Now:u}.txt",
+                Filter = "Text Files (*.txt)|*.txt",
+                CheckPathExists = true,
+                RestoreDirectory = true,
+            };
+
+            var result = dialog.ShowDialog();
+
+            if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(dialog.FileName))
+            {
+                try
+                {
+                    // Get the text again in case any new logs were written
+                    File.WriteAllText(dialog.FileName, this.LogViewer.GetCurrentViewText());
+                }
+                catch (Exception exception)
+                {
+                    this.Logger.LogError(exception, $"Failed to write log file: {dialog.FileName}");
+                }
+            }
         }
 
         private void ShowPasswordField_Changed(object sender, bool value)

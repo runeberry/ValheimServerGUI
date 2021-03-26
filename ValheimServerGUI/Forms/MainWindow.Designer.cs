@@ -76,6 +76,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
+            this.ButtonSaveLogs = new System.Windows.Forms.Button();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -418,6 +419,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabLogs
             // 
+            this.TabLogs.Controls.Add(this.ButtonSaveLogs);
             this.TabLogs.Controls.Add(this.LogViewSelectField);
             this.TabLogs.Controls.Add(this.LogViewer);
             this.TabLogs.Controls.Add(this.ButtonClearLogs);
@@ -516,6 +518,15 @@ namespace ValheimServerGUI.Forms
             // 
             this.ServerRefreshTimer.Interval = 1000;
             // 
+            // ButtonSaveLogs
+            // 
+            this.ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
+            this.ButtonSaveLogs.Name = "ButtonSaveLogs";
+            this.ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
+            this.ButtonSaveLogs.TabIndex = 4;
+            this.ButtonSaveLogs.Text = "Save Logs...";
+            this.ButtonSaveLogs.UseVisualStyleBackColor = true;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -592,5 +603,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ColumnHeader ColumnPlayerUpdated;
         private ValheimServerGUI.Controls.LogViewer LogViewer;
         private ValheimServerGUI.Controls.DropdownFormField LogViewSelectField;
+        private System.Windows.Forms.Button ButtonSaveLogs;
     }
 }

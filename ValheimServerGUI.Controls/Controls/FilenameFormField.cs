@@ -10,6 +10,8 @@ namespace ValheimServerGUI.Controls
         private Action<OpenFileDialog> FileDialogBuilder;
         private Action<FolderBrowserDialog> FolderDialogBuilder;
 
+        #region IFormField implementation
+
         public string LabelText
         {
             get => this.Label.Text;
@@ -26,8 +28,18 @@ namespace ValheimServerGUI.Controls
         public string Value
         {
             get => this.TextBox.Text;
-            set => this.TextBox.Text = value;
+            set
+            {
+                if (this.TextBox.Text == value) return;
+
+                this.TextBox.Text = value;
+                this.ValueChanged?.Invoke(this, value);
+            }
         }
+
+        public event EventHandler<string> ValueChanged;
+
+        #endregion
 
         public bool ReadOnly
         {
@@ -52,6 +64,8 @@ namespace ValheimServerGUI.Controls
         public FilenameFormField()
         {
             InitializeComponent();
+
+            this.TextBox.TextChanged += this.OnTextChanged;
         }
 
         public void ConfigureFileDialog(Action<OpenFileDialog> builder)
@@ -62,6 +76,11 @@ namespace ValheimServerGUI.Controls
         public void ConfigureFolderDialog(Action<FolderBrowserDialog> builder)
         {
             FolderDialogBuilder = builder;
+        }
+
+        private void OnTextChanged(object sender, EventArgs args)
+        {
+            this.ValueChanged?.Invoke(this, this.Value);
         }
 
         private void FileBrowserButton_Click(object sender, EventArgs e)

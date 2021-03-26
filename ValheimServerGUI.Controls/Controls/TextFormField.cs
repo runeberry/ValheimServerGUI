@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace ValheimServerGUI.Forms.Controls
@@ -7,6 +8,8 @@ namespace ValheimServerGUI.Forms.Controls
     {
         private const char PasswordChar = '●';
         private const char PasswordCharDisabled = '\0';
+
+        #region IFormField implementation
 
         public string LabelText
         {
@@ -24,8 +27,18 @@ namespace ValheimServerGUI.Forms.Controls
         public string Value
         {
             get => this.TextBox.Text;
-            set => this.TextBox.Text = value;
+            set
+            {
+                if (this.TextBox.Text == value) return;
+
+                this.TextBox.Text = value;
+                this.ValueChanged?.Invoke(this, value);
+            }
         }
+
+        public event EventHandler<string> ValueChanged;
+        
+        #endregion
 
         public bool HideValue
         {
@@ -42,6 +55,13 @@ namespace ValheimServerGUI.Forms.Controls
         public TextFormField()
         {
             InitializeComponent();
+
+            this.TextBox.TextChanged += this.OnTextChanged;
+        }
+
+        private void OnTextChanged(object sender, EventArgs args)
+        {
+            this.ValueChanged?.Invoke(this, this.Value);
         }
     }
 }

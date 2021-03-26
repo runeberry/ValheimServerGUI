@@ -1,10 +1,13 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 
 namespace ValheimServerGUI.Controls
 {
     public partial class NumericFormField : UserControl, IFormField<int>
     {
+        #region IFormField implementation
+
         public string LabelText
         {
             get => this.Label.Text;
@@ -21,8 +24,18 @@ namespace ValheimServerGUI.Controls
         public int Value
         {
             get => (int)this.NumericUpDown.Value;
-            set => this.NumericUpDown.Value = value;
+            set 
+            {
+                if (this.NumericUpDown.Value == value) return;
+
+                this.NumericUpDown.Value = value;
+                this.ValueChanged?.Invoke(this, Value);
+            }
         }
+
+        public event EventHandler<int> ValueChanged;
+
+        #endregion
 
         public int Minimum
         {
@@ -39,6 +52,13 @@ namespace ValheimServerGUI.Controls
         public NumericFormField()
         {
             InitializeComponent();
+
+            this.NumericUpDown.ValueChanged += this.OnValueChanged;
+        }
+
+        private void OnValueChanged(object sender, EventArgs args)
+        {
+            this.ValueChanged?.Invoke(this, this.Value);
         }
     }
 }

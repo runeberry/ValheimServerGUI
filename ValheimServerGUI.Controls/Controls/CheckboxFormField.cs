@@ -6,7 +6,7 @@ namespace ValheimServerGUI.Controls
 {
     public partial class CheckboxFormField : UserControl, IFormField<bool>
     {
-        public event EventHandler<bool> ValueChanged;
+        #region IFormField implementation
 
         public string LabelText
         {
@@ -27,9 +27,15 @@ namespace ValheimServerGUI.Controls
             set
             {
                 if (value == this.Value) return;
+
                 this.CheckBox.Checked = value;
+                this.ValueChanged?.Invoke(this, value);
             }
         }
+
+        public event EventHandler<bool> ValueChanged;
+
+        #endregion
 
         public CheckboxFormField()
         {

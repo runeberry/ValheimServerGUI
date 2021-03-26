@@ -9,7 +9,7 @@ namespace ValheimServerGUI.Controls
 {
     public partial class RadioFormField : UserControl, IFormField<bool>
     {
-        public event EventHandler<bool> ValueChanged;
+        #region IFormField implementation
 
         public string LabelText
         {
@@ -30,9 +30,15 @@ namespace ValheimServerGUI.Controls
             set
             {
                 if (value == this.Value) return;
+
                 this.RadioButton.Checked = value;
+                this.ValueChanged?.Invoke(this, value);
             }
         }
+
+        public event EventHandler<bool> ValueChanged;
+
+        #endregion
 
         public string GroupName { get; set; }
 

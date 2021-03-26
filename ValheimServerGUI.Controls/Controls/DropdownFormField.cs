@@ -8,7 +8,7 @@ namespace ValheimServerGUI.Controls
 {
     public partial class DropdownFormField : UserControl, IFormField<string>
     {
-        public string EmptyText { get; set; } = "";
+        #region IFormField implementation
 
         public string LabelText
         {
@@ -38,19 +38,22 @@ namespace ValheimServerGUI.Controls
             }
             set
             {
-                if (value == null)
-                {
-                    this.ComboBox.SelectedItem = value;
-                    return;
-                }
+                if (this.ComboBox.SelectedItem?.ToString() == value) return;
 
-                if (this.DataSource.Contains(value))
+                if (value == null || this.DataSource.Contains(value))
                 {
-                    // Only allow value dropdown items to be set
+                    // Only allow null or values within DataSource to be set, ignore all others
                     this.ComboBox.SelectedItem = value;
+                    this.ValueChanged?.Invoke(this, value);
                 }
             }
         }
+
+        public event EventHandler<string> ValueChanged;
+
+        #endregion
+
+        public string EmptyText { get; set; } = "";
 
         public IEnumerable<string> DataSource
         {
@@ -91,6 +94,13 @@ namespace ValheimServerGUI.Controls
         public DropdownFormField()
         {
             InitializeComponent();
+
+            this.ComboBox.SelectedIndexChanged += this.OnSelectedIndexChanged;
+        }
+
+        private void OnSelectedIndexChanged(object sender, EventArgs args)
+        {
+            this.ValueChanged?.Invoke(this, this.Value);
         }
     }
 }

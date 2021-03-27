@@ -223,6 +223,7 @@ namespace ValheimServerGUI.Game
             {
                 player.PlayerStatus = PlayerStatus.Joining;
                 player.LastStatusChange = DateTime.UtcNow;
+                player.ZdoId = null;
                 this.PlayerDataProvider.Upsert(player);
             }
         }
@@ -230,7 +231,7 @@ namespace ValheimServerGUI.Game
         private void OnPlayerConnected(object sender, EventLogContext context, params string[] captures)
         {
             var playerName = captures[0];
-            //var zdoid = captures[1]; // Seems to be a unique object id for the game session
+            var zdoid = captures[1]; // Seems to be a unique object id for the game session
             //var otherNumber = captures[2]; // Not sure what this is for?
 
             if (string.IsNullOrWhiteSpace(playerName)) return;
@@ -241,6 +242,7 @@ namespace ValheimServerGUI.Game
                 player.PlayerName = playerName;
                 player.PlayerStatus = PlayerStatus.Online;
                 player.LastStatusChange = DateTime.UtcNow;
+                player.ZdoId = zdoid;
                 this.PlayerDataProvider.Upsert(player);
             }
         }
@@ -255,6 +257,7 @@ namespace ValheimServerGUI.Game
             {
                 player.PlayerStatus = PlayerStatus.Leaving;
                 player.LastStatusChange = DateTime.UtcNow;
+                player.ZdoId = null;
                 this.PlayerDataProvider.Upsert(player);
             }
         }
@@ -269,6 +272,7 @@ namespace ValheimServerGUI.Game
             {
                 player.PlayerStatus = PlayerStatus.Offline;
                 player.LastStatusChange = DateTime.UtcNow;
+                player.ZdoId = null;
                 this.PlayerDataProvider.Upsert(player);
             }
         }

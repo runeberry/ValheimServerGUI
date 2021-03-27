@@ -33,5 +33,11 @@ namespace ValheimServerGUI.Game
         /// </summary>
         [JsonIgnore]
         public PlayerStatus PlayerStatus { get; set; }
+
+        /// <summary>
+        /// The player's current object id in-game. Changes with each session.
+        /// </summary>
+        [JsonIgnore]
+        public string ZdoId { get; set; }
     }
 }

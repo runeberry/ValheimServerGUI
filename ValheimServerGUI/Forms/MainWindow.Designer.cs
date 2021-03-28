@@ -415,7 +415,7 @@ namespace ValheimServerGUI.Forms
             // ColumnPlayerName
             // 
             this.ColumnPlayerName.DisplayIndex = 0;
-            this.ColumnPlayerName.Text = "Name";
+            this.ColumnPlayerName.Text = "Character Name";
             this.ColumnPlayerName.Width = 160;
             // 
             // ColumnPlayerUpdated

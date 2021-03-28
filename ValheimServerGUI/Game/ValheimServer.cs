@@ -319,38 +319,46 @@ namespace ValheimServerGUI.Game
 
             // This is tricky becase we don't have the SteamID in this particular log message
             // So consider all players that are currently connecting to the game
-            var players = this.PlayerDataProvider.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
+            var joiningPlayers = this.PlayerDataProvider.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
+            var joiningWithSameName = joiningPlayers.Where(p => p.PlayerName == playerName);
 
-            if (players.Count() == 1)
+            if (joiningPlayers.Count() > 1 && joiningWithSameName.Any())
             {
-                // If there's only one player connecting, use that player, it's gotta be the same person... right?
-                player = players.Single();
+                // If multiple players are joining, we can narrow down the list if any of the joining
+                // players already have a name that matches the requested player name
+                joiningPlayers = joiningWithSameName;
+
+                this.ApplicationLogger.LogTrace($"Multiple players joining, but found {joiningPlayers.Count()} match(es) by name {playerName}.");
+            }
+
+            if (joiningPlayers.Count() == 1)
+            {
+                // If there's only one player connecting (or multiple players, but one has the same name), use that player.
+                // It's gotta be the same person... right?
+                player = joiningPlayers.Single();
+                player.SteamIdConfident = true;
+                player.SteamIdAlternates = null;
+
+                this.ApplicationLogger.LogTrace($"Matched PlayerName {playerName} to SteamId {player.SteamId} with high confidence.");
             }
             else
             {
-                // If there are multiple players connecting, see if any of the player records have a matching name
-                var playersByName = players.Where(p => p.PlayerName == playerName);
-
-                if (playersByName.Any())
+                if (this.PlayerDataProvider.ResolveUncertainSteamIds())
                 {
-                    if (playersByName.Count() == 1)
-                    {
-                        // If there's a single matching record by name, assume that's the same player
-                        player = playersByName.Single();
-                    }
-                    else
-                    {
-                        // If there are multiple player records with the same name, hoo boy... return the oldest connecting one
-                        player = playersByName.OrderBy(p => p.LastStatusChange).First();
-                    }
+                    // Run this method recursively until no more uncertain id updates are made
+                    player = this.FindJoiningPlayerByName(playerName);
                 }
                 else
                 {
-                    // If there's no matching name, just return the oldest connecting player
-                    player = players.OrderBy(p => p.LastStatusChange).First();
+                    // We tried, but we couldn't resolve this name to a single player.
+                    // Simply assume it's the player who's been trying to join the longest.
+                    player = joiningPlayers.OrderBy(p => p.LastStatusChange).First();
+
+                    this.ApplicationLogger.LogWarning(
+                        $"Multiple players joining, matched PlayerName {playerName} to SteamId {player.SteamId} with low confidence.");
                 }
             }
-
+            
             return player;
         }
 

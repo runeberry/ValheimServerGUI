@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -21,6 +22,20 @@ namespace ValheimServerGUI.Game
         /// </summary>
         [JsonProperty("steamId")]
         public string SteamId { get; set; }
+
+        /// <summary>
+        /// Could we confidently match up the player's name and steamId?
+        /// </summary>
+        [JsonProperty("steamIdConfident")]
+        public bool SteamIdConfident { get; set; }
+
+        /// <summary>
+        /// If we could not confidently match up the connecting player name with a steamId,
+        /// then keep track of any possible ids. Will try to resolve the correct one over time.
+        /// This list will also contain the value chosen for SteamId.
+        /// </summary>
+        [JsonProperty("steamIdAlternates", NullValueHandling = NullValueHandling.Ignore)]
+        public List<string> SteamIdAlternates { get; set; }
 
         /// <summary>
         /// The last time the player logged on to the server.

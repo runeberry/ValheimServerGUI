@@ -97,12 +97,14 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
             this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
             this.ButtonSaveLogs.Click += this.ButtonSaveLogs_Click;
+            this.ButtonPlayerDetails.Click += ButtonPlayerDetails_Click;
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
             this.WorldSelectRadioExisting.ValueChanged += this.WorldSelectRadioExisting_Changed;
             this.WorldSelectRadioNew.ValueChanged += this.WorldSelectRadioNew_Changed;
             this.LogViewSelectField.ValueChanged += this.LogViewSelectField_Changed;
+            this.PlayersTable.SelectionChanged += PlayersTable_SelectionChanged;
         }
 
         private void InitializeFormFields()
@@ -364,6 +366,15 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void ButtonPlayerDetails_Click(object sender, EventArgs e)
+        {
+            if (!this.PlayersTable.TryGetSelectedRow<PlayerInfo>(out var row)) return;
+
+            var form = this.FormProvider.GetForm<PlayerDetailsForm>();
+            form.SetPlayerData(row.Entity);
+            form.Show();
+        }
+
         private void ShowPasswordField_Changed(object sender, bool value)
         {
             this.ServerPasswordField.HideValue = !value;
@@ -420,6 +431,11 @@ namespace ValheimServerGUI.Forms
         private void ServerRefreshTimer_Tick(object sender, EventArgs e)
         {
             this.UpdatePlayerStatus();
+        }
+
+        private void PlayersTable_SelectionChanged(object sender, EventArgs e)
+        {
+            this.ButtonPlayerDetails.Enabled = this.PlayersTable.IsRowSelected;
         }
 
         #endregion

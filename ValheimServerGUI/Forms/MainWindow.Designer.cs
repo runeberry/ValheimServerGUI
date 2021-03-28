@@ -59,12 +59,14 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
             this.TabPlayers = new System.Windows.Forms.TabPage();
+            this.ButtonPlayerDetails = new System.Windows.Forms.Button();
             this.PlayersTable = new ValheimServerGUI.Controls.DataListView();
             this.ColumnPlayerStatus = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerName = new System.Windows.Forms.ColumnHeader();
             this.ColumnPlayerUpdated = new System.Windows.Forms.ColumnHeader();
             this.ImageList = new System.Windows.Forms.ImageList(this.components);
             this.TabLogs = new System.Windows.Forms.TabPage();
+            this.ButtonSaveLogs = new System.Windows.Forms.Button();
             this.LogViewSelectField = new ValheimServerGUI.Controls.DropdownFormField();
             this.LogViewer = new ValheimServerGUI.Controls.LogViewer();
             this.ButtonClearLogs = new System.Windows.Forms.Button();
@@ -76,7 +78,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
-            this.ButtonSaveLogs = new System.Windows.Forms.Button();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -371,6 +372,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabPlayers
             // 
+            this.TabPlayers.Controls.Add(this.ButtonPlayerDetails);
             this.TabPlayers.Controls.Add(this.PlayersTable);
             this.TabPlayers.Location = new System.Drawing.Point(4, 24);
             this.TabPlayers.Name = "TabPlayers";
@@ -378,6 +380,16 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.TabIndex = 3;
             this.TabPlayers.Text = "Players";
             this.TabPlayers.UseVisualStyleBackColor = true;
+            // 
+            // ButtonPlayerDetails
+            // 
+            this.ButtonPlayerDetails.Enabled = false;
+            this.ButtonPlayerDetails.Location = new System.Drawing.Point(3, 3);
+            this.ButtonPlayerDetails.Name = "ButtonPlayerDetails";
+            this.ButtonPlayerDetails.Size = new System.Drawing.Size(92, 23);
+            this.ButtonPlayerDetails.TabIndex = 1;
+            this.ButtonPlayerDetails.Text = "Player Info...";
+            this.ButtonPlayerDetails.UseVisualStyleBackColor = true;
             // 
             // PlayersTable
             // 
@@ -430,9 +442,17 @@ namespace ValheimServerGUI.Forms
             this.TabLogs.Text = "Logs";
             this.TabLogs.UseVisualStyleBackColor = true;
             // 
+            // ButtonSaveLogs
+            // 
+            this.ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
+            this.ButtonSaveLogs.Name = "ButtonSaveLogs";
+            this.ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
+            this.ButtonSaveLogs.TabIndex = 4;
+            this.ButtonSaveLogs.Text = "Save Logs...";
+            this.ButtonSaveLogs.UseVisualStyleBackColor = true;
+            // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -518,15 +538,6 @@ namespace ValheimServerGUI.Forms
             // 
             this.ServerRefreshTimer.Interval = 1000;
             // 
-            // ButtonSaveLogs
-            // 
-            this.ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
-            this.ButtonSaveLogs.Name = "ButtonSaveLogs";
-            this.ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
-            this.ButtonSaveLogs.TabIndex = 4;
-            this.ButtonSaveLogs.Text = "Save Logs...";
-            this.ButtonSaveLogs.UseVisualStyleBackColor = true;
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -604,5 +615,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.LogViewer LogViewer;
         private ValheimServerGUI.Controls.DropdownFormField LogViewSelectField;
         private System.Windows.Forms.Button ButtonSaveLogs;
+        private System.Windows.Forms.Button ButtonPlayerDetails;
     }
 }

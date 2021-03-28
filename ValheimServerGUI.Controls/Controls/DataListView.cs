@@ -39,11 +39,22 @@ namespace ValheimServerGUI.Controls
 
         private readonly Dictionary<Type, DataListViewRowBinding> RowBindings = new();
 
+        public bool IsRowSelected => this.ListView.SelectedItems.Count > 0;
+
+        public event EventHandler SelectionChanged;
+
         #endregion
 
         public DataListView()
         {
             InitializeComponent();
+
+            this.ListView.ItemSelectionChanged += ListView_ItemSelectionChanged;
+        }
+
+        private void ListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
+        {
+            this.SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         public DataListView AddRowBinding<TEntity>(Action<IDataListViewRowBinding<TEntity>> builder)
@@ -59,6 +70,45 @@ namespace ValheimServerGUI.Controls
 
             return this;
         }
+
+        #region Read methods
+
+        public IEnumerable<DataListViewRow<TEntity>> GetRowsWithType<TEntity>()
+        {
+            return this.Rows
+                .Select(row => row as DataListViewRow<TEntity>)
+                .Where(row => row != null);
+        }
+
+        public DataListViewRow GetSelectedRow()
+        {
+            if (!this.IsRowSelected) return null;
+
+            return this.ListView.SelectedItems[0] as DataListViewRow;
+        }
+
+        public DataListViewRow<TEntity> GetSelectedRow<TEntity>()
+        {
+            if (!this.IsRowSelected) return null;
+
+            return this.ListView.SelectedItems[0] as DataListViewRow<TEntity>;
+        }
+
+        public bool TryGetSelectedRow(out DataListViewRow row)
+        {
+            row = this.GetSelectedRow();
+            return row != null;
+        }
+
+        public bool TryGetSelectedRow<TEntity>(out DataListViewRow<TEntity> row)
+        {
+            row = this.GetSelectedRow<TEntity>();
+            return row != null;
+        }
+
+        #endregion
+
+        #region Write methods
 
         public DataListViewRow AddRowFromValues(params object[] values)
         {
@@ -86,18 +136,14 @@ namespace ValheimServerGUI.Controls
             return item;
         }
 
-        public IEnumerable<DataListViewRow<TEntity>> GetRowsWithType<TEntity>()
-        {
-            return this.Rows
-                .Select(row => row as DataListViewRow<TEntity>)
-                .Where(row => row != null);
-        }
+        #endregion
 
         #region Nested class: DataListViewRow
 
         public class DataListViewRow : ListViewItem
         {
             public DataListView Parent { get; }
+            public Guid Guid { get; }
 
             private readonly List<DataListViewCell> _cells = new();
             public IReadOnlyList<DataListViewCell> Cells => _cells;
@@ -105,6 +151,7 @@ namespace ValheimServerGUI.Controls
             public DataListViewRow(DataListView parent)
             {
                 this.Parent = parent;
+                this.Guid = Guid.NewGuid();
             }
 
             public DataListViewRow(DataListView parent, int numColumns)

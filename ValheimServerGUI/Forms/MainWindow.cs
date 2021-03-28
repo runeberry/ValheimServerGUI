@@ -97,14 +97,15 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
             this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
             this.ButtonSaveLogs.Click += this.ButtonSaveLogs_Click;
-            this.ButtonPlayerDetails.Click += ButtonPlayerDetails_Click;
+            this.ButtonPlayerDetails.Click += this.ButtonPlayerDetails_Click;
+            this.ButtonRemovePlayer.Click += this.ButtonRemovePlayer_Click;
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
             this.WorldSelectRadioExisting.ValueChanged += this.WorldSelectRadioExisting_Changed;
             this.WorldSelectRadioNew.ValueChanged += this.WorldSelectRadioNew_Changed;
             this.LogViewSelectField.ValueChanged += this.LogViewSelectField_Changed;
-            this.PlayersTable.SelectionChanged += PlayersTable_SelectionChanged;
+            this.PlayersTable.SelectionChanged += this.PlayersTable_SelectionChanged;
         }
 
         private void InitializeFormFields()
@@ -375,6 +376,15 @@ namespace ValheimServerGUI.Forms
             form.Show();
         }
 
+        private void ButtonRemovePlayer_Click(object sender, EventArgs e)
+        {
+            if (this.PlayersTable.TryGetSelectedRow<PlayerInfo>(out var row))
+            {
+                this.PlayerDataProvider.Remove(row.Entity);
+                this.PlayersTable.RemoveSelectedRow();
+            }
+        }
+
         private void ShowPasswordField_Changed(object sender, bool value)
         {
             this.ServerPasswordField.HideValue = !value;
@@ -435,7 +445,9 @@ namespace ValheimServerGUI.Forms
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
         {
-            this.ButtonPlayerDetails.Enabled = this.PlayersTable.IsRowSelected;
+            var isSelected = this.PlayersTable.TryGetSelectedRow<PlayerInfo>(out var row);
+            this.ButtonPlayerDetails.Enabled = isSelected;
+            this.ButtonRemovePlayer.Enabled = isSelected && row.Entity.PlayerStatus == PlayerStatus.Offline;
         }
 
         #endregion

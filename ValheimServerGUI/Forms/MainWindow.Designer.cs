@@ -59,6 +59,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
             this.TabPlayers = new System.Windows.Forms.TabPage();
+            this.ButtonRemovePlayer = new System.Windows.Forms.Button();
             this.ButtonPlayerDetails = new System.Windows.Forms.Button();
             this.PlayersTable = new ValheimServerGUI.Controls.DataListView();
             this.ColumnPlayerStatus = new System.Windows.Forms.ColumnHeader();
@@ -372,6 +373,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabPlayers
             // 
+            this.TabPlayers.Controls.Add(this.ButtonRemovePlayer);
             this.TabPlayers.Controls.Add(this.ButtonPlayerDetails);
             this.TabPlayers.Controls.Add(this.PlayersTable);
             this.TabPlayers.Location = new System.Drawing.Point(4, 24);
@@ -380,6 +382,16 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.TabIndex = 3;
             this.TabPlayers.Text = "Players";
             this.TabPlayers.UseVisualStyleBackColor = true;
+            // 
+            // ButtonRemovePlayer
+            // 
+            this.ButtonRemovePlayer.Enabled = false;
+            this.ButtonRemovePlayer.Image = global::ValheimServerGUI.Properties.Resources.Cancel_16x;
+            this.ButtonRemovePlayer.Location = new System.Drawing.Point(426, 3);
+            this.ButtonRemovePlayer.Name = "ButtonRemovePlayer";
+            this.ButtonRemovePlayer.Size = new System.Drawing.Size(23, 23);
+            this.ButtonRemovePlayer.TabIndex = 2;
+            this.ButtonRemovePlayer.UseVisualStyleBackColor = true;
             // 
             // ButtonPlayerDetails
             // 
@@ -616,5 +628,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.DropdownFormField LogViewSelectField;
         private System.Windows.Forms.Button ButtonSaveLogs;
         private System.Windows.Forms.Button ButtonPlayerDetails;
+        private System.Windows.Forms.Button ButtonRemovePlayer;
     }
 }

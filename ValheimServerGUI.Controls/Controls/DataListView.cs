@@ -136,6 +136,50 @@ namespace ValheimServerGUI.Controls
             return item;
         }
 
+        public bool RemoveRow(DataListViewRow row)
+        {
+            if (row == null) return false;
+
+            var result = this._rows.Remove(row);
+
+            if (result)
+            {
+                this.ListView.Items.Remove(row);
+            }
+
+            return result;
+        }
+
+        public bool RemoveSelectedRow()
+        {
+            return this.RemoveRow(this.GetSelectedRow());
+        }
+
+        public bool RemoveRows(IEnumerable<DataListViewRow> rows)
+        {
+            if (rows == null) return false;
+
+            var anyRemoved = false;
+
+            foreach (var row in rows)
+            {
+                var result = this.RemoveRow(row);
+                anyRemoved = anyRemoved || result;
+            }
+
+            return anyRemoved;
+        }
+
+        public bool RemoveRowsWhere(Func<DataListViewRow, bool> condition)
+        {
+            return this.RemoveRows(this.Rows.Where(condition).ToList());
+        }
+
+        public bool RemoveRowsWhere<TEntity>(Func<DataListViewRow<TEntity>, bool> condition)
+        {
+            return this.RemoveRows(this.GetRowsWithType<TEntity>().Where(condition).ToList());
+        }
+
         #endregion
 
         #region Nested class: DataListViewRow
@@ -143,7 +187,6 @@ namespace ValheimServerGUI.Controls
         public class DataListViewRow : ListViewItem
         {
             public DataListView Parent { get; }
-            public Guid Guid { get; }
 
             private readonly List<DataListViewCell> _cells = new();
             public IReadOnlyList<DataListViewCell> Cells => _cells;
@@ -151,7 +194,6 @@ namespace ValheimServerGUI.Controls
             public DataListViewRow(DataListView parent)
             {
                 this.Parent = parent;
-                this.Guid = Guid.NewGuid();
             }
 
             public DataListViewRow(DataListView parent, int numColumns)

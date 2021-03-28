@@ -38,12 +38,14 @@ namespace ValheimServerGUI.Forms
             this.OnlineStatusField = new ValheimServerGUI.Controls.LabelField();
             this.StatusChangedField = new ValheimServerGUI.Controls.LabelField();
             this.SteamIdWarningIcon = new System.Windows.Forms.PictureBox();
+            this.SteamIdCopyIcon = new System.Windows.Forms.PictureBox();
             ((System.ComponentModel.ISupportInitialize)(this.SteamIdWarningIcon)).BeginInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SteamIdCopyIcon)).BeginInit();
             this.SuspendLayout();
             // 
             // PlayerNameField
             // 
-            this.PlayerNameField.HelpText = "The player\'s Valheim character name in game.";
+            this.PlayerNameField.HelpText = resources.GetString("PlayerNameField.HelpText");
             this.PlayerNameField.LabelSplitRatio = 0.5D;
             this.PlayerNameField.LabelText = "Character Name:";
             this.PlayerNameField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -76,7 +78,8 @@ namespace ValheimServerGUI.Forms
             // 
             // SteamIdField
             // 
-            this.SteamIdField.HelpText = resources.GetString("SteamIdField.HelpText");
+            this.SteamIdField.HelpText = "The ID associated with the player\'s Steam account. You can use this ID to ban or " +
+    "block players, or add players as admins.";
             this.SteamIdField.LabelSplitRatio = 0.5D;
             this.SteamIdField.LabelText = "Steam ID:";
             this.SteamIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -129,18 +132,29 @@ namespace ValheimServerGUI.Forms
             // SteamIdWarningIcon
             // 
             this.SteamIdWarningIcon.Image = global::ValheimServerGUI.Properties.Resources.StatusWarning_16x;
-            this.SteamIdWarningIcon.Location = new System.Drawing.Point(259, 33);
+            this.SteamIdWarningIcon.Location = new System.Drawing.Point(258, 12);
             this.SteamIdWarningIcon.Name = "SteamIdWarningIcon";
             this.SteamIdWarningIcon.Size = new System.Drawing.Size(16, 16);
             this.SteamIdWarningIcon.TabIndex = 7;
             this.SteamIdWarningIcon.TabStop = false;
             this.SteamIdWarningIcon.Visible = false;
             // 
+            // SteamIdCopyIcon
+            // 
+            this.SteamIdCopyIcon.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.SteamIdCopyIcon.Image = global::ValheimServerGUI.Properties.Resources.Copy_16x;
+            this.SteamIdCopyIcon.Location = new System.Drawing.Point(258, 34);
+            this.SteamIdCopyIcon.Name = "SteamIdCopyIcon";
+            this.SteamIdCopyIcon.Size = new System.Drawing.Size(16, 16);
+            this.SteamIdCopyIcon.TabIndex = 8;
+            this.SteamIdCopyIcon.TabStop = false;
+            // 
             // PlayerDetailsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(289, 155);
+            this.Controls.Add(this.SteamIdCopyIcon);
             this.Controls.Add(this.SteamIdWarningIcon);
             this.Controls.Add(this.StatusChangedField);
             this.Controls.Add(this.OnlineStatusField);
@@ -158,6 +172,7 @@ namespace ValheimServerGUI.Forms
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
             this.Text = "Player Info";
             ((System.ComponentModel.ISupportInitialize)(this.SteamIdWarningIcon)).EndInit();
+            ((System.ComponentModel.ISupportInitialize)(this.SteamIdCopyIcon)).EndInit();
             this.ResumeLayout(false);
 
         }
@@ -172,5 +187,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.LabelField OnlineStatusField;
         private ValheimServerGUI.Controls.LabelField StatusChangedField;
         private System.Windows.Forms.PictureBox SteamIdWarningIcon;
+        private System.Windows.Forms.PictureBox SteamIdCopyIcon;
     }
 }

@@ -57,6 +57,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="SteamIdField.HelpText" xml:space="preserve">
+    <value>The ID associated with the player's Steam account. You can use this ID to ban or block players, or add players as admins.
+
+NOTE: If you see a warning icon (!) to the right, it means the app was unable to accurately determine this player's Steam ID. 
+This is a limitation of Valheim Dedicated Server and can happen when multiple players join the server at the same time.
+The app will attempt to resolve this issue each time the player logs in.</value>
+  </data>
   <assembly alias="System.Drawing.Common" name="System.Drawing.Common, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>

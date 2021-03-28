@@ -43,9 +43,9 @@ namespace ValheimServerGUI.Forms
             // 
             // PlayerNameField
             // 
-            this.PlayerNameField.HelpText = "";
+            this.PlayerNameField.HelpText = "The player\'s Valheim character name in game.";
             this.PlayerNameField.LabelSplitRatio = 0.5D;
-            this.PlayerNameField.LabelText = "Player Name:";
+            this.PlayerNameField.LabelText = "Character Name:";
             this.PlayerNameField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
             this.PlayerNameField.Location = new System.Drawing.Point(12, 12);
             this.PlayerNameField.Name = "PlayerNameField";
@@ -76,7 +76,7 @@ namespace ValheimServerGUI.Forms
             // 
             // SteamIdField
             // 
-            this.SteamIdField.HelpText = "";
+            this.SteamIdField.HelpText = resources.GetString("SteamIdField.HelpText");
             this.SteamIdField.LabelSplitRatio = 0.5D;
             this.SteamIdField.LabelText = "Steam ID:";
             this.SteamIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -89,7 +89,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ZdoIdField
             // 
-            this.ZdoIdField.HelpText = "";
+            this.ZdoIdField.HelpText = "The player\'s object ID in game. This changes with each game session.";
             this.ZdoIdField.LabelSplitRatio = 0.5D;
             this.ZdoIdField.LabelText = "ZDOID:";
             this.ZdoIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
@@ -102,7 +102,7 @@ namespace ValheimServerGUI.Forms
             // 
             // OnlineStatusField
             // 
-            this.OnlineStatusField.HelpText = "";
+            this.OnlineStatusField.HelpText = "Possible statuses are: Online, Offline, Joining, or Leaving";
             this.OnlineStatusField.LabelSplitRatio = 0.5D;
             this.OnlineStatusField.LabelText = "Online Status:";
             this.OnlineStatusField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;

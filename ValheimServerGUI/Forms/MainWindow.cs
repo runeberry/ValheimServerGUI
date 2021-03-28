@@ -373,7 +373,7 @@ namespace ValheimServerGUI.Forms
 
             var form = this.FormProvider.GetForm<PlayerDetailsForm>();
             form.SetPlayerData(row.Entity);
-            form.Show();
+            form.ShowDialog();
         }
 
         private void ButtonRemovePlayer_Click(object sender, EventArgs e)

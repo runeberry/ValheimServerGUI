@@ -121,10 +121,21 @@ namespace ValheimServerGUI.Tools.Data
         public virtual void Upsert(TEntity entity)
         {
             this.Entities[entity.Key] = entity;
-
             this.EntityUpdated?.Invoke(this, entity);
-            this.DataUpdated?.Invoke(this, EventArgs.Empty);
 
+            this.DataUpdated?.Invoke(this, EventArgs.Empty);
+            this.Save();
+        }
+
+        public virtual void UpsertBulk(IEnumerable<TEntity> entities)
+        {
+            foreach (var entity in entities)
+            {
+                this.Entities[entity.Key] = entity;
+                this.EntityUpdated?.Invoke(this, entity);
+            }
+
+            this.DataUpdated?.Invoke(this, EventArgs.Empty);
             this.Save();
         }
 
@@ -133,8 +144,28 @@ namespace ValheimServerGUI.Tools.Data
             if (this.Entities.Remove(entity.Key))
             {
                 this.EntityRemoved?.Invoke(this, entity);
+
                 this.DataUpdated?.Invoke(this, EventArgs.Empty);
-                
+                this.Save();
+            }
+        }
+
+        public virtual void RemoveBulk(IEnumerable<TEntity> entities)
+        {
+            var anyRemoved = false;
+
+            foreach (var entity in entities)
+            {
+                if (this.Entities.Remove(entity.Key))
+                {
+                    this.EntityRemoved?.Invoke(this, entity);
+                    anyRemoved = true;
+                }
+            }
+
+            if (anyRemoved)
+            {
+                this.DataUpdated?.Invoke(this, EventArgs.Empty);
                 this.Save();
             }
         }

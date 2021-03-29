@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -424,7 +424,7 @@ namespace ValheimServerGUI.Forms
         {
             if (this.TabPlayers.Visible)
             {
-                this.UpdatePlayerStatus();
+                this.RefreshPlayersTable();
                 this.ServerRefreshTimer.Enabled = true;
             }
             else
@@ -440,7 +440,7 @@ namespace ValheimServerGUI.Forms
 
         private void ServerRefreshTimer_Tick(object sender, EventArgs e)
         {
-            this.UpdatePlayerStatus();
+            this.RefreshPlayersTable();
         }
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
@@ -564,11 +564,11 @@ namespace ValheimServerGUI.Forms
             return this.ImageList.Images.IndexOfKey(key);
         }
 
-        private void UpdatePlayerStatus()
+        private void RefreshPlayersTable()
         {
-            foreach (var player in this.PlayerDataProvider.Data)
+            foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
             {
-                this.UpdatePlayerStatus(player);
+                row.RefreshValues();
             }
         }
 

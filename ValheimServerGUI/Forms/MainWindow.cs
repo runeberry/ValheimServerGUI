@@ -593,7 +593,7 @@ namespace ValheimServerGUI.Forms
             var imageIndex = -1;
             var color = this.PlayersTable.ForeColor;
 
-            switch (serverPlayer.PlayerStatus)
+            switch (player.PlayerStatus)
             {
                 case PlayerStatus.Online:
                     imageIndex = this.GetImageIndex(nameof(Resources.StatusOK_16x));

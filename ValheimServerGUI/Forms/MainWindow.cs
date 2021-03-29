@@ -589,31 +589,28 @@ namespace ValheimServerGUI.Forms
                 playerRow.RefreshValues();
             }
 
-            // Update icon based on player status
+            // Update styles based on player status
             var imageIndex = -1;
-            switch (player.PlayerStatus)
+            var color = this.PlayersTable.ForeColor;
+
+            switch (serverPlayer.PlayerStatus)
             {
                 case PlayerStatus.Online:
                     imageIndex = this.GetImageIndex(nameof(Resources.StatusOK_16x));
                     break;
                 case PlayerStatus.Joining:
+                    imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
+                    break;
                 case PlayerStatus.Leaving:
                     imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
                     break;
                 case PlayerStatus.Offline:
                     imageIndex = this.GetImageIndex(nameof(Resources.StatusNotStarted_16x));
-                    break;
-            }
-            playerRow.ImageIndex = imageIndex;
-
-            // Update font based on player status
-            var color = this.PlayersTable.ForeColor;
-            switch (player.PlayerStatus)
-            {
-                case PlayerStatus.Offline:
                     color = Color.Gray;
                     break;
             }
+
+            playerRow.ImageIndex = imageIndex;
             playerRow.ForeColor = color;
         }
 

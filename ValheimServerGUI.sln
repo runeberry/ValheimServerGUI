@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.31019.35
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValheimServerGUI", "ValheimServerGUI\ValheimServerGUI.csproj", "{DC84CCCF-D315-483E-B7CF-732312B55389}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValheimServerGUI.Controls", "ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj", "{36E75C0A-F596-4766-8148-D7C442501503}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValheimServerGUI.Controls", "ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj", "{36E75C0A-F596-4766-8148-D7C442501503}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValheimServerGUI.Tests", "ValheimServerGUI.Tests\ValheimServerGUI.Tests.csproj", "{22F12ECA-242A-4D4D-9C2E-5949F353AD29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{36E75C0A-F596-4766-8148-D7C442501503}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{36E75C0A-F596-4766-8148-D7C442501503}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{36E75C0A-F596-4766-8148-D7C442501503}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22F12ECA-242A-4D4D-9C2E-5949F353AD29}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22F12ECA-242A-4D4D-9C2E-5949F353AD29}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22F12ECA-242A-4D4D-9C2E-5949F353AD29}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22F12ECA-242A-4D4D-9C2E-5949F353AD29}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

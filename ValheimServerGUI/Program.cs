@@ -1,4 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Forms;
@@ -40,12 +41,14 @@ namespace ValheimServerGUI
             });
             services.AddSingleton<IFormProvider, FormProvider>();
             services.AddSingleton<IProcessProvider, ProcessProvider>();
-            services.AddSingleton<ApplicationLogger>();
+            services.AddSingleton<ILogger, ApplicationLogger>();
+            services.AddSingleton<IEventLogger, ApplicationLogger>();
 
             // Game & server data
             services
                 .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
-                .AddSingleton<IPlayerDataProvider, PlayerDataProvider>()
+                .AddSingleton<IPlayerDataFileProvider, PlayerDataFileProvider>()
+                .AddSingleton<IPlayerDataRepository, PlayerDataRepository>()
                 .AddSingleton<ValheimServerLogger>()
                 .AddSingleton<ValheimServer>();
 

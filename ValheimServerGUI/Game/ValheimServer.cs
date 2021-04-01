@@ -43,16 +43,16 @@ namespace ValheimServerGUI.Game
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
-        private readonly IPlayerDataProvider PlayerDataProvider;
+        private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServerLogger ServerLogger;
-        private readonly ApplicationLogger ApplicationLogger;
+        private readonly IEventLogger ApplicationLogger;
         
         public ValheimServer(
             IProcessProvider processProvider, 
             IValheimFileProvider fileProvider,
-            IPlayerDataProvider playerDataProvider,
+            IPlayerDataRepository playerDataProvider,
             ValheimServerLogger serverLogger,
-            ApplicationLogger appLogger)
+            IEventLogger appLogger)
         {
             this.ProcessProvider = processProvider;
             this.FileProvider = fileProvider;

@@ -11,6 +11,38 @@ namespace ValheimServerGUI.Tools
 {
     public static class WinFormsExtensions
     {
+        #region Control extensions
+
+        public static EventHandler<TArgs> BuildEventHandler<TArgs>(this Control control, Action<TArgs> action)
+        {
+            return (sender, args) =>
+            {
+                if (control.InvokeRequired)
+                {
+                    control.Invoke(new Action<TArgs>(action), new object[] { args });
+                    return;
+                }
+
+                action(args);
+            };
+        }
+
+        public static EventHandler BuildEventHandler(this Control control, Action action)
+        {
+            return (sender, args) =>
+            {
+                if (control.InvokeRequired)
+                {
+                    control.Invoke(action);
+                    return;
+                }
+
+                action();
+            };
+        }
+
+        #endregion
+
         #region TextBox extensions
 
         public static void AppendLine(this TextBox textBox, string line)

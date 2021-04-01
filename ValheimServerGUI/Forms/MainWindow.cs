@@ -23,19 +23,19 @@ namespace ValheimServerGUI.Forms
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
         private readonly IValheimFileProvider FileProvider;
-        private readonly IPlayerDataProvider PlayerDataProvider;
+        private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
         private readonly ValheimServerLogger ServerLogger;
-        private readonly ApplicationLogger Logger;
+        private readonly IEventLogger Logger;
 
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferences userPrefs,
             IValheimFileProvider fileProvider,
-            IPlayerDataProvider playerDataProvider,
+            IPlayerDataRepository playerDataProvider,
             ValheimServer server,
             ValheimServerLogger serverLogger,
-            ApplicationLogger appLogger)
+            IEventLogger appLogger)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
@@ -50,6 +50,8 @@ namespace ValheimServerGUI.Forms
             InitializeServer();
             InitializeFormEvents();
             InitializeFormFields(); // Display data back to user, always last
+
+            this.PlayerDataProvider.Load(); // todo: find a better way
         }
 
         #region Initialization
@@ -66,7 +68,8 @@ namespace ValheimServerGUI.Forms
             this.Server.StatusChanged += this.OnServerStatusChanged;
             this.Server.WorldSaved += this.OnWorldSaved;
 
-            this.PlayerDataProvider.PlayerStatusChanged += this.OnPlayerStatusChanged;
+            this.PlayerDataProvider.DataReady += this.BuildEventHandler(this.OnPlayerDataReady);
+            this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
         }
 
         private void InitializeFormEvents()
@@ -488,14 +491,16 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void OnPlayerStatusChanged(object sender, PlayerInfo player)
+        private void OnPlayerDataReady()
         {
-            if (this.InvokeRequired)
+            foreach (var player in this.PlayerDataProvider.Data)
             {
-                this.Invoke(new Action<object, PlayerInfo>(OnPlayerStatusChanged), new object[] { sender, player });
-                return;
+                this.UpdatePlayerStatus(player);
             }
+        }
 
+        private void OnPlayerUpdated(PlayerInfo player)
+        {
             this.UpdatePlayerStatus(player);
         }
 

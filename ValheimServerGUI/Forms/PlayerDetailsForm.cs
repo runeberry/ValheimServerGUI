@@ -7,11 +7,11 @@ namespace ValheimServerGUI.Forms
 {
     public partial class PlayerDetailsForm : Form
     {
-        private readonly IPlayerDataProvider PlayerDataProvider;
+        private readonly IPlayerDataRepository PlayerDataProvider;
 
         private PlayerInfo Player;
 
-        public PlayerDetailsForm(IPlayerDataProvider playerDataProvider)
+        public PlayerDetailsForm(IPlayerDataRepository playerDataProvider)
         {
             this.PlayerDataProvider = playerDataProvider;
 

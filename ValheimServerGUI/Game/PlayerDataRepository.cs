@@ -2,31 +2,36 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Data;
-using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Game
 {
-    public interface IPlayerDataProvider : ILocalDataProvider<PlayerInfo>
+    public interface IPlayerDataRepository : IDataRepository<PlayerInfo>
     {
         event EventHandler<PlayerInfo> PlayerStatusChanged;
 
         bool ResolveUncertainSteamIds();
+
+        void Load(); // todo: find a way to automatically load data without an explicit call
     }
 
-    public class PlayerDataProvider : JsonLocalDataProvider<PlayerInfo>, IPlayerDataProvider
+    public class PlayerDataRepository : DataFileRepository<PlayerInfo>, IPlayerDataRepository
     {
+        private readonly IPlayerDataFileProvider DataFileProvider;
+
         public event EventHandler<PlayerInfo> PlayerStatusChanged;
 
         private Dictionary<string, PlayerStatus> PlayerStatusMap = new();
 
-        public PlayerDataProvider(ApplicationLogger logger) : base(logger, Resources.PlayerListFilePath)
+        public PlayerDataRepository(
+            IPlayerDataFileProvider dataFileProvider, 
+            ILogger logger) 
+            : base(dataFileProvider, logger)
         {
-            this.DataLoaded += this.OnDataLoaded;
-            this.EntityUpdated += this.OnEntityUpdated;
+            this.DataFileProvider = dataFileProvider;
 
-            this.Load();
+            this.DataFileProvider.DataLoaded += this.OnDataLoaded;
+            this.EntityUpdated += this.OnEntityUpdated;
         }
 
         public bool ResolveUncertainSteamIds()

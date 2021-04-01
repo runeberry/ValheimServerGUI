@@ -31,6 +31,8 @@ namespace ValheimServerGUI.Tools
         {
             return (sender, args) =>
             {
+                // This technique allows cross-thread access to UI controls
+                // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
                 if (control.InvokeRequired)
                 {
                     control.Invoke(action);

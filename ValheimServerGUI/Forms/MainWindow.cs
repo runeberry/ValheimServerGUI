@@ -63,10 +63,10 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeServer()
         {
-            this.Logger.LogReceived += (_, log) => this.OnLogReceived(log.Message, LogViewApplication);
-            this.ServerLogger.LogReceived += (_, log) => this.OnLogReceived(log.Message, LogViewServer);
-            this.Server.StatusChanged += this.OnServerStatusChanged;
-            this.Server.WorldSaved += this.OnWorldSaved;
+            this.Logger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnApplicationLogReceived);
+            this.ServerLogger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnServerLogReceived);
+            this.Server.StatusChanged += this.BuildEventHandler<ServerStatus>(this.OnServerStatusChanged);
+            this.Server.WorldSaved += this.BuildEventHandler<decimal>(this.OnWorldSaved);
 
             this.PlayerDataProvider.DataReady += this.BuildEventHandler(this.OnPlayerDataReady);
             this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
@@ -457,27 +457,18 @@ namespace ValheimServerGUI.Forms
 
         #region Server Events
 
-        private void OnLogReceived(string message, string viewName)
+        private void OnApplicationLogReceived(EventLogContext logEvent)
         {
-            // This technique allows cross-thread access to UI controls
-            // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<string, string>(OnLogReceived), new object[] { message, viewName });
-                return;
-            }
-
-            this.AddLog(message, viewName);
+            this.AddLog(logEvent.Message, LogViewApplication);
         }
 
-        private void OnServerStatusChanged(object sender, ServerStatus status)
+        private void OnServerLogReceived(EventLogContext logEvent)
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<object, ServerStatus>(OnServerStatusChanged), new object[] { sender, status });
-                return;
-            }
+            this.AddLog(logEvent.Message, LogViewServer);
+        }
 
+        private void OnServerStatusChanged(ServerStatus status)
+        {
             this.SetStatusText(status.ToString());
 
             this.RefreshFormStateForServer();
@@ -504,14 +495,8 @@ namespace ValheimServerGUI.Forms
             this.UpdatePlayerStatus(player);
         }
 
-        private void OnWorldSaved(object sender, decimal duration)
+        private void OnWorldSaved(decimal duration)
         {
-            if (this.InvokeRequired)
-            {
-                this.Invoke(new Action<object, decimal>(OnWorldSaved), new object[] { sender, duration });
-                return;
-            }
-
             // todo: something
         }
 

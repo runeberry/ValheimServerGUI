@@ -4,16 +4,16 @@ namespace ValheimServerGUI.Tools.Data
 {
     public static class DataFileProviderExtensions
     {
-        public static void Load<TFile>(this IDataFileProvider provider)
+        public static void Load<TFile>(this IDataFileProvider provider, string filePath)
             where TFile : class
         {
-            Task.Run(() => provider.LoadAsync<TFile>());
+            Task.Run(() => provider.LoadAsync<TFile>(filePath));
         }
 
-        public static void Save<TFile>(this IDataFileProvider provider, TFile data)
+        public static void Save<TFile>(this IDataFileProvider provider, string filePath, TFile data)
             where TFile : class
         {
-            Task.Run(() => provider.SaveAsync(data));
+            Task.Run(() => provider.SaveAsync(filePath, data));
         }
     }
 }

@@ -9,8 +9,8 @@ namespace ValheimServerGUI.Tools.Data
 
         event EventHandler<object> DataSaved;
 
-        Task<TFile> LoadAsync<TFile>() where TFile : class;
+        Task<TFile> LoadAsync<TFile>(string filePath) where TFile : class;
 
-        Task SaveAsync<TFile>(TFile data) where TFile : class;
+        Task SaveAsync<TFile>(string filePath, TFile data) where TFile : class;
     }
 }

@@ -8,16 +8,16 @@ namespace ValheimServerGUI.Tools.Data
     public class DataFileRepository<TEntity> : IDataRepository<TEntity>
         where TEntity : IPrimaryKeyEntity
     {
-        private readonly IDataFileProvider DataFileProvider;
+        protected IDataFileRepositoryContext Context { get; }
+        protected string FilePath { get; }
 
-        protected readonly ILogger Logger;
+        protected IDataFileProvider DataFileProvider => Context.DataFileProvider;
+        protected ILogger Logger => Context.Logger;
 
-        public DataFileRepository(
-            IDataFileProvider dataFileProvider,
-            ILogger logger)
+        public DataFileRepository(IDataFileRepositoryContext context, string filePath)
         {
-            this.DataFileProvider = dataFileProvider;
-            this.Logger = logger;
+            this.Context = context;
+            this.FilePath = filePath;
 
             this.DataFileProvider.DataLoaded += this.OnDataLoaded;
         }
@@ -26,12 +26,12 @@ namespace ValheimServerGUI.Tools.Data
 
         public virtual void Load()
         {
-            this.DataFileProvider.Load<JsonDataFile<TEntity>>();
+            this.DataFileProvider.Load<JsonDataFile<TEntity>>(this.FilePath);
         }
 
         public virtual void Save()
         {
-            this.DataFileProvider.Save(new JsonDataFile<TEntity>(this.Entities));
+            this.DataFileProvider.Save(this.FilePath, new JsonDataFile<TEntity>(this.Entities));
         }
 
         protected virtual void OnDataLoaded(object sender, object dataFile)

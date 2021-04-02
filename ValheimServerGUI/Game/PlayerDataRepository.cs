@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -17,19 +18,13 @@ namespace ValheimServerGUI.Game
 
     public class PlayerDataRepository : DataFileRepository<PlayerInfo>, IPlayerDataRepository
     {
-        private readonly IPlayerDataFileProvider DataFileProvider;
-
         public event EventHandler<PlayerInfo> PlayerStatusChanged;
 
-        private Dictionary<string, PlayerStatus> PlayerStatusMap = new();
+        private readonly Dictionary<string, PlayerStatus> PlayerStatusMap = new();
 
-        public PlayerDataRepository(
-            IPlayerDataFileProvider dataFileProvider, 
-            ILogger logger) 
-            : base(dataFileProvider, logger)
+        public PlayerDataRepository(IDataFileRepositoryContext context)  
+            : base(context, Resources.PlayerListFilePath)
         {
-            this.DataFileProvider = dataFileProvider;
-
             this.DataFileProvider.DataLoaded += this.OnDataLoaded;
             this.EntityUpdated += this.OnEntityUpdated;
         }

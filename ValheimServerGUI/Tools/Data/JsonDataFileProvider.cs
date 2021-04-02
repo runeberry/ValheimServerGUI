@@ -9,15 +9,13 @@ namespace ValheimServerGUI.Tools.Data
 {
     public class JsonDataFileProvider : IDataFileProvider
     {
-        private readonly string FilePath;
         private readonly JsonSerializer Serializer = new();
         private readonly ReaderWriterLockSlim RWLock = new();
 
         private readonly ILogger Logger;
 
-        public JsonDataFileProvider(string filePath, ILogger logger)
+        public JsonDataFileProvider(ILogger logger)
         {
-            this.FilePath = Environment.ExpandEnvironmentVariables(filePath);
             this.Logger = logger;
         }
 
@@ -39,17 +37,18 @@ namespace ValheimServerGUI.Tools.Data
 
         public event EventHandler<object> DataSaved;
 
-        public virtual Task<TFile> LoadAsync<TFile>() where TFile : class
+        public virtual Task<TFile> LoadAsync<TFile>(string filePath) where TFile : class
         {
+            filePath = Environment.ExpandEnvironmentVariables(filePath);
             TFile dataFile = default;
 
             this.RWLock.EnterReadLock();
 
             try
             {
-                if (File.Exists(FilePath))
+                if (File.Exists(filePath))
                 {
-                    using var streamReader = File.OpenText(this.FilePath);
+                    using var streamReader = File.OpenText(filePath);
                     using var jsonReader = new JsonTextReader(streamReader);
 
                     dataFile = this.Serializer.Deserialize<TFile>(jsonReader);
@@ -57,7 +56,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                this.Logger.LogError(e, "Error loading JSON data from file: {0}", this.FilePath);
+                this.Logger.LogError(e, "Error loading JSON data from file: {0}", filePath);
             }
             finally
             {
@@ -69,20 +68,22 @@ namespace ValheimServerGUI.Tools.Data
             return Task.FromResult(dataFile);
         }
 
-        public virtual Task SaveAsync<TFile>(TFile data) where TFile : class
+        public virtual Task SaveAsync<TFile>(string filePath, TFile data) where TFile : class
         {
+            filePath = Environment.ExpandEnvironmentVariables(filePath);
+
             this.RWLock.EnterWriteLock();
 
             try
             {
-                using var streamWriter = File.CreateText(this.FilePath);
+                using var streamWriter = File.CreateText(filePath);
                 using var jsonWriter = new JsonTextWriter(streamWriter);
 
                 this.Serializer.Serialize(jsonWriter, data);
             }
             catch (Exception e)
             {
-                this.Logger.LogError(e, "Error saving JSON data to file: {0}", this.FilePath);
+                this.Logger.LogError(e, "Error saving JSON data to file: {0}", filePath);
             }
             finally
             {

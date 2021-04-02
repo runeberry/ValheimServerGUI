@@ -7,8 +7,13 @@ namespace ValheimServerGUI.Tests.Game
 {
     public class ValheimServerTests
     {
+        private const string MessageJoining = "Got connection SteamID {0}";
+        private const string MessageWrongPassword = "Peer {0} has wrong password";
+        private const string MessageOffline = "Closing socket {0}";
+
         private readonly ValheimServer Server;
         private readonly ValheimServerLogger ServerLogger;
+        private readonly IPlayerDataRepository PlayerDataRepository;
 
         public ValheimServerTests()
         {
@@ -16,6 +21,7 @@ namespace ValheimServerGUI.Tests.Game
 
             Server = services.GetRequiredService<ValheimServer>();
             ServerLogger = services.GetRequiredService<ValheimServerLogger>();
+            PlayerDataRepository = services.GetRequiredService<IPlayerDataRepository>();
         }
 
         [Fact]
@@ -36,11 +42,55 @@ namespace ValheimServerGUI.Tests.Game
             Assert.Equal(ServerStatus.Running, eventStatus);
         }
 
+        [Fact]
+        public void CanDetectPlayerJoining()
+        {
+            var steamId = "1234";
+            PlayerInfo eventPlayer = null;
+            PlayerDataRepository.PlayerStatusChanged += (_, player) => eventPlayer = player;
+
+            Log(MessageJoining, steamId);
+
+            Assert.Equal(steamId, eventPlayer?.SteamId);
+        }
+
+        [Fact]
+        public void CanDetectPlayerLeaving()
+        {
+            var steamId = "1234";
+            PlayerInfo eventPlayer = null;
+            PlayerDataRepository.PlayerStatusChanged += (_, player) =>
+            {
+                if (player.PlayerStatus == PlayerStatus.Leaving) eventPlayer = player;
+            };
+
+            Log(MessageJoining, steamId);
+            Log(MessageWrongPassword, steamId);
+
+            Assert.Equal(steamId, eventPlayer?.SteamId);
+        }
+
+        [Fact]
+        public void CanDetectPlayerOffline()
+        {
+            var steamId = "1234";
+            PlayerInfo eventPlayer = null;
+            PlayerDataRepository.PlayerStatusChanged += (_, player) =>
+            {
+                if (player.PlayerStatus == PlayerStatus.Offline) eventPlayer = player;
+            };
+
+            Log(MessageJoining, steamId);
+            Log(MessageOffline, steamId);
+
+            Assert.Equal(steamId, eventPlayer?.SteamId);
+        }
+
         #region Helper methods
 
-        private void Log(string message)
+        private void Log(string message, params object[] args)
         {
-            ServerLogger.LogInformation(message);
+            ServerLogger.LogInformation(string.Format(message, args));
         }
 
         #endregion

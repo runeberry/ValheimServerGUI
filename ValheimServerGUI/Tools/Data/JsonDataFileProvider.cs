@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ValheimServerGUI.Tools.Data
 {
-    public class JsonDataFileProvider
+    public class JsonDataFileProvider : IDataFileProvider
     {
         private readonly string FilePath;
         private readonly JsonSerializer Serializer = new();

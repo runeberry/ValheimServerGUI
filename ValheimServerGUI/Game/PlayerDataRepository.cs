@@ -11,7 +11,11 @@ namespace ValheimServerGUI.Game
     {
         event EventHandler<PlayerInfo> PlayerStatusChanged;
 
-        bool ResolveUncertainSteamIds();
+        PlayerInfo FindPlayerBySteamId(string steamId, bool createNew = false);
+
+        PlayerInfo FindJoiningPlayerByName(string playerName);
+
+        void SavePlayer(PlayerInfo player);
 
         void Load(); // todo: find a way to automatically load data without an explicit call
     }
@@ -21,6 +25,7 @@ namespace ValheimServerGUI.Game
         public event EventHandler<PlayerInfo> PlayerStatusChanged;
 
         private readonly Dictionary<string, PlayerStatus> PlayerStatusMap = new();
+        private readonly HashSet<string> PoolOfUncertainty = new();
 
         public PlayerDataRepository(IDataFileRepositoryContext context)  
             : base(context, Resources.PlayerListFilePath)
@@ -29,32 +34,78 @@ namespace ValheimServerGUI.Game
             this.EntityUpdated += this.OnEntityUpdated;
         }
 
-        public bool ResolveUncertainSteamIds()
+        public PlayerInfo FindPlayerBySteamId(string steamId, bool createNew = false)
         {
-            var anyResolved = false;
+            // Gonna sneak a little validation in here don't tell nobody :3
+            if (string.IsNullOrWhiteSpace(steamId)) return null;
 
-            try
+            var player = this.FindById(steamId);
+
+            if (player == null && createNew)
             {
-                var numResolved = 0;
-
-                do
+                player = new PlayerInfo
                 {
-                    numResolved = this.ResolveUncertainSteamIdsInternal();
-                    anyResolved = anyResolved || numResolved > 0;
+                    SteamId = steamId,
+                    PlayerStatus = PlayerStatus.Offline, // Considered offline until otherwise defined
+                };
+                this.Upsert(player);
+            }
+
+            return player;
+        }
+
+        public PlayerInfo FindJoiningPlayerByName(string playerName)
+        {
+            PlayerInfo player;
+
+            // This is tricky becase we don't have the SteamID in this particular log message
+            // So consider all players that are currently connecting to the game
+            var joiningPlayers = this.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
+            var joiningWithSameName = joiningPlayers.Where(p => p.PlayerName == playerName);
+
+            if (joiningPlayers.Count() > 1 && joiningWithSameName.Any())
+            {
+                // If multiple players are joining, we can narrow down the list if any of the joining
+                // players already have a name that matches the requested player name
+                joiningPlayers = joiningWithSameName;
+
+                this.Logger.LogTrace($"Multiple players joining, but found {joiningPlayers.Count()} match(es) by name {playerName}.");
+            }
+
+            if (joiningPlayers.Count() == 1)
+            {
+                // If there's only one player connecting (or multiple players, but one has the same name), use that player.
+                // It's gotta be the same person... right?
+                player = joiningPlayers.Single();
+                player.SteamIdConfident = true;
+                player.SteamIdAlternates = null;
+
+                this.Logger.LogTrace($"Matched PlayerName {playerName} to SteamId {player.SteamId} with high confidence.");
+            }
+            else
+            {
+                if (this.ResolveUncertainSteamIds())
+                {
+                    // Run this method recursively until no more uncertain id updates are made
+                    player = this.FindJoiningPlayerByName(playerName);
                 }
-                while (numResolved > 0);
-            }
-            catch (Exception e)
-            {
-                this.Logger.LogWarning(e, "Encountered exception when trying to resolve uncertain steamIds");
+                else
+                {
+                    // We tried, but we couldn't resolve this name to a single player.
+                    // Simply assume it's the player who's been trying to join the longest.
+                    player = joiningPlayers.OrderBy(p => p.LastStatusChange).First();
+
+                    this.Logger.LogWarning(
+                        $"Multiple players joining, matched PlayerName {playerName} to SteamId {player.SteamId} with low confidence.");
+                }
             }
 
-            if (anyResolved)
-            {
-                this.Save();
-            }
+            return player;
+        }
 
-            return anyResolved;
+        public void SavePlayer(PlayerInfo player)
+        {
+            this.Upsert(player);
         }
 
         #region Non-public methods
@@ -86,15 +137,54 @@ namespace ValheimServerGUI.Game
 
             if (statusChanged)
             {
+                if (player.PlayerStatus == PlayerStatus.Joining)
+                {
+                    // All players that are concurrently joining will be added to the pool
+                    this.PoolOfUncertainty.Add(player.SteamId);
+                }
+                else if (oldStatus == PlayerStatus.Joining && !this.Data.Any(p => p.PlayerStatus == PlayerStatus.Joining))
+                {
+                    // If this is the last player to *leave* the joining status, clear the pool
+                    this.PoolOfUncertainty.Clear();
+                }
+
                 this.PlayerStatusChanged?.Invoke(this, player);
             }
+        }
+
+        private bool ResolveUncertainSteamIds()
+        {
+            var anyResolved = false;
+
+            try
+            {
+                var numResolved = 0;
+
+                do
+                {
+                    numResolved = this.ResolveUncertainSteamIdsInternal();
+                    anyResolved = anyResolved || numResolved > 0;
+                }
+                while (numResolved > 0);
+            }
+            catch (Exception e)
+            {
+                this.Logger.LogWarning(e, "Encountered exception when trying to resolve uncertain steamIds");
+            }
+
+            if (anyResolved)
+            {
+                this.Save();
+            }
+
+            return anyResolved;
         }
 
         private int ResolveUncertainSteamIdsInternal()
         {
             var numResolved = 0;
 
-            // Search any players we've ever encountered where we haven't been able to resolve the steamId
+            // Search any players we've ever encountered where we haven't been able to resolve the steamId (including offline players)
             var uncertainPlayers = this.Data.Where(p => !p.SteamIdConfident);
             if (!uncertainPlayers.Any()) return numResolved;
 

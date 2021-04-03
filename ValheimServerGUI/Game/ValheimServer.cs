@@ -43,20 +43,20 @@ namespace ValheimServerGUI.Game
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
-        private readonly IPlayerDataRepository PlayerDataProvider;
+        private readonly IPlayerDataRepository PlayerDataRepository;
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger ApplicationLogger;
         
         public ValheimServer(
             IProcessProvider processProvider, 
             IValheimFileProvider fileProvider,
-            IPlayerDataRepository playerDataProvider,
+            IPlayerDataRepository playerDataRepository,
             ValheimServerLogger serverLogger,
             IEventLogger appLogger)
         {
             this.ProcessProvider = processProvider;
             this.FileProvider = fileProvider;
-            this.PlayerDataProvider = playerDataProvider;
+            this.PlayerDataRepository = playerDataRepository;
             this.ServerLogger = serverLogger;
             this.ApplicationLogger = appLogger;
 
@@ -218,13 +218,13 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            var player = this.FindPlayerBySteamId(steamId, true);
+            var player = this.PlayerDataRepository.FindPlayerBySteamId(steamId, true);
             if (player != null)
             {
                 player.PlayerStatus = PlayerStatus.Joining;
                 player.LastStatusChange = DateTime.UtcNow;
                 player.ZdoId = null;
-                this.PlayerDataProvider.Upsert(player);
+                this.PlayerDataRepository.SavePlayer(player);
             }
         }
 
@@ -236,14 +236,14 @@ namespace ValheimServerGUI.Game
 
             if (string.IsNullOrWhiteSpace(playerName)) return;
 
-            var player = FindJoiningPlayerByName(playerName);
+            var player = this.PlayerDataRepository.FindJoiningPlayerByName(playerName);
             if (player != null)
             {
                 player.PlayerName = playerName;
                 player.PlayerStatus = PlayerStatus.Online;
                 player.LastStatusChange = DateTime.UtcNow;
                 player.ZdoId = zdoid;
-                this.PlayerDataProvider.Upsert(player);
+                this.PlayerDataRepository.SavePlayer(player);
             }
         }
 
@@ -252,13 +252,13 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            var player = this.FindPlayerBySteamId(steamId);
+            var player = this.PlayerDataRepository.FindPlayerBySteamId(steamId);
             if (player != null)
             {
                 player.PlayerStatus = PlayerStatus.Leaving;
                 player.LastStatusChange = DateTime.UtcNow;
                 player.ZdoId = null;
-                this.PlayerDataProvider.Upsert(player);
+                this.PlayerDataRepository.SavePlayer(player);
             }
         }
 
@@ -267,13 +267,13 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            var player = this.FindPlayerBySteamId(steamId);
+            var player = this.PlayerDataRepository.FindPlayerBySteamId(steamId);
             if (player != null)
             {
                 player.PlayerStatus = PlayerStatus.Offline;
                 player.LastStatusChange = DateTime.UtcNow;
                 player.ZdoId = null;
-                this.PlayerDataProvider.Upsert(player);
+                this.PlayerDataRepository.SavePlayer(player);
             }
         }
 
@@ -287,79 +287,6 @@ namespace ValheimServerGUI.Game
             this.WorldSaved?.Invoke(this, timeMs);
 
             // todo: something
-        }
-
-        #endregion
-
-        #region Non-public methods
-
-        private PlayerInfo FindPlayerBySteamId(string steamId, bool createNew = false)
-        {
-            // Gonna sneak a little validation in here don't tell nobody :3
-            if (string.IsNullOrWhiteSpace(steamId)) return null;
-
-            var player = this.PlayerDataProvider.FindById(steamId);
-
-            if (player == null && createNew)
-            {
-                player = new PlayerInfo
-                {
-                    SteamId = steamId,
-                    PlayerStatus = PlayerStatus.Offline, // Considered offline until otherwise defined
-                };
-                this.PlayerDataProvider.Upsert(player);
-            }
-
-            return player;
-        }
-
-        private PlayerInfo FindJoiningPlayerByName(string playerName)
-        {
-            PlayerInfo player;
-
-            // This is tricky becase we don't have the SteamID in this particular log message
-            // So consider all players that are currently connecting to the game
-            var joiningPlayers = this.PlayerDataProvider.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
-            var joiningWithSameName = joiningPlayers.Where(p => p.PlayerName == playerName);
-
-            if (joiningPlayers.Count() > 1 && joiningWithSameName.Any())
-            {
-                // If multiple players are joining, we can narrow down the list if any of the joining
-                // players already have a name that matches the requested player name
-                joiningPlayers = joiningWithSameName;
-
-                this.ApplicationLogger.LogTrace($"Multiple players joining, but found {joiningPlayers.Count()} match(es) by name {playerName}.");
-            }
-
-            if (joiningPlayers.Count() == 1)
-            {
-                // If there's only one player connecting (or multiple players, but one has the same name), use that player.
-                // It's gotta be the same person... right?
-                player = joiningPlayers.Single();
-                player.SteamIdConfident = true;
-                player.SteamIdAlternates = null;
-
-                this.ApplicationLogger.LogTrace($"Matched PlayerName {playerName} to SteamId {player.SteamId} with high confidence.");
-            }
-            else
-            {
-                if (this.PlayerDataProvider.ResolveUncertainSteamIds())
-                {
-                    // Run this method recursively until no more uncertain id updates are made
-                    player = this.FindJoiningPlayerByName(playerName);
-                }
-                else
-                {
-                    // We tried, but we couldn't resolve this name to a single player.
-                    // Simply assume it's the player who's been trying to join the longest.
-                    player = joiningPlayers.OrderBy(p => p.LastStatusChange).First();
-
-                    this.ApplicationLogger.LogWarning(
-                        $"Multiple players joining, matched PlayerName {playerName} to SteamId {player.SteamId} with low confidence.");
-                }
-            }
-            
-            return player;
         }
 
         #endregion

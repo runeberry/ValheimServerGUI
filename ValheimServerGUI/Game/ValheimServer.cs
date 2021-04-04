@@ -120,6 +120,8 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStart) return;
 
+            this.ApplicationLogger.LogInformation("Starting server...");
+
             var exePath = this.FileProvider.ServerExe.FullName;
             var publicFlag = options.Public ? 1 : 0;
             var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag}";
@@ -144,6 +146,8 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStop) return;
 
+            this.ApplicationLogger.LogInformation("Stopping server...");
+
             this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
 
             this.IsRestarting = false;
@@ -157,6 +161,8 @@ namespace ValheimServerGUI.Game
         public void Restart(IValheimServerOptions options = null)
         {
             if (!this.CanRestart) return;
+
+            this.ApplicationLogger.LogInformation("Restarting server...");
 
             this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
 

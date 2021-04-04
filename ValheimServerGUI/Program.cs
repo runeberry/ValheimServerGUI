@@ -34,6 +34,8 @@ namespace ValheimServerGUI
         public static void ConfigureServices(IServiceCollection services)
         {
             // Tools
+            var applicationLogger = new ApplicationLogger();
+
             services.AddSingleton<IUserPreferences>((_) =>
             {
                 var userPreferences = new UserPreferences();
@@ -44,8 +46,8 @@ namespace ValheimServerGUI
             services.AddSingleton<IDataFileProvider, JsonDataFileProvider>();
             services.AddSingleton<IFormProvider, FormProvider>();
             services.AddSingleton<IProcessProvider, ProcessProvider>();
-            services.AddSingleton<ILogger, ApplicationLogger>();
-            services.AddSingleton<IEventLogger, ApplicationLogger>();
+            services.AddSingleton<ILogger>(applicationLogger);
+            services.AddSingleton<IEventLogger>(applicationLogger);
 
             // Game & server data
             services

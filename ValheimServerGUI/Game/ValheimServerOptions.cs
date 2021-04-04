@@ -11,6 +11,8 @@ namespace ValheimServerGUI.Game
 
         public string WorldName { get; set; }
 
+        public bool NewWorld { get; set; }
+
         public bool Public { get; set; }
 
         public int Port { get; set; }
@@ -24,6 +26,10 @@ namespace ValheimServerGUI.Game
 
             // WorldName validation
             // todo: Validate world exists? Or do we trust it from the UI control?
+            if (this.NewWorld)
+            {
+                if (this.WorldName.Length < 5 || this.WorldName.Length > 20) throw new ArgumentException($"{nameof(WorldName)} must be 5-20 characters long.");
+            }
 
             // Name validation
             if (this.Name == this.WorldName) throw new ArgumentException($"{nameof(Name)} cannot be the same as your {nameof(WorldName)} ({this.WorldName}).");

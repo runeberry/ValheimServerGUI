@@ -230,7 +230,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectNewNameField.HideValue = false;
             this.WorldSelectNewNameField.LabelText = "New World Name";
             this.WorldSelectNewNameField.Location = new System.Drawing.Point(6, 45);
-            this.WorldSelectNewNameField.MaxLength = 32767;
+            this.WorldSelectNewNameField.MaxLength = 20;
             this.WorldSelectNewNameField.Name = "WorldSelectNewNameField";
             this.WorldSelectNewNameField.Size = new System.Drawing.Size(234, 41);
             this.WorldSelectNewNameField.TabIndex = 18;

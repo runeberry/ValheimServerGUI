@@ -256,8 +256,9 @@ namespace ValheimServerGUI.Forms
         private void ButtonStartServer_Click(object sender, EventArgs e)
         {
             string worldName;
+            bool newWorld = this.WorldSelectRadioNew.Value;
 
-            if (this.WorldSelectRadioNew.Value)
+            if (newWorld)
             {
                 // Creating a new world, ensure that the name is available
                 worldName = this.WorldSelectNewNameField.Value;
@@ -293,6 +294,7 @@ namespace ValheimServerGUI.Forms
                 Name = this.ServerNameField.Value,
                 Password = this.ServerPasswordField.Value,
                 WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
+                NewWorld = newWorld,
                 Public = this.CommunityServerField.Value,
                 Port = this.ServerPortField.Value,
             };

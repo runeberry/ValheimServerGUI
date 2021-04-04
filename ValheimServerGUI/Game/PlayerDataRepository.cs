@@ -53,6 +53,12 @@ namespace ValheimServerGUI.Game
             {
                 // If we have no offline record of this player, create a new record
                 player = new PlayerInfo { SteamId = steamId };
+
+                this.Logger.LogInformation("1 player joining for SteamID {0} (new player)", steamId);
+            }
+            else
+            {
+                this.Logger.LogInformation("1 player joining for SteamID {0} (existing player)", steamId);
             }
 
             player.PlayerStatus = PlayerStatus.Joining;
@@ -168,13 +174,16 @@ namespace ValheimServerGUI.Game
                 // Once all joining players have come online, update the remaining anonymous players to an online status
                 var remainingPlayers = this.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
                 
-                foreach (var jp in remainingPlayers)
+                if (remainingPlayers.Any())
                 {
-                    jp.PlayerStatus = PlayerStatus.Online;
-                    playersToSave.Add(jp);
-                }
+                    foreach (var jp in remainingPlayers)
+                    {
+                        jp.PlayerStatus = PlayerStatus.Online;
+                        playersToSave.Add(jp);
+                    }
 
-                this.Logger.LogInformation("(PlayerOnline) {0} anonymous player(s) entering Online status", remainingPlayers.Count());
+                    this.Logger.LogInformation("(PlayerOnline) {0} anonymous player(s) entering Online status", remainingPlayers.Count());
+                }
             }
 
             if (playersToRemove.Any())
@@ -196,28 +205,38 @@ namespace ValheimServerGUI.Game
         {
             var players = this.Data.Where(p => p.SteamId == steamId && p.PlayerStatus.IsAnyValue(PlayerStatus.Joining, PlayerStatus.Online)).ToList();
 
-            foreach (var player in players)
+            if (players.Any())
             {
-                player.PlayerStatus = PlayerStatus.Leaving;
-                player.LastStatusChange = DateTime.UtcNow;
-                player.ZdoId = null;
-            }
+                foreach (var player in players)
+                {
+                    player.PlayerStatus = PlayerStatus.Leaving;
+                    player.LastStatusChange = DateTime.UtcNow;
+                    player.ZdoId = null;
+                }
 
-            this.UpsertBulk(players);
+                this.UpsertBulk(players);
+
+                this.Logger.LogInformation("{0} player(s) Leaving for SteamID {1}", players.Count, steamId);
+            }
         }
 
         public void SetPlayerOffline(string steamId)
         {
             var players = this.Data.Where(p => p.SteamId == steamId && p.PlayerStatus.IsAnyValue(PlayerStatus.Joining, PlayerStatus.Online)).ToList();
 
-            foreach (var player in players)
+            if (players.Any())
             {
-                player.PlayerStatus = PlayerStatus.Offline;
-                player.LastStatusChange = DateTime.UtcNow;
-                player.ZdoId = null;
-            }
+                foreach (var player in players)
+                {
+                    player.PlayerStatus = PlayerStatus.Offline;
+                    player.LastStatusChange = DateTime.UtcNow;
+                    player.ZdoId = null;
+                }
 
-            this.UpsertBulk(players);
+                this.UpsertBulk(players);
+
+                this.Logger.LogInformation("{0} player(s) Offline for SteamID {1}", players.Count, steamId);
+            }
         }
 
         #region Non-public methods

@@ -43,6 +43,10 @@ namespace ValheimServerGUI.Controls
 
         public event EventHandler SelectionChanged;
 
+        public int? SortColumn { get; protected set;  }
+
+        public bool SortDescending { get; protected set; }
+
         #endregion
 
         public DataListView()
@@ -50,11 +54,20 @@ namespace ValheimServerGUI.Controls
             InitializeComponent();
 
             this.ListView.ItemSelectionChanged += ListView_ItemSelectionChanged;
+            this.ListView.ColumnClick += ListView_ColumnClick;
         }
 
         private void ListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
             this.SelectionChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void ListView_ColumnClick(object sender, ColumnClickEventArgs e)
+        {
+            var descending = false;
+            if (this.SortColumn == e.Column) descending = !this.SortDescending;
+
+            this.OrderByColumn(e.Column, descending);
         }
 
         public DataListView AddRowBinding<TEntity>(Action<IDataListViewRowBinding<TEntity>> builder)
@@ -117,6 +130,9 @@ namespace ValheimServerGUI.Controls
             this.ListView.Items.Add(item);
             this._rows.Add(item);
 
+            // Reapply the sort when data is added
+            if (this.SortColumn.HasValue) this.OrderByColumn(this.SortColumn.Value, this.SortDescending);
+
             return item;
         }
 
@@ -132,6 +148,9 @@ namespace ValheimServerGUI.Controls
 
             this.ListView.Items.Add(item);
             this._rows.Add(item);
+
+            // Reapply the sort when data is added
+            if (this.SortColumn.HasValue) this.OrderByColumn(this.SortColumn.Value, this.SortDescending);
 
             return item;
         }
@@ -178,6 +197,28 @@ namespace ValheimServerGUI.Controls
         public bool RemoveRowsWhere<TEntity>(Func<DataListViewRow<TEntity>, bool> condition)
         {
             return this.RemoveRows(this.GetRowsWithType<TEntity>().Where(condition).ToList());
+        }
+
+        #endregion
+
+        #region Sort methods
+
+        public void OrderByColumn(int colIndex, bool descending = false)
+        {
+            if (colIndex >= this.Columns.Count) return;
+
+            var rowsCopy = descending
+                ? this._rows.OrderByDescending(r => r.GetCell(colIndex)?.Value).ToArray()
+                : this._rows.OrderBy(r => r.GetCell(colIndex)?.Value).ToArray();
+
+            this.SortColumn = colIndex;
+            this.SortDescending = descending;
+
+            this.ListView.Items.Clear();
+            this._rows.Clear();
+
+            this.ListView.Items.AddRange(rowsCopy);
+            this._rows.AddRange(rowsCopy);
         }
 
         #endregion

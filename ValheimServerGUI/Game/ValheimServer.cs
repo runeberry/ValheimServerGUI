@@ -218,14 +218,7 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            var player = this.PlayerDataRepository.FindPlayerBySteamId(steamId, true);
-            if (player != null)
-            {
-                player.PlayerStatus = PlayerStatus.Joining;
-                player.LastStatusChange = DateTime.UtcNow;
-                player.ZdoId = null;
-                this.PlayerDataRepository.SavePlayer(player);
-            }
+            this.PlayerDataRepository.SetPlayerJoining(steamId);
         }
 
         private void OnPlayerConnected(object sender, EventLogContext context, params string[] captures)
@@ -236,15 +229,7 @@ namespace ValheimServerGUI.Game
 
             if (string.IsNullOrWhiteSpace(playerName)) return;
 
-            var player = this.PlayerDataRepository.FindJoiningPlayerByName(playerName);
-            if (player != null)
-            {
-                player.PlayerName = playerName;
-                player.PlayerStatus = PlayerStatus.Online;
-                player.LastStatusChange = DateTime.UtcNow;
-                player.ZdoId = zdoid;
-                this.PlayerDataRepository.SavePlayer(player);
-            }
+            this.PlayerDataRepository.SetPlayerOnline(playerName, zdoid);
         }
 
         private void OnPlayerDisconnecting(object sender, EventLogContext context, params string[] captures)
@@ -252,14 +237,7 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            var player = this.PlayerDataRepository.FindPlayerBySteamId(steamId);
-            if (player != null)
-            {
-                player.PlayerStatus = PlayerStatus.Leaving;
-                player.LastStatusChange = DateTime.UtcNow;
-                player.ZdoId = null;
-                this.PlayerDataRepository.SavePlayer(player);
-            }
+            this.PlayerDataRepository.SetPlayerLeaving(steamId);
         }
 
         private void OnPlayerDisconnected(object sender, EventLogContext context, params string[] captures)
@@ -267,14 +245,7 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            var player = this.PlayerDataRepository.FindPlayerBySteamId(steamId);
-            if (player != null)
-            {
-                player.PlayerStatus = PlayerStatus.Offline;
-                player.LastStatusChange = DateTime.UtcNow;
-                player.ZdoId = null;
-                this.PlayerDataRepository.SavePlayer(player);
-            }
+            this.PlayerDataRepository.SetPlayerOffline(steamId);
         }
 
         private void OnWorldSaved(object sender, EventLogContext context, params string[] captures)

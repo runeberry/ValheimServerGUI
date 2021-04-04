@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using ValheimServerGUI.Properties;
+using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -11,11 +12,13 @@ namespace ValheimServerGUI.Game
     {
         event EventHandler<PlayerInfo> PlayerStatusChanged;
 
-        PlayerInfo FindPlayerBySteamId(string steamId, bool createNew = false);
+        PlayerInfo SetPlayerJoining(string steamId);
 
-        PlayerInfo FindJoiningPlayerByName(string playerName);
+        PlayerInfo SetPlayerOnline(string name, string zdoid);
 
-        void SavePlayer(PlayerInfo player);
+        void SetPlayerLeaving(string steamId);
+
+        void SetPlayerOffline(string steamId);
 
         void Load(); // todo: find a way to automatically load data without an explicit call
     }
@@ -25,7 +28,8 @@ namespace ValheimServerGUI.Game
         public event EventHandler<PlayerInfo> PlayerStatusChanged;
 
         private readonly Dictionary<string, PlayerStatus> PlayerStatusMap = new();
-        private readonly HashSet<string> PoolOfUncertainty = new();
+        private readonly Dictionary<string, DateTimeOffset> LastOfflineCache = new();
+        private int JoinCount;
 
         public PlayerDataRepository(IDataFileRepositoryContext context)  
             : base(context, Resources.PlayerListFilePath)
@@ -34,78 +38,186 @@ namespace ValheimServerGUI.Game
             this.EntityUpdated += this.OnEntityUpdated;
         }
 
-        public PlayerInfo FindPlayerBySteamId(string steamId, bool createNew = false)
+        public PlayerInfo SetPlayerJoining(string steamId)
         {
-            // Gonna sneak a little validation in here don't tell nobody :3
             if (string.IsNullOrWhiteSpace(steamId)) return null;
 
-            var player = this.FindById(steamId);
+            // Retrieve the player w/ this SteamID who was most recently online
+            var players = this.Data
+                .Where(p => p.SteamId == steamId && p.PlayerStatus == PlayerStatus.Offline)
+                .OrderByDescending(p => p.LastStatusChange);
 
-            if (player == null && createNew)
+            var player = players.FirstOrDefault();
+
+            if (player == null)
             {
-                player = new PlayerInfo
-                {
-                    SteamId = steamId,
-                    PlayerStatus = PlayerStatus.Offline, // Considered offline until otherwise defined
-                };
-                this.Upsert(player);
+                // If we have no offline record of this player, create a new record
+                player = new PlayerInfo { SteamId = steamId };
             }
+
+            player.PlayerStatus = PlayerStatus.Joining;
+            player.LastStatusChange = DateTime.UtcNow;
+            this.JoinCount++;
+            this.Upsert(player);
 
             return player;
         }
 
-        public PlayerInfo FindJoiningPlayerByName(string playerName)
+        public PlayerInfo SetPlayerOnline(string name, string zdoid)
         {
-            PlayerInfo player;
+            if (string.IsNullOrWhiteSpace(name)) return null;
 
-            // This is tricky becase we don't have the SteamID in this particular log message
-            // So consider all players that are currently connecting to the game
-            var joiningPlayers = this.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
-            var joiningWithSameName = joiningPlayers.Where(p => p.PlayerName == playerName);
+            PlayerInfo player = null;
+            var playersToSave = new List<PlayerInfo>();
+            var playersToRemove = new List<string>();
 
-            if (joiningPlayers.Count() > 1 && joiningWithSameName.Any())
+            var playersWithSameName = this.Data
+                .Where(p => p.PlayerName == name && p.PlayerStatus.IsAnyValue(PlayerStatus.Joining, PlayerStatus.Offline));
+
+            var joiningPlayers = this.Data
+                .Where(p => p.PlayerStatus == PlayerStatus.Joining);
+
+            if (playersWithSameName.Count() == 1)
             {
-                // If multiple players are joining, we can narrow down the list if any of the joining
-                // players already have a name that matches the requested player name
-                joiningPlayers = joiningWithSameName;
+                // One player record with this name has been seen in the past with this name, so use it
+                player = playersWithSameName.Single();
+                this.Logger.LogInformation("(PlayerOnline) Player {0} belongs to SteamID {1} (Single match by name)", name, player.SteamId);
 
-                this.Logger.LogTrace($"Multiple players joining, but found {joiningPlayers.Count()} match(es) by name {playerName}.");
-            }
-
-            if (joiningPlayers.Count() == 1)
-            {
-                // If there's only one player connecting (or multiple players, but one has the same name), use that player.
-                // It's gotta be the same person... right?
-                player = joiningPlayers.Single();
-                player.SteamIdConfident = true;
-                player.SteamIdAlternates = null;
-
-                this.Logger.LogTrace($"Matched PlayerName {playerName} to SteamId {player.SteamId} with high confidence.");
-            }
-            else
-            {
-                if (this.ResolveUncertainSteamIds())
+                if (player.PlayerStatus == PlayerStatus.Offline)
                 {
-                    // Run this method recursively until no more uncertain id updates are made
-                    player = this.FindJoiningPlayerByName(playerName);
+                    // If this record with this matching name was offline, then same steam player
+                    // is logging in with a different name than the one we picked when they were joining
+                    var wrongJoiningPlayer = this.Data.Where(p => p.SteamId == player.SteamId && p.PlayerStatus == PlayerStatus.Joining).FirstOrDefault();
+
+                    // If there was somehow no joining steamId match, just use this player anyway
+                    if (wrongJoiningPlayer != null)
+                    {
+                        wrongJoiningPlayer.PlayerStatus = PlayerStatus.Offline;
+                        if (this.LastOfflineCache.TryGetValue(player.Key, out var origTimestamp))
+                        {
+                            wrongJoiningPlayer.LastStatusChange = origTimestamp;
+                        }
+                        playersToSave.Add(wrongJoiningPlayer);
+
+                        this.Logger.LogInformation("Player {0} was not logging in after all, reverting to offline status", wrongJoiningPlayer.PlayerName);
+                    }
+                }
+            }
+            else if (playersWithSameName.Count() > 1)
+            {
+                // Multiple offline or joining players have been detected with the same name
+                var joiningPlayersWithSameName = playersWithSameName
+                    .Where(p => p.PlayerStatus == PlayerStatus.Joining);
+
+                if (joiningPlayersWithSameName.Count() == 1)
+                {
+                    // If one of those is joining, assume that's the right player
+                    player = joiningPlayersWithSameName.Single();
+                    this.Logger.LogInformation("(PlayerOnline) Player {0} belongs to SteamID {1} (Single joining by name)", name, player.SteamId);
                 }
                 else
                 {
-                    // We tried, but we couldn't resolve this name to a single player.
-                    // Simply assume it's the player who's been trying to join the longest.
-                    player = joiningPlayers.OrderBy(p => p.LastStatusChange).First();
-
-                    this.Logger.LogWarning(
-                        $"Multiple players joining, matched PlayerName {playerName} to SteamId {player.SteamId} with low confidence.");
+                    // Otherwise, we cannot reliably pick which of the players by this name we should update
+                    this.Logger.LogInformation("Cannot resolve SteamID for Player {0} (Multiple joining w/ same name)", name);
                 }
+            }
+            else if (joiningPlayers.Count() == 1)
+            {
+                // No players were found joining or offline w/ this name, but there is only one joining player, so we can confirm this match
+                player = joiningPlayers.Single();
+                this.Logger.LogInformation("(PlayerOnline) Player {0} belongs to SteamID {1} (Single player joining)", name, player.SteamId);
+
+                if (player.PlayerName == null)
+                {
+                    playersToRemove.Add(player.Key);
+                    player.PlayerName = name;
+                }
+                else if (player.PlayerName != name)
+                {
+                    // Make a new record for each character that a SteamID logs in with, set the old record back to offline
+                    player.PlayerStatus = PlayerStatus.Offline;
+                    if (this.LastOfflineCache.TryGetValue(player.Key, out var origTimestamp))
+                    {
+                        player.LastStatusChange = origTimestamp;
+                    }
+                    playersToSave.Add(player);
+
+                    this.Logger.LogInformation("Player {0} was not logging in after all, reverting to offline status", player.PlayerName);
+
+                    var steamId = player.SteamId;
+                    player = new PlayerInfo { SteamId = steamId, PlayerName = name };
+                }
+            }
+            else
+            {
+                this.Logger.LogInformation("Cannot resolve SteamID for Player {0} (Multiple players joining, no match by name)", name);
+            }
+
+            if (player != null)
+            {
+                // If we could actually determine which player to update, do it now
+                player.PlayerStatus = PlayerStatus.Online;
+                player.LastStatusChange = DateTime.UtcNow;
+                player.MatchConfident = true;
+                player.ZdoId = zdoid;
+                playersToSave.Add(player);
+            }
+
+            if (--this.JoinCount == 0)
+            {
+                // Once all joining players have come online, update the remaining anonymous players to an online status
+                var remainingPlayers = this.Data.Where(p => p.PlayerStatus == PlayerStatus.Joining);
+                
+                foreach (var jp in remainingPlayers)
+                {
+                    jp.PlayerStatus = PlayerStatus.Online;
+                    playersToSave.Add(jp);
+                }
+
+                this.Logger.LogInformation("(PlayerOnline) {0} anonymous player(s) entering Online status", remainingPlayers.Count());
+            }
+
+            if (playersToRemove.Any())
+            {
+                this.RemoveBulk(playersToRemove);
+                this.Logger.LogInformation("{0} player(s) removed", playersToSave.Count);
+            }
+            
+            if (playersToSave.Any())
+            {
+                this.UpsertBulk(playersToSave);
+                this.Logger.LogInformation("{0} player(s) saved", playersToSave.Count);
             }
 
             return player;
         }
 
-        public void SavePlayer(PlayerInfo player)
+        public void SetPlayerLeaving(string steamId)
         {
-            this.Upsert(player);
+            var players = this.Data.Where(p => p.SteamId == steamId && p.PlayerStatus.IsAnyValue(PlayerStatus.Joining, PlayerStatus.Online)).ToList();
+
+            foreach (var player in players)
+            {
+                player.PlayerStatus = PlayerStatus.Leaving;
+                player.LastStatusChange = DateTime.UtcNow;
+                player.ZdoId = null;
+            }
+
+            this.UpsertBulk(players);
+        }
+
+        public void SetPlayerOffline(string steamId)
+        {
+            var players = this.Data.Where(p => p.SteamId == steamId && p.PlayerStatus.IsAnyValue(PlayerStatus.Joining, PlayerStatus.Online)).ToList();
+
+            foreach (var player in players)
+            {
+                player.PlayerStatus = PlayerStatus.Offline;
+                player.LastStatusChange = DateTime.UtcNow;
+                player.ZdoId = null;
+            }
+
+            this.UpsertBulk(players);
         }
 
         #region Non-public methods
@@ -117,6 +229,7 @@ namespace ValheimServerGUI.Game
             foreach (var player in this.Data)
             {
                 this.PlayerStatusMap[player.Key] = player.PlayerStatus;
+                this.LastOfflineCache[player.Key] = player.LastStatusChange;
             }
         }
 
@@ -127,6 +240,15 @@ namespace ValheimServerGUI.Game
             if (this.PlayerStatusMap.TryGetValue(player.Key, out var oldStatus))
             {
                 statusChanged = player.PlayerStatus != oldStatus;
+
+                if (statusChanged)
+                {
+                    // If the player enters the Offline status, we need to cache that time to reference later
+                    if (player.PlayerStatus == PlayerStatus.Offline)
+                    {
+                        this.LastOfflineCache[player.Key] = player.LastStatusChange;
+                    }
+                }
             }
             else
             {
@@ -137,113 +259,8 @@ namespace ValheimServerGUI.Game
 
             if (statusChanged)
             {
-                if (player.PlayerStatus == PlayerStatus.Joining)
-                {
-                    // All players that are concurrently joining will be added to the pool
-                    this.PoolOfUncertainty.Add(player.SteamId);
-                }
-                else if (oldStatus == PlayerStatus.Joining && !this.Data.Any(p => p.PlayerStatus == PlayerStatus.Joining))
-                {
-                    // If this is the last player to *leave* the joining status, clear the pool
-                    this.PoolOfUncertainty.Clear();
-                }
-
                 this.PlayerStatusChanged?.Invoke(this, player);
             }
-        }
-
-        private bool ResolveUncertainSteamIds()
-        {
-            var anyResolved = false;
-
-            try
-            {
-                var numResolved = 0;
-
-                do
-                {
-                    numResolved = this.ResolveUncertainSteamIdsInternal();
-                    anyResolved = anyResolved || numResolved > 0;
-                }
-                while (numResolved > 0);
-            }
-            catch (Exception e)
-            {
-                this.Logger.LogWarning(e, "Encountered exception when trying to resolve uncertain steamIds");
-            }
-
-            if (anyResolved)
-            {
-                this.Save();
-            }
-
-            return anyResolved;
-        }
-
-        private int ResolveUncertainSteamIdsInternal()
-        {
-            var numResolved = 0;
-
-            // Search any players we've ever encountered where we haven't been able to resolve the steamId (including offline players)
-            var uncertainPlayers = this.Data.Where(p => !p.SteamIdConfident);
-            if (!uncertainPlayers.Any()) return numResolved;
-
-            // Any of these players may have an incorrect steamId
-            var possibleSteamIds = uncertainPlayers.Select(p => p.SteamId).Distinct();
-
-            foreach (var player in uncertainPlayers)
-            {
-                if (player.SteamIdAlternates == null || !player.SteamIdAlternates.Any())
-                {
-                    // First pass, the player may have any of these possible ids
-                    player.SteamIdAlternates = possibleSteamIds.ToList();
-                }
-                else
-                {
-                    // Each time the player connects, the alternates list has the opportunity to get smaller
-                    // by looking at all the possible SteamIds in each session until we can find the one
-                    // that is always common for this player name
-                    var intersection = player.SteamIdAlternates.Intersect(possibleSteamIds);
-
-                    if (intersection.Count() == 1)
-                    {
-                        // We have found the common steamId for this player name
-                        var steamId = intersection.Single();
-
-                        player.SteamIdConfident = true;
-                        player.SteamIdAlternates = null;
-                        numResolved++;
-
-                        this.Logger.LogInformation("RESOLVED: SteamId {0} belongs to player {1}",
-                            steamId, player.PlayerName);
-
-                        if (player.SteamId != steamId)
-                        {
-                            // Our previous guess was incorrect, swap with the player who currently has this id
-                            var otherPlayer = uncertainPlayers.Single(p => p.SteamId == steamId);
-                            otherPlayer.SteamId = player.SteamId;
-                            player.SteamId = steamId;
-
-                            this.Logger.LogInformation("Previous SteamId {0} was incorrect, swapping with player {1}",
-                                steamId, player.PlayerName);
-                        }
-                    }
-                    else if (!intersection.Any())
-                    {
-                        // The only way this should happen is if a player with the same name was encountered
-                        // on a completely different steamId that was also uncertain
-                        this.Logger.LogWarning("Unable to resolve SteamId for player {0}. Is this player's name in use by another Steam user?",
-                            player.PlayerName);
-                    }
-                    else
-                    {
-                        this.Logger.LogTrace("Unable to resolve SteamId for player {1}, may be one of: {0}",
-                            string.Join(", ", intersection), player.PlayerName);
-                    }
-                }
-            }
-
-            return numResolved;
         }
 
         #endregion

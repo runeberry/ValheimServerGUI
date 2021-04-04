@@ -57,7 +57,7 @@ namespace ValheimServerGUI.Forms
             this.OnlineStatusField.Value = this.Player.PlayerStatus.ToString();
             this.StatusChangedField.Value = new TimeAgo(this.Player.LastStatusChange).ToString();
 
-            this.SteamIdWarningIcon.Visible = !this.Player.SteamIdConfident;
+            this.SteamIdWarningIcon.Visible = !this.Player.MatchConfident;
         }
     }
 }

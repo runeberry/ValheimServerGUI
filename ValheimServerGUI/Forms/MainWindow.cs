@@ -16,7 +16,6 @@ namespace ValheimServerGUI.Forms
     public partial class MainWindow : Form
     {
         private static readonly string NL = Environment.NewLine;
-        private const string PlayerNameUnknown = "(unknown)";
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
 
@@ -115,7 +114,7 @@ namespace ValheimServerGUI.Forms
         {
             this.PlayersTable.AddRowBinding<PlayerInfo>(row =>
             {
-                row.AddCellBinding(this.ColumnPlayerName.Index, p => p.PlayerName ?? PlayerNameUnknown);
+                row.AddCellBinding(this.ColumnPlayerName.Index, p => p.PlayerName ?? $"(...{p.SteamId[^4..]})");
                 row.AddCellBinding(this.ColumnPlayerStatus.Index, p => p.PlayerStatus);
                 row.AddCellBinding(this.ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
             });
@@ -564,20 +563,12 @@ namespace ValheimServerGUI.Forms
 
         private void UpdatePlayerStatus(PlayerInfo player)
         {
-            var playerName = player.PlayerName ?? PlayerNameUnknown;
-
-            var playerRow = this.PlayersTable
+            var playerRows = this.PlayersTable
                 .GetRowsWithType<PlayerInfo>()
-                .FirstOrDefault(p => p.Entity.SteamId == player.SteamId);
+                .Where(p => p.Entity.SteamId == player.SteamId);
 
-            if (playerRow == null)
-            {
-                playerRow = this.PlayersTable.AddRowFromEntity(player);
-            }
-            else
-            {
-                playerRow.RefreshValues();
-            }
+            var playerRow = playerRows.FirstOrDefault(p => p.Entity.Key == player.Key) ?? this.PlayersTable.AddRowFromEntity(player);
+            if (playerRow == null) return;
 
             // Update styles based on player status
             var imageIndex = -1;

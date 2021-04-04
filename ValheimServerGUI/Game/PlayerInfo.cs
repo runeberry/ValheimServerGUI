@@ -8,7 +8,7 @@ namespace ValheimServerGUI.Game
     public class PlayerInfo : IPrimaryKeyEntity
     {
         [JsonIgnore]
-        public string Key => this.SteamId;
+        public string Key => this.PlayerName == null ? this.SteamId : $"{this.SteamId}:{this.PlayerName}";
 
         /// <summary>
         /// The character's name as it appears within Valheim
@@ -26,16 +26,8 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// Could we confidently match up the player's name and steamId?
         /// </summary>
-        [JsonProperty("steamIdConfident")]
-        public bool SteamIdConfident { get; set; }
-
-        /// <summary>
-        /// If we could not confidently match up the connecting player name with a steamId,
-        /// then keep track of any possible ids. Will try to resolve the correct one over time.
-        /// This list will also contain the value chosen for SteamId.
-        /// </summary>
-        [JsonProperty("steamIdAlternates", NullValueHandling = NullValueHandling.Ignore)]
-        public List<string> SteamIdAlternates { get; set; }
+        [JsonProperty("matchConfident")]
+        public bool MatchConfident { get; set; }
 
         /// <summary>
         /// The last time the player logged on to the server.

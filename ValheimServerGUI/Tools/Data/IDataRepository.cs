@@ -23,7 +23,11 @@ namespace ValheimServerGUI.Tools.Data
 
         void UpsertBulk(IEnumerable<TEntity> entities);
 
+        void Remove(string key);
+
         void Remove(TEntity entity);
+
+        void RemoveBulk(IEnumerable<string> keys);
 
         void RemoveBulk(IEnumerable<TEntity> entities);
 

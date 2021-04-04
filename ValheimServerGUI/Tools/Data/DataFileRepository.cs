@@ -88,12 +88,43 @@ namespace ValheimServerGUI.Tools.Data
             this.Save();
         }
 
+        public virtual void Remove(string key)
+        {
+            if (this.Entities.TryGetValue(key, out var entity) && this.Entities.Remove(key))
+            {
+                this.EntityRemoved?.Invoke(this, entity);
+
+                this.DataUpdated?.Invoke(this, EventArgs.Empty);
+                this.Save();
+            }
+        }
+
         public virtual void Remove(TEntity entity)
         {
             if (this.Entities.Remove(entity.Key))
             {
                 this.EntityRemoved?.Invoke(this, entity);
 
+                this.DataUpdated?.Invoke(this, EventArgs.Empty);
+                this.Save();
+            }
+        }
+
+        public virtual void RemoveBulk(IEnumerable<string> keys)
+        {
+            var anyRemoved = false;
+
+            foreach (var key in keys)
+            {
+                if (this.Entities.TryGetValue(key, out var entity) && this.Entities.Remove(key))
+                {
+                    this.EntityRemoved?.Invoke(this, entity);
+                    anyRemoved = true;
+                }
+            }
+
+            if (anyRemoved)
+            {
                 this.DataUpdated?.Invoke(this, EventArgs.Empty);
                 this.Save();
             }

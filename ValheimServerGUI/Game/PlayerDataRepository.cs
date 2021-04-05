@@ -222,7 +222,7 @@ namespace ValheimServerGUI.Game
 
         public void SetPlayerOffline(string steamId)
         {
-            var players = this.Data.Where(p => p.SteamId == steamId && p.PlayerStatus.IsAnyValue(PlayerStatus.Joining, PlayerStatus.Online)).ToList();
+            var players = this.Data.Where(p => p.SteamId == steamId && p.PlayerStatus != PlayerStatus.Offline).ToList();
 
             if (players.Any())
             {

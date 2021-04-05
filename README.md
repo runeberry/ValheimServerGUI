@@ -8,8 +8,10 @@ Need help? You can find support articles in the [Online Manual here](https://git
 
 **Disclaimer:** _This is a fan-made project. Runeberry Software is not affiliated with Valheim or Iron Gate Studio in any official capacity. Use at your own risk!_
 
-<p align="center">
-  <img align="center" src="img/Screenshot-1.png">
+<p width="100%" align="center">
+  <a href="img/Screenshot-1.png"><img src="img/Screenshot-1.png" width="30%"></a>
+  <a href="img/Screenshot-3.png"><img src="img/Screenshot-3.png" width="30%"></a>
+  <a href="img/Screenshot-2.png"><img src="img/Screenshot-2.png" width="30%"></a>
 </p>
 
 ## Requirements

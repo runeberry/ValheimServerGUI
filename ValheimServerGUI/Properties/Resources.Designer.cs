@@ -391,6 +391,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server.
+        /// </summary>
+        internal static string UrlPortForwardingGuide {
+            get {
+                return ResourceManager.GetString("UrlPortForwardingGuide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://twitter.com/Runeberries.
         /// </summary>
         internal static string UrlTwitter {

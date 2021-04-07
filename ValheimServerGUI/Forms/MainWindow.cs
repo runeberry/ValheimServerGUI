@@ -26,6 +26,7 @@ namespace ValheimServerGUI.Forms
         private readonly ValheimServer Server;
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
+        private readonly IExternalIpClient ExternalIpClient;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -34,7 +35,8 @@ namespace ValheimServerGUI.Forms
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
             ValheimServerLogger serverLogger,
-            IEventLogger appLogger)
+            IEventLogger appLogger,
+            IExternalIpClient externalIpClient)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
@@ -43,6 +45,7 @@ namespace ValheimServerGUI.Forms
             this.Server = server;
             this.ServerLogger = serverLogger;
             this.Logger = appLogger;
+            this.ExternalIpClient = externalIpClient;
 
             InitializeComponent(); // WinForms generated code, always first
             InitializeImages();
@@ -69,6 +72,8 @@ namespace ValheimServerGUI.Forms
 
             this.PlayerDataProvider.DataReady += this.BuildEventHandler(this.OnPlayerDataReady);
             this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
+
+            this.ExternalIpClient.AddressReceived += this.BuildEventHandler<ExternalIpResponse>(this.ExternalIpClient_AddressReceived);
         }
 
         private void InitializeFormEvents()
@@ -93,6 +98,7 @@ namespace ValheimServerGUI.Forms
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
+            this.TabServerDetails.VisibleChanged += TabServerDetails_VisibleChanged;
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -443,6 +449,11 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void TabServerDetails_VisibleChanged(object sender, EventArgs e)
+        {
+            if (string.IsNullOrWhiteSpace(this.LabelExternalIpAddress.Value)) this.ExternalIpClient.GetExternalIpAddress();
+        }
+
         private void LogViewSelectField_Changed(object sender, string viewName)
         {
             this.LogViewer.LogView = viewName;
@@ -505,6 +516,11 @@ namespace ValheimServerGUI.Forms
         private void OnWorldSaved(decimal duration)
         {
             // todo: something
+        }
+
+        private void ExternalIpClient_AddressReceived(ExternalIpResponse response)
+        {
+            if (!string.IsNullOrWhiteSpace(response.Ip)) this.LabelExternalIpAddress.Value = response.Ip;
         }
 
         #endregion

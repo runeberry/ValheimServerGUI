@@ -77,6 +77,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
+            this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
             this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
@@ -236,6 +237,11 @@ namespace ValheimServerGUI.Forms
         private void MenuItemHelpManual_Click(object sender, EventArgs e)
         {
             WebHelper.OpenWebAddress(Resources.UrlHelp);
+        }
+
+        private void MenuItemHelpPortForwarding_Clicked(object sender, EventArgs e)
+        {
+            WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
         private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)

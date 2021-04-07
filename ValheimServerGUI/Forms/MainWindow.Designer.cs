@@ -38,6 +38,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileClose = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemHelpPortForwarding = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
@@ -132,6 +133,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.MenuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuItemHelpManual,
+            this.MenuItemHelpPortForwarding,
             this.MenuItemHelpUpdates,
             this.MenuItemHelpSeparator1,
             this.MenuItemHelpAbout});
@@ -145,6 +147,13 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpManual.Name = "MenuItemHelpManual";
             this.MenuItemHelpManual.Size = new System.Drawing.Size(171, 22);
             this.MenuItemHelpManual.Text = "Online &Manual";
+            // 
+            // MenuItemHelpPortForwarding
+            // 
+            this.MenuItemHelpPortForwarding.Image = global::ValheimServerGUI.Properties.Resources.OpenWeb_16x;
+            this.MenuItemHelpPortForwarding.Name = "MenuItemHelpPortForwarding";
+            this.MenuItemHelpPortForwarding.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpPortForwarding.Text = "&Port Forwarding...";
             // 
             // MenuItemHelpUpdates
             // 
@@ -634,5 +643,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonSaveLogs;
         private System.Windows.Forms.Button ButtonPlayerDetails;
         private System.Windows.Forms.Button ButtonRemovePlayer;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemHelpPortForwarding;
     }
 }

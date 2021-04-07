@@ -24,7 +24,7 @@ namespace ValheimServerGUI.Tools.Http
 
         public Type ResponseContentType { get; set; }
 
-        public List<HttpResponseHandler> Callbacks { get; } = new();
+        public List<EventHandler<HttpResponseMessage>> Callbacks { get; } = new();
 
         public RestClientRequest(RestClient client)
         {
@@ -76,12 +76,16 @@ namespace ValheimServerGUI.Tools.Http
                         {
                             // Log the error, but keep iterating over callbacks
                             this.Context.Logger.LogError(callbackException, "HTTP request callback encountered an unexpected error: {0}", logAddress);
+                            this.Context.Logger.LogError(callbackException.Message);
+                            this.Context.Logger.LogError(callbackException.StackTrace);
                         }
                     }
                 }
                 catch (Exception e)
                 {
                     this.Context.Logger.LogError(e, "HTTP request encountered an unexpected error: {0}", logAddress);
+                    this.Context.Logger.LogError(e.Message);
+                    this.Context.Logger.LogError(e.StackTrace);
                     return;
                 }
             });

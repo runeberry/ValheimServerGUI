@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Net.Http;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Http;
@@ -7,7 +8,7 @@ namespace ValheimServerGUI.Tools
 {
     public interface IExternalIpClient
     {
-        event HttpResponseHandler<ExternalIpResponse> AddressReceived;
+        event EventHandler<ExternalIpResponse> AddressReceived;
 
         void GetExternalIpAddress();
     }
@@ -18,7 +19,7 @@ namespace ValheimServerGUI.Tools
         {
         }
 
-        public event HttpResponseHandler<ExternalIpResponse> AddressReceived;
+        public event EventHandler<ExternalIpResponse> AddressReceived;
 
         public void GetExternalIpAddress()
         {

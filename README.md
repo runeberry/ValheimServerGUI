@@ -24,6 +24,7 @@ In order to run ValheimServerGUI, you will need the following:
 
 ## Features
 
+* **Online players** - Show which players are online or offline, and when they arrived/left
 * **It remembers!** - Stores your server info between sessions, and it can't be overwritten by Steam
 * **Status updates** - Clearly shows when your server is running, starting, or stopping
 * **Cleaner server logs** - eliminates a lot of the noisy debug logs produced by the server
@@ -34,7 +35,6 @@ In order to run ValheimServerGUI, you will need the following:
 ### Coming soon...
 
 * **Worlds manager** - View, delete, or backup your worlds from within the app
-* **Online players** - Show which players are online or offline, and when they arrived/left
 * **Ban list management** - Manage your servers ban/allow lists from within the app
 
 ## Quick guide

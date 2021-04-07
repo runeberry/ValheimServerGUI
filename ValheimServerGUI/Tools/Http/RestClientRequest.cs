@@ -54,7 +54,7 @@ namespace ValheimServerGUI.Tools.Http
                     
                     if (!responseMessage.IsSuccessStatusCode)
                     {
-                        this.Context.Logger.LogError("HTTP request was not successful ({1}): {0}", logAddress, statusCode);
+                        this.Context.Logger.LogError("HTTP request was not successful ({0}): {1}", statusCode, logAddress);
                         return;
                     }
 
@@ -64,7 +64,7 @@ namespace ValheimServerGUI.Tools.Http
                         this.ResponseContent = JsonConvert.DeserializeObject(responseContentStr, this.ResponseContentType);
                     }
 
-                    this.Context.Logger.LogTrace("HTTP request was successful ({1}): {0}", logAddress, statusCode);
+                    this.Context.Logger.LogTrace("HTTP request was successful ({0}): {1}", statusCode, logAddress);
 
                     foreach (var callback in this.Callbacks)
                     {

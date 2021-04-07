@@ -1,4 +1,4 @@
-﻿
+
 namespace ValheimServerGUI.Forms
 {
     partial class MainWindow
@@ -456,6 +456,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ButtonSaveLogs
             // 
+            this.ButtonSaveLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
             this.ButtonSaveLogs.Name = "ButtonSaveLogs";
             this.ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
@@ -477,6 +478,9 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewer
             // 
+            this.LogViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.LogViewer.Location = new System.Drawing.Point(3, 51);
             this.LogViewer.LogView = "DefaultLogView";
             this.LogViewer.Name = "LogViewer";
@@ -486,6 +490,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ButtonClearLogs
             // 
+            this.ButtonClearLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonClearLogs.Location = new System.Drawing.Point(374, 22);
             this.ButtonClearLogs.Name = "ButtonClearLogs";
             this.ButtonClearLogs.Size = new System.Drawing.Size(75, 23);

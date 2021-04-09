@@ -134,7 +134,7 @@ take up to 15 minutes, and rarely not show up at all. You can always "Join by IP
         luQHKWcAAAAASUVORK5CYII=
 </value>
   </data>
-  <data name="labelField2.HelpText" xml:space="preserve">
+  <data name="LabelLocalIpAddress.HelpText" xml:space="preserve">
     <value>Use this IP address to connect to your server if you're playing on the host machine.
 This will give you the fastest possible connection! (i.e. "the host advantage")
 

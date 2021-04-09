@@ -62,9 +62,12 @@ namespace ValheimServerGUI.Forms
             this.TabServerDetails = new System.Windows.Forms.TabPage();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.CopyButtonLocalIpAddress = new ValheimServerGUI.Forms.CopyButton();
+            this.CopyButtonExternalIpAddress = new ValheimServerGUI.Forms.CopyButton();
+            this.CopyButtonInternalIpAddress = new ValheimServerGUI.Forms.CopyButton();
             this.label1 = new System.Windows.Forms.Label();
             this.LabelExternalIpAddress = new ValheimServerGUI.Controls.LabelField();
-            this.labelField2 = new ValheimServerGUI.Controls.LabelField();
+            this.LabelLocalIpAddress = new ValheimServerGUI.Controls.LabelField();
             this.LabelInternalIpAddress = new ValheimServerGUI.Controls.LabelField();
             this.TabPlayers = new System.Windows.Forms.TabPage();
             this.ButtonRemovePlayer = new System.Windows.Forms.Button();
@@ -412,9 +415,12 @@ namespace ValheimServerGUI.Forms
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.CopyButtonLocalIpAddress);
+            this.groupBox1.Controls.Add(this.CopyButtonExternalIpAddress);
+            this.groupBox1.Controls.Add(this.CopyButtonInternalIpAddress);
             this.groupBox1.Controls.Add(this.label1);
             this.groupBox1.Controls.Add(this.LabelExternalIpAddress);
-            this.groupBox1.Controls.Add(this.labelField2);
+            this.groupBox1.Controls.Add(this.LabelLocalIpAddress);
             this.groupBox1.Controls.Add(this.LabelInternalIpAddress);
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
@@ -422,6 +428,30 @@ namespace ValheimServerGUI.Forms
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Connection Details";
+            // 
+            // CopyButtonLocalIpAddress
+            // 
+            this.CopyButtonLocalIpAddress.CopyFunction = null;
+            this.CopyButtonLocalIpAddress.Location = new System.Drawing.Point(254, 64);
+            this.CopyButtonLocalIpAddress.Name = "CopyButtonLocalIpAddress";
+            this.CopyButtonLocalIpAddress.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonLocalIpAddress.TabIndex = 5;
+            // 
+            // CopyButtonExternalIpAddress
+            // 
+            this.CopyButtonExternalIpAddress.CopyFunction = null;
+            this.CopyButtonExternalIpAddress.Location = new System.Drawing.Point(254, 22);
+            this.CopyButtonExternalIpAddress.Name = "CopyButtonExternalIpAddress";
+            this.CopyButtonExternalIpAddress.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonExternalIpAddress.TabIndex = 4;
+            // 
+            // CopyButtonInternalIpAddress
+            // 
+            this.CopyButtonInternalIpAddress.CopyFunction = null;
+            this.CopyButtonInternalIpAddress.Location = new System.Drawing.Point(254, 43);
+            this.CopyButtonInternalIpAddress.Name = "CopyButtonInternalIpAddress";
+            this.CopyButtonInternalIpAddress.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonInternalIpAddress.TabIndex = 6;
             // 
             // label1
             // 
@@ -449,18 +479,18 @@ namespace ValheimServerGUI.Forms
             this.LabelExternalIpAddress.Value = "";
             this.LabelExternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
-            // labelField2
+            // LabelLocalIpAddress
             // 
-            this.labelField2.HelpText = resources.GetString("labelField2.HelpText");
-            this.labelField2.LabelSplitRatio = 0.5D;
-            this.labelField2.LabelText = "Local IP Address:";
-            this.labelField2.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.labelField2.Location = new System.Drawing.Point(6, 64);
-            this.labelField2.Name = "labelField2";
-            this.labelField2.Size = new System.Drawing.Size(242, 15);
-            this.labelField2.TabIndex = 2;
-            this.labelField2.Value = "127.0.0.1";
-            this.labelField2.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            this.LabelLocalIpAddress.HelpText = resources.GetString("LabelLocalIpAddress.HelpText");
+            this.LabelLocalIpAddress.LabelSplitRatio = 0.5D;
+            this.LabelLocalIpAddress.LabelText = "Local IP Address:";
+            this.LabelLocalIpAddress.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelLocalIpAddress.Location = new System.Drawing.Point(6, 64);
+            this.LabelLocalIpAddress.Name = "LabelLocalIpAddress";
+            this.LabelLocalIpAddress.Size = new System.Drawing.Size(242, 15);
+            this.LabelLocalIpAddress.TabIndex = 2;
+            this.LabelLocalIpAddress.Value = "127.0.0.1";
+            this.LabelLocalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // LabelInternalIpAddress
             // 
@@ -744,11 +774,14 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonRemovePlayer;
         private System.Windows.Forms.TabPage TabServerDetails;
         private System.Windows.Forms.GroupBox groupBox1;
-        private ValheimServerGUI.Controls.LabelField labelField2;
+        private ValheimServerGUI.Controls.LabelField LabelLocalIpAddress;
         private ValheimServerGUI.Controls.LabelField LabelInternalIpAddress;
         private ValheimServerGUI.Controls.LabelField LabelExternalIpAddress;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.ToolStripMenuItem MenuItemHelpPortForwarding;
+        private CopyButton CopyButtonLocalIpAddress;
+        private CopyButton CopyButtonExternalIpAddress;
+        private CopyButton CopyButtonInternalIpAddress;
     }
 }

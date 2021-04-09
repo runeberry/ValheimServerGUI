@@ -1,10 +1,13 @@
-﻿using System.Net.Http;
+﻿using Microsoft.Extensions.Logging;
+using System.Net.Http;
 
 namespace ValheimServerGUI.Tools.Http
 {
     public class RestClient
     {
         public IRestClientContext Context { get; }
+
+        public ILogger Logger => this.Context.Logger;
 
         public RestClient(IRestClientContext context)
         {

@@ -51,7 +51,7 @@ namespace ValheimServerGUI
             services.AddSingleton<IEventLogger>(applicationLogger);
             services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
             services.AddSingleton<IRestClientContext, RestClientContext>();
-            services.AddSingleton<IExternalIpClient, ExternalIpClient>();
+            services.AddSingleton<IIpAddressProvider, IpAddressProvider>();
 
             // Game & server data
             services

@@ -162,7 +162,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpPortForwarding.Image = global::ValheimServerGUI.Properties.Resources.OpenWeb_16x;
             this.MenuItemHelpPortForwarding.Name = "MenuItemHelpPortForwarding";
             this.MenuItemHelpPortForwarding.Size = new System.Drawing.Size(171, 22);
-            this.MenuItemHelpPortForwarding.Text = "&Port Forwarding...";
+            this.MenuItemHelpPortForwarding.Text = "&Port Forwarding";
             // 
             // MenuItemHelpUpdates
             // 
@@ -432,7 +432,7 @@ namespace ValheimServerGUI.Forms
             this.label1.Size = new System.Drawing.Size(286, 45);
             this.label1.TabIndex = 3;
             this.label1.Text = "Note: Before others can join your server, you\'ll need to\r\nset up port forwarding " +
-    "on your router. Check out our\r\nguide under Help > Port Forwarding...\r\n";
+    "on your router. Check out the\r\nguide under Help > Port Forwarding.\r\n";
             // 
             // LabelExternalIpAddress
             // 

@@ -448,11 +448,15 @@ namespace ValheimServerGUI.Forms
 
         private void TabPlayers_VisibleChanged(object sender, EventArgs e)
         {
+            if (!this.TabPlayers.Visible) return;
+
             this.RefreshPlayersTable();
         }
 
         private async Task TabServerDetails_VisibleChanged()
         {
+            if (!this.TabServerDetails.Visible) return;
+
             this.RefreshServerDetails();
 
             await this.RefreshExternalIpAsync();
@@ -466,8 +470,8 @@ namespace ValheimServerGUI.Forms
 
         private void ServerRefreshTimer_Tick(object sender, EventArgs e)
         {
-            this.RefreshPlayersTable();
-            this.RefreshServerDetails();
+            if (this.TabPlayers.Visible) this.RefreshPlayersTable();
+            if (this.TabServerDetails.Visible) this.RefreshServerDetails();
         }
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
@@ -605,8 +609,6 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshPlayersTable()
         {
-            if (!this.TabPlayers.Visible) return;
-
             foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
             {
                 row.RefreshValues();
@@ -615,8 +617,6 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshServerDetails()
         {
-            if (!this.TabServerDetails.Visible) return;
-
             if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
             {
                 var elapsed = this.ServerUptimeTimer.Elapsed;

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
@@ -18,6 +19,9 @@ namespace ValheimServerGUI.Forms
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
+
+        private readonly Stopwatch ServerUptimeTimer = new();
+        private readonly Queue<decimal> WorldSaveTimes = new();
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -99,7 +103,7 @@ namespace ValheimServerGUI.Forms
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
-            this.TabServerDetails.VisibleChanged += TabServerDetails_VisibleChanged;
+            this.TabServerDetails.VisibleChanged += this.TabServerDetails_VisibleChanged;
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -442,21 +446,12 @@ namespace ValheimServerGUI.Forms
 
         private void TabPlayers_VisibleChanged(object sender, EventArgs e)
         {
-            if (this.TabPlayers.Visible)
-            {
-                this.RefreshPlayersTable();
-                this.ServerRefreshTimer.Enabled = true;
-            }
-            else
-            {
-                this.ServerRefreshTimer.Enabled = false;
-            }
+            this.RefreshPlayersTable();
         }
 
         private void TabServerDetails_VisibleChanged(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(this.LabelExternalIpAddress.Value)) this.IpAddressProvider.GetExternalIpAddress();
-            if (string.IsNullOrWhiteSpace(this.LabelInternalIpAddress.Value)) this.IpAddressProvider.GetInternalIpAddress();
+            this.RefreshServerDetails();
         }
 
         private void LogViewSelectField_Changed(object sender, string viewName)
@@ -467,6 +462,7 @@ namespace ValheimServerGUI.Forms
         private void ServerRefreshTimer_Tick(object sender, EventArgs e)
         {
             this.RefreshPlayersTable();
+            this.RefreshServerDetails();
         }
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
@@ -503,6 +499,15 @@ namespace ValheimServerGUI.Forms
                 this.RefreshWorldSelect();
                 this.WorldSelectRadioExisting.Value = true;
             }
+
+            if (status == ServerStatus.Running)
+            {
+                this.ServerUptimeTimer.Restart();
+            }
+            else
+            {
+                if (this.ServerUptimeTimer.IsRunning) this.ServerUptimeTimer.Stop();
+            }
         }
 
         private void OnPlayerDataReady()
@@ -520,7 +525,13 @@ namespace ValheimServerGUI.Forms
 
         private void OnWorldSaved(decimal duration)
         {
-            // todo: something
+            this.LabelLastWorldSave.Value = $"{DateTime.Now:G} ({duration:F}ms)";
+
+            if (this.WorldSaveTimes.Count >= 10) this.WorldSaveTimes.Dequeue();
+            this.WorldSaveTimes.Enqueue(duration);
+            
+            var average = this.WorldSaveTimes.Average();
+            this.LabelAverageWorldSave.Value = $"{average:F}ms";
         }
 
         private void IpAddressProvider_ExternalIpReceived(string ip)
@@ -589,10 +600,32 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshPlayersTable()
         {
+            if (!this.TabPlayers.Visible) return;
+
             foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
             {
                 row.RefreshValues();
             }
+        }
+
+        private void RefreshServerDetails()
+        {
+            if (!this.TabServerDetails.Visible) return;
+
+            if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
+            {
+                var elapsed = this.ServerUptimeTimer.Elapsed;
+                var days = elapsed.Days;
+                var timestr = elapsed.ToString(@"hh\:mm\:ss");
+
+                if (days == 1) timestr = $"1 day + {timestr}";
+                else if (days > 1) timestr = $"{days} days + {timestr}";
+
+                this.LabelSessionDuration.Value = timestr;
+            }
+
+            if (string.IsNullOrWhiteSpace(this.LabelExternalIpAddress.Value)) this.IpAddressProvider.GetExternalIpAddress();
+            if (string.IsNullOrWhiteSpace(this.LabelInternalIpAddress.Value)) this.IpAddressProvider.GetInternalIpAddress();
         }
 
         private void UpdatePlayerStatus(PlayerInfo player)

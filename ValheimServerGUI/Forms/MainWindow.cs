@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
@@ -19,6 +20,7 @@ namespace ValheimServerGUI.Forms
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
+        private const string IpLoadingText = "Loading...";
 
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
@@ -103,7 +105,7 @@ namespace ValheimServerGUI.Forms
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
-            this.TabServerDetails.VisibleChanged += this.TabServerDetails_VisibleChanged;
+            this.TabServerDetails.VisibleChanged += this.BuildEventHandlerAsync(this.TabServerDetails_VisibleChanged, 100);
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -449,9 +451,12 @@ namespace ValheimServerGUI.Forms
             this.RefreshPlayersTable();
         }
 
-        private void TabServerDetails_VisibleChanged(object sender, EventArgs e)
+        private async Task TabServerDetails_VisibleChanged()
         {
             this.RefreshServerDetails();
+
+            await this.RefreshExternalIpAsync();
+            await this.RefreshInternalIpAsync();
         }
 
         private void LogViewSelectField_Changed(object sender, string viewName)
@@ -623,9 +628,16 @@ namespace ValheimServerGUI.Forms
 
                 this.LabelSessionDuration.Value = timestr;
             }
+        }
 
-            if (string.IsNullOrWhiteSpace(this.LabelExternalIpAddress.Value)) this.IpAddressProvider.GetExternalIpAddress();
-            if (string.IsNullOrWhiteSpace(this.LabelInternalIpAddress.Value)) this.IpAddressProvider.GetInternalIpAddress();
+        private async Task RefreshExternalIpAsync()
+        {
+            if (this.LabelExternalIpAddress.Value == IpLoadingText) await Task.Run(this.IpAddressProvider.GetExternalIpAddress);
+        }
+
+        private async Task RefreshInternalIpAsync()
+        {
+            if (this.LabelInternalIpAddress.Value == IpLoadingText) await Task.Run(this.IpAddressProvider.GetInternalIpAddress);
         }
 
         private void UpdatePlayerStatus(PlayerInfo player)

@@ -523,7 +523,7 @@ namespace ValheimServerGUI.Forms
             this.LabelExternalIpAddress.Name = "LabelExternalIpAddress";
             this.LabelExternalIpAddress.Size = new System.Drawing.Size(264, 15);
             this.LabelExternalIpAddress.TabIndex = 0;
-            this.LabelExternalIpAddress.Value = "";
+            this.LabelExternalIpAddress.Value = "Loading...";
             this.LabelExternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // LabelLocalIpAddress
@@ -549,7 +549,7 @@ namespace ValheimServerGUI.Forms
             this.LabelInternalIpAddress.Name = "LabelInternalIpAddress";
             this.LabelInternalIpAddress.Size = new System.Drawing.Size(264, 15);
             this.LabelInternalIpAddress.TabIndex = 1;
-            this.LabelInternalIpAddress.Value = "";
+            this.LabelInternalIpAddress.Value = "Loading...";
             this.LabelInternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // TabPlayers
@@ -647,7 +647,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";

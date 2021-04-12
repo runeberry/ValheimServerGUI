@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
+using System.Threading.Tasks;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Http;
 
@@ -17,9 +18,9 @@ namespace ValheimServerGUI.Tools
 
         event EventHandler<string> InternalIpReceived;
 
-        void GetExternalIpAddress();
+        Task GetExternalIpAddressAsync();
 
-        void GetInternalIpAddress();
+        Task GetInternalIpAddressAsync();
     }
 
     public class IpAddressProvider : RestClient, IIpAddressProvider
@@ -32,15 +33,15 @@ namespace ValheimServerGUI.Tools
 
         public event EventHandler<string> InternalIpReceived;
 
-        public void GetExternalIpAddress()
+        public Task GetExternalIpAddressAsync()
         {
-            this.Request(HttpMethod.Get, Resources.UrlExternalIpLookup)
+            return this.Request(HttpMethod.Get, Resources.UrlExternalIpLookup)
                 .WithCallback<ExternalIpResponse>(this.OnExternalIpResponse)
-                .Send();
+                .SendAsync();
         }
 
         // Adapted from: https://stackoverflow.com/a/40528818/7071436
-        public void GetInternalIpAddress()
+        public Task GetInternalIpAddressAsync()
         {
             // Extract the IPv4 addresses from all network interfaces that are currently "up"
             var addresses = NetworkInterface.GetAllNetworkInterfaces()
@@ -53,7 +54,7 @@ namespace ValheimServerGUI.Tools
             if (!addresses.Any())
             {
                 this.Logger.LogWarning("Failed to find internal IP address: No network interfaces are UP with any IPv4 addresses");
-                return;
+                return Task.CompletedTask;
             }
 
             // Prefer addresses from the DHCP server if they're available
@@ -76,6 +77,8 @@ namespace ValheimServerGUI.Tools
                 this.Logger.LogTrace("Found {0} internal IP address(es): {1}", results.Count(), string.Join(", ", results));
                 this.InternalIpReceived?.Invoke(this, result);
             }
+
+            return Task.CompletedTask;
         }
 
         private void OnExternalIpResponse(object sender, ExternalIpResponse response)

@@ -632,12 +632,12 @@ namespace ValheimServerGUI.Forms
 
         private async Task RefreshExternalIpAsync()
         {
-            if (this.LabelExternalIpAddress.Value == IpLoadingText) await Task.Run(this.IpAddressProvider.GetExternalIpAddress);
+            if (this.LabelExternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetExternalIpAddressAsync();
         }
 
         private async Task RefreshInternalIpAsync()
         {
-            if (this.LabelInternalIpAddress.Value == IpLoadingText) await Task.Run(this.IpAddressProvider.GetInternalIpAddress);
+            if (this.LabelInternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetInternalIpAddressAsync();
         }
 
         private void UpdatePlayerStatus(PlayerInfo player)

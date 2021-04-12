@@ -8,11 +8,16 @@ Need help? You can find support articles in the [Online Manual here](https://git
 
 **Disclaimer:** _This is a fan-made project. Runeberry Software is not affiliated with Valheim or Iron Gate Studio in any official capacity. Use at your own risk!_
 
-<p width="100%" align="center">
-  <a href="img/Screenshot-1.png"><img src="img/Screenshot-1.png" width="30%"></a>
-  <a href="img/Screenshot-3.png"><img src="img/Screenshot-3.png" width="30%"></a>
-  <a href="img/Screenshot-2.png"><img src="img/Screenshot-2.png" width="30%"></a>
-</p>
+<table width="100%" align="center">
+  <tr>
+    <td><a href="img/Screenshot-ServerControls.png"><img src="img/Screenshot-ServerControls.png"></a></td>
+    <td><a href="img/Screenshot-ServerDetails.png"><img src="img/Screenshot-ServerDetails.png"></a></td>
+  </tr>
+  <tr>
+    <td><a href="img/Screenshot-Players.png"><img src="img/Screenshot-Players.png"></a></td>
+    <td><a href="img/Screenshot-Logs.png"><img src="img/Screenshot-Logs.png"></a></td>
+  </tr>
+</table>
 
 ## Requirements
 
@@ -26,6 +31,8 @@ In order to run ValheimServerGUI, you will need the following:
 
 * **It remembers!** - Stores your server info between sessions, and it can't be overwritten by Steam
 * **Status updates** - Clearly shows when your server is running, starting, or stopping
+* **Online players** - Show which players are online or offline, and when they arrived/left
+* **Easy IP address** - No more guessing, copy the right IP address to give to your friends straight from the app
 * **Cleaner server logs** - eliminates a lot of the noisy debug logs produced by the server
 * **Input validation** - Prevents you from creating a server with bad info that would fail to launch
 * **Safe shutdowns** - Safely stops the server when you close the app or shut down Windows
@@ -34,7 +41,6 @@ In order to run ValheimServerGUI, you will need the following:
 ### Coming soon...
 
 * **Worlds manager** - View, delete, or backup your worlds from within the app
-* **Online players** - Show which players are online or offline, and when they arrived/left
 * **Ban list management** - Manage your servers ban/allow lists from within the app
 
 ## Quick guide

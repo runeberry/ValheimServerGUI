@@ -208,6 +208,9 @@
   <data name="UrlDonate" xml:space="preserve">
     <value>https://www.buymeacoffee.com/runeberry</value>
   </data>
+  <data name="UrlExternalIpLookup" xml:space="preserve">
+    <value>https://api.ipify.org?format=json</value>
+  </data>
   <data name="UrlGithubApplication" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI</value>
   </data>
@@ -216,6 +219,9 @@
   </data>
   <data name="UrlHelp" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/wiki</value>
+  </data>
+  <data name="UrlPortForwardingGuide" xml:space="preserve">
+    <value>https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server</value>
   </data>
   <data name="UrlTwitter" xml:space="preserve">
     <value>https://twitter.com/Runeberries</value>

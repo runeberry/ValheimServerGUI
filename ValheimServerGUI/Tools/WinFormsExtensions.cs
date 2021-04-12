@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ValheimServerGUI.Tools
@@ -40,6 +40,44 @@ namespace ValheimServerGUI.Tools
                 }
 
                 action();
+            };
+        }
+
+        public static EventHandler<TArgs> BuildEventHandlerAsync<TArgs>(this Control control, Func<TArgs, Task> taskFunc, int taskDelay = 0)
+        {
+            return async (sender, args) =>
+            {
+                if (taskDelay > 0) await Task.Delay(taskDelay);
+
+                await Task.Run(() =>
+                {
+                    if (control.InvokeRequired)
+                    {
+                        control.Invoke(new Func<TArgs, Task>(taskFunc), new object[] { args });
+                        return;
+                    }
+
+                    taskFunc(args);
+                });
+            };
+        }
+
+        public static EventHandler BuildEventHandlerAsync(this Control control, Func<Task> taskFunc, int taskDelay = 0)
+        {
+            return async (sender, args) =>
+            {
+                if (taskDelay > 0) await Task.Delay(taskDelay);
+
+                await Task.Run(() =>
+                {
+                    if (control.InvokeRequired)
+                    {
+                        control.Invoke(new Func<Task>(taskFunc));
+                        return;
+                    }
+
+                    taskFunc();
+                });
             };
         }
 

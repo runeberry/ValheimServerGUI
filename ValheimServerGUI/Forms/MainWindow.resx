@@ -134,6 +134,19 @@ take up to 15 minutes, and rarely not show up at all. You can always "Join by IP
         luQHKWcAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="LabelLocalIpAddress.HelpText" xml:space="preserve">
+    <value>Use this IP address to connect to your server if you're playing on the host machine.
+This will give you the fastest possible connection! (i.e. "the host advantage")
+
+TIP: You can also connect to "localhost", which is a little easier than typing "127.0.0.1"</value>
+  </data>
+  <data name="LabelInternalIpAddress.HelpText" xml:space="preserve">
+    <value>This is the address that players on your home network (connected to your router)
+can use to join your server. Give this address to your friends for LAN setups, or use 
+it yourself if you're hosting your server on another machine on your home network
+(different from the one you're playing on).
+</value>
+  </data>
   <data name="TrayContextMenuStart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO

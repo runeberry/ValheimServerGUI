@@ -38,6 +38,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileClose = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemHelpPortForwarding = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
@@ -58,6 +59,19 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
+            this.TabServerDetails = new System.Windows.Forms.TabPage();
+            this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.LabelSessionDuration = new ValheimServerGUI.Controls.LabelField();
+            this.LabelAverageWorldSave = new ValheimServerGUI.Controls.LabelField();
+            this.LabelLastWorldSave = new ValheimServerGUI.Controls.LabelField();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.CopyButtonLocalIpAddress = new ValheimServerGUI.Forms.CopyButton();
+            this.CopyButtonExternalIpAddress = new ValheimServerGUI.Forms.CopyButton();
+            this.CopyButtonInternalIpAddress = new ValheimServerGUI.Forms.CopyButton();
+            this.label1 = new System.Windows.Forms.Label();
+            this.LabelExternalIpAddress = new ValheimServerGUI.Controls.LabelField();
+            this.LabelLocalIpAddress = new ValheimServerGUI.Controls.LabelField();
+            this.LabelInternalIpAddress = new ValheimServerGUI.Controls.LabelField();
             this.TabPlayers = new System.Windows.Forms.TabPage();
             this.ButtonRemovePlayer = new System.Windows.Forms.Button();
             this.ButtonPlayerDetails = new System.Windows.Forms.Button();
@@ -84,6 +98,9 @@ namespace ValheimServerGUI.Forms
             this.Tabs.SuspendLayout();
             this.TabServerControls.SuspendLayout();
             this.WorldSelectGroupBox.SuspendLayout();
+            this.TabServerDetails.SuspendLayout();
+            this.groupBox2.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.TabPlayers.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
@@ -132,6 +149,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.MenuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuItemHelpManual,
+            this.MenuItemHelpPortForwarding,
             this.MenuItemHelpUpdates,
             this.MenuItemHelpSeparator1,
             this.MenuItemHelpAbout});
@@ -145,6 +163,13 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpManual.Name = "MenuItemHelpManual";
             this.MenuItemHelpManual.Size = new System.Drawing.Size(171, 22);
             this.MenuItemHelpManual.Text = "Online &Manual";
+            // 
+            // MenuItemHelpPortForwarding
+            // 
+            this.MenuItemHelpPortForwarding.Image = global::ValheimServerGUI.Properties.Resources.OpenWeb_16x;
+            this.MenuItemHelpPortForwarding.Name = "MenuItemHelpPortForwarding";
+            this.MenuItemHelpPortForwarding.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpPortForwarding.Text = "&Port Forwarding";
             // 
             // MenuItemHelpUpdates
             // 
@@ -184,6 +209,7 @@ namespace ValheimServerGUI.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Tabs.Controls.Add(this.TabServerControls);
+            this.Tabs.Controls.Add(this.TabServerDetails);
             this.Tabs.Controls.Add(this.TabPlayers);
             this.Tabs.Controls.Add(this.TabLogs);
             this.Tabs.Location = new System.Drawing.Point(12, 27);
@@ -371,6 +397,161 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.ButtonStartServer.UseVisualStyleBackColor = true;
             // 
+            // TabServerDetails
+            // 
+            this.TabServerDetails.Controls.Add(this.groupBox2);
+            this.TabServerDetails.Controls.Add(this.groupBox1);
+            this.TabServerDetails.Location = new System.Drawing.Point(4, 24);
+            this.TabServerDetails.Name = "TabServerDetails";
+            this.TabServerDetails.Size = new System.Drawing.Size(452, 252);
+            this.TabServerDetails.TabIndex = 4;
+            this.TabServerDetails.Text = "Server Details";
+            this.TabServerDetails.UseVisualStyleBackColor = true;
+            // 
+            // groupBox2
+            // 
+            this.groupBox2.Controls.Add(this.LabelSessionDuration);
+            this.groupBox2.Controls.Add(this.LabelAverageWorldSave);
+            this.groupBox2.Controls.Add(this.LabelLastWorldSave);
+            this.groupBox2.Location = new System.Drawing.Point(3, 143);
+            this.groupBox2.Name = "groupBox2";
+            this.groupBox2.Size = new System.Drawing.Size(307, 100);
+            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabStop = false;
+            this.groupBox2.Text = "Statistics";
+            // 
+            // LabelSessionDuration
+            // 
+            this.LabelSessionDuration.HelpText = "";
+            this.LabelSessionDuration.LabelSplitRatio = 0.5D;
+            this.LabelSessionDuration.LabelText = "Server Uptime:";
+            this.LabelSessionDuration.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelSessionDuration.Location = new System.Drawing.Point(7, 23);
+            this.LabelSessionDuration.Name = "LabelSessionDuration";
+            this.LabelSessionDuration.Size = new System.Drawing.Size(241, 15);
+            this.LabelSessionDuration.TabIndex = 2;
+            this.LabelSessionDuration.Value = "";
+            this.LabelSessionDuration.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
+            // LabelAverageWorldSave
+            // 
+            this.LabelAverageWorldSave.HelpText = "The average amount of time it has taken to save\r\nyour game world, over the past 1" +
+    "0 saves.";
+            this.LabelAverageWorldSave.LabelSplitRatio = 0.455D;
+            this.LabelAverageWorldSave.LabelText = "Avg. World Save:";
+            this.LabelAverageWorldSave.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelAverageWorldSave.Location = new System.Drawing.Point(6, 65);
+            this.LabelAverageWorldSave.Name = "LabelAverageWorldSave";
+            this.LabelAverageWorldSave.Size = new System.Drawing.Size(264, 15);
+            this.LabelAverageWorldSave.TabIndex = 1;
+            this.LabelAverageWorldSave.Value = "";
+            this.LabelAverageWorldSave.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
+            // LabelLastWorldSave
+            // 
+            this.LabelLastWorldSave.HelpText = "";
+            this.LabelLastWorldSave.LabelSplitRatio = 0.405D;
+            this.LabelLastWorldSave.LabelText = "Last World Save:";
+            this.LabelLastWorldSave.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelLastWorldSave.Location = new System.Drawing.Point(6, 44);
+            this.LabelLastWorldSave.Name = "LabelLastWorldSave";
+            this.LabelLastWorldSave.Size = new System.Drawing.Size(295, 15);
+            this.LabelLastWorldSave.TabIndex = 0;
+            this.LabelLastWorldSave.Value = "";
+            this.LabelLastWorldSave.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.CopyButtonLocalIpAddress);
+            this.groupBox1.Controls.Add(this.CopyButtonExternalIpAddress);
+            this.groupBox1.Controls.Add(this.CopyButtonInternalIpAddress);
+            this.groupBox1.Controls.Add(this.label1);
+            this.groupBox1.Controls.Add(this.LabelExternalIpAddress);
+            this.groupBox1.Controls.Add(this.LabelLocalIpAddress);
+            this.groupBox1.Controls.Add(this.LabelInternalIpAddress);
+            this.groupBox1.Location = new System.Drawing.Point(3, 3);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(307, 134);
+            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "Connection Details";
+            // 
+            // CopyButtonLocalIpAddress
+            // 
+            this.CopyButtonLocalIpAddress.CopyFunction = null;
+            this.CopyButtonLocalIpAddress.Location = new System.Drawing.Point(276, 63);
+            this.CopyButtonLocalIpAddress.Name = "CopyButtonLocalIpAddress";
+            this.CopyButtonLocalIpAddress.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonLocalIpAddress.TabIndex = 5;
+            // 
+            // CopyButtonExternalIpAddress
+            // 
+            this.CopyButtonExternalIpAddress.CopyFunction = null;
+            this.CopyButtonExternalIpAddress.Location = new System.Drawing.Point(276, 22);
+            this.CopyButtonExternalIpAddress.Name = "CopyButtonExternalIpAddress";
+            this.CopyButtonExternalIpAddress.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonExternalIpAddress.TabIndex = 4;
+            // 
+            // CopyButtonInternalIpAddress
+            // 
+            this.CopyButtonInternalIpAddress.CopyFunction = null;
+            this.CopyButtonInternalIpAddress.Location = new System.Drawing.Point(276, 43);
+            this.CopyButtonInternalIpAddress.Name = "CopyButtonInternalIpAddress";
+            this.CopyButtonInternalIpAddress.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonInternalIpAddress.TabIndex = 6;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(6, 82);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(286, 45);
+            this.label1.TabIndex = 3;
+            this.label1.Text = "Note: Before others can join your server, you\'ll need to\r\nset up port forwarding " +
+    "on your router. Check out the\r\nguide under Help > Port Forwarding.\r\n";
+            // 
+            // LabelExternalIpAddress
+            // 
+            this.LabelExternalIpAddress.HelpText = "This is the address that players from outside your home network will use to\r\nconn" +
+    "ect to your server. Give this address to your friends for standard online play.\r" +
+    "\n";
+            this.LabelExternalIpAddress.LabelSplitRatio = 0.455D;
+            this.LabelExternalIpAddress.LabelText = "External IP Address:";
+            this.LabelExternalIpAddress.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelExternalIpAddress.Location = new System.Drawing.Point(6, 22);
+            this.LabelExternalIpAddress.Name = "LabelExternalIpAddress";
+            this.LabelExternalIpAddress.Size = new System.Drawing.Size(264, 15);
+            this.LabelExternalIpAddress.TabIndex = 0;
+            this.LabelExternalIpAddress.Value = "Loading...";
+            this.LabelExternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
+            // LabelLocalIpAddress
+            // 
+            this.LabelLocalIpAddress.HelpText = resources.GetString("LabelLocalIpAddress.HelpText");
+            this.LabelLocalIpAddress.LabelSplitRatio = 0.455D;
+            this.LabelLocalIpAddress.LabelText = "Local IP Address:";
+            this.LabelLocalIpAddress.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelLocalIpAddress.Location = new System.Drawing.Point(6, 64);
+            this.LabelLocalIpAddress.Name = "LabelLocalIpAddress";
+            this.LabelLocalIpAddress.Size = new System.Drawing.Size(264, 15);
+            this.LabelLocalIpAddress.TabIndex = 2;
+            this.LabelLocalIpAddress.Value = "127.0.0.1";
+            this.LabelLocalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
+            // LabelInternalIpAddress
+            // 
+            this.LabelInternalIpAddress.HelpText = resources.GetString("LabelInternalIpAddress.HelpText");
+            this.LabelInternalIpAddress.LabelSplitRatio = 0.455D;
+            this.LabelInternalIpAddress.LabelText = "Internal IP Address:";
+            this.LabelInternalIpAddress.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelInternalIpAddress.Location = new System.Drawing.Point(6, 43);
+            this.LabelInternalIpAddress.Name = "LabelInternalIpAddress";
+            this.LabelInternalIpAddress.Size = new System.Drawing.Size(264, 15);
+            this.LabelInternalIpAddress.TabIndex = 1;
+            this.LabelInternalIpAddress.Value = "Loading...";
+            this.LabelInternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
             // TabPlayers
             // 
             this.TabPlayers.Controls.Add(this.ButtonRemovePlayer);
@@ -456,6 +637,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ButtonSaveLogs
             // 
+            this.ButtonSaveLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
             this.ButtonSaveLogs.Name = "ButtonSaveLogs";
             this.ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
@@ -477,6 +659,9 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewer
             // 
+            this.LogViewer.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.LogViewer.Location = new System.Drawing.Point(3, 51);
             this.LogViewer.LogView = "DefaultLogView";
             this.LogViewer.Name = "LogViewer";
@@ -486,6 +671,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ButtonClearLogs
             // 
+            this.ButtonClearLogs.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonClearLogs.Location = new System.Drawing.Point(374, 22);
             this.ButtonClearLogs.Name = "ButtonClearLogs";
             this.ButtonClearLogs.Size = new System.Drawing.Size(75, 23);
@@ -548,6 +734,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerRefreshTimer
             // 
+            this.ServerRefreshTimer.Enabled = true;
             this.ServerRefreshTimer.Interval = 1000;
             // 
             // MainWindow
@@ -571,6 +758,10 @@ namespace ValheimServerGUI.Forms
             this.Tabs.ResumeLayout(false);
             this.TabServerControls.ResumeLayout(false);
             this.WorldSelectGroupBox.ResumeLayout(false);
+            this.TabServerDetails.ResumeLayout(false);
+            this.groupBox2.ResumeLayout(false);
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TrayContextMenuStrip.ResumeLayout(false);
@@ -629,5 +820,19 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonSaveLogs;
         private System.Windows.Forms.Button ButtonPlayerDetails;
         private System.Windows.Forms.Button ButtonRemovePlayer;
+        private System.Windows.Forms.TabPage TabServerDetails;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private ValheimServerGUI.Controls.LabelField LabelLocalIpAddress;
+        private ValheimServerGUI.Controls.LabelField LabelInternalIpAddress;
+        private ValheimServerGUI.Controls.LabelField LabelExternalIpAddress;
+        private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemHelpPortForwarding;
+        private CopyButton CopyButtonLocalIpAddress;
+        private CopyButton CopyButtonExternalIpAddress;
+        private CopyButton CopyButtonInternalIpAddress;
+        private ValheimServerGUI.Controls.LabelField LabelAverageWorldSave;
+        private ValheimServerGUI.Controls.LabelField LabelLastWorldSave;
+        private ValheimServerGUI.Controls.LabelField LabelSessionDuration;
     }
 }

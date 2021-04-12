@@ -1,9 +1,12 @@
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
@@ -18,6 +21,10 @@ namespace ValheimServerGUI.Forms
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
+        private const string IpLoadingText = "Loading...";
+
+        private readonly Stopwatch ServerUptimeTimer = new();
+        private readonly Queue<decimal> WorldSaveTimes = new();
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -26,6 +33,7 @@ namespace ValheimServerGUI.Forms
         private readonly ValheimServer Server;
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
+        private readonly IIpAddressProvider IpAddressProvider;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -34,7 +42,8 @@ namespace ValheimServerGUI.Forms
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
             ValheimServerLogger serverLogger,
-            IEventLogger appLogger)
+            IEventLogger appLogger,
+            IIpAddressProvider ipAddressProvider)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
@@ -43,6 +52,7 @@ namespace ValheimServerGUI.Forms
             this.Server = server;
             this.ServerLogger = serverLogger;
             this.Logger = appLogger;
+            this.IpAddressProvider = ipAddressProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             InitializeImages();
@@ -69,6 +79,9 @@ namespace ValheimServerGUI.Forms
 
             this.PlayerDataProvider.DataReady += this.BuildEventHandler(this.OnPlayerDataReady);
             this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
+
+            this.IpAddressProvider.ExternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_ExternalIpReceived);
+            this.IpAddressProvider.InternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_InternalIpReceived);
         }
 
         private void InitializeFormEvents()
@@ -77,6 +90,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
+            this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
             this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
@@ -92,6 +106,7 @@ namespace ValheimServerGUI.Forms
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
+            this.TabServerDetails.VisibleChanged += this.BuildEventHandlerAsync(this.TabServerDetails_VisibleChanged);
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -101,6 +116,9 @@ namespace ValheimServerGUI.Forms
             this.ButtonSaveLogs.Click += this.ButtonSaveLogs_Click;
             this.ButtonPlayerDetails.Click += this.ButtonPlayerDetails_Click;
             this.ButtonRemovePlayer.Click += this.ButtonRemovePlayer_Click;
+            this.CopyButtonExternalIpAddress.CopyFunction = () => this.LabelExternalIpAddress.Value;
+            this.CopyButtonInternalIpAddress.CopyFunction = () => this.LabelInternalIpAddress.Value;
+            this.CopyButtonLocalIpAddress.CopyFunction = () => this.LabelLocalIpAddress.Value;
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
@@ -236,6 +254,11 @@ namespace ValheimServerGUI.Forms
         private void MenuItemHelpManual_Click(object sender, EventArgs e)
         {
             WebHelper.OpenWebAddress(Resources.UrlHelp);
+        }
+
+        private void MenuItemHelpPortForwarding_Clicked(object sender, EventArgs e)
+        {
+            WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
         private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
@@ -426,15 +449,21 @@ namespace ValheimServerGUI.Forms
 
         private void TabPlayers_VisibleChanged(object sender, EventArgs e)
         {
-            if (this.TabPlayers.Visible)
-            {
-                this.RefreshPlayersTable();
-                this.ServerRefreshTimer.Enabled = true;
-            }
-            else
-            {
-                this.ServerRefreshTimer.Enabled = false;
-            }
+            if (!this.TabPlayers.Visible) return;
+
+            this.RefreshPlayersTable();
+        }
+
+        private async Task TabServerDetails_VisibleChanged()
+        {
+            if (!this.TabServerDetails.Visible) return;
+
+            this.RefreshServerDetails();
+            this.RefreshIpPorts();
+
+            await Task.Delay(100); // todo: Why can I await this delay and the UI thread is fine, but awaiting the next call freezes it?
+            await this.RefreshExternalIpAsync();
+            await this.RefreshInternalIpAsync();
         }
 
         private void LogViewSelectField_Changed(object sender, string viewName)
@@ -444,7 +473,8 @@ namespace ValheimServerGUI.Forms
 
         private void ServerRefreshTimer_Tick(object sender, EventArgs e)
         {
-            this.RefreshPlayersTable();
+            if (this.TabPlayers.Visible) this.RefreshPlayersTable();
+            if (this.TabServerDetails.Visible) this.RefreshServerDetails();
         }
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
@@ -481,6 +511,15 @@ namespace ValheimServerGUI.Forms
                 this.RefreshWorldSelect();
                 this.WorldSelectRadioExisting.Value = true;
             }
+
+            if (status == ServerStatus.Running)
+            {
+                this.ServerUptimeTimer.Restart();
+            }
+            else
+            {
+                if (this.ServerUptimeTimer.IsRunning) this.ServerUptimeTimer.Stop();
+            }
         }
 
         private void OnPlayerDataReady()
@@ -498,7 +537,25 @@ namespace ValheimServerGUI.Forms
 
         private void OnWorldSaved(decimal duration)
         {
-            // todo: something
+            this.LabelLastWorldSave.Value = $"{DateTime.Now:G} ({duration:F}ms)";
+
+            if (this.WorldSaveTimes.Count >= 10) this.WorldSaveTimes.Dequeue();
+            this.WorldSaveTimes.Enqueue(duration);
+            
+            var average = this.WorldSaveTimes.Average();
+            this.LabelAverageWorldSave.Value = $"{average:F}ms";
+        }
+
+        private void IpAddressProvider_ExternalIpReceived(string ip)
+        {
+            this.LabelExternalIpAddress.Value = ip;
+            this.RefreshIpPorts();
+        }
+
+        private void IpAddressProvider_InternalIpReceived(string ip)
+        {
+            this.LabelInternalIpAddress.Value = ip;
+            this.RefreshIpPorts();
         }
 
         #endregion
@@ -560,6 +617,53 @@ namespace ValheimServerGUI.Forms
             foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
             {
                 row.RefreshValues();
+            }
+        }
+
+        private void RefreshServerDetails()
+        {
+            if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
+            {
+                var elapsed = this.ServerUptimeTimer.Elapsed;
+                var days = elapsed.Days;
+                var timestr = elapsed.ToString(@"hh\:mm\:ss");
+
+                if (days == 1) timestr = $"1 day + {timestr}";
+                else if (days > 1) timestr = $"{days} days + {timestr}";
+
+                this.LabelSessionDuration.Value = timestr;
+            }
+        }
+
+        private async Task RefreshExternalIpAsync()
+        {
+            if (this.LabelExternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetExternalIpAddressAsync();
+        }
+
+        private async Task RefreshInternalIpAsync()
+        {
+            if (this.LabelInternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetInternalIpAddressAsync();
+        }
+
+        private void RefreshIpPorts()
+        {
+            const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
+
+            var fields = new[] { this.LabelExternalIpAddress, this.LabelInternalIpAddress, this.LabelLocalIpAddress };
+            var destPort = this.ServerPortField.Value;
+            var isDefaultPort = destPort.ToString() == Resources.DefaultServerPort;
+
+            foreach (var field in fields)
+            {
+                if (field.Value == null || field.Value == IpLoadingText) continue; // Don't try to modify loading text
+
+                var ipMatch = Regex.Match(field.Value, ipExpr);
+                var captures = (ipMatch.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
+
+                if (captures.Length == 0) continue; // Quit if we can't extract the IP address
+
+                var ip = captures[0];
+                field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
             }
         }
 

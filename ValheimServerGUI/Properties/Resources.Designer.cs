@@ -355,6 +355,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.ipify.org?format=json.
+        /// </summary>
+        internal static string UrlExternalIpLookup {
+            get {
+                return ResourceManager.GetString("UrlExternalIpLookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI.
         /// </summary>
         internal static string UrlGithubApplication {
@@ -378,6 +387,15 @@ namespace ValheimServerGUI.Properties {
         internal static string UrlHelp {
             get {
                 return ResourceManager.GetString("UrlHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server.
+        /// </summary>
+        internal static string UrlPortForwardingGuide {
+            get {
+                return ResourceManager.GetString("UrlPortForwardingGuide", resourceCulture);
             }
         }
         

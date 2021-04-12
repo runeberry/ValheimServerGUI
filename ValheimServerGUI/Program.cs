@@ -6,6 +6,7 @@ using ValheimServerGUI.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
+using ValheimServerGUI.Tools.Http;
 using ValheimServerGUI.Tools.Logging;
 using ValheimServerGUI.Tools.Preferences;
 using ValheimServerGUI.Tools.Processes;
@@ -48,6 +49,9 @@ namespace ValheimServerGUI
             services.AddSingleton<IProcessProvider, ProcessProvider>();
             services.AddSingleton<ILogger>(applicationLogger);
             services.AddSingleton<IEventLogger>(applicationLogger);
+            services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
+            services.AddSingleton<IRestClientContext, RestClientContext>();
+            services.AddSingleton<IIpAddressProvider, IpAddressProvider>();
 
             // Game & server data
             services

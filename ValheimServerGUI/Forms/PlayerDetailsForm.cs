@@ -19,15 +19,7 @@ namespace ValheimServerGUI.Forms
 
             this.ButtonRefresh.Click += ButtonRefresh_Click;
             this.ButtonOK.Click += ButtonOK_Click;
-            this.SteamIdCopyIcon.Click += SteamIdCopyIcon_Click;
-        }
-
-        private void SteamIdCopyIcon_Click(object sender, EventArgs e)
-        {
-            if (this.Player?.SteamId != null)
-            {
-                Clipboard.SetText(this.Player.SteamId);
-            }
+            this.SteamIdCopyButton.CopyFunction = () => this.Player?.SteamId;
         }
 
         private void ButtonRefresh_Click(object sender, EventArgs e)

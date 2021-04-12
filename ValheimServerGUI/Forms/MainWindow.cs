@@ -5,6 +5,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
@@ -105,7 +106,7 @@ namespace ValheimServerGUI.Forms
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
-            this.TabServerDetails.VisibleChanged += this.BuildEventHandlerAsync(this.TabServerDetails_VisibleChanged, 100);
+            this.TabServerDetails.VisibleChanged += this.BuildEventHandlerAsync(this.TabServerDetails_VisibleChanged);
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -458,7 +459,9 @@ namespace ValheimServerGUI.Forms
             if (!this.TabServerDetails.Visible) return;
 
             this.RefreshServerDetails();
+            this.RefreshIpPorts();
 
+            await Task.Delay(100); // todo: Why can I await this delay and the UI thread is fine, but awaiting the next call freezes it?
             await this.RefreshExternalIpAsync();
             await this.RefreshInternalIpAsync();
         }
@@ -546,11 +549,13 @@ namespace ValheimServerGUI.Forms
         private void IpAddressProvider_ExternalIpReceived(string ip)
         {
             this.LabelExternalIpAddress.Value = ip;
+            this.RefreshIpPorts();
         }
 
         private void IpAddressProvider_InternalIpReceived(string ip)
         {
             this.LabelInternalIpAddress.Value = ip;
+            this.RefreshIpPorts();
         }
 
         #endregion
@@ -638,6 +643,28 @@ namespace ValheimServerGUI.Forms
         private async Task RefreshInternalIpAsync()
         {
             if (this.LabelInternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetInternalIpAddressAsync();
+        }
+
+        private void RefreshIpPorts()
+        {
+            const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
+
+            var fields = new[] { this.LabelExternalIpAddress, this.LabelInternalIpAddress, this.LabelLocalIpAddress };
+            var destPort = this.ServerPortField.Value;
+            var isDefaultPort = destPort.ToString() == Resources.DefaultServerPort;
+
+            foreach (var field in fields)
+            {
+                if (field.Value == null || field.Value == IpLoadingText) continue; // Don't try to modify loading text
+
+                var ipMatch = Regex.Match(field.Value, ipExpr);
+                var captures = (ipMatch.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
+
+                if (captures.Length == 0) continue; // Quit if we can't extract the IP address
+
+                var ip = captures[0];
+                field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
+            }
         }
 
         private void UpdatePlayerStatus(PlayerInfo player)

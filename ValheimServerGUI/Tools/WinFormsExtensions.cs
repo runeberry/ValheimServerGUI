@@ -47,14 +47,18 @@ namespace ValheimServerGUI.Tools
         {
             return async (sender, args) =>
             {
-                if (control.InvokeRequired)
-                {
-                    control.Invoke(new Func<TArgs, Task>(taskFunc), new object[] { args });
-                    return;
-                }
-
                 if (taskDelay > 0) await Task.Delay(taskDelay);
-                await Task.Run(() => taskFunc(args));
+
+                await Task.Run(() =>
+                {
+                    if (control.InvokeRequired)
+                    {
+                        control.Invoke(new Func<TArgs, Task>(taskFunc), new object[] { args });
+                        return;
+                    }
+
+                    taskFunc(args);
+                });
             };
         }
 
@@ -62,14 +66,18 @@ namespace ValheimServerGUI.Tools
         {
             return async (sender, args) =>
             {
-                if (control.InvokeRequired)
-                {
-                    control.Invoke(new Func<Task>(taskFunc));
-                    return;
-                }
-
                 if (taskDelay > 0) await Task.Delay(taskDelay);
-                await Task.Run(() => taskFunc());
+
+                await Task.Run(() =>
+                {
+                    if (control.InvokeRequired)
+                    {
+                        control.Invoke(new Func<Task>(taskFunc));
+                        return;
+                    }
+
+                    taskFunc();
+                });
             };
         }
 

@@ -24,6 +24,8 @@ namespace ValheimServerGUI.Tools.Http
 
         public Type ResponseContentType { get; set; }
 
+        public List<Action<HttpRequestMessage>> RequestBuilders { get; } = new();
+
         public List<EventHandler<HttpResponseMessage>> Callbacks { get; } = new();
 
         public RestClientRequest(RestClient client)
@@ -31,7 +33,14 @@ namespace ValheimServerGUI.Tools.Http
             this.Client = client;
         }
 
-        public async Task SendAsync()
+        public async Task<TResponse> SendAsync<TResponse>()
+            where TResponse : class
+        {
+            await this.WithResponseType<TResponse>().SendAsync();
+            return this.ResponseContent as TResponse;
+        }
+
+        public async Task<HttpResponseMessage> SendAsync()
         {
             var logAddress = $"{this.Method} {this.Uri}";
 
@@ -46,13 +55,18 @@ namespace ValheimServerGUI.Tools.Http
                     requestMessage.Content = new StringContent(strPayload, Encoding.UTF8, "application/json");
                 }
 
+                foreach (var requestBuilder in this.RequestBuilders)
+                {
+                    requestBuilder(requestMessage);
+                }
+
                 var responseMessage = await client.SendAsync(requestMessage);
                 var statusCode = (int)responseMessage.StatusCode;
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
                     this.Context.Logger.LogError("HTTP request was not successful ({0}): {1}", statusCode, logAddress);
-                    return;
+                    return responseMessage;
                 }
 
                 if (this.ResponseContentType != null)
@@ -77,13 +91,15 @@ namespace ValheimServerGUI.Tools.Http
                         this.Context.Logger.LogError(callbackException.StackTrace);
                     }
                 }
+
+                return responseMessage;
             }
             catch (Exception e)
             {
                 this.Context.Logger.LogError(e, "HTTP request encountered an unexpected error: {0}", logAddress);
                 this.Context.Logger.LogError(e.Message);
                 this.Context.Logger.LogError(e.StackTrace);
-                return;
+                return null;
             }
         }
     }

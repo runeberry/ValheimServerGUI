@@ -39,8 +39,8 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpPortForwarding = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
+            this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.StatusStripLabelLeft = new System.Windows.Forms.ToolStripStatusLabel();
@@ -95,6 +95,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
+            this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -173,17 +174,17 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpPortForwarding.Size = new System.Drawing.Size(171, 22);
             this.MenuItemHelpPortForwarding.Text = "&Port Forwarding";
             // 
+            // MenuItemHelpSeparator1
+            // 
+            this.MenuItemHelpSeparator1.Name = "MenuItemHelpSeparator1";
+            this.MenuItemHelpSeparator1.Size = new System.Drawing.Size(168, 6);
+            // 
             // MenuItemHelpUpdates
             // 
             this.MenuItemHelpUpdates.Image = global::ValheimServerGUI.Properties.Resources.UnsyncedCommits_16x_Horiz;
             this.MenuItemHelpUpdates.Name = "MenuItemHelpUpdates";
             this.MenuItemHelpUpdates.Size = new System.Drawing.Size(171, 22);
             this.MenuItemHelpUpdates.Text = "Check for &Updates";
-            // 
-            // MenuItemHelpSeparator1
-            // 
-            this.MenuItemHelpSeparator1.Name = "MenuItemHelpSeparator1";
-            this.MenuItemHelpSeparator1.Size = new System.Drawing.Size(168, 6);
             // 
             // MenuItemHelpAbout
             // 
@@ -662,7 +663,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -752,6 +752,11 @@ namespace ValheimServerGUI.Forms
             // 
             this.ServerRefreshTimer.Enabled = true;
             this.ServerRefreshTimer.Interval = 1000;
+            // 
+            // UpdateCheckTimer
+            // 
+            this.UpdateCheckTimer.Enabled = true;
+            this.UpdateCheckTimer.Interval = 60000;
             // 
             // MainWindow
             // 
@@ -852,5 +857,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.LabelField LabelSessionDuration;
         private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelSpacer;
         private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelRight;
+        private System.Windows.Forms.Timer UpdateCheckTimer;
     }
 }

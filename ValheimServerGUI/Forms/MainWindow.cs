@@ -22,7 +22,7 @@ namespace ValheimServerGUI.Forms
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
         private const string IpLoadingText = "Loading...";
-
+        
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
         private readonly Dictionary<ServerStatus, Image> ServerStatusIconMap = new()
@@ -32,6 +32,9 @@ namespace ValheimServerGUI.Forms
             { ServerStatus.Running, Resources.StatusRun_16x },
             { ServerStatus.Stopping, Resources.UnsyncedCommits_16x_Horiz },
         };
+
+        private readonly TimeSpan UpdateCheckInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
+        private DateTime NextUpdateCheck = DateTime.MaxValue;
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -116,6 +119,7 @@ namespace ValheimServerGUI.Forms
 
             // Timers
             this.ServerRefreshTimer.Tick += this.ServerRefreshTimer_Tick;
+            this.UpdateCheckTimer.Tick += this.BuildEventHandlerAsync(this.UpdateCheckTimer_Tick);
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
@@ -492,6 +496,14 @@ namespace ValheimServerGUI.Forms
             if (this.TabServerDetails.Visible) this.RefreshServerDetails();
         }
 
+        private async Task UpdateCheckTimer_Tick()
+        {
+            if (DateTime.UtcNow > this.NextUpdateCheck)
+            {
+                await this.CheckForUpdatesAsync(false);
+            }
+        }
+
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
         {
             var isSelected = this.PlayersTable.TryGetSelectedRow<PlayerInfo>(out var row);
@@ -833,6 +845,8 @@ namespace ValheimServerGUI.Forms
                     }
                 }
             }
+
+            this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
         }
 
         private void CloseApplicationOnServerStopped()

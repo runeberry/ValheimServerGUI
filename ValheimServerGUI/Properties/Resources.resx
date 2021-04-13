@@ -211,6 +211,9 @@
   <data name="UrlExternalIpLookup" xml:space="preserve">
     <value>https://api.ipify.org?format=json</value>
   </data>
+  <data name="UrlGithubApi" xml:space="preserve">
+    <value>https://api.github.com/repos/runeberry/ValheimServerGUI</value>
+  </data>
   <data name="UrlGithubApplication" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI</value>
   </data>

@@ -364,6 +364,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.github.com/repos/runeberry/ValheimServerGUI.
+        /// </summary>
+        internal static string UrlGithubApi {
+            get {
+                return ResourceManager.GetString("UrlGithubApi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI.
         /// </summary>
         internal static string UrlGithubApplication {

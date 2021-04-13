@@ -34,6 +34,7 @@ namespace ValheimServerGUI.Forms
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
+        private readonly IGitHubClient GitHubClient;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -43,7 +44,8 @@ namespace ValheimServerGUI.Forms
             ValheimServer server,
             ValheimServerLogger serverLogger,
             IEventLogger appLogger,
-            IIpAddressProvider ipAddressProvider)
+            IIpAddressProvider ipAddressProvider,
+            IGitHubClient gitHubClient)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
@@ -53,6 +55,7 @@ namespace ValheimServerGUI.Forms
             this.ServerLogger = serverLogger;
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
+            this.GitHubClient = gitHubClient;
 
             InitializeComponent(); // WinForms generated code, always first
             InitializeImages();
@@ -86,6 +89,9 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormEvents()
         {
+            // MainWindow
+            this.Shown += this.BuildEventHandlerAsync(this.MainWindow_Load, 250);
+
             // Menu items
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
@@ -106,7 +112,7 @@ namespace ValheimServerGUI.Forms
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
-            this.TabServerDetails.VisibleChanged += this.BuildEventHandlerAsync(this.TabServerDetails_VisibleChanged);
+            this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -148,11 +154,15 @@ namespace ValheimServerGUI.Forms
 
         #region MainWindow Events
 
-        protected override void OnLoad(EventArgs e)
+        private Task MainWindow_Load()
         {
-            base.OnLoad(e);
-
             this.Logger.LogInformation($"Valheim Server GUI v{AssemblyHelper.GetApplicationVersion()} - Loaded OK");
+
+            return Task.WhenAll(
+                this.RefreshInternalIpAsync(),
+                this.RefreshExternalIpAsync(),
+                this.CheckForUpdatesAsync(false)
+            );
         }
 
         protected override void OnShown(EventArgs e)
@@ -454,16 +464,12 @@ namespace ValheimServerGUI.Forms
             this.RefreshPlayersTable();
         }
 
-        private async Task TabServerDetails_VisibleChanged()
+        private void TabServerDetails_VisibleChanged()
         {
             if (!this.TabServerDetails.Visible) return;
 
             this.RefreshServerDetails();
             this.RefreshIpPorts();
-
-            await Task.Delay(100); // todo: Why can I await this delay and the UI thread is fine, but awaiting the next call freezes it?
-            await this.RefreshExternalIpAsync();
-            await this.RefreshInternalIpAsync();
         }
 
         private void LogViewSelectField_Changed(object sender, string viewName)
@@ -755,6 +761,15 @@ namespace ValheimServerGUI.Forms
 
             this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
             this.WorldSelectRadioExisting.Value = true;
+        }
+
+        private async Task CheckForUpdatesAsync(bool showPrompt)
+        {
+            var release = await this.GitHubClient.GetLatestReleaseAsync();
+            if (AssemblyHelper.IsNewerVersion(release?.TagName))
+            {
+                this.SetStatusText($"An update is available ({release.TagName})");
+            }
         }
 
         private void CloseApplicationOnServerStopped()

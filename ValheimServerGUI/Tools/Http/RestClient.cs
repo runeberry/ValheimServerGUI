@@ -19,6 +19,11 @@ namespace ValheimServerGUI.Tools.Http
             return BuildRequest(method, uri, payload);
         }
 
+        public RestClientRequest Get(string uri)
+        {
+            return BuildRequest(HttpMethod.Get, uri);
+        }
+
         private RestClientRequest BuildRequest(HttpMethod method, string uri, object payload = null)
         {
             return new RestClientRequest(this)

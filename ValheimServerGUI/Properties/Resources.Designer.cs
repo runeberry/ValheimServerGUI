@@ -346,6 +346,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 1.00:00:00.
+        /// </summary>
+        internal static string UpdateCheckInterval {
+            get {
+                return ResourceManager.GetString("UpdateCheckInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://www.buymeacoffee.com/runeberry.
         /// </summary>
         internal static string UrlDonate {
@@ -360,6 +369,15 @@ namespace ValheimServerGUI.Properties {
         internal static string UrlExternalIpLookup {
             get {
                 return ResourceManager.GetString("UrlExternalIpLookup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.github.com/repos/runeberry/ValheimServerGUI.
+        /// </summary>
+        internal static string UrlGithubApi {
+            get {
+                return ResourceManager.GetString("UrlGithubApi", resourceCulture);
             }
         }
         

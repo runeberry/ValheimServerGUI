@@ -12,6 +12,16 @@ namespace ValheimServerGUI.Tools.Http
             return request;
         }
 
+        public static RestClientRequest WithHeader(this RestClientRequest request, string key, string value)
+        {
+            request.RequestBuilders.Add(message =>
+            {
+                message.Headers.TryAddWithoutValidation(key, value);
+            });
+
+            return request;
+        }
+
         public static RestClientRequest WithCallback(this RestClientRequest request, EventHandler<HttpResponseMessage> callback)
         {
             request.Callbacks.Add(callback);

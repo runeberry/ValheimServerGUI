@@ -22,9 +22,19 @@ namespace ValheimServerGUI.Forms
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
         private const string IpLoadingText = "Loading...";
-
+        
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
+        private readonly Dictionary<ServerStatus, Image> ServerStatusIconMap = new()
+        {
+            { ServerStatus.Stopped, Resources.StatusPause_grey_16x },
+            { ServerStatus.Starting, Resources.UnsyncedCommits_16x_Horiz },
+            { ServerStatus.Running, Resources.StatusRun_16x },
+            { ServerStatus.Stopping, Resources.UnsyncedCommits_16x_Horiz },
+        };
+
+        private readonly TimeSpan UpdateCheckInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
+        private DateTime NextUpdateCheck = DateTime.MaxValue;
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -34,6 +44,7 @@ namespace ValheimServerGUI.Forms
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
+        private readonly IGitHubClient GitHubClient;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -43,7 +54,8 @@ namespace ValheimServerGUI.Forms
             ValheimServer server,
             ValheimServerLogger serverLogger,
             IEventLogger appLogger,
-            IIpAddressProvider ipAddressProvider)
+            IIpAddressProvider ipAddressProvider,
+            IGitHubClient gitHubClient)
         {
             this.FormProvider = formProvider;
             this.UserPrefs = userPrefs;
@@ -53,6 +65,7 @@ namespace ValheimServerGUI.Forms
             this.ServerLogger = serverLogger;
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
+            this.GitHubClient = gitHubClient;
 
             InitializeComponent(); // WinForms generated code, always first
             InitializeImages();
@@ -86,12 +99,15 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormEvents()
         {
+            // MainWindow
+            this.Shown += this.BuildEventHandlerAsync(this.MainWindow_Load, 250);
+
             // Menu items
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
             this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
-            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
+            this.MenuItemHelpUpdates.Click += this.BuildEventHandlerAsync(this.MenuItemHelpUpdates_Clicked);
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
             // Tray icon
@@ -103,10 +119,11 @@ namespace ValheimServerGUI.Forms
 
             // Timers
             this.ServerRefreshTimer.Tick += this.ServerRefreshTimer_Tick;
+            this.UpdateCheckTimer.Tick += this.BuildEventHandlerAsync(this.UpdateCheckTimer_Tick);
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
-            this.TabServerDetails.VisibleChanged += this.BuildEventHandlerAsync(this.TabServerDetails_VisibleChanged);
+            this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
             this.ButtonStartServer.Click += this.ButtonStartServer_Click;
@@ -119,6 +136,7 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonExternalIpAddress.CopyFunction = () => this.LabelExternalIpAddress.Value;
             this.CopyButtonInternalIpAddress.CopyFunction = () => this.LabelInternalIpAddress.Value;
             this.CopyButtonLocalIpAddress.CopyFunction = () => this.LabelLocalIpAddress.Value;
+            this.StatusStripLabelRight.Click += this.BuildEventHandlerAsync(this.StatusStripLabelRight_Click);
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
@@ -142,17 +160,22 @@ namespace ValheimServerGUI.Forms
 
             this.RefreshFormFields();
             this.LoadFormValuesFromUserPrefs();
+            this.OnServerStatusChanged(ServerStatus.Stopped);
         }
 
         #endregion
 
         #region MainWindow Events
 
-        protected override void OnLoad(EventArgs e)
+        private Task MainWindow_Load()
         {
-            base.OnLoad(e);
-
             this.Logger.LogInformation($"Valheim Server GUI v{AssemblyHelper.GetApplicationVersion()} - Loaded OK");
+
+            return Task.WhenAll(
+                this.RefreshInternalIpAsync(),
+                this.RefreshExternalIpAsync(),
+                this.CheckForUpdatesAsync(false)
+            );
         }
 
         protected override void OnShown(EventArgs e)
@@ -261,9 +284,9 @@ namespace ValheimServerGUI.Forms
             WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
-        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
+        private async Task MenuItemHelpUpdates_Clicked()
         {
-            WebHelper.OpenWebAddress(Resources.UrlUpdates);
+            await this.CheckForUpdatesAsync(true);
         }
 
         private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
@@ -454,16 +477,12 @@ namespace ValheimServerGUI.Forms
             this.RefreshPlayersTable();
         }
 
-        private async Task TabServerDetails_VisibleChanged()
+        private void TabServerDetails_VisibleChanged()
         {
             if (!this.TabServerDetails.Visible) return;
 
             this.RefreshServerDetails();
             this.RefreshIpPorts();
-
-            await Task.Delay(100); // todo: Why can I await this delay and the UI thread is fine, but awaiting the next call freezes it?
-            await this.RefreshExternalIpAsync();
-            await this.RefreshInternalIpAsync();
         }
 
         private void LogViewSelectField_Changed(object sender, string viewName)
@@ -477,11 +496,26 @@ namespace ValheimServerGUI.Forms
             if (this.TabServerDetails.Visible) this.RefreshServerDetails();
         }
 
+        private async Task UpdateCheckTimer_Tick()
+        {
+            if (DateTime.UtcNow > this.NextUpdateCheck)
+            {
+                await this.CheckForUpdatesAsync(false);
+            }
+        }
+
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
         {
             var isSelected = this.PlayersTable.TryGetSelectedRow<PlayerInfo>(out var row);
             this.ButtonPlayerDetails.Enabled = isSelected;
             this.ButtonRemovePlayer.Enabled = isSelected && row.Entity.PlayerStatus == PlayerStatus.Offline;
+        }
+
+        private async Task StatusStripLabelRight_Click()
+        {
+            if (!this.StatusStripLabelRight.IsLink) return;
+
+            await this.CheckForUpdatesAsync(true);
         }
 
         #endregion
@@ -500,7 +534,7 @@ namespace ValheimServerGUI.Forms
 
         private void OnServerStatusChanged(ServerStatus status)
         {
-            this.SetStatusText(status.ToString());
+            this.SetStatusTextLeft(status.ToString(), this.ServerStatusIconMap[status]);
 
             this.RefreshFormStateForServer();
 
@@ -602,9 +636,17 @@ namespace ValheimServerGUI.Forms
             this.LogViewer.ClearLogView(this.LogViewer.LogView);
         }
 
-        private void SetStatusText(string message)
+        private void SetStatusTextLeft(string message, Image icon)
         {
-            this.StatusStripLabel.Text = message;
+            this.StatusStripLabelLeft.Text = message;
+            this.StatusStripLabelLeft.Image = icon;
+        }
+
+        private void SetStatusTextRight(string message, Image icon, bool isLink)
+        {
+            this.StatusStripLabelRight.Text = message;
+            this.StatusStripLabelRight.Image = icon;
+            this.StatusStripLabelRight.IsLink = isLink;
         }
 
         private int GetImageIndex(string key)
@@ -755,6 +797,56 @@ namespace ValheimServerGUI.Forms
 
             this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
             this.WorldSelectRadioExisting.Value = true;
+        }
+
+        private async Task CheckForUpdatesAsync(bool showPrompt)
+        {
+            this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);
+
+            var currentVersion = AssemblyHelper.GetApplicationVersion();
+            var release = await this.GitHubClient.GetLatestReleaseAsync();
+
+            if (AssemblyHelper.IsNewerVersion(release?.TagName))
+            {
+                this.SetStatusTextRight($"Update available ({release.TagName})", Resources.StatusWarning_16x, true);
+
+                if (showPrompt)
+                {
+                    var result = MessageBox.Show(
+                        $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+            else
+            {
+                currentVersion = release.TagName ?? currentVersion; // Use the v-prefixed version if available
+                this.SetStatusTextRight($"Up to date ({currentVersion})", Resources.StatusOK_16x, false);
+
+                if (showPrompt)
+                {
+                    var result = MessageBox.Show(
+                        "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+
+            this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
         }
 
         private void CloseApplicationOnServerStopped()

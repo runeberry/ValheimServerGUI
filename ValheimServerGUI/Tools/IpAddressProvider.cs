@@ -3,7 +3,6 @@ using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
@@ -35,7 +34,7 @@ namespace ValheimServerGUI.Tools
 
         public Task GetExternalIpAddressAsync()
         {
-            return this.Request(HttpMethod.Get, Resources.UrlExternalIpLookup)
+            return this.Get(Resources.UrlExternalIpLookup)
                 .WithCallback<ExternalIpResponse>(this.OnExternalIpResponse)
                 .SendAsync();
         }

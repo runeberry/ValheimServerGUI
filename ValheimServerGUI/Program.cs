@@ -52,6 +52,7 @@ namespace ValheimServerGUI
             services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
             services.AddSingleton<IRestClientContext, RestClientContext>();
             services.AddSingleton<IIpAddressProvider, IpAddressProvider>();
+            services.AddSingleton<IGitHubClient, GitHubClient>();
 
             // Game & server data
             services

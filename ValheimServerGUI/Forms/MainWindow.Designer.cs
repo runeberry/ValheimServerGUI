@@ -43,7 +43,9 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
-            this.StatusStripLabel = new System.Windows.Forms.ToolStripStatusLabel();
+            this.StatusStripLabelLeft = new System.Windows.Forms.ToolStripStatusLabel();
+            this.StatusStripLabelSpacer = new System.Windows.Forms.ToolStripStatusLabel();
+            this.StatusStripLabelRight = new System.Windows.Forms.ToolStripStatusLabel();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
             this.WorldSelectGroupBox = new System.Windows.Forms.GroupBox();
@@ -150,8 +152,8 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuItemHelpManual,
             this.MenuItemHelpPortForwarding,
-            this.MenuItemHelpUpdates,
             this.MenuItemHelpSeparator1,
+            this.MenuItemHelpUpdates,
             this.MenuItemHelpAbout});
             this.MenuItemHelp.Name = "MenuItemHelp";
             this.MenuItemHelp.Size = new System.Drawing.Size(44, 20);
@@ -173,7 +175,7 @@ namespace ValheimServerGUI.Forms
             // 
             // MenuItemHelpUpdates
             // 
-            this.MenuItemHelpUpdates.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemHelpUpdates.Image")));
+            this.MenuItemHelpUpdates.Image = global::ValheimServerGUI.Properties.Resources.UnsyncedCommits_16x_Horiz;
             this.MenuItemHelpUpdates.Name = "MenuItemHelpUpdates";
             this.MenuItemHelpUpdates.Size = new System.Drawing.Size(171, 22);
             this.MenuItemHelpUpdates.Text = "Check for &Updates";
@@ -192,16 +194,29 @@ namespace ValheimServerGUI.Forms
             // StatusStrip
             // 
             this.StatusStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.StatusStripLabel});
+            this.StatusStripLabelLeft,
+            this.StatusStripLabelSpacer,
+            this.StatusStripLabelRight});
             this.StatusStrip.Location = new System.Drawing.Point(0, 310);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(484, 22);
             this.StatusStrip.TabIndex = 1;
             // 
-            // StatusStripLabel
+            // StatusStripLabelLeft
             // 
-            this.StatusStripLabel.Name = "StatusStripLabel";
-            this.StatusStripLabel.Size = new System.Drawing.Size(0, 17);
+            this.StatusStripLabelLeft.Name = "StatusStripLabelLeft";
+            this.StatusStripLabelLeft.Size = new System.Drawing.Size(0, 17);
+            // 
+            // StatusStripLabelSpacer
+            // 
+            this.StatusStripLabelSpacer.Name = "StatusStripLabelSpacer";
+            this.StatusStripLabelSpacer.Size = new System.Drawing.Size(469, 17);
+            this.StatusStripLabelSpacer.Spring = true;
+            // 
+            // StatusStripLabelRight
+            // 
+            this.StatusStripLabelRight.Name = "StatusStripLabelRight";
+            this.StatusStripLabelRight.Size = new System.Drawing.Size(0, 17);
             // 
             // Tabs
             // 
@@ -647,6 +662,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -782,7 +798,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripSeparator MenuItemHelpSeparator1;
         private System.Windows.Forms.ToolStripMenuItem MenuItemHelpAbout;
         private System.Windows.Forms.StatusStrip StatusStrip;
-        private System.Windows.Forms.ToolStripStatusLabel StatusStripLabel;
+        private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelLeft;
         private System.Windows.Forms.TabControl Tabs;
         private System.Windows.Forms.TabPage TabServerControls;
         private System.Windows.Forms.TabPage TabLogs;
@@ -834,5 +850,7 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.LabelField LabelAverageWorldSave;
         private ValheimServerGUI.Controls.LabelField LabelLastWorldSave;
         private ValheimServerGUI.Controls.LabelField LabelSessionDuration;
+        private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelSpacer;
+        private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelRight;
     }
 }

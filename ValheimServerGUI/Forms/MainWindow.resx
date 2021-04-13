@@ -58,16 +58,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Drawing.Common" name="System.Drawing.Common, Version=5.0.0.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51" />
-  <data name="MenuItemFileDirectories.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
-        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADSSURBVDhPY6AYfPv27TwQ/yeA3wOBAFQLKvj87vn/O9uq
-        8OI39078//r1awNUCyoA2QBS9OH9R6z49cPL/+/v68LmqvMoBpCKQfqGkAFPTi38/+7R+f8fnl0H04+P
-        zSTeAFAMVB97/V964SM4BvFB+r58+WKA1wCQzciaQQDZkM+fP9/HawDIuTAN2DDYG/gMAPkZWQOyC0D4
-        9usv+A1AdwG6ATAX4M0L+MIAKL8eHBO4wPfv3xWAit4jG4Kk+T1IHqoUN4Aash7kGiS8HqKZgQEA4bql
-        4ptlmmAAAAAASUVORK5CYII=
-</value>
-  </data>
   <data name="MenuItemHelpManual.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
         iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
@@ -80,16 +70,14 @@
         D/8uQJ9LMpCdAJO1wD1+nQCTcxg78e3rsCq1/gvS+wNO/eKaJR8tQgAAAABJRU5ErkJggg==
 </value>
   </data>
-  <data name="MenuItemHelpUpdates.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="MenuItemFileDirectories.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAAXpJREFUOE+Nk79Kw1AUh/sE0ifwDQSfoXtAcMkiCB0chFLXumTJ4pRVySIIoYMO
-        nXSJQxc7WDoECiIkCOIQh05dj/c75ASTZujw67333HO+8+emPRFpaLvdHjttnM7bd11qHCz48m4ub+tv
-        2QfSOLiAEyc5unqUg7P7vSD645wiAk0/v5s2xFQ4BQ2AM0TP77k6907jHR1eJJJlmQwGAxkOh7JYLACt
-        nPoGqINvnpYCbDr/UJtVkOe5AjzP0zWOY4XUAIKvH5SssvJfl5+SpqnaJpOJhGGoAlLZg7oCy1aWpfAK
-        BFMyGo1G4vt+XYG142ILncHtS6YAqqA8erayoyhSGytn7sjOnuSNV1h/lepsZeMEiL0Nkv0OwGRByMql
-        Z6DW+/82ugAFveHMc9E3/QOweZCdgdYzaAHGVt5sNpMkSdSRwZKZO+zcV20GDUAFWZERJ7KzcgZgbXDG
-        D/8uQJ9LMpCdAJO1wD1+nQCTcxg78e3rsCq1/gvS+wNO/eKaJR8tQgAAAABJRU5ErkJggg==
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8
+        YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAADSSURBVDhPY6AYfPv27TwQ/yeA3wOBAFQLKvj87vn/O9uq
+        8OI39078//r1awNUCyoA2QBS9OH9R6z49cPL/+/v68LmqvMoBpCKQfqGkAFPTi38/+7R+f8fnl0H04+P
+        zSTeAFAMVB97/V964SM4BvFB+r58+WKA1wCQzciaQQDZkM+fP9/HawDIuTAN2DDYG/gMAPkZWQOyC0D4
+        9usv+A1AdwG6ATAX4M0L+MIAKL8eHBO4wPfv3xWAit4jG4Kk+T1IHqoUN4Aash7kGiS8HqKZgQEA4bql
+        4ptlmmAAAAAASUVORK5CYII=
 </value>
   </data>
   <data name="WorldSelectExistingNameField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
@@ -147,31 +135,12 @@ it yourself if you're hosting your server on another machine on your home networ
 (different from the one you're playing on).
 </value>
   </data>
-  <data name="TrayContextMenuStart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
+  <data name="LogViewSelectField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
     <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAAKNJREFUOE9jQAbfvn07/+XLFwMol3QANOA/EL///v17AlSINAAyIGZexP97L+/9
-        //r16/z3798LQKWIAyADLLpM/rtMdPi/+8pOkGtI8xLMABju3tlJmpfQDQBhkryEzQAQJtpLuAyAYYJe
-        ImRA/eZa8gwAeWH9ubXkeQEUiJceXSIvEEFOfv7mOenRSLST0QHIAJKcjA5ABgAxRZmJxOzMwAAAu3wo
-        luQHKWcAAAAASUVORK5CYII=
-</value>
-  </data>
-  <data name="TrayContextMenuRestart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAARBJREFUOE+Vkz0OwjAMhXsUjtCBgbEHQOIKOQISKxIdERyAQyAY2Ni6wIaUHakz
-        7dKydA1+UQxumlZ0+KrEP692nERN0xgPRWSeDcCmjDGRxArMdlML1vfnzayOy6+NgQ0+itHEJCiwv25b
-        SSEQQzk1i7QEmMVhbs6Pk/0jwBo29jsRHRTYXNamrErbjiMh0qIq3vBxnGtHBStg4ONeaR1DhCvBmZAt
-        +1vAiaRoR/qtwBCeQILSWSB/5T8BOFzvsUyS+ALIswJsQHm0T0PJAL5QCxlfHBwQ7THjThWw9R2ikmVh
-        VE4kJTDC4TE6dS2doy4Sl0fUUqSPzlXGR4ho/HHUY+IFQ048ZwQhWBJ4zib6AHCk5q+A7T1yAAAAAElF
-        TkSuQmCC
-</value>
-  </data>
-  <data name="TrayContextMenuStop.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
-    <value>
-        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
-        vAAADrwBlbxySQAAAClJREFUOE9jGGbg27dv/4nBUOWYACS5UI0XLx41YGQYQAyGKh8egIEBAMuiAHSi
-        jpx4AAAAAElFTkSuQmCC
+        AAEAAAD/////AQAAAAAAAAAEAQAAAH9TeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW1N5
+        c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVi
+        bGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dAwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24GAAAI
+        CAkCAAAAAAAAAAAAAAARAgAAAAAAAAAL
 </value>
   </data>
   <data name="NotifyIcon.Icon" type="System.Drawing.Icon, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
@@ -383,6 +352,33 @@ it yourself if you're hosting your server on another machine on your home networ
         vMXrv6akHyIAslwgAf1vwiuZjdFCjoyMCICMjIwIgIyMjAiAjIyMCICMjIwIgIyMjAiAjIyMCICMjIwI
         gIyMjAiAjIwsl82QChxhwKNr6KKQkeWjFYWMf7O/Pxtj0V8/xgvzcpCRFbaVrowW0RKAjKyAjQiAjKyA
         7f8DbWhZKaNP5FoAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="TrayContextMenuStart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAKNJREFUOE9jQAbfvn07/+XLFwMol3QANOA/EL///v17AlSINAAyIGZexP97L+/9
+        //r16/z3798LQKWIAyADLLpM/rtMdPi/+8pOkGtI8xLMABju3tlJmpfQDQBhkryEzQAQJtpLuAyAYYJe
+        ImRA/eZa8gwAeWH9ubXkeQEUiJceXSIvEEFOfv7mOenRSLST0QHIAJKcjA5ABgAxRZmJxOzMwAAAu3wo
+        luQHKWcAAAAASUVORK5CYII=
+</value>
+  </data>
+  <data name="TrayContextMenuRestart.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAARBJREFUOE+Vkz0OwjAMhXsUjtCBgbEHQOIKOQISKxIdERyAQyAY2Ni6wIaUHakz
+        7dKydA1+UQxumlZ0+KrEP692nERN0xgPRWSeDcCmjDGRxArMdlML1vfnzayOy6+NgQ0+itHEJCiwv25b
+        SSEQQzk1i7QEmMVhbs6Pk/0jwBo29jsRHRTYXNamrErbjiMh0qIq3vBxnGtHBStg4ONeaR1DhCvBmZAt
+        +1vAiaRoR/qtwBCeQILSWSB/5T8BOFzvsUyS+ALIswJsQHm0T0PJAL5QCxlfHBwQ7THjThWw9R2ikmVh
+        VE4kJTDC4TE6dS2doy4Sl0fUUqSPzlXGR4ho/HHUY+IFQ048ZwQhWBJ4zib6AHCk5q+A7T1yAAAAAElF
+        TkSuQmCC
+</value>
+  </data>
+  <data name="TrayContextMenuStop.Image" type="System.Drawing.Bitmap, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAABGdBTUEAALGPC/xhBQAAAAlwSFlzAAAO
+        vAAADrwBlbxySQAAAClJREFUOE9jGGbg27dv/4nBUOWYACS5UI0XLx41YGQYQAyGKh8egIEBAMuiAHSi
+        jpx4AAAAAElFTkSuQmCC
 </value>
   </data>
   <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing.Common" mimetype="application/x-microsoft.net.object.bytearray.base64">

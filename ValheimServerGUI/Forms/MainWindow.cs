@@ -25,6 +25,13 @@ namespace ValheimServerGUI.Forms
 
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
+        private readonly Dictionary<ServerStatus, Image> ServerStatusIconMap = new()
+        {
+            { ServerStatus.Stopped, Resources.StatusPause_grey_16x },
+            { ServerStatus.Starting, Resources.UnsyncedCommits_16x_Horiz },
+            { ServerStatus.Running, Resources.StatusRun_16x },
+            { ServerStatus.Stopping, Resources.UnsyncedCommits_16x_Horiz },
+        };
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferences UserPrefs;
@@ -97,7 +104,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
             this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
-            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
+            this.MenuItemHelpUpdates.Click += this.BuildEventHandlerAsync(this.MenuItemHelpUpdates_Clicked);
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
             // Tray icon
@@ -125,6 +132,7 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonExternalIpAddress.CopyFunction = () => this.LabelExternalIpAddress.Value;
             this.CopyButtonInternalIpAddress.CopyFunction = () => this.LabelInternalIpAddress.Value;
             this.CopyButtonLocalIpAddress.CopyFunction = () => this.LabelLocalIpAddress.Value;
+            this.StatusStripLabelRight.Click += this.BuildEventHandlerAsync(this.StatusStripLabelRight_Click);
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
@@ -148,6 +156,7 @@ namespace ValheimServerGUI.Forms
 
             this.RefreshFormFields();
             this.LoadFormValuesFromUserPrefs();
+            this.OnServerStatusChanged(ServerStatus.Stopped);
         }
 
         #endregion
@@ -271,9 +280,9 @@ namespace ValheimServerGUI.Forms
             WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
-        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
+        private async Task MenuItemHelpUpdates_Clicked()
         {
-            WebHelper.OpenWebAddress(Resources.UrlUpdates);
+            await this.CheckForUpdatesAsync(true);
         }
 
         private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
@@ -490,6 +499,13 @@ namespace ValheimServerGUI.Forms
             this.ButtonRemovePlayer.Enabled = isSelected && row.Entity.PlayerStatus == PlayerStatus.Offline;
         }
 
+        private async Task StatusStripLabelRight_Click()
+        {
+            if (!this.StatusStripLabelRight.IsLink) return;
+
+            await this.CheckForUpdatesAsync(true);
+        }
+
         #endregion
 
         #region Server Events
@@ -506,7 +522,7 @@ namespace ValheimServerGUI.Forms
 
         private void OnServerStatusChanged(ServerStatus status)
         {
-            this.SetStatusText(status.ToString());
+            this.SetStatusTextLeft(status.ToString(), this.ServerStatusIconMap[status]);
 
             this.RefreshFormStateForServer();
 
@@ -608,9 +624,17 @@ namespace ValheimServerGUI.Forms
             this.LogViewer.ClearLogView(this.LogViewer.LogView);
         }
 
-        private void SetStatusText(string message)
+        private void SetStatusTextLeft(string message, Image icon)
         {
-            this.StatusStripLabel.Text = message;
+            this.StatusStripLabelLeft.Text = message;
+            this.StatusStripLabelLeft.Image = icon;
+        }
+
+        private void SetStatusTextRight(string message, Image icon, bool isLink)
+        {
+            this.StatusStripLabelRight.Text = message;
+            this.StatusStripLabelRight.Image = icon;
+            this.StatusStripLabelRight.IsLink = isLink;
         }
 
         private int GetImageIndex(string key)
@@ -765,10 +789,49 @@ namespace ValheimServerGUI.Forms
 
         private async Task CheckForUpdatesAsync(bool showPrompt)
         {
+            this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);
+
+            var currentVersion = AssemblyHelper.GetApplicationVersion();
             var release = await this.GitHubClient.GetLatestReleaseAsync();
+
             if (AssemblyHelper.IsNewerVersion(release?.TagName))
             {
-                this.SetStatusText($"An update is available ({release.TagName})");
+                this.SetStatusTextRight($"Update available ({release.TagName})", Resources.StatusWarning_16x, true);
+
+                if (showPrompt)
+                {
+                    var result = MessageBox.Show(
+                        $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+            else
+            {
+                currentVersion = release.TagName ?? currentVersion; // Use the v-prefixed version if available
+                this.SetStatusTextRight($"Up to date ({currentVersion})", Resources.StatusOK_16x, false);
+
+                if (showPrompt)
+                {
+                    var result = MessageBox.Show(
+                        "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
             }
         }
 

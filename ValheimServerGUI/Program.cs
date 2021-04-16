@@ -15,6 +15,8 @@ namespace ValheimServerGUI
 {
     public static class Program
     {
+        private static IExceptionHandler ExceptionHandler;
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
@@ -24,12 +26,22 @@ namespace ValheimServerGUI
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
+            Application.ThreadException += Application_ThreadException;
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
 
             var services = new ServiceCollection();
             ConfigureServices(services);
             using var serviceProvider = services.BuildServiceProvider();
+            ExceptionHandler = serviceProvider.GetRequiredService<IExceptionHandler>();
 
-            Application.Run(serviceProvider.GetRequiredService<MainWindow>());
+            try
+            {
+                Application.Run(serviceProvider.GetRequiredService<MainWindow>());
+            }
+            catch (Exception e)
+            {
+                ExceptionHandler.HandleException(e, "Application Run Exception");
+            }
         }
 
         public static void ConfigureServices(IServiceCollection services)
@@ -53,6 +65,7 @@ namespace ValheimServerGUI
             services.AddSingleton<IRestClientContext, RestClientContext>();
             services.AddSingleton<IIpAddressProvider, IpAddressProvider>();
             services.AddSingleton<IGitHubClient, GitHubClient>();
+            services.AddSingleton<IExceptionHandler, ExceptionHandler>();
 
             // Game & server data
             services
@@ -67,6 +80,16 @@ namespace ValheimServerGUI
                 .AddSingleton<DirectoriesForm>()
                 .AddSingleton<AboutForm>()
                 .AddTransient<PlayerDetailsForm>();
+        }
+
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            ExceptionHandler.HandleException(e.ExceptionObject as Exception, "Unhandled Exception");
+        }
+
+        private static void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
+        {
+            ExceptionHandler.HandleException(e.Exception, "Thread Exception");
         }
     }
 }

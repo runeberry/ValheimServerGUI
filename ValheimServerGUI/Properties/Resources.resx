@@ -211,6 +211,9 @@
   <data name="UrlDonate" xml:space="preserve">
     <value>https://www.buymeacoffee.com/runeberry</value>
   </data>
+  <data name="UrlDotnetDownload" xml:space="preserve">
+    <value>https://dotnet.microsoft.com/download/dotnet/5.0</value>
+  </data>
   <data name="UrlExternalIpLookup" xml:space="preserve">
     <value>https://api.ipify.org?format=json</value>
   </data>

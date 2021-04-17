@@ -29,5 +29,10 @@ namespace ValheimServerGUI.Tools
                 return false;
             }
         }
+
+        public static Version GetDotnetRuntimeVersion()
+        {
+            return Environment.Version;
+        }
     }
 }

@@ -364,6 +364,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://dotnet.microsoft.com/download/dotnet/5.0.
+        /// </summary>
+        internal static string UrlDotnetDownload {
+            get {
+                return ResourceManager.GetString("UrlDotnetDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://api.ipify.org?format=json.
         /// </summary>
         internal static string UrlExternalIpLookup {

@@ -77,6 +77,7 @@ namespace ValheimServerGUI.Tools
                 NL +
                 $"ValheimServerGUI version: {AssemblyHelper.GetApplicationVersion()}{NL}" +
                 $"OS Version: {os.VersionString}{NL}" +
+                $".NET Version: {Environment.Version}" +
                 NL +
                 $"Stack trace:{NL}{e.StackTrace}";
 

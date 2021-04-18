@@ -112,7 +112,7 @@ namespace ValheimServerGUI.Forms
 
             // Tray icon
             this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
-            this.TrayContextMenuStart.Click += this.ButtonStartServer_Click;
+            this.TrayContextMenuStart.Click += this.BuildEventHandler(this.StartServer);
             this.TrayContextMenuRestart.Click += this.ButtonRestartServer_Click;
             this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
             this.TrayContextMenuClose.Click += this.MenuItemFileClose_Clicked;
@@ -126,7 +126,7 @@ namespace ValheimServerGUI.Forms
             this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
-            this.ButtonStartServer.Click += this.ButtonStartServer_Click;
+            this.ButtonStartServer.Click += this.BuildEventHandler(this.StartServer);
             this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
             this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
@@ -183,6 +183,13 @@ namespace ValheimServerGUI.Forms
             base.OnShown(e);
 
             this.CheckFilePaths();
+
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            if (prefs.StartServerAutomatically)
+            {
+                this.StartServer();
+            }
         }
 
         protected override void OnResize(EventArgs e)
@@ -303,79 +310,6 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Form Field Events
-
-        private void ButtonStartServer_Click(object sender, EventArgs e)
-        {
-            string worldName;
-            bool newWorld = this.WorldSelectRadioNew.Value;
-
-            if (newWorld)
-            {
-                // Creating a new world, ensure that the name is available
-                worldName = this.WorldSelectNewNameField.Value;
-                if (!this.FileProvider.IsWorldNameAvailable(worldName))
-                {
-                    MessageBox.Show(
-                        $"A world named '{worldName}' already exists.",
-                        "Server Configuration Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    this.WorldSelectRadioExisting.Value = true;
-                    return;
-                }
-            }
-            else
-            {
-                // Using an existing world, ensure that the file exists
-                worldName = this.WorldSelectExistingNameField.Value;
-                if (this.FileProvider.IsWorldNameAvailable(worldName))
-                {
-                    // Don't think this is possible to hit because the name comes from a dropdown
-                    MessageBox.Show(
-                        $"No world exists with name '{worldName}'.",
-                        "Server Configuration Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            var options = new ValheimServerOptions
-            {
-                Name = this.ServerNameField.Value,
-                Password = this.ServerPasswordField.Value,
-                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
-                NewWorld = newWorld,
-                Public = this.CommunityServerField.Value,
-                Port = this.ServerPortField.Value,
-            };
-
-            try
-            {
-                options.Validate();
-                Server.Start(options);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(
-                    exception.Message,
-                    "Server Configuration Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            // User preferences are saved each time the server is started
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-
-            prefs.ServerName = this.ServerNameField.Value;
-            prefs.ServerPort = this.ServerPortField.Value;
-            prefs.ServerPassword = this.ServerPasswordField.Value;
-            prefs.ServerWorldName = worldName;
-            prefs.ServerPublic = this.CommunityServerField.Value;
-
-            this.UserPrefsProvider.SavePreferences(prefs);
-        }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
@@ -602,6 +536,79 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Common Methods
+
+        private void StartServer()
+        {
+            string worldName;
+            bool newWorld = this.WorldSelectRadioNew.Value;
+
+            if (newWorld)
+            {
+                // Creating a new world, ensure that the name is available
+                worldName = this.WorldSelectNewNameField.Value;
+                if (!this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    MessageBox.Show(
+                        $"A world named '{worldName}' already exists.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    this.WorldSelectRadioExisting.Value = true;
+                    return;
+                }
+            }
+            else
+            {
+                // Using an existing world, ensure that the file exists
+                worldName = this.WorldSelectExistingNameField.Value;
+                if (this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    // Don't think this is possible to hit because the name comes from a dropdown
+                    MessageBox.Show(
+                        $"No world exists with name '{worldName}'.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            var options = new ValheimServerOptions
+            {
+                Name = this.ServerNameField.Value,
+                Password = this.ServerPasswordField.Value,
+                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
+                NewWorld = newWorld,
+                Public = this.CommunityServerField.Value,
+                Port = this.ServerPortField.Value,
+            };
+
+            try
+            {
+                options.Validate();
+                Server.Start(options);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(
+                    exception.Message,
+                    "Server Configuration Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            // User preferences are saved each time the server is started
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            prefs.ServerName = this.ServerNameField.Value;
+            prefs.ServerPort = this.ServerPortField.Value;
+            prefs.ServerPassword = this.ServerPasswordField.Value;
+            prefs.ServerWorldName = worldName;
+            prefs.ServerPublic = this.CommunityServerField.Value;
+
+            this.UserPrefsProvider.SavePreferences(prefs);
+        }
 
         private void CheckFilePaths()
         {

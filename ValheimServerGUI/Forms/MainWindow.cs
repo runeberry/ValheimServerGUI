@@ -102,6 +102,7 @@ namespace ValheimServerGUI.Forms
             this.Shown += this.BuildEventHandlerAsync(this.MainWindow_Load, 250);
 
             // Menu items
+            this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
@@ -262,6 +263,11 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Menu Items
+
+        private void MenuItemFilePreferences_Click(object sender, EventArgs e)
+        {
+            this.ShowPreferencesForm();
+        }
 
         private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
         {
@@ -619,6 +625,12 @@ namespace ValheimServerGUI.Forms
                     this.ShowDirectoriesForm();
                 }
             }
+        }
+
+        private void ShowPreferencesForm()
+        {
+            this.FormProvider.GetForm<PreferencesForm>().ShowDialog();
+            this.RefreshFormFields();
         }
 
         private void ShowDirectoriesForm()

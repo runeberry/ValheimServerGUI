@@ -14,6 +14,8 @@ namespace ValheimServerGUI.Game
             ValheimGamePath = Resources.DefaultGamePath,
             ValheimServerPath = Resources.DefaultServerPath,
             ValheimWorldsFolder = Resources.DefaultWorldsFolder,
+            StartWithWindows = false,
+            StartServerAutomatically = false,
             ServerPort = int.Parse(Resources.DefaultServerPort),
         };
 
@@ -25,6 +27,12 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("valheimWorldsFolder")]
         public string ValheimWorldsFolder { get; set; }
+
+        [JsonProperty("startWithWindows")]
+        public bool StartWithWindows { get; set; }
+
+        [JsonProperty("startServerAutomatically")]
+        public bool StartServerAutomatically { get; set; }
 
         [JsonProperty("servers")]
         public List<ServerPreferences> Servers { get; set; }

@@ -33,6 +33,7 @@ namespace ValheimServerGUI.Forms
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.MenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemFilePreferences = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileDirectories = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemFileClose = new System.Windows.Forms.ToolStripMenuItem();
@@ -122,12 +123,20 @@ namespace ValheimServerGUI.Forms
             // MenuItemFile
             // 
             this.MenuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuItemFilePreferences,
             this.MenuItemFileDirectories,
             this.MenuItemFileSeparator1,
             this.MenuItemFileClose});
             this.MenuItemFile.Name = "MenuItemFile";
             this.MenuItemFile.Size = new System.Drawing.Size(37, 20);
             this.MenuItemFile.Text = "&File";
+            // 
+            // MenuItemFilePreferences
+            // 
+            this.MenuItemFilePreferences.Image = global::ValheimServerGUI.Properties.Resources.Settings_16x;
+            this.MenuItemFilePreferences.Name = "MenuItemFilePreferences";
+            this.MenuItemFilePreferences.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFilePreferences.Text = "&Preferences...";
             // 
             // MenuItemFileDirectories
             // 
@@ -858,5 +867,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelSpacer;
         private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelRight;
         private System.Windows.Forms.Timer UpdateCheckTimer;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemFilePreferences;
     }
 }

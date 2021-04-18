@@ -76,6 +76,7 @@ namespace ValheimServerGUI
             services
                 .AddSingleton<MainWindow>()
                 .AddSingleton<DirectoriesForm>()
+                .AddSingleton<PreferencesForm>()
                 .AddSingleton<AboutForm>()
                 .AddTransient<PlayerDetailsForm>();
         }

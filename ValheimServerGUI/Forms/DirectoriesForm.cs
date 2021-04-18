@@ -16,6 +16,11 @@ namespace ValheimServerGUI.Forms
         public DirectoriesForm(IUserPreferencesProvider userPrefsProvider) : this()
         {
             this.UserPrefsProvider = userPrefsProvider;
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
 
             InitializeFormFields();
         }

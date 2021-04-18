@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace ValheimServerGUI.Tools.Data
 {
-    public interface IDataFileProvider
+    public interface IFileProvider
     {
         event EventHandler<object> DataLoaded;
 

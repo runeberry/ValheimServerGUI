@@ -241,6 +241,9 @@
   <data name="UserPrefsFilePath" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt</value>
   </data>
+  <data name="UserPrefsFilePathV2" xml:space="preserve">
+    <value>%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.json</value>
+  </data>
   <data name="ValheimGameSiteUrl" xml:space="preserve">
     <value>https://www.valheimgame.com/</value>
   </data>

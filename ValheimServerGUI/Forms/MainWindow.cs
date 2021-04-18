@@ -12,7 +12,6 @@ using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
-using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI.Forms
 {
@@ -37,7 +36,7 @@ namespace ValheimServerGUI.Forms
         private DateTime NextUpdateCheck = DateTime.MaxValue;
 
         private readonly IFormProvider FormProvider;
-        private readonly IUserPreferences UserPrefs;
+        private readonly IUserPreferencesProvider UserPrefsProvider;
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
@@ -48,7 +47,7 @@ namespace ValheimServerGUI.Forms
 
         public MainWindow(
             IFormProvider formProvider,
-            IUserPreferences userPrefs,
+            IUserPreferencesProvider userPrefsProvider,
             IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
@@ -58,7 +57,7 @@ namespace ValheimServerGUI.Forms
             IGitHubClient gitHubClient)
         {
             this.FormProvider = formProvider;
-            this.UserPrefs = userPrefs;
+            this.UserPrefsProvider = userPrefsProvider;
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
@@ -159,7 +158,7 @@ namespace ValheimServerGUI.Forms
             this.LogViewSelectField.Value = LogViewServer;
 
             this.RefreshFormFields();
-            this.LoadFormValuesFromUserPrefs();
+            this.LoadFormValuesFromUserPrefs(this.UserPrefsProvider.LoadPreferences());
             this.OnServerStatusChanged(ServerStatus.Stopped);
         }
 
@@ -361,13 +360,15 @@ namespace ValheimServerGUI.Forms
             }
 
             // User preferences are saved each time the server is started
-            UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPort, this.ServerPortField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerWorldName, worldName);
-            UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
+            var prefs = this.UserPrefsProvider.LoadPreferences();
 
-            UserPrefs.SaveFile();
+            prefs.ServerName = this.ServerNameField.Value;
+            prefs.ServerPort = this.ServerPortField.Value;
+            prefs.ServerPassword = this.ServerPasswordField.Value;
+            prefs.ServerWorldName = worldName;
+            prefs.ServerPublic = this.CommunityServerField.Value;
+
+            this.UserPrefsProvider.SavePreferences(prefs);
         }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
@@ -787,15 +788,15 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void LoadFormValuesFromUserPrefs()
+        private void LoadFormValuesFromUserPrefs(UserPreferences prefs)
         {
-            this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
-            this.ServerPortField.Value = UserPrefs.GetNumberValue(PrefKeys.ServerPort, int.Parse(Resources.DefaultServerPort));
-            this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
-            this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
+            this.ServerNameField.Value = prefs.ServerName;
+            this.ServerPortField.Value = prefs.ServerPort;
+            this.ServerPasswordField.Value = prefs.ServerPassword;
+            this.CommunityServerField.Value = prefs.ServerPublic;
             this.ShowPasswordField.Value = false;
 
-            this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
+            this.WorldSelectExistingNameField.Value = prefs.ServerWorldName;
             this.WorldSelectRadioExisting.Value = true;
         }
 

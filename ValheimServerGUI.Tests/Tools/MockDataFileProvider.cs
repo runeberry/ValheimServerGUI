@@ -4,7 +4,7 @@ using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Tests.Tools
 {
-    public class MockDataFileProvider : IDataFileProvider
+    public class MockDataFileProvider : IFileProvider
     {
         private object DataFile;
 

@@ -11,7 +11,7 @@ namespace ValheimServerGUI.Tools.Data
         protected IDataFileRepositoryContext Context { get; }
         protected string FilePath { get; }
 
-        protected IDataFileProvider DataFileProvider => Context.DataFileProvider;
+        protected IFileProvider DataFileProvider => Context.DataFileProvider;
         protected ILogger Logger => Context.Logger;
 
         public DataFileRepository(IDataFileRepositoryContext context, string filePath)

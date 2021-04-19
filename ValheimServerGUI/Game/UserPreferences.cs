@@ -14,8 +14,7 @@ namespace ValheimServerGUI.Game
             ValheimGamePath = Resources.DefaultGamePath,
             ValheimServerPath = Resources.DefaultServerPath,
             ValheimWorldsFolder = Resources.DefaultWorldsFolder,
-            StartWithWindows = false,
-            StartServerAutomatically = false,
+            CheckForUpdates = true,
             ServerPort = int.Parse(Resources.DefaultServerPort),
         };
 
@@ -33,6 +32,12 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("startServerAutomatically")]
         public bool StartServerAutomatically { get; set; }
+
+        [JsonProperty("startMinimized")]
+        public bool StartMinimized { get; set; }
+        
+        [JsonProperty("checkForUpdates")]
+        public bool? CheckForUpdates { get; set; }
 
         [JsonProperty("servers")]
         public List<ServerPreferences> Servers { get; set; }

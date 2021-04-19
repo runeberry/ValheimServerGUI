@@ -72,7 +72,7 @@ namespace ValheimServerGUI.Tools
                 rk.SetValue(appTitle, appPath);
                 return true;
             }
-            catch (SecurityException e)
+            catch (SecurityException)
             {
                 logger.LogWarning($"{nameof(RunOnStartup)}: No LocalMachine access (not Administrator), trying CurrentUser...");
             }
@@ -108,7 +108,7 @@ namespace ValheimServerGUI.Tools
                 rk.DeleteValue(appTitle);
                 return true;
             }
-            catch (SecurityException e)
+            catch (SecurityException)
             {
                 logger.LogWarning($"{nameof(RemoveFromStartup)}: No LocalMachine access (not Administrator), trying CurrentUser...");
             }
@@ -145,7 +145,7 @@ namespace ValheimServerGUI.Tools
                 rk = Registry.LocalMachine.OpenSubKey(RegistryKey, true);
                 return rk.GetValue(appTitle)?.ToString();
             }
-            catch (SecurityException e)
+            catch (SecurityException)
             {
                 logger.LogWarning($"{nameof(GetStartupPath)}: No LocalMachine access (not Administrator), trying CurrentUser...");
             }

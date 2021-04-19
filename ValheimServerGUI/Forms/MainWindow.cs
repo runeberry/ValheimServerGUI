@@ -541,6 +541,11 @@ namespace ValheimServerGUI.Forms
             {
                 this.StartServer();
             }
+
+            if (prefs.StartMinimized)
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
         }
 
         private void StartServer()
@@ -825,8 +830,16 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectRadioExisting.Value = true;
         }
 
-        private async Task CheckForUpdatesAsync(bool showPrompt)
+        private async Task CheckForUpdatesAsync(bool isManualCheck)
         {
+            if (!isManualCheck)
+            {
+                this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
+
+                var prefs = this.UserPrefsProvider.LoadPreferences();
+                if (!prefs.CheckForUpdates.GetValueOrDefault(UserPreferences.Default.CheckForUpdates.Value)) return;
+            }
+
             this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);
 
             var currentVersion = AssemblyHelper.GetApplicationVersion();
@@ -836,7 +849,7 @@ namespace ValheimServerGUI.Forms
             {
                 this.SetStatusTextRight($"Update available ({release.TagName})", Resources.StatusWarning_16x, true);
 
-                if (showPrompt)
+                if (isManualCheck)
                 {
                     var result = MessageBox.Show(
                         $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
@@ -856,7 +869,7 @@ namespace ValheimServerGUI.Forms
                 currentVersion = release.TagName ?? currentVersion; // Use the v-prefixed version if available
                 this.SetStatusTextRight($"Up to date ({currentVersion})", Resources.StatusOK_16x, false);
 
-                if (showPrompt)
+                if (isManualCheck)
                 {
                     var result = MessageBox.Show(
                         "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
@@ -871,8 +884,6 @@ namespace ValheimServerGUI.Forms
                     }
                 }
             }
-
-            this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
         }
 
         private void CloseApplicationOnServerStopped()

@@ -35,6 +35,8 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults = new System.Windows.Forms.Button();
             this.WindowsStartField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerStartField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.StartMinimizedField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.CheckForUpdatesField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.SuspendLayout();
             // 
             // ButtonCancel
@@ -90,11 +92,33 @@ namespace ValheimServerGUI.Forms
             this.ServerStartField.TabIndex = 7;
             this.ServerStartField.Value = false;
             // 
+            // StartMinimizedField
+            // 
+            this.StartMinimizedField.HelpText = "";
+            this.StartMinimizedField.LabelText = "Start ValheimServerGUI minimized";
+            this.StartMinimizedField.Location = new System.Drawing.Point(12, 58);
+            this.StartMinimizedField.Name = "StartMinimizedField";
+            this.StartMinimizedField.Size = new System.Drawing.Size(334, 17);
+            this.StartMinimizedField.TabIndex = 8;
+            this.StartMinimizedField.Value = false;
+            // 
+            // CheckForUpdatesField
+            // 
+            this.CheckForUpdatesField.HelpText = resources.GetString("CheckForUpdatesField.HelpText");
+            this.CheckForUpdatesField.LabelText = "Automatically check for updates";
+            this.CheckForUpdatesField.Location = new System.Drawing.Point(12, 81);
+            this.CheckForUpdatesField.Name = "CheckForUpdatesField";
+            this.CheckForUpdatesField.Size = new System.Drawing.Size(334, 17);
+            this.CheckForUpdatesField.TabIndex = 9;
+            this.CheckForUpdatesField.Value = false;
+            // 
             // PreferencesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(359, 217);
+            this.Controls.Add(this.CheckForUpdatesField);
+            this.Controls.Add(this.StartMinimizedField);
             this.Controls.Add(this.ServerStartField);
             this.Controls.Add(this.WindowsStartField);
             this.Controls.Add(this.ButtonDefaults);
@@ -117,5 +141,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonDefaults;
         private ValheimServerGUI.Controls.CheckboxFormField WindowsStartField;
         private ValheimServerGUI.Controls.CheckboxFormField ServerStartField;
+        private ValheimServerGUI.Controls.CheckboxFormField StartMinimizedField;
+        private ValheimServerGUI.Controls.CheckboxFormField CheckForUpdatesField;
     }
 }

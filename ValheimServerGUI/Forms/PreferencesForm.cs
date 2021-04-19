@@ -2,6 +2,7 @@
 using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Forms
@@ -35,6 +36,11 @@ namespace ValheimServerGUI.Forms
 
             this.WindowsStartField.Value = prefs.StartWithWindows;
             this.ServerStartField.Value = prefs.StartServerAutomatically;
+            this.StartMinimizedField.Value = prefs.StartMinimized;
+            this.CheckForUpdatesField.Value = prefs.CheckForUpdates.GetValueOrDefault(UserPreferences.Default.CheckForUpdates.Value);
+
+            var startupInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
+            this.CheckForUpdatesField.HelpText = this.CheckForUpdatesField.HelpText?.Replace("{startupInterval}", $"{startupInterval.TotalHours} hours");
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
@@ -43,6 +49,8 @@ namespace ValheimServerGUI.Forms
 
             prefs.StartWithWindows = this.WindowsStartField.Value;
             prefs.StartServerAutomatically = this.ServerStartField.Value;
+            prefs.StartMinimized = this.StartMinimizedField.Value;
+            prefs.CheckForUpdates = this.CheckForUpdatesField.Value;
 
             StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
 
@@ -59,6 +67,8 @@ namespace ValheimServerGUI.Forms
         {
             this.WindowsStartField.Value = UserPreferences.Default.StartWithWindows;
             this.ServerStartField.Value = UserPreferences.Default.StartServerAutomatically;
+            this.StartMinimizedField.Value = UserPreferences.Default.StartMinimized;
+            this.CheckForUpdatesField.Value = UserPreferences.Default.CheckForUpdates.Value;
         }
     }
 }

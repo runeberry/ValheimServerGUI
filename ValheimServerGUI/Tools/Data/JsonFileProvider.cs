@@ -56,7 +56,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                this.LogException(e, $"Error loading JSON data from file: {filePath}");
+                this.Logger.LogException(e, $"Error loading JSON data from file: {filePath}");
             }
             finally
             {
@@ -83,7 +83,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                this.LogException(e, $"Error saving JSON data to file: {filePath}");
+                this.Logger.LogException(e, $"Error saving JSON data to file: {filePath}");
             }
             finally
             {
@@ -93,16 +93,6 @@ namespace ValheimServerGUI.Tools.Data
             this.OnDataSaved(data);
 
             return Task.CompletedTask;
-        }
-
-        #endregion
-
-        #region Non-public methods
-
-        protected void LogException(Exception e, string message)
-        {
-            this.Logger.LogError($"{message} - {e.GetType().Name}: {e.Message}");
-            this.Logger.LogError(e.StackTrace);
         }
 
         #endregion

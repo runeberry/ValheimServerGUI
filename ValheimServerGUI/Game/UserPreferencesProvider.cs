@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ValheimServerGUI.Properties;
+using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -64,7 +65,7 @@ namespace ValheimServerGUI.Game
             }
             catch (Exception e)
             {
-                this.LogException(e, "Failed to save user preferences");
+                this.Logger.LogException(e, "Failed to save user preferences");
             }
         }
 
@@ -88,7 +89,7 @@ namespace ValheimServerGUI.Game
             }
             catch (Exception e)
             {
-                this.LogException(e, "Failed to load user preferences");
+                this.Logger.LogException(e, "Failed to load user preferences");
                 return UserPreferences.Default;
             }
         }
@@ -142,7 +143,7 @@ namespace ValheimServerGUI.Game
             }
             catch (Exception e)
             {
-                this.LogException(e, "Migration failed");
+                this.Logger.LogException(e, "Migration failed");
                 prefs = null;
                 return false;
             }

@@ -181,15 +181,7 @@ namespace ValheimServerGUI.Forms
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-
-            this.CheckFilePaths();
-
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-
-            if (prefs.StartServerAutomatically)
-            {
-                this.StartServer();
-            }
+            this.RunStartupStuff();
         }
 
         protected override void OnResize(EventArgs e)
@@ -536,6 +528,20 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Common Methods
+
+        private void RunStartupStuff()
+        {
+            this.CheckFilePaths();
+
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
+
+            if (prefs.StartServerAutomatically)
+            {
+                this.StartServer();
+            }
+        }
 
         private void StartServer()
         {

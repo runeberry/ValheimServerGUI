@@ -1,21 +1,25 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Forms
 {
     public partial class PreferencesForm : Form
     {
         private readonly IUserPreferencesProvider UserPrefsProvider;
+        private readonly ILogger Logger;
 
         public PreferencesForm()
         {
             InitializeComponent();
         }
 
-        public PreferencesForm(IUserPreferencesProvider userPrefsProvider) : this()
+        public PreferencesForm(IUserPreferencesProvider userPrefsProvider, ILogger logger) : this()
         {
             this.UserPrefsProvider = userPrefsProvider;
+            this.Logger = logger;
         }
 
         protected override void OnShown(EventArgs e)
@@ -39,6 +43,8 @@ namespace ValheimServerGUI.Forms
 
             prefs.StartWithWindows = this.WindowsStartField.Value;
             prefs.StartServerAutomatically = this.ServerStartField.Value;
+
+            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
 
             this.UserPrefsProvider.SavePreferences(prefs);
             this.Close();

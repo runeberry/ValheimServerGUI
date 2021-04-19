@@ -14,7 +14,7 @@ namespace ValheimServerGUI.Tests
             var services = new ServiceCollection();
             Program.ConfigureServices(services);
 
-            services.Replace(ServiceDescriptor.Singleton<IDataFileProvider, MockDataFileProvider>());
+            services.Replace(ServiceDescriptor.Singleton<IFileProvider, MockDataFileProvider>());
             services.Replace(ServiceDescriptor.Singleton<IProcessProvider, MockProcessProvider>());
 
             return services.BuildServiceProvider();

@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
-using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI.Game
 {
@@ -18,24 +16,29 @@ namespace ValheimServerGUI.Game
     {
         private static readonly string NL = Environment.NewLine;
 
-        private readonly IUserPreferences UserPrefs;
+        private readonly IUserPreferencesProvider UserPrefsProvider;
 
-        public ValheimFileProvider(IUserPreferences userPrefs)
+        public ValheimFileProvider(IUserPreferencesProvider userPrefsProvider)
         {
-            this.UserPrefs = userPrefs;
+            this.UserPrefsProvider = userPrefsProvider;
         }
 
-        public FileInfo GameExe => this.GetFileInfo(PrefKeys.ValheimGamePath, ".exe");
+        public FileInfo GameExe => this.GetFileInfo("ValheimGamePath", this.Current().ValheimGamePath, ".exe");
 
-        public FileInfo ServerExe => this.GetFileInfo(PrefKeys.ValheimServerPath, ".exe");
+        public FileInfo ServerExe => this.GetFileInfo("ValheimServerPath", this.Current().ValheimServerPath, ".exe");
 
-        public DirectoryInfo WorldsFolder => this.GetDirectoryInfo(PrefKeys.ValheimWorldsFolder);
+        public DirectoryInfo WorldsFolder => this.GetDirectoryInfo("ValheimWorldsFolder", this.Current().ValheimWorldsFolder);
 
         #region Non-public methods
 
-        private FileInfo GetFileInfo(string prefKey, string extension = null)
+        private UserPreferences Current()
         {
-            var path = this.UserPrefs.GetEnvironmentValue(prefKey);
+            return this.UserPrefsProvider.LoadPreferences();
+        }
+
+        private FileInfo GetFileInfo(string prefKey, string path, string extension = null)
+        {
+            path = Environment.ExpandEnvironmentVariables(path);
 
             if (string.IsNullOrWhiteSpace(path))
             {
@@ -55,9 +58,9 @@ namespace ValheimServerGUI.Game
             return new FileInfo(path);
         }
 
-        private DirectoryInfo GetDirectoryInfo(string prefKey)
+        private DirectoryInfo GetDirectoryInfo(string prefKey, string path)
         {
-            var path = this.UserPrefs.GetEnvironmentValue(prefKey);
+            path = Environment.ExpandEnvironmentVariables(path);
 
             if (string.IsNullOrWhiteSpace(path))
             {

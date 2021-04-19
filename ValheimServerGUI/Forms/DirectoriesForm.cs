@@ -1,30 +1,37 @@
 ﻿using System;
 using System.Windows.Forms;
-using ValheimServerGUI.Tools.Preferences;
+using ValheimServerGUI.Game;
 
 namespace ValheimServerGUI.Forms
 {
     public partial class DirectoriesForm : Form
     {
-        private readonly IUserPreferences UserPrefs;
+        private readonly IUserPreferencesProvider UserPrefsProvider;
 
         public DirectoriesForm()
         {
             InitializeComponent();
         }
 
-        public DirectoriesForm(IUserPreferences userPrefs) : this()
+        public DirectoriesForm(IUserPreferencesProvider userPrefsProvider) : this()
         {
-            this.UserPrefs = userPrefs;
+            this.UserPrefsProvider = userPrefsProvider;
+        }
+
+        protected override void OnShown(EventArgs e)
+        {
+            base.OnShown(e);
 
             InitializeFormFields();
         }
 
         private void InitializeFormFields()
         {
-            this.GamePathField.Value = this.UserPrefs.GetEnvironmentValue(PrefKeys.ValheimGamePath);
-            this.ServerPathField.Value = this.UserPrefs.GetEnvironmentValue(PrefKeys.ValheimServerPath);
-            this.WorldsFolderField.Value = this.UserPrefs.GetEnvironmentValue(PrefKeys.ValheimWorldsFolder);
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            this.GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
+            this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
+            this.WorldsFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimWorldsFolder);
 
             this.GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
             this.ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
@@ -36,11 +43,13 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            this.UserPrefs.SetValue(PrefKeys.ValheimGamePath, this.GamePathField.Value);
-            this.UserPrefs.SetValue(PrefKeys.ValheimServerPath, this.ServerPathField.Value);
-            this.UserPrefs.SetValue(PrefKeys.ValheimWorldsFolder, this.WorldsFolderField.Value);
-            this.UserPrefs.SaveFile();
+            var prefs = this.UserPrefsProvider.LoadPreferences();
 
+            prefs.ValheimGamePath = this.GamePathField.Value;
+            prefs.ValheimServerPath = this.ServerPathField.Value;
+            prefs.ValheimWorldsFolder = this.WorldsFolderField.Value;
+
+            this.UserPrefsProvider.SavePreferences(prefs);
             this.Close();
         }
 
@@ -51,9 +60,9 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonDefaults_Click(object sender, EventArgs e)
         {
-            this.GamePathField.Value = UserPreferences.Default.GetEnvironmentValue(PrefKeys.ValheimGamePath);
-            this.ServerPathField.Value = UserPreferences.Default.GetEnvironmentValue(PrefKeys.ValheimServerPath);
-            this.WorldsFolderField.Value = UserPreferences.Default.GetEnvironmentValue(PrefKeys.ValheimWorldsFolder);
+            this.GamePathField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimGamePath);
+            this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimServerPath);
+            this.WorldsFolderField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimWorldsFolder);
         }
     }
 }

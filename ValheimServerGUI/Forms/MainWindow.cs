@@ -12,7 +12,6 @@ using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
-using ValheimServerGUI.Tools.Preferences;
 
 namespace ValheimServerGUI.Forms
 {
@@ -37,7 +36,7 @@ namespace ValheimServerGUI.Forms
         private DateTime NextUpdateCheck = DateTime.MaxValue;
 
         private readonly IFormProvider FormProvider;
-        private readonly IUserPreferences UserPrefs;
+        private readonly IUserPreferencesProvider UserPrefsProvider;
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
@@ -48,7 +47,7 @@ namespace ValheimServerGUI.Forms
 
         public MainWindow(
             IFormProvider formProvider,
-            IUserPreferences userPrefs,
+            IUserPreferencesProvider userPrefsProvider,
             IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
@@ -58,7 +57,7 @@ namespace ValheimServerGUI.Forms
             IGitHubClient gitHubClient)
         {
             this.FormProvider = formProvider;
-            this.UserPrefs = userPrefs;
+            this.UserPrefsProvider = userPrefsProvider;
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
@@ -103,6 +102,7 @@ namespace ValheimServerGUI.Forms
             this.Shown += this.BuildEventHandlerAsync(this.MainWindow_Load, 250);
 
             // Menu items
+            this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
@@ -112,7 +112,7 @@ namespace ValheimServerGUI.Forms
 
             // Tray icon
             this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
-            this.TrayContextMenuStart.Click += this.ButtonStartServer_Click;
+            this.TrayContextMenuStart.Click += this.BuildEventHandler(this.StartServer);
             this.TrayContextMenuRestart.Click += this.ButtonRestartServer_Click;
             this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
             this.TrayContextMenuClose.Click += this.MenuItemFileClose_Clicked;
@@ -126,7 +126,7 @@ namespace ValheimServerGUI.Forms
             this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
-            this.ButtonStartServer.Click += this.ButtonStartServer_Click;
+            this.ButtonStartServer.Click += this.BuildEventHandler(this.StartServer);
             this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
             this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
@@ -159,7 +159,7 @@ namespace ValheimServerGUI.Forms
             this.LogViewSelectField.Value = LogViewServer;
 
             this.RefreshFormFields();
-            this.LoadFormValuesFromUserPrefs();
+            this.LoadFormValuesFromUserPrefs(this.UserPrefsProvider.LoadPreferences());
             this.OnServerStatusChanged(ServerStatus.Stopped);
         }
 
@@ -181,8 +181,7 @@ namespace ValheimServerGUI.Forms
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-
-            this.CheckFilePaths();
+            this.RunStartupStuff();
         }
 
         protected override void OnResize(EventArgs e)
@@ -264,6 +263,11 @@ namespace ValheimServerGUI.Forms
 
         #region Menu Items
 
+        private void MenuItemFilePreferences_Click(object sender, EventArgs e)
+        {
+            this.ShowPreferencesForm();
+        }
+
         private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
         {
             this.ShowDirectoriesForm();
@@ -298,77 +302,6 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Form Field Events
-
-        private void ButtonStartServer_Click(object sender, EventArgs e)
-        {
-            string worldName;
-            bool newWorld = this.WorldSelectRadioNew.Value;
-
-            if (newWorld)
-            {
-                // Creating a new world, ensure that the name is available
-                worldName = this.WorldSelectNewNameField.Value;
-                if (!this.FileProvider.IsWorldNameAvailable(worldName))
-                {
-                    MessageBox.Show(
-                        $"A world named '{worldName}' already exists.",
-                        "Server Configuration Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    this.WorldSelectRadioExisting.Value = true;
-                    return;
-                }
-            }
-            else
-            {
-                // Using an existing world, ensure that the file exists
-                worldName = this.WorldSelectExistingNameField.Value;
-                if (this.FileProvider.IsWorldNameAvailable(worldName))
-                {
-                    // Don't think this is possible to hit because the name comes from a dropdown
-                    MessageBox.Show(
-                        $"No world exists with name '{worldName}'.",
-                        "Server Configuration Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            var options = new ValheimServerOptions
-            {
-                Name = this.ServerNameField.Value,
-                Password = this.ServerPasswordField.Value,
-                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
-                NewWorld = newWorld,
-                Public = this.CommunityServerField.Value,
-                Port = this.ServerPortField.Value,
-            };
-
-            try
-            {
-                options.Validate();
-                Server.Start(options);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(
-                    exception.Message,
-                    "Server Configuration Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            // User preferences are saved each time the server is started
-            UserPrefs.SetValue(PrefKeys.ServerName, this.ServerNameField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPort, this.ServerPortField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerPassword, this.ServerPasswordField.Value);
-            UserPrefs.SetValue(PrefKeys.ServerWorldName, worldName);
-            UserPrefs.SetValue(PrefKeys.ServerPublic, this.CommunityServerField.Value);
-
-            UserPrefs.SaveFile();
-        }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
@@ -596,6 +529,98 @@ namespace ValheimServerGUI.Forms
 
         #region Common Methods
 
+        private void RunStartupStuff()
+        {
+            this.CheckFilePaths();
+
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
+
+            if (prefs.StartServerAutomatically)
+            {
+                this.StartServer();
+            }
+
+            if (prefs.StartMinimized)
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
+        }
+
+        private void StartServer()
+        {
+            string worldName;
+            bool newWorld = this.WorldSelectRadioNew.Value;
+
+            if (newWorld)
+            {
+                // Creating a new world, ensure that the name is available
+                worldName = this.WorldSelectNewNameField.Value;
+                if (!this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    MessageBox.Show(
+                        $"A world named '{worldName}' already exists.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    this.WorldSelectRadioExisting.Value = true;
+                    return;
+                }
+            }
+            else
+            {
+                // Using an existing world, ensure that the file exists
+                worldName = this.WorldSelectExistingNameField.Value;
+                if (this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    // Don't think this is possible to hit because the name comes from a dropdown
+                    MessageBox.Show(
+                        $"No world exists with name '{worldName}'.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            var options = new ValheimServerOptions
+            {
+                Name = this.ServerNameField.Value,
+                Password = this.ServerPasswordField.Value,
+                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
+                NewWorld = newWorld,
+                Public = this.CommunityServerField.Value,
+                Port = this.ServerPortField.Value,
+            };
+
+            try
+            {
+                options.Validate();
+                Server.Start(options);
+            }
+            catch (Exception exception)
+            {
+                MessageBox.Show(
+                    exception.Message,
+                    "Server Configuration Error",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+
+            // User preferences are saved each time the server is started
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            prefs.ServerName = this.ServerNameField.Value;
+            prefs.ServerPort = this.ServerPortField.Value;
+            prefs.ServerPassword = this.ServerPasswordField.Value;
+            prefs.ServerWorldName = worldName;
+            prefs.ServerPublic = this.CommunityServerField.Value;
+
+            this.UserPrefsProvider.SavePreferences(prefs);
+        }
+
         private void CheckFilePaths()
         {
             try
@@ -618,6 +643,12 @@ namespace ValheimServerGUI.Forms
                     this.ShowDirectoriesForm();
                 }
             }
+        }
+
+        private void ShowPreferencesForm()
+        {
+            this.FormProvider.GetForm<PreferencesForm>().ShowDialog();
+            this.RefreshFormFields();
         }
 
         private void ShowDirectoriesForm()
@@ -787,20 +818,28 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void LoadFormValuesFromUserPrefs()
+        private void LoadFormValuesFromUserPrefs(UserPreferences prefs)
         {
-            this.ServerNameField.Value = UserPrefs.GetValue(PrefKeys.ServerName);
-            this.ServerPortField.Value = UserPrefs.GetNumberValue(PrefKeys.ServerPort, int.Parse(Resources.DefaultServerPort));
-            this.ServerPasswordField.Value = UserPrefs.GetValue(PrefKeys.ServerPassword);
-            this.CommunityServerField.Value = UserPrefs.GetFlagValue(PrefKeys.ServerPublic);
+            this.ServerNameField.Value = prefs.ServerName;
+            this.ServerPortField.Value = prefs.ServerPort;
+            this.ServerPasswordField.Value = prefs.ServerPassword;
+            this.CommunityServerField.Value = prefs.ServerPublic;
             this.ShowPasswordField.Value = false;
 
-            this.WorldSelectExistingNameField.Value = UserPrefs.GetValue(PrefKeys.ServerWorldName);
+            this.WorldSelectExistingNameField.Value = prefs.ServerWorldName;
             this.WorldSelectRadioExisting.Value = true;
         }
 
-        private async Task CheckForUpdatesAsync(bool showPrompt)
+        private async Task CheckForUpdatesAsync(bool isManualCheck)
         {
+            if (!isManualCheck)
+            {
+                this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
+
+                var prefs = this.UserPrefsProvider.LoadPreferences();
+                if (!prefs.CheckForUpdates.GetValueOrDefault(UserPreferences.Default.CheckForUpdates.Value)) return;
+            }
+
             this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);
 
             var currentVersion = AssemblyHelper.GetApplicationVersion();
@@ -810,7 +849,7 @@ namespace ValheimServerGUI.Forms
             {
                 this.SetStatusTextRight($"Update available ({release.TagName})", Resources.StatusWarning_16x, true);
 
-                if (showPrompt)
+                if (isManualCheck)
                 {
                     var result = MessageBox.Show(
                         $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
@@ -830,7 +869,7 @@ namespace ValheimServerGUI.Forms
                 currentVersion = release.TagName ?? currentVersion; // Use the v-prefixed version if available
                 this.SetStatusTextRight($"Up to date ({currentVersion})", Resources.StatusOK_16x, false);
 
-                if (showPrompt)
+                if (isManualCheck)
                 {
                     var result = MessageBox.Show(
                         "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
@@ -845,8 +884,6 @@ namespace ValheimServerGUI.Forms
                     }
                 }
             }
-
-            this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
         }
 
         private void CloseApplicationOnServerStopped()

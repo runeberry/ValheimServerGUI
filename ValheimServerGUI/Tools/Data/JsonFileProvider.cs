@@ -76,6 +76,12 @@ namespace ValheimServerGUI.Tools.Data
 
             try
             {
+                if (!Directory.Exists(filePath))
+                {
+                    var directory = Path.GetDirectoryName(filePath);
+                    Directory.CreateDirectory(directory);
+                }
+
                 using var streamWriter = File.CreateText(filePath);
                 using var jsonWriter = new JsonTextWriter(streamWriter);
 

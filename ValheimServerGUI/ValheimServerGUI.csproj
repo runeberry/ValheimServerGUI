@@ -12,7 +12,7 @@
     <Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
     <Copyright>2021</Copyright>
     <PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
-    <Version>1.2.3</Version>
+    <Version>1.2.4</Version>
   </PropertyGroup>
 
   <ItemGroup>

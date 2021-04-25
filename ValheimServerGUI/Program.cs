@@ -9,7 +9,6 @@ using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
 using ValheimServerGUI.Tools.Http;
 using ValheimServerGUI.Tools.Logging;
-using ValheimServerGUI.Tools.Preferences;
 using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI
@@ -52,28 +51,24 @@ namespace ValheimServerGUI
             // Tools
             var applicationLogger = new ApplicationLogger();
 
-            services.AddSingleton<IUserPreferences>((_) =>
-            {
-                var userPreferences = new UserPreferences();
-                userPreferences.LoadFile();
-                return userPreferences;
-            });
-            services.AddSingleton<IDataFileRepositoryContext, DataFileRepositoryContext>();
-            services.AddSingleton<IDataFileProvider, JsonDataFileProvider>();
-            services.AddSingleton<IFormProvider, FormProvider>();
-            services.AddSingleton<IProcessProvider, ProcessProvider>();
-            services.AddSingleton<ILogger>(applicationLogger);
-            services.AddSingleton<IEventLogger>(applicationLogger);
-            services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
-            services.AddSingleton<IRestClientContext, RestClientContext>();
-            services.AddSingleton<IIpAddressProvider, IpAddressProvider>();
-            services.AddSingleton<IGitHubClient, GitHubClient>();
-            services.AddSingleton<IExceptionHandler, ExceptionHandler>();
+            services
+                .AddSingleton<IDataFileRepositoryContext, DataFileRepositoryContext>()
+                .AddSingleton<IFileProvider, JsonFileProvider>()
+                .AddSingleton<IFormProvider, FormProvider>()
+                .AddSingleton<IProcessProvider, ProcessProvider>()
+                .AddSingleton<ILogger>(applicationLogger)
+                .AddSingleton<IEventLogger>(applicationLogger)
+                .AddSingleton<IHttpClientProvider, HttpClientProvider>()
+                .AddSingleton<IRestClientContext, RestClientContext>()
+                .AddSingleton<IIpAddressProvider, IpAddressProvider>()
+                .AddSingleton<IGitHubClient, GitHubClient>()
+                .AddSingleton<IExceptionHandler, ExceptionHandler>();
 
             // Game & server data
             services
                 .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
                 .AddSingleton<IPlayerDataRepository, PlayerDataRepository>()
+                .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<ValheimServerLogger>()
                 .AddSingleton<ValheimServer>();
 
@@ -81,6 +76,7 @@ namespace ValheimServerGUI
             services
                 .AddSingleton<MainWindow>()
                 .AddSingleton<DirectoriesForm>()
+                .AddSingleton<PreferencesForm>()
                 .AddSingleton<AboutForm>()
                 .AddTransient<PlayerDetailsForm>();
         }

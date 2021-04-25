@@ -7,14 +7,14 @@ using System.Threading.Tasks;
 
 namespace ValheimServerGUI.Tools.Data
 {
-    public class JsonDataFileProvider : IDataFileProvider
+    public class JsonFileProvider : IFileProvider
     {
-        private readonly JsonSerializer Serializer = new();
+        private readonly JsonSerializer Serializer = new() { Formatting = Formatting.Indented };
         private readonly ReaderWriterLockSlim RWLock = new();
 
-        private readonly ILogger Logger;
+        protected readonly ILogger Logger;
 
-        public JsonDataFileProvider(ILogger logger)
+        public JsonFileProvider(ILogger logger)
         {
             this.Logger = logger;
         }
@@ -56,7 +56,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                this.Logger.LogError(e, "Error loading JSON data from file: {0}", filePath);
+                this.Logger.LogException(e, $"Error loading JSON data from file: {filePath}");
             }
             finally
             {
@@ -76,6 +76,12 @@ namespace ValheimServerGUI.Tools.Data
 
             try
             {
+                if (!Directory.Exists(filePath))
+                {
+                    var directory = Path.GetDirectoryName(filePath);
+                    Directory.CreateDirectory(directory);
+                }
+
                 using var streamWriter = File.CreateText(filePath);
                 using var jsonWriter = new JsonTextWriter(streamWriter);
 
@@ -83,7 +89,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                this.Logger.LogError(e, "Error saving JSON data to file: {0}", filePath);
+                this.Logger.LogException(e, $"Error saving JSON data to file: {filePath}");
             }
             finally
             {

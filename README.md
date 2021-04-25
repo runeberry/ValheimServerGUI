@@ -29,14 +29,14 @@ In order to run ValheimServerGUI, you will need the following:
 
 ## Features
 
-* **Online players** - Show which players are online or offline, and when they arrived/left
 * **It remembers!** - Stores your server info between sessions, and it can't be overwritten by Steam
 * **Status updates** - Clearly shows when your server is running, starting, or stopping
 * **Online players** - Show which players are online or offline, and when they arrived/left
 * **Easy IP address** - No more guessing, copy the right IP address to give to your friends straight from the app
-* **Cleaner server logs** - eliminates a lot of the noisy debug logs produced by the server
+* **Cleaner server logs** - Eliminates a lot of the noisy debug logs produced by the server
 * **Input validation** - Prevents you from creating a server with bad info that would fail to launch
 * **Safe shutdowns** - Safely stops the server when you close the app or shut down Windows
+* **Automatic startup** - If enabled, can automatically start up your server when Windows starts
 * **Minimize to tray** - Minimize this app and control your server entirely from the Windows system tray
 
 ### Coming soon...

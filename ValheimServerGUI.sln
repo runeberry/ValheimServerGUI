@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValheimServerGUI.Serverless
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ValheimServerGUI.Serverless.Tests", "ValheimServerGUI.Serverless.Tests\ValheimServerGUI.Serverless.Tests.csproj", "{B366DF72-040D-464A-A200-E9CCD4F17B33}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ValheimServerGUI.Tools", "ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj", "{39BE3CA2-906A-446F-95DA-E37C359B6197}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B366DF72-040D-464A-A200-E9CCD4F17B33}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B366DF72-040D-464A-A200-E9CCD4F17B33}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B366DF72-040D-464A-A200-E9CCD4F17B33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{39BE3CA2-906A-446F-95DA-E37C359B6197}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{39BE3CA2-906A-446F-95DA-E37C359B6197}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{39BE3CA2-906A-446F-95DA-E37C359B6197}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{39BE3CA2-906A-446F-95DA-E37C359B6197}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

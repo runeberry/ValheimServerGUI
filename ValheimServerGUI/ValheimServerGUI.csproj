@@ -6,7 +6,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\ApplicationIcon.ico</ApplicationIcon>
     <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
     <Authors>Runeberry Software, LLC</Authors>
     <Product>ValheimServerGUI</Product>
     <Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj" />
+    <ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>

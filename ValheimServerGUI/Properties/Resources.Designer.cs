@@ -427,6 +427,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://api.runeberry.com/vsg-api.
+        /// </summary>
+        internal static string UrlRuneberryApi {
+            get {
+                return ResourceManager.GetString("UrlRuneberryApi", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://twitter.com/Runeberries.
         /// </summary>
         internal static string UrlTwitter {

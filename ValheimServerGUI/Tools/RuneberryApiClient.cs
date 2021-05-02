@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Http;
 
 namespace ValheimServerGUI.Tools
@@ -16,7 +17,7 @@ namespace ValheimServerGUI.Tools
 
         public async Task<bool> SendCrashReportAsync(CrashReport report)
         {
-            var response = await this.Post("https://api.runeberry.com/vsg-api/crash-report", report)
+            var response = await this.Post($"{Resources.UrlRuneberryApi}/crash-report", report)
                 .SendAsync();
 
             return response.IsSuccessStatusCode;

@@ -98,7 +98,6 @@ namespace ValheimServerGUI.Game
         {
             { "ValheimGamePath", (p, v) => p.ValheimGamePath = v },
             { "ValheimServerPath", (p, v) => p.ValheimServerPath = v },
-            { "ValheimWorldsFolder", (p, v) => p.ValheimWorldsFolder = v },
             { "ServerName", (p, v) => p.ServerName = v },
             { "ServerPassword", (p, v) => p.ServerPassword = v },
             { "ServerWorldName", (p, v) => p.ServerWorldName = v },

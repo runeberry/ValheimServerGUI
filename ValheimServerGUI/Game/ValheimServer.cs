@@ -123,9 +123,9 @@ namespace ValheimServerGUI.Game
             this.ApplicationLogger.LogInformation("Starting server...");
 
             var exePath = this.FileProvider.ServerExe.FullName;
-            var worldsFolder = this.FileProvider.SaveDataFolder.FullName;
+            var saveDataFolder = this.FileProvider.SaveDataFolder.FullName;
             var publicFlag = options.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{worldsFolder}""";
+            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}""";
             var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);

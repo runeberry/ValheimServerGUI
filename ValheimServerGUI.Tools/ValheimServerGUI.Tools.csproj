@@ -2,6 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

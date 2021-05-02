@@ -4,6 +4,8 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <RootNamespace>ValheimServerGUI</RootNamespace>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>

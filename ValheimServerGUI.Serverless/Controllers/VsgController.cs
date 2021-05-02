@@ -2,7 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon.S3;
+using Amazon.S3.Model;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using ValheimServerGUI.Tools;
 
@@ -12,8 +15,9 @@ namespace ValheimServerGUI.Serverless.Controllers
     public class VsgController : ControllerBase
     {
         private readonly ILogger Logger;
+        private readonly IConfiguration Configuration;
 
-        public VsgController(ILogger<VsgController> logger)
+        public VsgController(ILogger<VsgController> logger, IConfiguration configuration)
         {
             Logger = logger;
         }
@@ -23,7 +27,17 @@ namespace ValheimServerGUI.Serverless.Controllers
         {
             Logger.LogInformation("Receiving crash report");
 
-            return Accepted(request);
+            //var awsAccessKey = Configuration.GetValue<string>("AWSAccessKey");
+            //var awsSecretKey = Configuration.GetValue<string>("AWSSecretKey");
+            var s3BucketUrl = Configuration.GetValue<string>("AWSS3BucketUrl");
+            
+            var config = new AmazonS3Config { ServiceURL = s3BucketUrl };
+            var client = new AmazonS3Client(config);
+
+            var s3Request = new PutObjectRequest {  };
+            var s3Response = await client.PutObjectAsync(s3Request);
+
+            return StatusCode((int)s3Response.HttpStatusCode, request);
         }
 
         [HttpGet("player-steam-info")]

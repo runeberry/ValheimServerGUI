@@ -1,9 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace ValheimServerGUI.Tools
@@ -15,73 +11,65 @@ namespace ValheimServerGUI.Tools
 
     public class ExceptionHandler : IExceptionHandler
     {
-        private static readonly string NL = Environment.NewLine;
+        private readonly IRuneberryApiClient RuneberryApiClient;
+
+        public ExceptionHandler(IRuneberryApiClient runeberryApiClient)
+        {
+            RuneberryApiClient = runeberryApiClient;
+        }
 
         public void HandleException(Exception e, string additionalMessage = null)
         {
             if (e == null) return;
+            
             additionalMessage ??= "Unhandled Exception";
-
-            var message = "An unhandled exception has been thrown, and ValheimServerGUI will be terminated.";
-            //var stackTrace = string.Join(NL, e.StackTrace.Split(NL).Take(3));
-            message += $"{NL}{NL}{BuildMessageBody(e, additionalMessage)}";
+            
+            var userMessage = "A fatal error has occured. Would you like to send an automated crash report to the developer?";
 
             var result = MessageBox.Show(
-                message,
+                userMessage,
                 additionalMessage,
-                MessageBoxButtons.OK,
+                MessageBoxButtons.YesNo,
                 MessageBoxIcon.Error);
 
-            //if (result == DialogResult.Yes)
-            //{
-            //    try
-            //    {
-            //        var body = BuildMessageBody(e, additionalMessage);
-            //        SendEmail("ValheimServerGUI - Automated bug report", additionalMessage);
+            if (result == DialogResult.Yes)
+            {
+                var crashReport = BuildCrashReport(e, additionalMessage);
 
-            //        MessageBox.Show("Bug report sent. Thank you!", additionalMessage, MessageBoxButtons.OK, MessageBoxIcon.Information);
-            //    }
-            //    catch(Exception e2)
-            //    {
-            //        MessageBox.Show("Failed to send bug report. Sorry!" + e2.Message, additionalMessage, MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            //    }
-            //}
+                var success = RuneberryApiClient.SendCrashReportAsync(crashReport).GetAwaiter().GetResult();
+
+                if (success)
+                {
+                    MessageBox.Show("Crash report received. Thank you!");
+                }
+                else
+                {
+                    MessageBox.Show("Failed to send crash report. Contact Runeberry Software for further support.");
+                }
+            }
         }
 
-        //private void SendEmail(string subject, string body)
-        //{
-        //    var mailClient = new SmtpClient("");
-        //    var mailMessage = new MailMessage();
-
-        //    mailMessage.From = new MailAddress("");
-        //    mailMessage.From = new MailAddress("");
-        //    mailMessage.To.Add(new MailAddress(""));
-
-        //    mailMessage.Subject = subject;
-        //    mailMessage.Body = body;
-
-        //    mailClient.Send(mailMessage);
-        //    mailMessage.Dispose();
-        //}
-
-        private string BuildMessageBody(Exception e, string additionalMessage)
+        private CrashReport BuildCrashReport(Exception e, string additionalMessage)
         {
-            var os = Environment.OSVersion;
+            var additionalInfo = new Dictionary<string, string>
+            {
+                { "ExceptionType", e.GetType().Name },
+                { "Message", e.Message },
+                { "Context", additionalMessage },
+                { "Source", e.Source },
+                { "TargetSite", e.TargetSite?.ToString() },
+                { "StackTrace", e.StackTrace },
+            };
 
-            var body =
-                $"{e.GetType().Name}: {e.Message}{NL}" +
-                $"Timestamp: {DateTime.UtcNow:O}{NL}" +
-                $"Context: {additionalMessage}{NL}" +
-                $"Source: {e.Source}{NL}" +
-                $"TargetSite: {e.TargetSite}{NL}" +
-                NL +
-                $"ValheimServerGUI version: {AssemblyHelper.GetApplicationVersion()}{NL}" +
-                $"OS Version: {os.VersionString}{NL}" +
-                $".NET Version: {Environment.Version}" +
-                NL +
-                $"Stack trace:{NL}{e.StackTrace}";
-
-            return body;
+            return new CrashReport
+            {
+                Source = "UnhandledException",
+                Timestamp = DateTime.UtcNow,
+                AppVersion = AssemblyHelper.GetApplicationVersion(),
+                OsVersion = Environment.OSVersion.VersionString,
+                DotnetVersion = Environment.Version.ToString(),
+                AdditionalInfo = additionalInfo,
+            };
         }
     }
 }

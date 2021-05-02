@@ -118,11 +118,11 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds.
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\IronGate\Valheim.
         /// </summary>
-        internal static string DefaultWorldsFolder {
+        internal static string DefaultValheimSaveFolder {
             get {
-                return ResourceManager.GetString("DefaultWorldsFolder", resourceCulture);
+                return ResourceManager.GetString("DefaultValheimSaveFolder", resourceCulture);
             }
         }
         

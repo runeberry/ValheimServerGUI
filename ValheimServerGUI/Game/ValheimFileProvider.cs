@@ -9,6 +9,8 @@ namespace ValheimServerGUI.Game
 
         FileInfo ServerExe { get; }
 
+        DirectoryInfo SaveDataFolder { get; }
+
         DirectoryInfo WorldsFolder { get; }
     }
 
@@ -27,7 +29,9 @@ namespace ValheimServerGUI.Game
 
         public FileInfo ServerExe => this.GetFileInfo("ValheimServerPath", this.Current().ValheimServerPath, ".exe");
 
-        public DirectoryInfo WorldsFolder => this.GetDirectoryInfo("ValheimWorldsFolder", this.Current().ValheimWorldsFolder);
+        public DirectoryInfo SaveDataFolder => this.GetDirectoryInfo("ValheimSaveDataFolder", this.Current().ValheimSaveDataFolder);
+
+        public DirectoryInfo WorldsFolder => this.GetDirectoryInfo("ValheimWorldsFolder", Path.Join(this.Current().ValheimSaveDataFolder, "worlds"));
 
         #region Non-public methods
 

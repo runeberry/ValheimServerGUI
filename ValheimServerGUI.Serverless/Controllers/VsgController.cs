@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Serverless.Controllers
 {
@@ -18,13 +19,15 @@ namespace ValheimServerGUI.Serverless.Controllers
         }
 
         [HttpPost("crash-report")]
-        public async Task<IActionResult> CreateBugReport([FromBody] object request)
+        public async Task<IActionResult> CreateCrashReport([FromBody] CrashReport request)
         {
-            return Ok("Received bug report");
+            Logger.LogInformation("Receiving crash report");
+
+            return Accepted(request);
         }
 
         [HttpGet("player-steam-info")]
-        public async Task<IActionResult> GetPlayerSteamInfo([FromQuery] object request)
+        public async Task<IActionResult> GetPlayerSteamInfo([FromQuery] string steamId)
         {
             return Ok("Player steam info");
         }

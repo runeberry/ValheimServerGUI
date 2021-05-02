@@ -22,7 +22,8 @@
         "Timeout": 30,
         "Role": null,
         "Policies": [
-          "AWSLambda_FullAccess"
+          "AWSLambda_FullAccess",
+          "AmazonS3FullAccess"
         ],
         "Events": {
           "ProxyResource": {

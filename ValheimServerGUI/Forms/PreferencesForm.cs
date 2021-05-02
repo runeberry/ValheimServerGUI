@@ -37,7 +37,7 @@ namespace ValheimServerGUI.Forms
             this.WindowsStartField.Value = prefs.StartWithWindows;
             this.ServerStartField.Value = prefs.StartServerAutomatically;
             this.StartMinimizedField.Value = prefs.StartMinimized;
-            this.CheckForUpdatesField.Value = prefs.CheckForUpdates.GetValueOrDefault(UserPreferences.Default.CheckForUpdates.Value);
+            this.CheckForUpdatesField.Value = prefs.CheckForUpdates;
 
             var startupInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
             this.CheckForUpdatesField.HelpText = this.CheckForUpdatesField.HelpText?.Replace("{startupInterval}", $"{startupInterval.TotalHours} hours");
@@ -68,7 +68,7 @@ namespace ValheimServerGUI.Forms
             this.WindowsStartField.Value = UserPreferences.Default.StartWithWindows;
             this.ServerStartField.Value = UserPreferences.Default.StartServerAutomatically;
             this.StartMinimizedField.Value = UserPreferences.Default.StartMinimized;
-            this.CheckForUpdatesField.Value = UserPreferences.Default.CheckForUpdates.Value;
+            this.CheckForUpdatesField.Value = UserPreferences.Default.CheckForUpdates;
         }
     }
 }

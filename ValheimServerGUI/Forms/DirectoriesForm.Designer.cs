@@ -35,7 +35,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults = new System.Windows.Forms.Button();
             this.GamePathField = new ValheimServerGUI.Controls.FilenameFormField();
             this.ServerPathField = new ValheimServerGUI.Controls.FilenameFormField();
-            this.WorldsFolderField = new ValheimServerGUI.Controls.FilenameFormField();
+            this.SaveDataFolderField = new ValheimServerGUI.Controls.FilenameFormField();
             this.SuspendLayout();
             // 
             // ButtonCancel
@@ -80,6 +80,7 @@ namespace ValheimServerGUI.Forms
             this.GamePathField.Location = new System.Drawing.Point(12, 12);
             this.GamePathField.MultiFileSeparator = "; ";
             this.GamePathField.Name = "GamePathField";
+            this.GamePathField.ReadOnly = false;
             this.GamePathField.Size = new System.Drawing.Size(335, 41);
             this.GamePathField.TabIndex = 6;
             this.GamePathField.Value = "";
@@ -93,29 +94,32 @@ namespace ValheimServerGUI.Forms
             this.ServerPathField.Location = new System.Drawing.Point(12, 59);
             this.ServerPathField.MultiFileSeparator = "; ";
             this.ServerPathField.Name = "ServerPathField";
+            this.ServerPathField.ReadOnly = false;
             this.ServerPathField.Size = new System.Drawing.Size(335, 41);
             this.ServerPathField.TabIndex = 7;
             this.ServerPathField.Value = "";
             // 
             // WorldsFolderField
             // 
-            this.WorldsFolderField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.Directory;
-            this.WorldsFolderField.HelpText = resources.GetString("WorldsFolderField.HelpText");
-            this.WorldsFolderField.InitialPath = null;
-            this.WorldsFolderField.LabelText = "Valheim Worlds Folder";
-            this.WorldsFolderField.Location = new System.Drawing.Point(12, 106);
-            this.WorldsFolderField.MultiFileSeparator = "; ";
-            this.WorldsFolderField.Name = "WorldsFolderField";
-            this.WorldsFolderField.Size = new System.Drawing.Size(335, 41);
-            this.WorldsFolderField.TabIndex = 8;
-            this.WorldsFolderField.Value = "";
+            this.SaveDataFolderField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.Directory;
+            this.SaveDataFolderField.HelpText = "The location of the save data for your Valheim server,\r\nincluding the \"worlds\" fo" +
+    "lder, admin lists, etc.";
+            this.SaveDataFolderField.InitialPath = null;
+            this.SaveDataFolderField.LabelText = "Valheim Save Data Folder";
+            this.SaveDataFolderField.Location = new System.Drawing.Point(12, 106);
+            this.SaveDataFolderField.MultiFileSeparator = "; ";
+            this.SaveDataFolderField.Name = "WorldsFolderField";
+            this.SaveDataFolderField.ReadOnly = false;
+            this.SaveDataFolderField.Size = new System.Drawing.Size(335, 41);
+            this.SaveDataFolderField.TabIndex = 8;
+            this.SaveDataFolderField.Value = "";
             // 
             // DirectoriesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(359, 217);
-            this.Controls.Add(this.WorldsFolderField);
+            this.Controls.Add(this.SaveDataFolderField);
             this.Controls.Add(this.ServerPathField);
             this.Controls.Add(this.GamePathField);
             this.Controls.Add(this.ButtonDefaults);
@@ -138,6 +142,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonDefaults;
         private ValheimServerGUI.Controls.FilenameFormField GamePathField;
         private ValheimServerGUI.Controls.FilenameFormField ServerPathField;
-        private ValheimServerGUI.Controls.FilenameFormField WorldsFolderField;
+        private ValheimServerGUI.Controls.FilenameFormField SaveDataFolderField;
     }
 }

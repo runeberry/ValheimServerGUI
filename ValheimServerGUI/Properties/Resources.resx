@@ -136,8 +136,8 @@
   <data name="DefaultServerPort" xml:space="preserve">
     <value>2456</value>
   </data>
-  <data name="DefaultWorldsFolder" xml:space="preserve">
-    <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim\worlds</value>
+  <data name="DefaultValheimSaveFolder" xml:space="preserve">
+    <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim</value>
   </data>
   <data name="DonateLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DonateLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

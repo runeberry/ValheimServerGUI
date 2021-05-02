@@ -837,7 +837,7 @@ namespace ValheimServerGUI.Forms
                 this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
 
                 var prefs = this.UserPrefsProvider.LoadPreferences();
-                if (!prefs.CheckForUpdates.GetValueOrDefault(UserPreferences.Default.CheckForUpdates.Value)) return;
+                if (!prefs.CheckForUpdates) return;
             }
 
             this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);

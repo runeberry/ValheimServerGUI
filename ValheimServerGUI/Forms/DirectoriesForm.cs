@@ -31,14 +31,10 @@ namespace ValheimServerGUI.Forms
 
             this.GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
             this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
-            this.WorldsFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimWorldsFolder);
+            this.SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
 
             this.GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
             this.ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
-
-            // Currently valheim_server doesn't support using different world folders.
-            // Re-enable this control and properly add support in the server options if a method ever gets added to do this.
-            this.WorldsFolderField.ReadOnly = true;
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
@@ -47,7 +43,7 @@ namespace ValheimServerGUI.Forms
 
             prefs.ValheimGamePath = this.GamePathField.Value;
             prefs.ValheimServerPath = this.ServerPathField.Value;
-            prefs.ValheimWorldsFolder = this.WorldsFolderField.Value;
+            prefs.ValheimSaveDataFolder = this.SaveDataFolderField.Value;
 
             this.UserPrefsProvider.SavePreferences(prefs);
             this.Close();
@@ -62,7 +58,7 @@ namespace ValheimServerGUI.Forms
         {
             this.GamePathField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimGamePath);
             this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimServerPath);
-            this.WorldsFolderField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimWorldsFolder);
+            this.SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimSaveDataFolder);
         }
     }
 }

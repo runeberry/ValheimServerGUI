@@ -9,23 +9,19 @@ namespace ValheimServerGUI.Game
     public class UserPreferences
     {
         [JsonIgnore]
-        public static UserPreferences Default => new()
-        {
-            ValheimGamePath = Resources.DefaultGamePath,
-            ValheimServerPath = Resources.DefaultServerPath,
-            ValheimWorldsFolder = Resources.DefaultWorldsFolder,
-            CheckForUpdates = true,
-            ServerPort = int.Parse(Resources.DefaultServerPort),
-        };
+        private static readonly int DefaultServerPort = int.Parse(Resources.DefaultServerPort);
+
+        [JsonIgnore]
+        public static UserPreferences Default => new();
 
         [JsonProperty("valheimGamePath")]
-        public string ValheimGamePath { get; set; }
+        public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
 
         [JsonProperty("valheimServerPath")]
-        public string ValheimServerPath { get; set; }
+        public string ValheimServerPath { get; set; } = Resources.DefaultServerPath;
 
-        [JsonProperty("valheimWorldsFolder")]
-        public string ValheimWorldsFolder { get; set; }
+        [JsonProperty("valheimSaveDataFolder")]
+        public string ValheimSaveDataFolder { get; set; } = Resources.DefaultValheimSaveFolder;
 
         [JsonProperty("startWithWindows")]
         public bool StartWithWindows { get; set; }
@@ -35,12 +31,12 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("startMinimized")]
         public bool StartMinimized { get; set; }
-        
+
         [JsonProperty("checkForUpdates")]
-        public bool? CheckForUpdates { get; set; }
+        public bool CheckForUpdates { get; set; } = true;
 
         [JsonProperty("servers")]
-        public List<ServerPreferences> Servers { get; set; }
+        public List<ServerPreferences> Servers { get; set; } = new();
 
         [JsonIgnore]
         public string ServerName
@@ -73,7 +69,7 @@ namespace ValheimServerGUI.Game
         [JsonIgnore]
         public int ServerPort
         {
-            get => this.Servers.FirstOrDefault()?.Port ?? default;
+            get => this.Servers.FirstOrDefault()?.Port ?? DefaultServerPort;
             set => this.SetServerValue(s => s.Port = value);
         }
 
@@ -106,7 +102,7 @@ namespace ValheimServerGUI.Game
             public bool CommunityServer { get; set; }
 
             [JsonProperty("port")]
-            public int Port { get; set; }
+            public int Port { get; set; } = DefaultServerPort;
         }
     }
 }

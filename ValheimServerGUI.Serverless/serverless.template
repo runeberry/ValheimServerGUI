@@ -23,7 +23,8 @@
         "Role": null,
         "Policies": [
           "AWSLambda_FullAccess",
-          "AmazonS3FullAccess"
+          "AmazonS3FullAccess",
+          "CloudWatchLambdaInsightsExecutionRolePolicy"
         ],
         "Events": {
           "ProxyResource": {

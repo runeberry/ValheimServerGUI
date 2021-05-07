@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace ValheimServerGUI.Serverless
@@ -20,6 +21,12 @@ namespace ValheimServerGUI.Serverless
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    webBuilder.ConfigureAppConfiguration(config =>
+                    {
+                        var executingLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+                        config.AddJsonFile(System.IO.Path.Join(executingLocation, "appsettings.secret.json"));
+                        config.AddJsonFile(System.IO.Path.Join(executingLocation, "appsettings.local.json"), optional: true);
+                    });
                     webBuilder.UseStartup<Startup>();
                 });
     }

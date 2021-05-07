@@ -16,7 +16,7 @@
   <ItemGroup>
     <!-- This setup allows us to include a file outside of the project directory -->
     <!-- Courtesy of: https://stackoverflow.com/a/11808911/7071436 -->
-    <Content Include="..\SolutionResources\appsettings.secret.json">
+    <Content Include="..\SolutionResources\*.json">
       <Link>%(RecursiveDir)%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

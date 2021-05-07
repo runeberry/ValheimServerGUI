@@ -2,11 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Amazon;
+using Amazon.Lambda.Core;
 using Amazon.S3;
 using Amazon.S3.Model;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Serverless.Controllers
@@ -16,28 +19,62 @@ namespace ValheimServerGUI.Serverless.Controllers
     {
         private readonly ILogger Logger;
         private readonly IConfiguration Configuration;
+        
+        private ILambdaContext LambdaContext => this.HttpContext.Items["LambdaContext"] as ILambdaContext;
 
         public VsgController(ILogger<VsgController> logger, IConfiguration configuration)
         {
             Logger = logger;
+            Configuration = configuration;
         }
 
         [HttpPost("crash-report")]
         public async Task<IActionResult> CreateCrashReport([FromBody] CrashReport request)
         {
-            Logger.LogInformation("Receiving crash report");
+            Logger.LogInformation("Receiving crash report (standard logger)");
 
-            //var awsAccessKey = Configuration.GetValue<string>("AWSAccessKey");
-            //var awsSecretKey = Configuration.GetValue<string>("AWSSecretKey");
-            var s3BucketUrl = Configuration.GetValue<string>("AWSS3BucketUrl");
-            
-            var config = new AmazonS3Config { ServiceURL = s3BucketUrl };
-            var client = new AmazonS3Client(config);
+            Exception exception;
+            int statusCode;
 
-            var s3Request = new PutObjectRequest {  };
-            var s3Response = await client.PutObjectAsync(s3Request);
+            try
+            {
+                var s3BucketName = Configuration.GetValue<string>("S3BucketName");
+                var s3BucketRegion = Configuration.GetValue<string>("S3BucketRegion");
 
-            return StatusCode((int)s3Response.HttpStatusCode, request);
+                var client = new AmazonS3Client(RegionEndpoint.GetBySystemName(s3BucketRegion));
+
+                // Ensure that each crash report has an ID
+                request.CrashReportId ??= Guid.NewGuid().ToString();
+
+                var s3Request = new PutObjectRequest
+                {
+                    BucketName = s3BucketName,
+                    Key = $"crash-reports/CrashReport-{request.CrashReportId}",
+                    ContentType = "application/json",
+                    ContentBody = JsonConvert.SerializeObject(request),
+                };
+                var s3Response = await client.PutObjectAsync(s3Request);
+
+                Logger.LogInformation($"Crash report created: {request.CrashReportId}");
+
+                return Accepted(request);
+            }
+            catch (AmazonS3Exception e)
+            {
+                exception = e;
+                statusCode = (int)e.StatusCode;
+            }
+            catch (Exception e)
+            {
+                exception = e;
+                statusCode = 500;
+            }
+
+            Logger.LogException(exception, $"{exception.GetType().Name} occurred during S3 upload");
+            Logger.LogError(exception.Message);
+            Logger.LogError(exception.StackTrace);
+
+            return StatusCode(statusCode, new { message = exception.Message });
         }
 
         [HttpGet("player-steam-info")]

@@ -53,7 +53,10 @@
       "Type": "AWS::S3::Bucket",
       "DeletionPolicy": "Retain",
       "Properties": {
-        "BucketName": "runeberry-valheim-server-gui"
+        "BucketName": "runeberry-valheim-server-gui",
+        "VersioningConfiguration": {
+          "Status": "Enabled"
+        }
       }
     }
   },

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using ValheimServerGUI.Forms;
 
 namespace ValheimServerGUI.Tools
 {
@@ -35,17 +36,19 @@ namespace ValheimServerGUI.Tools
             if (result == DialogResult.Yes)
             {
                 var crashReport = BuildCrashReport(e, additionalMessage);
+                var task = RuneberryApiClient.SendCrashReportAsync(crashReport);
 
-                var success = RuneberryApiClient.SendCrashReportAsync(crashReport).GetAwaiter().GetResult();
+                var asyncPopout = new AsyncPopout(task, options =>
+                {
+                    options.Title = "Crash Report";
+                    options.Text = "Sending crash report...";
+                    options.CloseOnSuccess = true;
+                    options.SuccessMessage = "Crash report received. Thank you!";
+                    options.FailureMessage = "Failed to send crash report.\r\nContact Runeberry Software for further support.";
+                });
 
-                if (success)
-                {
-                    MessageBox.Show("Crash report received. Thank you!");
-                }
-                else
-                {
-                    MessageBox.Show("Failed to send crash report. Contact Runeberry Software for further support.");
-                }
+                // todo: this fails if the application is already running
+                Application.Run(asyncPopout);
             }
         }
 

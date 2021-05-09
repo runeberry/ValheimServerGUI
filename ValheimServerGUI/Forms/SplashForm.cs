@@ -14,6 +14,7 @@ namespace ValheimServerGUI.Forms
 #if DEBUG
         private static readonly bool SimulateLongRunningStartup = false;
         private static readonly bool SimulateStartupTaskException = false;
+        private static readonly bool SimulateAsyncPopoutOnStart = false;
 #endif
         private Form MainForm;
         private bool IsFirstShown = true;
@@ -263,7 +264,20 @@ namespace ValheimServerGUI.Forms
         private void FinishStartup()
         {
             this.MainForm.Show();
+#if DEBUG
+            if (SimulateAsyncPopoutOnStart)
+            {
+                var asyncPopout = new AsyncPopout(Task.Delay(5000), options =>
+                {
+                    options.Text = "Testing AsyncPopout...";
+                    options.Title = "Testing AsyncPopout";
+                    options.SuccessMessage = "Task succeeded!";
+                    options.FailureMessage = "Task failed!";
+                });
 
+                asyncPopout.Show();
+            }
+#endif
             // Hide the splash screen so it's no longer visible once the application is loaded
             this.Hide();
         }

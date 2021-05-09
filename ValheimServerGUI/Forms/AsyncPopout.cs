@@ -72,7 +72,8 @@ namespace ValheimServerGUI.Forms
                 if (this.Options.CloseOnFailure) return this.CloseAsync();
 
                 var errMessage = this.Options.FailureMessage ?? "The task was cancelled due to an error.";
-                this.FinishedMessage = $"{errMessage}\r\n{task.Exception.GetType().Name}\r\n{task.Exception.Message}";
+                var ex = task.Exception.GetPrimaryException();
+                this.FinishedMessage = $"{errMessage}\r\n{ex.GetType().Name}\r\n{ex.Message}";
             }
             else
             {

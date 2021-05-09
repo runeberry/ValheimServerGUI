@@ -215,7 +215,7 @@ namespace ValheimServerGUI.Forms
 
         private void RunStartupTasks()
         {
-            var i = 1;
+            //var i = 1;
             foreach (var taskFunc in this.StartupTasks)
             {
                 //this.Logger.LogTrace($"Beginning startup task #{i++}");

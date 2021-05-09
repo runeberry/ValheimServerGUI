@@ -29,8 +29,11 @@ namespace ValheimServerGUI.Forms
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             this.LoadingLabel = new System.Windows.Forms.Label();
             this.CloseButton = new System.Windows.Forms.Button();
+            this.ProgressBar = new System.Windows.Forms.ProgressBar();
+            this.Timer = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // LoadingLabel
@@ -54,12 +57,27 @@ namespace ValheimServerGUI.Forms
             this.CloseButton.Text = "Cancel";
             this.CloseButton.UseVisualStyleBackColor = true;
             // 
+            // ProgressBar
+            // 
+            this.ProgressBar.Location = new System.Drawing.Point(13, 76);
+            this.ProgressBar.MarqueeAnimationSpeed = 16;
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(178, 23);
+            this.ProgressBar.Step = 2;
+            this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
+            this.ProgressBar.TabIndex = 2;
+            // 
+            // Timer
+            // 
+            this.Timer.Enabled = true;
+            // 
             // AsyncPopout
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(284, 111);
             this.ControlBox = false;
+            this.Controls.Add(this.ProgressBar);
             this.Controls.Add(this.CloseButton);
             this.Controls.Add(this.LoadingLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
@@ -77,5 +95,7 @@ namespace ValheimServerGUI.Forms
 
         private System.Windows.Forms.Label LoadingLabel;
         private System.Windows.Forms.Button CloseButton;
+        private System.Windows.Forms.ProgressBar ProgressBar;
+        private System.Windows.Forms.Timer Timer;
     }
 }

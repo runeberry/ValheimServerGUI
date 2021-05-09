@@ -56,6 +56,7 @@ namespace ValheimServerGUI.Forms
 
             this.LoadingLabel.Text = this.FinishedMessage ?? "Task Complete!";
             this.CloseButton.Text = "Close";
+            this.ProgressBar.Visible = false;
         }
 
         private Task TaskContinuationHandler(Task task)

@@ -104,7 +104,7 @@ namespace ValheimServerGUI.Tools
         public static void AddImagesFromResourceFile(this ImageList list, Type resourcesType)
         {
             var resourceImages = new ResourceManager(resourcesType)
-                .GetResourceSet(CultureInfo.CurrentUICulture, true, true)
+                .GetResourceSet(CultureInfo.InvariantCulture, true, true)
                 .Cast<DictionaryEntry>()
                 .Where(de => de.Key != null && de.Value != null && typeof(Image).IsAssignableFrom(de.Value.GetType()))
                 .ToDictionary(de => de.Key.ToString(), de => de.Value as Image);

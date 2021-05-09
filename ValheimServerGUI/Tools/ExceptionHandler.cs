@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Windows.Forms;
 using ValheimServerGUI.Forms;
 
@@ -64,6 +65,8 @@ namespace ValheimServerGUI.Tools
                 { "Context", contextMessage },
                 { "Source", e.Source },
                 { "TargetSite", e.TargetSite?.ToString() },
+                { "CurrentCulture", CultureInfo.CurrentCulture?.ToString() },
+                { "CurentUICulture", CultureInfo.CurrentUICulture?.ToString() },
                 { "StackTrace", e.StackTrace },
             };
 

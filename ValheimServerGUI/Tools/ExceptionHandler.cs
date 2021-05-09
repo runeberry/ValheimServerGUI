@@ -7,7 +7,9 @@ namespace ValheimServerGUI.Tools
 {
     public interface IExceptionHandler
     {
-        void HandleException(Exception e, string additionalMessage = null);
+        event EventHandler ExceptionHandled;
+
+        void HandleException(Exception e, string contextMessage = null);
     }
 
     public class ExceptionHandler : IExceptionHandler
@@ -19,46 +21,48 @@ namespace ValheimServerGUI.Tools
             RuneberryApiClient = runeberryApiClient;
         }
 
-        public void HandleException(Exception e, string additionalMessage = null)
+        public event EventHandler ExceptionHandled;
+
+        public void HandleException(Exception e, string contextMessage = null)
         {
             if (e == null) return;
-            
-            additionalMessage ??= "Unhandled Exception";
-            
+
+            contextMessage ??= "Unknown Exception";
             var userMessage = "A fatal error has occured. Would you like to send an automated crash report to the developer?";
 
             var result = MessageBox.Show(
                 userMessage,
-                additionalMessage,
+                contextMessage,
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Error);
 
             if (result == DialogResult.Yes)
             {
-                var crashReport = BuildCrashReport(e, additionalMessage);
+                var crashReport = BuildCrashReport(e, contextMessage);
                 var task = RuneberryApiClient.SendCrashReportAsync(crashReport);
 
-                var asyncPopout = new AsyncPopout(task, options =>
+                var asyncPopout = new AsyncPopout(task, o =>
                 {
-                    options.Title = "Crash Report";
-                    options.Text = "Sending crash report...";
-                    options.CloseOnSuccess = true;
-                    options.SuccessMessage = "Crash report received. Thank you!";
-                    options.FailureMessage = "Failed to send crash report.\r\nContact Runeberry Software for further support.";
+                    o.Title = "Crash Report";
+                    o.Text = "Sending crash report...";
+                    o.CloseOnSuccess = true;
+                    o.SuccessMessage = "Crash report received. Thank you!";
+                    o.FailureMessage = "Failed to send crash report.\r\nContact Runeberry Software for further support.";
                 });
 
-                // todo: this fails if the application is already running
-                Application.Run(asyncPopout);
+                asyncPopout.ShowDialog();
             }
+
+            this.ExceptionHandled?.Invoke(this, EventArgs.Empty);
         }
 
-        private CrashReport BuildCrashReport(Exception e, string additionalMessage)
+        private CrashReport BuildCrashReport(Exception e, string contextMessage)
         {
             var additionalInfo = new Dictionary<string, string>
             {
                 { "ExceptionType", e.GetType().Name },
                 { "Message", e.Message },
-                { "Context", additionalMessage },
+                { "Context", contextMessage },
                 { "Source", e.Source },
                 { "TargetSite", e.TargetSite?.ToString() },
                 { "StackTrace", e.StackTrace },

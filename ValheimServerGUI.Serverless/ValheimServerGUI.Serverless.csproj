@@ -14,6 +14,10 @@
     <ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
+    <Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- This setup allows us to include a file outside of the project directory -->
     <!-- Courtesy of: https://stackoverflow.com/a/11808911/7071436 -->
     <Content Include="..\SolutionResources\*.json">

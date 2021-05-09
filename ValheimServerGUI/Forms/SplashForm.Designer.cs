@@ -29,21 +29,9 @@ namespace ValheimServerGUI.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.Label = new System.Windows.Forms.Label();
             this.AppNameLabel = new System.Windows.Forms.Label();
+            this.ProgressBar = new System.Windows.Forms.ProgressBar();
             this.SuspendLayout();
-            // 
-            // Label
-            // 
-            this.Label.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Label.Location = new System.Drawing.Point(12, 41);
-            this.Label.Name = "Label";
-            this.Label.Size = new System.Drawing.Size(174, 23);
-            this.Label.TabIndex = 0;
-            this.Label.Text = "Loading...";
-            this.Label.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // AppNameLabel
             // 
@@ -57,14 +45,24 @@ namespace ValheimServerGUI.Forms
             this.AppNameLabel.Text = "ValheimServerGUI";
             this.AppNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
+            // ProgressBar
+            // 
+            this.ProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.ProgressBar.Location = new System.Drawing.Point(12, 35);
+            this.ProgressBar.Name = "ProgressBar";
+            this.ProgressBar.Size = new System.Drawing.Size(174, 16);
+            this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
+            this.ProgressBar.TabIndex = 2;
+            // 
             // SplashForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(198, 73);
+            this.ClientSize = new System.Drawing.Size(198, 63);
             this.ControlBox = false;
             this.Controls.Add(this.AppNameLabel);
-            this.Controls.Add(this.Label);
+            this.Controls.Add(this.ProgressBar);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Name = "SplashForm";
             this.ShowInTaskbar = false;
@@ -74,8 +72,7 @@ namespace ValheimServerGUI.Forms
         }
 
         #endregion
-
-        private System.Windows.Forms.Label Label;
         private System.Windows.Forms.Label AppNameLabel;
+        private System.Windows.Forms.ProgressBar ProgressBar;
     }
 }

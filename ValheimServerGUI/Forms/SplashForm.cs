@@ -169,7 +169,7 @@ namespace ValheimServerGUI.Forms
             var numTasksFinished = this.FinishedTasks.Count;
             var pctTasksFinished = numTasksFinished * 100 / numTasks;
 
-            this.Label.Text = $"Loading... ({pctTasksFinished}%)";
+            this.ProgressBar.Value = pctTasksFinished;
 
             if (numTasksFinished >= numTasks)
             {

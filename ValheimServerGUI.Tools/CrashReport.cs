@@ -13,7 +13,7 @@ namespace ValheimServerGUI.Tools
         public string Source { get; set; }
 
         [JsonProperty("timestamp")]
-        public DateTimeOffset Timestamp { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
 
         [JsonProperty("appVersion")]
         public string AppVersion { get; set; }

@@ -28,6 +28,8 @@ namespace ValheimServerGUI.Tools
         {
             if (e == null) return;
 
+            e = e.GetPrimaryException();
+
             contextMessage ??= "Unknown Exception";
             var userMessage = "A fatal error has occured. Would you like to send an automated crash report to the developer?";
 

@@ -17,6 +17,10 @@ namespace ValheimServerGUI.Forms
 {
     public partial class MainWindow : Form
     {
+#if DEBUG
+        private const bool SimulateConstructorException = false;
+        private const bool SimulateStartServerException = false;
+#endif
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
@@ -53,6 +57,9 @@ namespace ValheimServerGUI.Forms
             IIpAddressProvider ipAddressProvider,
             ISoftwareUpdateProvider softwareUpdateProvider)
         {
+#if DEBUG
+            if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
             this.FormProvider = formProvider;
             this.UserPrefsProvider = userPrefsProvider;
             this.FileProvider = fileProvider;
@@ -588,6 +595,9 @@ namespace ValheimServerGUI.Forms
 
         private void StartServer()
         {
+#if DEBUG
+            if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
             string worldName;
             bool newWorld = this.WorldSelectRadioNew.Value;
 

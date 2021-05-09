@@ -22,6 +22,10 @@ namespace ValheimServerGUI.Tools
 
         public bool IsManualCheck { get; }
 
+        public bool IsSuccessful { get; }
+
+        public Exception Exception { get; }
+
         public SoftwareUpdateEventArgs(
             string latestVersion, 
             bool isNewerVersionAvailable,
@@ -30,6 +34,17 @@ namespace ValheimServerGUI.Tools
             this.LatestVersion = latestVersion;
             this.IsNewerVersionAvailable = isNewerVersionAvailable;
             this.IsManualCheck = isManualCheck;
+            this.IsSuccessful = true;
+        }
+
+        public SoftwareUpdateEventArgs(
+            Exception e, 
+            bool isManualCheck)
+        {
+            this.Exception = e;
+            this.IsNewerVersionAvailable = false;
+            this.IsManualCheck = isManualCheck;
+            this.IsSuccessful = false;
         }
     }
 
@@ -67,14 +82,24 @@ namespace ValheimServerGUI.Tools
 
             this.UpdateCheckStarted?.Invoke(this, EventArgs.Empty);
 
-            var currentVersion = AssemblyHelper.GetApplicationVersion();
-            var release = await this.GitHubClient.GetLatestReleaseAsync();
-            var newerVersionAvailable = AssemblyHelper.IsNewerVersion(release?.TagName);
+            SoftwareUpdateEventArgs eventArgs;
 
-            // In case there was no response from GitHub, consider the current running version as the "latest version"
-            var latestVersion = release?.TagName ?? AssemblyHelper.GetApplicationVersion();
+            try
+            {
+                var currentVersion = AssemblyHelper.GetApplicationVersion();
+                var release = await this.GitHubClient.GetLatestReleaseAsync();
+                var newerVersionAvailable = AssemblyHelper.IsNewerVersion(release?.TagName);
 
-            var eventArgs = new SoftwareUpdateEventArgs(latestVersion, newerVersionAvailable, isManualCheck);
+                // In case there was no response from GitHub, consider the current running version as the "latest version"
+                var latestVersion = release?.TagName ?? AssemblyHelper.GetApplicationVersion();
+
+                eventArgs = new SoftwareUpdateEventArgs(latestVersion, newerVersionAvailable, isManualCheck);
+            }
+            catch (Exception e)
+            {
+                eventArgs = new SoftwareUpdateEventArgs(e, isManualCheck);
+            }
+
             this.UpdateCheckFinished?.Invoke(this, eventArgs);
         }
     }

@@ -455,7 +455,7 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
-        #region Server Events
+        #region Service Events
 
         private void OnApplicationLogReceived(EventLogContext logEvent)
         {
@@ -534,7 +534,27 @@ namespace ValheimServerGUI.Forms
 
         private void SoftwareUpdateProvider_UpdateCheckFinished(SoftwareUpdateEventArgs e)
         {
-            if (e.IsNewerVersionAvailable)
+            if (!e.IsSuccessful)
+            {
+                this.SetStatusTextRight($"Update check failed", Resources.StatusCriticalError_16x, true);
+
+                if (e.IsManualCheck)
+                {
+                    var exception = e.Exception.GetPrimaryException();
+                    var result = MessageBox.Show(
+                        $"Update check failed: {exception.Message}" + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Error);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+            else if (e.IsNewerVersionAvailable)
             {
                 this.SetStatusTextRight($"Update available ({e.LatestVersion})", Resources.StatusWarning_16x, true);
 

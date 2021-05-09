@@ -18,8 +18,9 @@ namespace ValheimServerGUI.Forms
     public partial class MainWindow : Form
     {
 #if DEBUG
-        private const bool SimulateConstructorException = false;
-        private const bool SimulateStartServerException = false;
+        private static readonly bool SimulateConstructorException = false;
+        private static readonly bool SimulateStartServerException = false;
+        private static readonly bool SimulateStopServerException = false;
 #endif
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
@@ -306,6 +307,9 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            if (SimulateStopServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
             Server.Stop();
         }
 

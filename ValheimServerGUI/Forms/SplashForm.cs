@@ -11,6 +11,10 @@ namespace ValheimServerGUI.Forms
 {
     public partial class SplashForm : Form
     {
+#if DEBUG
+        private static readonly bool SimulateLongRunningStartup = false;
+        private static readonly bool SimulateStartupTaskException = false;
+#endif
         private Form MainForm;
         private bool IsFirstShown = true;
 
@@ -114,7 +118,24 @@ namespace ValheimServerGUI.Forms
             this.AddStartupTask(this.IpAddressProvider.GetExternalIpAddressAsync);
             this.AddStartupTask(this.IpAddressProvider.GetInternalIpAddressAsync);
             this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false));
-            //this.AddStartupTask(() => Task.Delay(2000));
+
+#if DEBUG
+            if (SimulateLongRunningStartup)
+            {
+                this.AddStartupTask(() => Task.Delay(2000));
+                this.AddStartupTask(() => Task.Delay(2500));
+                this.AddStartupTask(() => Task.Delay(3000));
+            }
+            
+            if (SimulateStartupTaskException)
+            {
+                this.AddStartupTask(async () =>
+                {
+                    await Task.Delay(500);
+                    throw new InvalidOperationException("Intentional exception thrown for testing");
+                });
+            }
+#endif
         }
 
         #endregion

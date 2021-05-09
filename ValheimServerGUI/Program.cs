@@ -38,7 +38,7 @@ namespace ValheimServerGUI
 
             try
             {
-                Application.Run(serviceProvider.GetRequiredService<MainWindow>());
+                Application.Run(serviceProvider.GetRequiredService<SplashForm>());
             }
             catch (Exception e)
             {
@@ -62,6 +62,7 @@ namespace ValheimServerGUI
                 .AddSingleton<IRestClientContext, RestClientContext>()
                 .AddSingleton<IIpAddressProvider, IpAddressProvider>()
                 .AddSingleton<IGitHubClient, GitHubClient>()
+                .AddSingleton<ISoftwareUpdateProvider, SoftwareUpdateProvider>()
                 .AddSingleton<IExceptionHandler, ExceptionHandler>()
                 .AddSingleton<IRuneberryApiClient, RuneberryApiClient>();
 
@@ -75,6 +76,7 @@ namespace ValheimServerGUI
 
             // Forms
             services
+                .AddSingleton<SplashForm>()
                 .AddSingleton<MainWindow>()
                 .AddSingleton<DirectoriesForm>()
                 .AddSingleton<PreferencesForm>()

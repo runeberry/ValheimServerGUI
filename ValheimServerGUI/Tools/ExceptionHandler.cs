@@ -45,7 +45,6 @@ namespace ValheimServerGUI.Tools
                 {
                     o.Title = "Crash Report";
                     o.Text = "Sending crash report...";
-                    o.CloseOnSuccess = true;
                     o.SuccessMessage = "Crash report received. Thank you!";
                     o.FailureMessage = "Failed to send crash report.\r\nContact Runeberry Software for further support.";
                 });

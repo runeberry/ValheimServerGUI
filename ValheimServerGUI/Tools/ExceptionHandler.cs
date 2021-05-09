@@ -75,6 +75,7 @@ namespace ValheimServerGUI.Tools
             return new CrashReport
             {
                 CrashReportId = Guid.NewGuid().ToString(),
+                ClientCorrelationId = AssemblyHelper.GetClientCorrelationId(),
                 Source = "UnhandledException",
                 Timestamp = DateTime.UtcNow,
                 AppVersion = AssemblyHelper.GetApplicationVersion(),

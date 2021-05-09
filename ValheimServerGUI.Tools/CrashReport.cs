@@ -9,6 +9,9 @@ namespace ValheimServerGUI.Tools
         [JsonProperty("id")]
         public string CrashReportId { get; set; }
 
+        [JsonProperty("clientCorrelationId")]
+        public string ClientCorrelationId { get; set; }
+
         [JsonProperty("source")]
         public string Source { get; set; }
 

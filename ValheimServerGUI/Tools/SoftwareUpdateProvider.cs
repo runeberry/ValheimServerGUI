@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
+using ValheimServerGUI.Game;
+using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Tools
 {
@@ -34,10 +36,15 @@ namespace ValheimServerGUI.Tools
     public class SoftwareUpdateProvider : ISoftwareUpdateProvider
     {
         private readonly IGitHubClient GitHubClient;
+        private readonly IUserPreferencesProvider UserPrefsProvider;
 
-        public SoftwareUpdateProvider(IGitHubClient gitHubClient)
+        private readonly TimeSpan UpdateCheckInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
+        private DateTime NextAutomaticUpdateCheck = DateTime.MinValue;
+
+        public SoftwareUpdateProvider(IGitHubClient gitHubClient, IUserPreferencesProvider userPrefsProvider)
         {
             this.GitHubClient = gitHubClient;
+            this.UserPrefsProvider = userPrefsProvider;
         }
 
         public event EventHandler UpdateCheckStarted;
@@ -46,6 +53,18 @@ namespace ValheimServerGUI.Tools
 
         public async Task CheckForUpdatesAsync(bool isManualCheck)
         {
+            if (!isManualCheck)
+            {
+                // Only fulfill automated checks if enough time has passed since the last check
+                var now = DateTime.UtcNow;
+                if (now < this.NextAutomaticUpdateCheck) return;
+                this.NextAutomaticUpdateCheck = now + this.UpdateCheckInterval;
+
+                // Only fulfill automated checks if the user has update checks enabled
+                var prefs = this.UserPrefsProvider.LoadPreferences();
+                if (!prefs.CheckForUpdates) return;
+            }
+
             this.UpdateCheckStarted?.Invoke(this, EventArgs.Empty);
 
             var currentVersion = AssemblyHelper.GetApplicationVersion();

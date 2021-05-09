@@ -30,10 +30,7 @@ namespace ValheimServerGUI.Forms
             { ServerStatus.Starting, Resources.UnsyncedCommits_16x_Horiz },
             { ServerStatus.Running, Resources.StatusRun_16x },
             { ServerStatus.Stopping, Resources.UnsyncedCommits_16x_Horiz },
-        };
-
-        private readonly TimeSpan UpdateCheckInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
-        private DateTime NextUpdateCheck = DateTime.MaxValue;
+        };      
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
@@ -428,10 +425,7 @@ namespace ValheimServerGUI.Forms
 
         private void UpdateCheckTimer_Tick()
         {
-            if (DateTime.UtcNow > this.NextUpdateCheck)
-            {
-                this.CheckForUpdates(false);
-            }
+            this.CheckForUpdates(false);
         }
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
@@ -866,14 +860,6 @@ namespace ValheimServerGUI.Forms
 
         private void CheckForUpdates(bool isManualCheck)
         {
-            if (!isManualCheck)
-            {
-                this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
-
-                var prefs = this.UserPrefsProvider.LoadPreferences();
-                if (!prefs.CheckForUpdates) return;
-            }
-
             Task.Run(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(isManualCheck));
         }
 

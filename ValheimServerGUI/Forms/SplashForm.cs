@@ -18,6 +18,7 @@ namespace ValheimServerGUI.Forms
 #endif
         private Form MainForm;
         private bool IsFirstShown = true;
+        private bool CloseAfterExceptionHandled = false;
 
         private readonly List<Func<Task>> StartupTasks = new();
         private readonly List<Task> FinishedTasks = new();
@@ -53,7 +54,7 @@ namespace ValheimServerGUI.Forms
             }
             catch (Exception e)
             {
-                this.HandleException(e);
+                this.HandleException(e, "Startup Init Exception", true);
             }
         }
 
@@ -65,6 +66,7 @@ namespace ValheimServerGUI.Forms
         private void InitializeFormEvents()
         {
             this.Shown += this.BuildEventHandler(this.SplashForm_OnShown);
+            this.ExceptionHandler.ExceptionHandled += this.BuildEventHandler(this.OnExceptionHandled);
         }
 
         #region Form events
@@ -99,7 +101,7 @@ namespace ValheimServerGUI.Forms
             }
             catch (Exception ex)
             {
-                this.HandleException(ex);
+                this.HandleException(ex, "Startup Run Exception", true);
             }
         }
 
@@ -159,7 +161,7 @@ namespace ValheimServerGUI.Forms
                 if (!task.IsCompletedSuccessfully)
                 {
                     this.Logger.LogWarning("Error encountered during startup task");
-                    this.HandleException(task.Exception);
+                    this.HandleException(task.Exception, "Startup Task Exception", true);
                     return;
                 }
 
@@ -182,17 +184,19 @@ namespace ValheimServerGUI.Forms
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            this.HandleException(e.ExceptionObject as Exception, "Unhandled Exception");
+            var isMainFormVisible = this.MainForm != null && this.MainForm.Visible;
+            this.HandleException(e.ExceptionObject as Exception, "Unhandled Exception", !isMainFormVisible);
         }
 
         private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            this.HandleException(e.Exception, "Thread Exception");
+            var isMainFormVisible = this.MainForm != null && this.MainForm.Visible;
+            this.HandleException(e.Exception, "Thread Exception", !isMainFormVisible);
         }
 
-        private void OnExceptionHandled(object sender, EventArgs e)
+        private void OnExceptionHandled()
         {
-            this.Close();
+            if (CloseAfterExceptionHandled) this.Close();
         }
 
         private void OnMainFormClosed(object sender, FormClosedEventArgs e)
@@ -252,13 +256,13 @@ namespace ValheimServerGUI.Forms
             return true;
         }
 
-        private void HandleException(Exception exception, string contextMessage = null)
+        private void HandleException(Exception exception, string contextMessage, bool closeAfterHandle)
         {
             this.Logger.LogError($"Encountered exception - {exception.GetType().Name}: {exception.Message}");
 
-            this.ExceptionHandler.ExceptionHandled += this.OnExceptionHandled;
+            this.CloseAfterExceptionHandled = closeAfterHandle;
 
-            this.ExceptionHandler.HandleException(exception, contextMessage ?? "Startup Exception");
+            this.ExceptionHandler.HandleException(exception, contextMessage);
         }
 
         private void FinishStartup()

@@ -21,7 +21,7 @@ namespace ValheimServerGUI.Tools
                 .WithHeader(Secrets.RuneberryApiKeyHeader, Secrets.RuneberryClientApiKey)
                 .SendAsync();
 
-            return response.IsSuccessStatusCode;
+            return response != null && response.IsSuccessStatusCode;
         }
     }
 }

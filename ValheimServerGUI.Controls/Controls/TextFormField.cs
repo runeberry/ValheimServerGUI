@@ -52,6 +52,12 @@ namespace ValheimServerGUI.Forms.Controls
             set => this.TextBox.MaxLength = value;
         }
 
+        public bool Multiline
+        {
+            get => this.TextBox.Multiline;
+            set => this.TextBox.Multiline = value;
+        }
+
         public TextFormField()
         {
             InitializeComponent();

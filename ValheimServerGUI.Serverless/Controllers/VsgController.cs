@@ -45,8 +45,9 @@ namespace ValheimServerGUI.Serverless.Controllers
 
                 // Ensure that each crash report has an ID
                 request.CrashReportId ??= Guid.NewGuid().ToString();
+                request.Source ??= "CrashReport";
                 request.Timestamp ??= DateTimeOffset.UtcNow;
-                var filename = $"CrashReport-{request.Timestamp.Value.ToFileTime()}-{request.CrashReportId}.json";
+                var filename = $"{request.Source}-{request.Timestamp.Value.ToFileTime()}-{request.CrashReportId}.json";
 
                 var s3Request = new PutObjectRequest
                 {

@@ -1,5 +1,6 @@
 ﻿using DeviceId;
 using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Security.Cryptography;
@@ -55,6 +56,21 @@ namespace ValheimServerGUI.Tools
             ClientCorrelationId = string.Join(string.Empty, hexStrings);
 
             return ClientCorrelationId;
+        }
+
+        public static CrashReport BuildCrashReport()
+        {
+            return new CrashReport
+            {
+                CrashReportId = Guid.NewGuid().ToString(),
+                ClientCorrelationId = GetClientCorrelationId(),
+                Timestamp = DateTime.UtcNow,
+                AppVersion = GetApplicationVersion(),
+                OsVersion = Environment.OSVersion.VersionString,
+                DotnetVersion = Environment.Version.ToString(),
+                CurrentCulture = CultureInfo.CurrentCulture?.ToString(),
+                CurrentUICulture = CultureInfo.CurrentUICulture?.ToString(),
+            };
         }
     }
 }

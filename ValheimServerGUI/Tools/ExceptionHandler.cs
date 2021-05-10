@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Windows.Forms;
 using ValheimServerGUI.Forms;
 
@@ -60,6 +59,8 @@ namespace ValheimServerGUI.Tools
 
         private CrashReport BuildCrashReport(Exception e, string contextMessage)
         {
+            var crashReport = AssemblyHelper.BuildCrashReport();
+
             var additionalInfo = new Dictionary<string, string>
             {
                 { "ExceptionType", e.GetType().Name },
@@ -67,22 +68,13 @@ namespace ValheimServerGUI.Tools
                 { "Context", contextMessage },
                 { "Source", e.Source },
                 { "TargetSite", e.TargetSite?.ToString() },
-                { "CurrentCulture", CultureInfo.CurrentCulture?.ToString() },
-                { "CurentUICulture", CultureInfo.CurrentUICulture?.ToString() },
                 { "StackTrace", e.StackTrace },
             };
 
-            return new CrashReport
-            {
-                CrashReportId = Guid.NewGuid().ToString(),
-                ClientCorrelationId = AssemblyHelper.GetClientCorrelationId(),
-                Source = "UnhandledException",
-                Timestamp = DateTime.UtcNow,
-                AppVersion = AssemblyHelper.GetApplicationVersion(),
-                OsVersion = Environment.OSVersion.VersionString,
-                DotnetVersion = Environment.Version.ToString(),
-                AdditionalInfo = additionalInfo,
-            };
+            crashReport.Source = "CrashReport";
+            crashReport.AdditionalInfo = additionalInfo;
+
+            return crashReport;
         }
     }
 }

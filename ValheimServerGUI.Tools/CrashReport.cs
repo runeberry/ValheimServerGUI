@@ -27,6 +27,12 @@ namespace ValheimServerGUI.Tools
         [JsonProperty("dotnetVersion")]
         public string DotnetVersion { get; set; }
 
+        [JsonProperty("currentCulture")]
+        public string CurrentCulture { get; set; }
+
+        [JsonProperty("currentUiCulture")]
+        public string CurrentUICulture { get; set; }
+
         [JsonProperty("additionalInfo")]
         public Dictionary<string, string> AdditionalInfo { get; set; }
 

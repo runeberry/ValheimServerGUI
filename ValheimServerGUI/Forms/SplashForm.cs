@@ -49,6 +49,7 @@ namespace ValheimServerGUI.Forms
             try
             {
                 InitializeComponent();
+                this.AddApplicationIcon();
                 InitializeAppName();
                 InitializeFormEvents();
             }

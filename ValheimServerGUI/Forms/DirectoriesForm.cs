@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Forms
 {
@@ -13,6 +14,7 @@ namespace ValheimServerGUI.Forms
         public DirectoriesForm()
         {
             InitializeComponent();
+            this.AddApplicationIcon();
         }
 
         public DirectoriesForm(IUserPreferencesProvider userPrefsProvider, IValheimFileProvider fileProvider) : this()

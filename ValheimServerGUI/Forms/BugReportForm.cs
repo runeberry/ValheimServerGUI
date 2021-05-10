@@ -16,6 +16,7 @@ namespace ValheimServerGUI.Forms
         public BugReportForm()
         {
             InitializeComponent();
+            this.AddApplicationIcon();
 
             this.ButtonSubmit.Click += this.BuildEventHandler(this.ButtonSubmit_Click);
             this.ButtonCancel.Click += this.BuildEventHandler(this.ButtonCancel_Click);

@@ -72,6 +72,7 @@ namespace ValheimServerGUI.Forms
             this.SoftwareUpdateProvider = softwareUpdateProvider;
 
             InitializeComponent(); // WinForms generated code, always first
+            this.AddApplicationIcon();
             InitializeImages();
             InitializeServer();
             InitializeFormEvents();

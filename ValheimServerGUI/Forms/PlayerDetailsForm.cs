@@ -16,6 +16,7 @@ namespace ValheimServerGUI.Forms
             this.PlayerDataProvider = playerDataProvider;
 
             InitializeComponent();
+            this.AddApplicationIcon();
 
             this.ButtonRefresh.Click += ButtonRefresh_Click;
             this.ButtonOK.Click += ButtonOK_Click;

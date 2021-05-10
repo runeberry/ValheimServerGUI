@@ -20,6 +20,7 @@ namespace ValheimServerGUI.Forms
         private AsyncPopout()
         {
             InitializeComponent();
+            this.AddApplicationIcon();
 
             this.CloseButton.Click += this.BuildEventHandler(this.Close);
             this.TaskFinished += this.BuildEventHandler(this.OnTaskFinished);

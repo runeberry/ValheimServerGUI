@@ -115,6 +115,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
             this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
+            this.MenuItemHelpBugReport.Click += this.MenuItemHelpBugReport_Click;
             this.MenuItemHelpUpdates.Click += this.BuildEventHandler(this.MenuItemHelpUpdates_Clicked);
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
@@ -288,6 +289,12 @@ namespace ValheimServerGUI.Forms
         private void MenuItemHelpPortForwarding_Clicked(object sender, EventArgs e)
         {
             WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
+        }
+
+        private void MenuItemHelpBugReport_Click(object sender, EventArgs e)
+        {
+            var bugReportForm = FormProvider.GetForm<BugReportForm>();
+            bugReportForm.ShowDialog();
         }
 
         private void MenuItemHelpUpdates_Clicked()

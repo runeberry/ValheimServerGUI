@@ -24,6 +24,11 @@ namespace ValheimServerGUI.Tools
                 .WithHeader("User-Agent", "ValheimServerGUI")
                 .SendAsync<GitHubRelease[]>();
 
+            if (releases == null)
+            {
+                throw new Exception("Unable to reach GitHub.");
+            }
+
             var latestRelease = releases
                 .Where(r => r.Assets != null && r.Assets.Any())
                 .Where(r => !r.Prerelease && !r.Draft)

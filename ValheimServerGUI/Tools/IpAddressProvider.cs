@@ -73,7 +73,6 @@ namespace ValheimServerGUI.Tools
 
             if (result != null)
             {
-                this.Logger.LogTrace("Found {0} internal IP address(es): {1}", results.Count(), string.Join(", ", results));
                 this.InternalIpReceived?.Invoke(this, result);
             }
 

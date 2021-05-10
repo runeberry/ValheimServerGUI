@@ -6,6 +6,18 @@ namespace ValheimServerGUI.Tools.Http
 {
     public static class RestClientRequestExtensions
     {
+        public static RestClientRequest WithClientOptions(this RestClientRequest request, Action<HttpClient> options)
+        {
+            request.ClientBuilders.Add(options);
+            return request;
+        }
+
+        public static RestClientRequest WithRequestOptions(this RestClientRequest request, Action<HttpRequestMessage> options)
+        {
+            request.RequestBuilders.Add(options);
+            return request;
+        }
+
         public static RestClientRequest WithResponseType<T>(this RestClientRequest request)
         {
             request.ResponseContentType = typeof(T);

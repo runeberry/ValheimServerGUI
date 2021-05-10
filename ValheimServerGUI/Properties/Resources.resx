@@ -154,6 +154,9 @@
   <data name="Loading_Blue_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Loading_Blue_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="NewBug_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NewBug_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="OpenWeb_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\OpenWeb_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -231,6 +234,9 @@
   </data>
   <data name="UrlPortForwardingGuide" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server</value>
+  </data>
+  <data name="UrlRuneberryApi" xml:space="preserve">
+    <value>https://api.runeberry.com/vsg-api</value>
   </data>
   <data name="UrlTwitter" xml:space="preserve">
     <value>https://twitter.com/Runeberries</value>

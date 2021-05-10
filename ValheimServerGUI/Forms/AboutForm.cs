@@ -10,6 +10,7 @@ namespace ValheimServerGUI.Forms
         public AboutForm()
         {
             InitializeComponent();
+            this.AddApplicationIcon();
 
             this.VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
         }

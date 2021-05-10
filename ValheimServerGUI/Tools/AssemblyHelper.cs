@@ -1,6 +1,10 @@
-﻿using System;
+﻿using DeviceId;
+using System;
+using System.Globalization;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace ValheimServerGUI.Tools
 {
@@ -33,6 +37,40 @@ namespace ValheimServerGUI.Tools
         public static Version GetDotnetRuntimeVersion()
         {
             return Environment.Version;
+        }
+
+        private static string ClientCorrelationId;
+
+        public static string GetClientCorrelationId()
+        {
+            if (ClientCorrelationId != null) return ClientCorrelationId;
+
+            var deviceId = new DeviceIdBuilder()
+                .AddMacAddress()
+                .AddMotherboardSerialNumber()
+                .ToString()
+                .ToLowerInvariant();
+
+            using var hash = MD5.Create();
+            var hexStrings = hash.ComputeHash(Encoding.UTF8.GetBytes(deviceId)).Select(b => b.ToString("x2"));
+            ClientCorrelationId = string.Join(string.Empty, hexStrings);
+
+            return ClientCorrelationId;
+        }
+
+        public static CrashReport BuildCrashReport()
+        {
+            return new CrashReport
+            {
+                CrashReportId = Guid.NewGuid().ToString(),
+                ClientCorrelationId = GetClientCorrelationId(),
+                Timestamp = DateTime.UtcNow,
+                AppVersion = GetApplicationVersion(),
+                OsVersion = Environment.OSVersion.VersionString,
+                DotnetVersion = Environment.Version.ToString(),
+                CurrentCulture = CultureInfo.CurrentCulture?.ToString(),
+                CurrentUICulture = CultureInfo.CurrentUICulture?.ToString(),
+            };
         }
     }
 }

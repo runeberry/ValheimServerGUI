@@ -17,6 +17,11 @@ namespace ValheimServerGUI.Forms
 {
     public partial class MainWindow : Form
     {
+#if DEBUG
+        private static readonly bool SimulateConstructorException = false;
+        private static readonly bool SimulateStartServerException = false;
+        private static readonly bool SimulateStopServerException = false;
+#endif
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
@@ -30,10 +35,7 @@ namespace ValheimServerGUI.Forms
             { ServerStatus.Starting, Resources.UnsyncedCommits_16x_Horiz },
             { ServerStatus.Running, Resources.StatusRun_16x },
             { ServerStatus.Stopping, Resources.UnsyncedCommits_16x_Horiz },
-        };
-
-        private readonly TimeSpan UpdateCheckInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
-        private DateTime NextUpdateCheck = DateTime.MaxValue;
+        };      
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
@@ -43,7 +45,7 @@ namespace ValheimServerGUI.Forms
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
-        private readonly IGitHubClient GitHubClient;
+        private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -54,8 +56,11 @@ namespace ValheimServerGUI.Forms
             ValheimServerLogger serverLogger,
             IEventLogger appLogger,
             IIpAddressProvider ipAddressProvider,
-            IGitHubClient gitHubClient)
+            ISoftwareUpdateProvider softwareUpdateProvider)
         {
+#if DEBUG
+            if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
             this.FormProvider = formProvider;
             this.UserPrefsProvider = userPrefsProvider;
             this.FileProvider = fileProvider;
@@ -64,9 +69,10 @@ namespace ValheimServerGUI.Forms
             this.ServerLogger = serverLogger;
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
-            this.GitHubClient = gitHubClient;
+            this.SoftwareUpdateProvider = softwareUpdateProvider;
 
             InitializeComponent(); // WinForms generated code, always first
+            this.AddApplicationIcon();
             InitializeImages();
             InitializeServer();
             InitializeFormEvents();
@@ -94,12 +100,15 @@ namespace ValheimServerGUI.Forms
 
             this.IpAddressProvider.ExternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_ExternalIpReceived);
             this.IpAddressProvider.InternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_InternalIpReceived);
+
+            this.SoftwareUpdateProvider.UpdateCheckStarted += this.BuildEventHandler(this.SoftwareUpdateProvider_UpdateCheckStarted);
+            this.SoftwareUpdateProvider.UpdateCheckFinished += this.BuildEventHandler<SoftwareUpdateEventArgs>(this.SoftwareUpdateProvider_UpdateCheckFinished);
         }
 
         private void InitializeFormEvents()
         {
             // MainWindow
-            this.Shown += this.BuildEventHandlerAsync(this.MainWindow_Load, 250);
+            this.Shown += this.BuildEventHandler(this.MainWindow_Load);
 
             // Menu items
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
@@ -107,7 +116,8 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
             this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
-            this.MenuItemHelpUpdates.Click += this.BuildEventHandlerAsync(this.MenuItemHelpUpdates_Clicked);
+            this.MenuItemHelpBugReport.Click += this.MenuItemHelpBugReport_Click;
+            this.MenuItemHelpUpdates.Click += this.BuildEventHandler(this.MenuItemHelpUpdates_Clicked);
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
             // Tray icon
@@ -119,7 +129,7 @@ namespace ValheimServerGUI.Forms
 
             // Timers
             this.ServerRefreshTimer.Tick += this.ServerRefreshTimer_Tick;
-            this.UpdateCheckTimer.Tick += this.BuildEventHandlerAsync(this.UpdateCheckTimer_Tick);
+            this.UpdateCheckTimer.Tick += this.BuildEventHandler(this.UpdateCheckTimer_Tick);
 
             // Tabs
             this.TabPlayers.VisibleChanged += this.TabPlayers_VisibleChanged;
@@ -136,7 +146,7 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonExternalIpAddress.CopyFunction = () => this.LabelExternalIpAddress.Value;
             this.CopyButtonInternalIpAddress.CopyFunction = () => this.LabelInternalIpAddress.Value;
             this.CopyButtonLocalIpAddress.CopyFunction = () => this.LabelLocalIpAddress.Value;
-            this.StatusStripLabelRight.Click += this.BuildEventHandlerAsync(this.StatusStripLabelRight_Click);
+            this.StatusStripLabelRight.Click += this.BuildEventHandler(this.StatusStripLabelRight_Click);
 
             // Form fields
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
@@ -167,15 +177,9 @@ namespace ValheimServerGUI.Forms
 
         #region MainWindow Events
 
-        private Task MainWindow_Load()
+        private void MainWindow_Load()
         {
             this.Logger.LogInformation($"Valheim Server GUI v{AssemblyHelper.GetApplicationVersion()} - Loaded OK");
-
-            return Task.WhenAll(
-                this.RefreshInternalIpAsync(),
-                this.RefreshExternalIpAsync(),
-                this.CheckForUpdatesAsync(false)
-            );
         }
 
         protected override void OnShown(EventArgs e)
@@ -288,9 +292,15 @@ namespace ValheimServerGUI.Forms
             WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
-        private async Task MenuItemHelpUpdates_Clicked()
+        private void MenuItemHelpBugReport_Click(object sender, EventArgs e)
         {
-            await this.CheckForUpdatesAsync(true);
+            var bugReportForm = FormProvider.GetForm<BugReportForm>();
+            bugReportForm.ShowDialog();
+        }
+
+        private void MenuItemHelpUpdates_Clicked()
+        {
+            this.CheckForUpdates(true);
         }
 
         private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
@@ -305,6 +315,9 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
+#if DEBUG
+            if (SimulateStopServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
             Server.Stop();
         }
 
@@ -429,12 +442,9 @@ namespace ValheimServerGUI.Forms
             if (this.TabServerDetails.Visible) this.RefreshServerDetails();
         }
 
-        private async Task UpdateCheckTimer_Tick()
+        private void UpdateCheckTimer_Tick()
         {
-            if (DateTime.UtcNow > this.NextUpdateCheck)
-            {
-                await this.CheckForUpdatesAsync(false);
-            }
+            this.CheckForUpdates(false);
         }
 
         private void PlayersTable_SelectionChanged(object sender, EventArgs e)
@@ -444,16 +454,16 @@ namespace ValheimServerGUI.Forms
             this.ButtonRemovePlayer.Enabled = isSelected && row.Entity.PlayerStatus == PlayerStatus.Offline;
         }
 
-        private async Task StatusStripLabelRight_Click()
+        private void StatusStripLabelRight_Click()
         {
             if (!this.StatusStripLabelRight.IsLink) return;
 
-            await this.CheckForUpdatesAsync(true);
+            this.CheckForUpdates(true);
         }
 
         #endregion
 
-        #region Server Events
+        #region Service Events
 
         private void OnApplicationLogReceived(EventLogContext logEvent)
         {
@@ -525,6 +535,73 @@ namespace ValheimServerGUI.Forms
             this.RefreshIpPorts();
         }
 
+        private void SoftwareUpdateProvider_UpdateCheckStarted()
+        {
+            this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);
+        }
+
+        private void SoftwareUpdateProvider_UpdateCheckFinished(SoftwareUpdateEventArgs e)
+        {
+            if (!e.IsSuccessful)
+            {
+                this.SetStatusTextRight($"Update check failed", Resources.StatusCriticalError_16x, true);
+
+                if (e.IsManualCheck)
+                {
+                    var exception = e.Exception.GetPrimaryException();
+                    var result = MessageBox.Show(
+                        $"Update check failed: {exception.Message}" + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Error);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+            else if (e.IsNewerVersionAvailable)
+            {
+                this.SetStatusTextRight($"Update available ({e.LatestVersion})", Resources.StatusWarning_16x, true);
+
+                if (e.IsManualCheck)
+                {
+                    var result = MessageBox.Show(
+                        $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Warning);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+            else
+            {
+                this.SetStatusTextRight($"Up to date ({e.LatestVersion})", Resources.StatusOK_16x, false);
+
+                if (e.IsManualCheck)
+                {
+                    var result = MessageBox.Show(
+                        "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
+                        "Would you like to go to the download page?",
+                        "Check for Updates",
+                        MessageBoxButtons.YesNo,
+                        MessageBoxIcon.Question);
+
+                    if (result == DialogResult.Yes)
+                    {
+                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         #region Common Methods
@@ -550,6 +627,9 @@ namespace ValheimServerGUI.Forms
 
         private void StartServer()
         {
+#if DEBUG
+            if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
             string worldName;
             bool newWorld = this.WorldSelectRadioNew.Value;
 
@@ -708,16 +788,6 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private async Task RefreshExternalIpAsync()
-        {
-            if (this.LabelExternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetExternalIpAddressAsync();
-        }
-
-        private async Task RefreshInternalIpAsync()
-        {
-            if (this.LabelInternalIpAddress.Value == IpLoadingText) await this.IpAddressProvider.GetInternalIpAddressAsync();
-        }
-
         private void RefreshIpPorts()
         {
             const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
@@ -830,60 +900,9 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectRadioExisting.Value = true;
         }
 
-        private async Task CheckForUpdatesAsync(bool isManualCheck)
+        private void CheckForUpdates(bool isManualCheck)
         {
-            if (!isManualCheck)
-            {
-                this.NextUpdateCheck = DateTime.UtcNow + this.UpdateCheckInterval;
-
-                var prefs = this.UserPrefsProvider.LoadPreferences();
-                if (!prefs.CheckForUpdates) return;
-            }
-
-            this.SetStatusTextRight("Checking for updates...", Resources.Loading_Blue_16x, false);
-
-            var currentVersion = AssemblyHelper.GetApplicationVersion();
-            var release = await this.GitHubClient.GetLatestReleaseAsync();
-
-            if (AssemblyHelper.IsNewerVersion(release?.TagName))
-            {
-                this.SetStatusTextRight($"Update available ({release.TagName})", Resources.StatusWarning_16x, true);
-
-                if (isManualCheck)
-                {
-                    var result = MessageBox.Show(
-                        $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
-                        "Would you like to go to the download page?",
-                        "Check for Updates",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
-                    }
-                }
-            }
-            else
-            {
-                currentVersion = release.TagName ?? currentVersion; // Use the v-prefixed version if available
-                this.SetStatusTextRight($"Up to date ({currentVersion})", Resources.StatusOK_16x, false);
-
-                if (isManualCheck)
-                {
-                    var result = MessageBox.Show(
-                        "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
-                        "Would you like to go to the download page?",
-                        "Check for Updates",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
-                    }
-                }
-            }
+            Task.Run(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(isManualCheck));
         }
 
         private void CloseApplicationOnServerStopped()

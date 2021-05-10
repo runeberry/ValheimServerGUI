@@ -40,6 +40,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelp = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpManual = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpPortForwarding = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemHelpBugReport = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
@@ -162,6 +163,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelp.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.MenuItemHelpManual,
             this.MenuItemHelpPortForwarding,
+            this.MenuItemHelpBugReport,
             this.MenuItemHelpSeparator1,
             this.MenuItemHelpUpdates,
             this.MenuItemHelpAbout});
@@ -173,32 +175,39 @@ namespace ValheimServerGUI.Forms
             // 
             this.MenuItemHelpManual.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemHelpManual.Image")));
             this.MenuItemHelpManual.Name = "MenuItemHelpManual";
-            this.MenuItemHelpManual.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpManual.Size = new System.Drawing.Size(192, 22);
             this.MenuItemHelpManual.Text = "Online &Manual";
             // 
             // MenuItemHelpPortForwarding
             // 
             this.MenuItemHelpPortForwarding.Image = global::ValheimServerGUI.Properties.Resources.OpenWeb_16x;
             this.MenuItemHelpPortForwarding.Name = "MenuItemHelpPortForwarding";
-            this.MenuItemHelpPortForwarding.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpPortForwarding.Size = new System.Drawing.Size(192, 22);
             this.MenuItemHelpPortForwarding.Text = "&Port Forwarding";
+            // 
+            // MenuItemHelpBugReport
+            // 
+            this.MenuItemHelpBugReport.Image = global::ValheimServerGUI.Properties.Resources.NewBug_16x;
+            this.MenuItemHelpBugReport.Name = "MenuItemHelpBugReport";
+            this.MenuItemHelpBugReport.Size = new System.Drawing.Size(192, 22);
+            this.MenuItemHelpBugReport.Text = "Submit a &Bug Report...";
             // 
             // MenuItemHelpSeparator1
             // 
             this.MenuItemHelpSeparator1.Name = "MenuItemHelpSeparator1";
-            this.MenuItemHelpSeparator1.Size = new System.Drawing.Size(168, 6);
+            this.MenuItemHelpSeparator1.Size = new System.Drawing.Size(189, 6);
             // 
             // MenuItemHelpUpdates
             // 
             this.MenuItemHelpUpdates.Image = global::ValheimServerGUI.Properties.Resources.UnsyncedCommits_16x_Horiz;
             this.MenuItemHelpUpdates.Name = "MenuItemHelpUpdates";
-            this.MenuItemHelpUpdates.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpUpdates.Size = new System.Drawing.Size(192, 22);
             this.MenuItemHelpUpdates.Text = "Check for &Updates";
             // 
             // MenuItemHelpAbout
             // 
             this.MenuItemHelpAbout.Name = "MenuItemHelpAbout";
-            this.MenuItemHelpAbout.Size = new System.Drawing.Size(171, 22);
+            this.MenuItemHelpAbout.Size = new System.Drawing.Size(192, 22);
             this.MenuItemHelpAbout.Text = "&About...";
             // 
             // StatusStrip
@@ -282,6 +291,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectNewNameField.LabelText = "New World Name";
             this.WorldSelectNewNameField.Location = new System.Drawing.Point(6, 45);
             this.WorldSelectNewNameField.MaxLength = 20;
+            this.WorldSelectNewNameField.Multiline = false;
             this.WorldSelectNewNameField.Name = "WorldSelectNewNameField";
             this.WorldSelectNewNameField.Size = new System.Drawing.Size(234, 41);
             this.WorldSelectNewNameField.TabIndex = 18;
@@ -379,6 +389,7 @@ namespace ValheimServerGUI.Forms
             this.ServerPasswordField.LabelText = "Server Password";
             this.ServerPasswordField.Location = new System.Drawing.Point(0, 47);
             this.ServerPasswordField.MaxLength = 64;
+            this.ServerPasswordField.Multiline = false;
             this.ServerPasswordField.Name = "ServerPasswordField";
             this.ServerPasswordField.Size = new System.Drawing.Size(243, 41);
             this.ServerPasswordField.TabIndex = 11;
@@ -391,6 +402,7 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField.LabelText = "Server Name";
             this.ServerNameField.Location = new System.Drawing.Point(0, 0);
             this.ServerNameField.MaxLength = 64;
+            this.ServerNameField.Multiline = false;
             this.ServerNameField.Name = "ServerNameField";
             this.ServerNameField.Size = new System.Drawing.Size(243, 41);
             this.ServerNameField.TabIndex = 10;
@@ -775,7 +787,6 @@ namespace ValheimServerGUI.Forms
             this.Controls.Add(this.Tabs);
             this.Controls.Add(this.StatusStrip);
             this.Controls.Add(this.MenuStrip);
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.MenuStrip;
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(500, 371);
@@ -868,5 +879,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripStatusLabel StatusStripLabelRight;
         private System.Windows.Forms.Timer UpdateCheckTimer;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFilePreferences;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemHelpBugReport;
     }
 }

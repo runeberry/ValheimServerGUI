@@ -179,6 +179,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap NewBug_16x {
+            get {
+                object obj = ResourceManager.GetObject("NewBug_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap OpenWeb_16x {
             get {
                 object obj = ResourceManager.GetObject("OpenWeb_16x", resourceCulture);
@@ -423,6 +433,15 @@ namespace ValheimServerGUI.Properties {
         internal static string UrlPortForwardingGuide {
             get {
                 return ResourceManager.GetString("UrlPortForwardingGuide", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://api.runeberry.com/vsg-api.
+        /// </summary>
+        internal static string UrlRuneberryApi {
+            get {
+                return ResourceManager.GetString("UrlRuneberryApi", resourceCulture);
             }
         }
         

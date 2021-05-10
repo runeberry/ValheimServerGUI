@@ -1,10 +1,13 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 
 namespace ValheimServerGUI.Tools.Logging
 {
     public class EventLogger : IEventLogger
     {
+        private readonly ConcurrentBuffer<string> ConcurrentBuffer = new(1000);
+
         protected string CategoryName { get; set; }
 
         protected virtual bool FilterLog(EventLogContext context)
@@ -18,6 +21,8 @@ namespace ValheimServerGUI.Tools.Logging
         }
 
         #region IEventLogger implementation
+
+        public IEnumerable<string> LogBuffer => this.ConcurrentBuffer;
 
         public event EventHandler<EventLogContext> LogReceived;
 
@@ -66,6 +71,9 @@ namespace ValheimServerGUI.Tools.Logging
                 // Suppress any logging errors
                 return;
             }
+
+            var formattedMessage = $"[{context.Timestamp:G}] {context.Message}";
+            this.ConcurrentBuffer.Enqueue(formattedMessage);
 
             LogReceived?.Invoke(this, context);
         }

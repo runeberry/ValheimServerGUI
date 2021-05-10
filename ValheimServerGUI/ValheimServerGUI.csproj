@@ -5,25 +5,34 @@
     <TargetFramework>net5.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Resources\ApplicationIcon.ico</ApplicationIcon>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
     <Authors>Runeberry Software, LLC</Authors>
     <Product>ValheimServerGUI</Product>
     <Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
     <Copyright>2021</Copyright>
     <PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
-    <Version>1.2.5</Version>
+    <Version>1.3.0</Version>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj" />
+    <ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Humanizer" Version="2.8.26" />
+    <PackageReference Include="DeviceId" Version="5.2.0" />
+    <PackageReference Include="Humanizer" Version="2.9.9" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
+    <Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" />
   </ItemGroup>
 
   <ItemGroup>
@@ -39,12 +48,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Update="Resources\ApplicationIcon.ico">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
   </ItemGroup>
 
 </Project>

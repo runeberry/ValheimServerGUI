@@ -6,6 +6,7 @@ using System.Linq;
 using System.Resources;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Tools
 {
@@ -81,6 +82,17 @@ namespace ValheimServerGUI.Tools
             };
         }
 
+        /// <summary>
+        /// (jb, 5/9/21) For some reason, you cannot set a Form's icon from a Resource in the Designer, so I've been setting it
+        /// using the file browser. However, I think this might be causing an issue when publishing the application as a trimmed
+        /// single-file executable - some users are encountering errors when trying to load *some image* on startup, and I think
+        /// this might be it.
+        /// </summary>
+        public static void AddApplicationIcon(this Form form)
+        {
+            form.Icon = Resources.ApplicationIcon;
+        }
+
         #endregion
 
         #region TextBox extensions
@@ -104,7 +116,7 @@ namespace ValheimServerGUI.Tools
         public static void AddImagesFromResourceFile(this ImageList list, Type resourcesType)
         {
             var resourceImages = new ResourceManager(resourcesType)
-                .GetResourceSet(CultureInfo.CurrentUICulture, true, true)
+                .GetResourceSet(CultureInfo.InvariantCulture, true, true)
                 .Cast<DictionaryEntry>()
                 .Where(de => de.Key != null && de.Value != null && typeof(Image).IsAssignableFrom(de.Value.GetType()))
                 .ToDictionary(de => de.Key.ToString(), de => de.Value as Image);

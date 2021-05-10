@@ -15,6 +15,7 @@ namespace ValheimServerGUI.Forms
         public PreferencesForm()
         {
             InitializeComponent();
+            this.AddApplicationIcon();
         }
 
         public PreferencesForm(IUserPreferencesProvider userPrefsProvider, ILogger logger) : this()

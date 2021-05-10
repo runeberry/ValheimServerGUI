@@ -24,6 +24,8 @@ namespace ValheimServerGUI.Tools.Http
 
         public Type ResponseContentType { get; set; }
 
+        public List<Action<HttpClient>> ClientBuilders { get; } = new();
+
         public List<Action<HttpRequestMessage>> RequestBuilders { get; } = new();
 
         public List<EventHandler<HttpResponseMessage>> Callbacks { get; } = new();
@@ -47,6 +49,12 @@ namespace ValheimServerGUI.Tools.Http
             try
             {
                 var client = this.Context.HttpClientProvider.CreateClient();
+
+                foreach (var clientBuilder in this.ClientBuilders)
+                {
+                    clientBuilder(client);
+                }
+
                 var requestMessage = new HttpRequestMessage(this.Method, this.Uri);
 
                 if (this.RequestContent != null)

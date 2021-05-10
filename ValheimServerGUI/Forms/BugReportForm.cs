@@ -1,11 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Tools;
 
@@ -13,8 +7,12 @@ namespace ValheimServerGUI.Forms
 {
     public partial class BugReportForm : Form
     {
-        public BugReportForm()
+        private readonly IRuneberryApiClient RuneberryApiClient;
+        
+        public BugReportForm(IRuneberryApiClient runeberryApiClient)
         {
+            this.RuneberryApiClient = runeberryApiClient;
+
             InitializeComponent();
             this.AddApplicationIcon();
 
@@ -44,7 +42,7 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonSubmit_Click()
         {
-            throw new NotImplementedException();
+            this.SubmitBugReport();
         }
 
         private void BugReportField_ValueChanged(string value)
@@ -57,6 +55,33 @@ namespace ValheimServerGUI.Forms
         {
             this.BugReportField.Value = string.Empty;
             this.ContactInfoField.Value = string.Empty;
+        }
+
+        private void SubmitBugReport()
+        {
+            var crashReport = AssemblyHelper.BuildCrashReport();
+
+            var additionalInfo = new Dictionary<string, string>
+            {
+                { "BugReport", this.BugReportField.Value },
+                { "ContactInfo", this.ContactInfoField.Value },
+            };
+
+            crashReport.Source = "BugReport";
+            crashReport.AdditionalInfo = additionalInfo;
+
+            var task = RuneberryApiClient.SendCrashReportAsync(crashReport);
+            var asyncPopout = new AsyncPopout(task, o =>
+            {
+                o.Title = "Bug Report";
+                o.Text = "Submitting bug report...";
+                o.SuccessMessage = "Bug report submitted. Thank you!";
+                o.FailureMessage = "Failed to submit bug report.\r\nContact Runeberry Software for further support.";
+            });
+
+            asyncPopout.ShowDialog();
+
+            this.Close();
         }
     }
 }

@@ -1,17 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Forms
 {
     public partial class BugReportForm : Form
     {
         private readonly IRuneberryApiClient RuneberryApiClient;
+
+        private readonly IEventLogger Logger;
         
-        public BugReportForm(IRuneberryApiClient runeberryApiClient)
+        public BugReportForm(
+            IRuneberryApiClient runeberryApiClient,
+            IEventLogger logger)
         {
             this.RuneberryApiClient = runeberryApiClient;
+            this.Logger = logger;
 
             InitializeComponent();
             this.AddApplicationIcon();
@@ -69,6 +76,7 @@ namespace ValheimServerGUI.Forms
 
             crashReport.Source = "BugReport";
             crashReport.AdditionalInfo = additionalInfo;
+            crashReport.Logs = this.Logger.LogBuffer.Reverse().Take(100).ToList();
 
             var task = RuneberryApiClient.SendCrashReportAsync(crashReport);
             var asyncPopout = new AsyncPopout(task, o =>

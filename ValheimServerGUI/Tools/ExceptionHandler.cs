@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Forms;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Tools
 {
@@ -16,9 +18,12 @@ namespace ValheimServerGUI.Tools
     {
         private readonly IRuneberryApiClient RuneberryApiClient;
 
-        public ExceptionHandler(IRuneberryApiClient runeberryApiClient)
+        private readonly IEventLogger Logger;
+
+        public ExceptionHandler(IRuneberryApiClient runeberryApiClient, IEventLogger logger)
         {
             RuneberryApiClient = runeberryApiClient;
+            Logger = logger;
         }
 
         public event EventHandler ExceptionHandled;
@@ -73,6 +78,7 @@ namespace ValheimServerGUI.Tools
 
             crashReport.Source = "CrashReport";
             crashReport.AdditionalInfo = additionalInfo;
+            crashReport.Logs = this.Logger.LogBuffer.Reverse().Take(100).ToList();
 
             return crashReport;
         }

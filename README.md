@@ -66,4 +66,4 @@ Got suggestions, feedback, or want to report a bug? Here's how you can reach me:
 
 ## Donate
 
-Do you like open-source gaming projects like this one? Want to see more of them? [Buy me a coffee](https://www.buymeacoffee.com/runeberry) to show your support! And check out my other projects on the [main site](runeberry.com).
+Do you like open-source gaming projects like this one? Want to see more of them? [Buy me a coffee](https://www.buymeacoffee.com/runeberry) to show your support! And check out my other projects on the [main site](https://runeberry.com).

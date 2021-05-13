@@ -102,9 +102,11 @@ namespace ValheimServerGUI.Forms
 
         private void RestoreDefaults()
         {
-            this.GamePathField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimGamePath);
-            this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimServerPath);
-            this.SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(UserPreferences.Default.ValheimSaveDataFolder);
+            var prefs = UserPreferences.GetDefault();
+
+            this.GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
+            this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
+            this.SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
         }
     }
 }

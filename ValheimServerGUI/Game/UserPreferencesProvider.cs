@@ -60,7 +60,8 @@ namespace ValheimServerGUI.Game
         {
             try
             {
-                this.SaveAsync(this.UserPrefsFilePath, preferences).GetAwaiter().GetResult();
+                var file = preferences.ToFile();
+                this.SaveAsync<UserPreferencesFile>(this.UserPrefsFilePath, file).GetAwaiter().GetResult();
                 this.Logger.LogInformation("User preferences saved");
             }
             catch (Exception e)
@@ -81,16 +82,17 @@ namespace ValheimServerGUI.Game
                     }
                     else
                     {
-                        return UserPreferences.Default;
+                        return UserPreferences.GetDefault();
                     }
                 }
 
-                return this.LoadAsync<UserPreferences>(this.UserPrefsFilePath).GetAwaiter().GetResult();
+                var file = this.LoadAsync<UserPreferencesFile>(this.UserPrefsFilePath).GetAwaiter().GetResult();
+                return UserPreferences.FromFile(file);
             }
             catch (Exception e)
             {
                 this.Logger.LogException(e, "Failed to load user preferences");
-                return UserPreferences.Default;
+                return UserPreferences.GetDefault();
             }
         }
 

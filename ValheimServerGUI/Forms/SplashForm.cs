@@ -202,6 +202,12 @@ namespace ValheimServerGUI.Forms
 
         private void OnMainFormClosed(object sender, FormClosedEventArgs e)
         {
+            if (this.InvokeRequired)
+            {
+                this.Invoke(new Action<object, FormClosedEventArgs>(this.OnMainFormClosed), new object[] { sender, e });
+                return;
+            }
+
             this.Close();
         }
 

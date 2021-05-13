@@ -66,10 +66,12 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonDefaults_Click(object sender, EventArgs e)
         {
-            this.WindowsStartField.Value = UserPreferences.Default.StartWithWindows;
-            this.ServerStartField.Value = UserPreferences.Default.StartServerAutomatically;
-            this.StartMinimizedField.Value = UserPreferences.Default.StartMinimized;
-            this.CheckForUpdatesField.Value = UserPreferences.Default.CheckForUpdates;
+            var prefs = UserPreferences.GetDefault();
+
+            this.WindowsStartField.Value = prefs.StartWithWindows;
+            this.ServerStartField.Value = prefs.StartServerAutomatically;
+            this.StartMinimizedField.Value = prefs.StartMinimized;
+            this.CheckForUpdatesField.Value = prefs.CheckForUpdates;
         }
     }
 }

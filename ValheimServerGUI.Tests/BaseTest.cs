@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System;
 using System.Windows.Forms;
+using ValheimServerGUI.Game;
 using ValheimServerGUI.Tests.Tools;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
@@ -22,6 +23,8 @@ namespace ValheimServerGUI.Tests
 
         protected MockProcessProvider MockProcessProvider { get; }
 
+        protected MockUserPreferencesProvider MockUserPreferencesProvider { get; }
+
         public BaseTest()
         {
             this.ServiceCollection = new ServiceCollection();
@@ -30,10 +33,12 @@ namespace ValheimServerGUI.Tests
             this.MockDataFileProvider = new();
             this.MockProcessProvider = new();
             this.MockHttpClientProvider = new();
+            this.MockUserPreferencesProvider = new();
 
             this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IFileProvider>(this.MockDataFileProvider));
             this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IProcessProvider>(this.MockProcessProvider));
             this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IHttpClientProvider>(this.MockHttpClientProvider));
+            this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IUserPreferencesProvider>(this.MockUserPreferencesProvider));
 
             this.ServiceProvider = this.ServiceCollection.BuildServiceProvider();
         }

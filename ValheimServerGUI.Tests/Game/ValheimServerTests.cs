@@ -1,14 +1,12 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using ValheimServerGUI.Game;
 using Xunit;
 
 namespace ValheimServerGUI.Tests.Game
 {
-    public class ValheimServerTests
+    public class ValheimServerTests : BaseTest
     {
         private const string MessageJoining = "Got connection SteamID {0}";
         private const string MessageOnline = "Got character ZDOID from {0} : {1}:1";
@@ -21,11 +19,9 @@ namespace ValheimServerGUI.Tests.Game
 
         public ValheimServerTests()
         {
-            var services = TestServices.Build();
-
-            Server = services.GetRequiredService<ValheimServer>();
-            ServerLogger = services.GetRequiredService<ValheimServerLogger>();
-            PlayerDataRepository = services.GetRequiredService<IPlayerDataRepository>();
+            this.Server = this.GetService<ValheimServer>();
+            ServerLogger = this.GetService<ValheimServerLogger>();
+            PlayerDataRepository = this.GetService<IPlayerDataRepository>();
         }
 
         [Fact]

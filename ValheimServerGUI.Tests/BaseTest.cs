@@ -10,7 +10,7 @@ using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Tests
 {
-    public class BaseTest
+    public partial class BaseTest
     {
         protected IServiceCollection ServiceCollection { get; }
 
@@ -38,12 +38,12 @@ namespace ValheimServerGUI.Tests
             this.ServiceProvider = this.ServiceCollection.BuildServiceProvider();
         }
 
-        public TService GetService<TService>()
+        protected TService GetService<TService>()
         {
             return this.ServiceProvider.GetRequiredService<TService>();
         }
 
-        public TForm GetForm<TForm>() where TForm : Form
+        protected TForm GetForm<TForm>() where TForm : Form
         {
             var formProvider = this.ServiceProvider.GetRequiredService<IFormProvider>();
             return formProvider.GetForm<TForm>();

@@ -6,7 +6,7 @@ namespace ValheimServerGUI.Tests.Forms
     public class MainWindowTests : BaseTest
     {
         [Fact]
-        public void CanInitMainWindow()
+        public void CanConstructMainWindow()
         {
             this.GetForm<MainWindow>();
         }

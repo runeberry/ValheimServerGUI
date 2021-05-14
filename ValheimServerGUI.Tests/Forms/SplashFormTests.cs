@@ -15,7 +15,7 @@ namespace ValheimServerGUI.Tests.Forms
         }
 
         [Fact]
-        public void CanInitSplashForm()
+        public void CanConstructSplashForm()
         {
             this.GetForm<SplashForm>();
         }

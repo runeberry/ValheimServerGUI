@@ -630,6 +630,12 @@ namespace ValheimServerGUI.Forms
 #if DEBUG
             if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
+            if (CheckPortInUse())
+            {
+                MessageBox.Show($"This port is already in use.{NL}Please choose a different port for the server", "Port in use", MessageBoxButtons.OK);
+                return;
+            }
+            
             string worldName;
             bool newWorld = this.WorldSelectRadioNew.Value;
 
@@ -723,6 +729,13 @@ namespace ValheimServerGUI.Forms
                     this.ShowDirectoriesForm();
                 }
             }
+        }
+
+        private bool CheckPortInUse()
+        {
+            int valheimPort = this.ServerPortField.Value;
+            bool alreadyinuse = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners().Any(p => p.Port == valheimPort);
+            return alreadyinuse;
         }
 
         private void ShowPreferencesForm()

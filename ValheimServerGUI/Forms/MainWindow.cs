@@ -26,6 +26,7 @@ namespace ValheimServerGUI.Forms
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
         private const string IpLoadingText = "Loading...";
+        private const string ServerAppName = "valheim_server";
         
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
@@ -609,6 +610,7 @@ namespace ValheimServerGUI.Forms
         private void RunStartupStuff()
         {
             this.CheckFilePaths();
+            this.CheckServerAlreadyRunning();
 
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
@@ -721,6 +723,24 @@ namespace ValheimServerGUI.Forms
                 if (result == DialogResult.Yes)
                 {
                     this.ShowDirectoriesForm();
+                }
+            }
+        }
+
+        private void CheckServerAlreadyRunning()
+        {
+            Process[] processCollection = Process.GetProcesses();
+            var valheimProcess = processCollection.Where(x => x.ProcessName == ServerAppName).FirstOrDefault();
+            if(valheimProcess != null)
+            {
+                var result = MessageBox.Show(                    
+                    $"The server is already running.{NL}Would you like to shut it down now?",
+                    "Server Already Running",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+                if(result == DialogResult.Yes)
+                {
+                    valheimProcess.Kill();
                 }
             }
         }

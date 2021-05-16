@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using ValheimServerGUI.Tools.Processes;
 
@@ -14,6 +15,11 @@ namespace ValheimServerGUI.Tests.Tools
         public Process GetProcess(string key)
         {
             throw new NotImplementedException("Cannot get processes in unit tests!");
+        }
+
+        public List<Process> FindExistingProcessesByName(string name)
+        {
+            return new();
         }
     }
 }

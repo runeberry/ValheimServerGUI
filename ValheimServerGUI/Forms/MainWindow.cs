@@ -630,9 +630,16 @@ namespace ValheimServerGUI.Forms
 #if DEBUG
             if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
-            if (CheckPortInUse())
+            var portFieldValue = this.ServerPortField.Value;
+            if (!this.IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue+1))
             {
-                MessageBox.Show($"This port is already in use.{NL}Please choose a different port for the server", "Port in use", MessageBoxButtons.OK);
+                MessageBox.Show(
+                    $"Port {portFieldValue} or {portFieldValue+1} is already in use.{NL}" +
+                    $"Valheim requires two adjacent ports to run a dedicated server.{NL}" +
+                    "Please shut down any UDP applications using these ports, or choose a different port for your server.", 
+                    "Port in use",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
                 return;
             }
             
@@ -729,13 +736,6 @@ namespace ValheimServerGUI.Forms
                     this.ShowDirectoriesForm();
                 }
             }
-        }
-
-        private bool CheckPortInUse()
-        {
-            int valheimPort = this.ServerPortField.Value;
-            bool alreadyinuse = System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().GetActiveUdpListeners().Any(p => p.Port == valheimPort);
-            return alreadyinuse;
         }
 
         private void ShowPreferencesForm()

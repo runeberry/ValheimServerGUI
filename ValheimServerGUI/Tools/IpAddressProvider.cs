@@ -20,6 +20,8 @@ namespace ValheimServerGUI.Tools
         Task GetExternalIpAddressAsync();
 
         Task GetInternalIpAddressAsync();
+
+        bool IsLocalUdpPortAvailable(params int[] ports);
     }
 
     public class IpAddressProvider : RestClient, IIpAddressProvider
@@ -77,6 +79,14 @@ namespace ValheimServerGUI.Tools
             }
 
             return Task.CompletedTask;
+        }
+
+        public bool IsLocalUdpPortAvailable(params int[] ports)
+        {
+            return !IPGlobalProperties
+                .GetIPGlobalProperties()
+                .GetActiveUdpListeners()
+                .Any(p => ports.Contains(p.Port));
         }
 
         private void OnExternalIpResponse(object sender, ExternalIpResponse response)

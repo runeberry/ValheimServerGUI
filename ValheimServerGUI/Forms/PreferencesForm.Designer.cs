@@ -37,6 +37,7 @@ namespace ValheimServerGUI.Forms
             this.ServerStartField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.StartMinimizedField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.CheckForUpdatesField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.CheckServerRunningField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.SuspendLayout();
             // 
             // ButtonCancel
@@ -106,17 +107,28 @@ namespace ValheimServerGUI.Forms
             // 
             this.CheckForUpdatesField.HelpText = resources.GetString("CheckForUpdatesField.HelpText");
             this.CheckForUpdatesField.LabelText = "Automatically check for updates";
-            this.CheckForUpdatesField.Location = new System.Drawing.Point(12, 81);
+            this.CheckForUpdatesField.Location = new System.Drawing.Point(12, 104);
             this.CheckForUpdatesField.Name = "CheckForUpdatesField";
             this.CheckForUpdatesField.Size = new System.Drawing.Size(334, 17);
             this.CheckForUpdatesField.TabIndex = 9;
             this.CheckForUpdatesField.Value = false;
+            // 
+            // CheckServerRunningField
+            // 
+            this.CheckServerRunningField.HelpText = resources.GetString("CheckServerRunningField.HelpText");
+            this.CheckServerRunningField.LabelText = "Check if server is already running on startup";
+            this.CheckServerRunningField.Location = new System.Drawing.Point(12, 81);
+            this.CheckServerRunningField.Name = "CheckServerRunningField";
+            this.CheckServerRunningField.Size = new System.Drawing.Size(334, 17);
+            this.CheckServerRunningField.TabIndex = 10;
+            this.CheckServerRunningField.Value = false;
             // 
             // PreferencesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(359, 217);
+            this.Controls.Add(this.CheckServerRunningField);
             this.Controls.Add(this.CheckForUpdatesField);
             this.Controls.Add(this.StartMinimizedField);
             this.Controls.Add(this.ServerStartField);
@@ -142,5 +154,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.CheckboxFormField ServerStartField;
         private ValheimServerGUI.Controls.CheckboxFormField StartMinimizedField;
         private ValheimServerGUI.Controls.CheckboxFormField CheckForUpdatesField;
+        private ValheimServerGUI.Controls.CheckboxFormField CheckServerRunningField;
     }
 }

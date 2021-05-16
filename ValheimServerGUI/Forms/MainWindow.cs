@@ -732,6 +732,9 @@ namespace ValheimServerGUI.Forms
 
         private void CheckServerAlreadyRunning()
         {
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+            if (!prefs.CheckServerRunning) return;
+
             string serverAppName;
 
             try
@@ -752,14 +755,16 @@ namespace ValheimServerGUI.Forms
 
                 if (valheimProcesses.Count == 1)
                 {
-                    message = "There is already an instance of Valheim Dedicated Server running on your computer." + NL +
+                    message = "There is already an instance of Valheim Dedicated Server running on your computer. " +
                         "Would you like to shut down this server so that ValheimServerGUI can manage it?";
                 }
                 else
                 {
-                    message = $"There are already {valheimProcesses.Count} instances of Valheim Dedicated Server running on your computer." + NL +
+                    message = $"There are already {valheimProcesses.Count} instances of Valheim Dedicated Server running on your computer. " +
                         "Would you like to shut them all down so that ValheimServerGUI can manage them?";
                 }
+
+                message += $"{NL}{NL}You can disable this message in File > Preferences...";
 
                 var result = MessageBox.Show(                    
                     message,

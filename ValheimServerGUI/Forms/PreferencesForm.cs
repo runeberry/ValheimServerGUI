@@ -38,6 +38,7 @@ namespace ValheimServerGUI.Forms
             this.WindowsStartField.Value = prefs.StartWithWindows;
             this.ServerStartField.Value = prefs.StartServerAutomatically;
             this.StartMinimizedField.Value = prefs.StartMinimized;
+            this.CheckServerRunningField.Value = prefs.CheckServerRunning;
             this.CheckForUpdatesField.Value = prefs.CheckForUpdates;
 
             var startupInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
@@ -51,6 +52,7 @@ namespace ValheimServerGUI.Forms
             prefs.StartWithWindows = this.WindowsStartField.Value;
             prefs.StartServerAutomatically = this.ServerStartField.Value;
             prefs.StartMinimized = this.StartMinimizedField.Value;
+            prefs.CheckServerRunning = this.CheckServerRunningField.Value;
             prefs.CheckForUpdates = this.CheckForUpdatesField.Value;
 
             StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
@@ -71,6 +73,7 @@ namespace ValheimServerGUI.Forms
             this.WindowsStartField.Value = prefs.StartWithWindows;
             this.ServerStartField.Value = prefs.StartServerAutomatically;
             this.StartMinimizedField.Value = prefs.StartMinimized;
+            this.CheckServerRunningField.Value = prefs.CheckServerRunning;
             this.CheckForUpdatesField.Value = prefs.CheckForUpdates;
         }
     }

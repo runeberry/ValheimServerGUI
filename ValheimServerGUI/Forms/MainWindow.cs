@@ -12,6 +12,7 @@ using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
+using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Forms
 {
@@ -47,6 +48,7 @@ namespace ValheimServerGUI.Forms
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
+        private readonly IProcessProvider ProcessProvider;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -57,7 +59,8 @@ namespace ValheimServerGUI.Forms
             ValheimServerLogger serverLogger,
             IEventLogger appLogger,
             IIpAddressProvider ipAddressProvider,
-            ISoftwareUpdateProvider softwareUpdateProvider)
+            ISoftwareUpdateProvider softwareUpdateProvider,
+            IProcessProvider processProvider)
         {
 #if DEBUG
             if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
@@ -71,6 +74,7 @@ namespace ValheimServerGUI.Forms
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
             this.SoftwareUpdateProvider = softwareUpdateProvider;
+            this.ProcessProvider = processProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             this.AddApplicationIcon();
@@ -729,18 +733,34 @@ namespace ValheimServerGUI.Forms
 
         private void CheckServerAlreadyRunning()
         {
-            Process[] processCollection = Process.GetProcesses();
-            var valheimProcess = processCollection.Where(x => x.ProcessName == ServerAppName).FirstOrDefault();
-            if(valheimProcess != null)
+            var valheimProcesses = this.ProcessProvider.FindExistingProcessesByName(ServerAppName);
+            if (valheimProcesses.Any())
             {
+                string message;
+
+                if (valheimProcesses.Count == 1)
+                {
+                    message = "There is already an instance of Valheim Dedicated Server running on your computer." + NL +
+                        "Would you like to shut down this server so that ValheimServerGUI can manage it?";
+                }
+                else
+                {
+                    message = $"There are already {valheimProcesses.Count} instances of Valheim Dedicated Server running on your computer." + NL +
+                        "Would you like to shut them all down so that ValheimServerGUI can manage them?";
+                }
+
                 var result = MessageBox.Show(                    
-                    $"The server is already running.{NL}Would you like to shut it down now?",
+                    message,
                     "Server Already Running",
                     MessageBoxButtons.YesNo,
                     MessageBoxIcon.Warning);
-                if(result == DialogResult.Yes)
+
+                if (result == DialogResult.Yes)
                 {
-                    valheimProcess.Kill();
+                    foreach (var process in valheimProcesses)
+                    {
+                        this.ProcessProvider.SafelyKillProcess(process);
+                    }
                 }
             }
         }

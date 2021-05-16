@@ -29,22 +29,29 @@ namespace ValheimServerGUI.Tools.Processes
         }
 
         /// <summary>
-        /// Starts a secondary process to safely kill the process with the specified key.
-        /// Returns the process with the specified key, which you can then wait for to exit.
+        /// Starts a secondary process to safely kill the provided process.
+        /// Returns the provided process.
         /// </summary>
-        public static Process SafelyKillProcess(this IProcessProvider provider, string key)
+        public static Process SafelyKillProcess(this IProcessProvider provider, Process process)
         {
-            var process = provider.GetProcess(key);
-            
             if (process != null)
             {
-                var killProcess = provider.AddBackgroundProcess($"{KillCommand}-{key}", KillCommand, $"/pid {process.Id}");
+                var killProcess = provider.AddBackgroundProcess($"{KillCommand}-{process.Id}", KillCommand, $"/pid {process.Id}");
 
                 // todo: Send output to application logs
                 killProcess.StartIO();
             }
 
             return process;
+        }
+
+        /// <summary>
+        /// Starts a secondary process to safely kill the process with the specified key.
+        /// Returns the process with the specified key, which you can then wait for to exit.
+        /// </summary>
+        public static Process SafelyKillProcess(this IProcessProvider provider, string key)
+        {
+            return provider.SafelyKillProcess(provider.GetProcess(key));
         }
 
         public static bool IsProcessRunning(this IProcessProvider provider, string key)

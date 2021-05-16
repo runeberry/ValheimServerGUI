@@ -27,6 +27,9 @@ namespace ValheimServerGUI.Game
         [JsonProperty("startMinimized")]
         public bool? StartMinimized { get; set; }
 
+        [JsonProperty("checkServerRunning")]
+        public bool? CheckServerRunning { get; set; }
+
         [JsonProperty("checkForUpdates")]
         public bool? CheckForUpdates { get; set; }
 

@@ -12,6 +12,7 @@ using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
+using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Forms
 {
@@ -46,6 +47,7 @@ namespace ValheimServerGUI.Forms
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
+        private readonly IProcessProvider ProcessProvider;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -56,7 +58,8 @@ namespace ValheimServerGUI.Forms
             ValheimServerLogger serverLogger,
             IEventLogger appLogger,
             IIpAddressProvider ipAddressProvider,
-            ISoftwareUpdateProvider softwareUpdateProvider)
+            ISoftwareUpdateProvider softwareUpdateProvider,
+            IProcessProvider processProvider)
         {
 #if DEBUG
             if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
@@ -70,6 +73,7 @@ namespace ValheimServerGUI.Forms
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
             this.SoftwareUpdateProvider = softwareUpdateProvider;
+            this.ProcessProvider = processProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             this.AddApplicationIcon();
@@ -609,6 +613,7 @@ namespace ValheimServerGUI.Forms
         private void RunStartupStuff()
         {
             this.CheckFilePaths();
+            this.CheckServerAlreadyRunning();
 
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
@@ -630,6 +635,19 @@ namespace ValheimServerGUI.Forms
 #if DEBUG
             if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
+            var portFieldValue = this.ServerPortField.Value;
+            if (!this.IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue+1))
+            {
+                MessageBox.Show(
+                    $"Port {portFieldValue} or {portFieldValue+1} is already in use.{NL}" +
+                    $"Valheim requires two adjacent ports to run a dedicated server.{NL}" +
+                    "Please shut down any UDP applications using these ports, or choose a different port for your server.", 
+                    "Port in use",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+                return;
+            }
+            
             string worldName;
             bool newWorld = this.WorldSelectRadioNew.Value;
 
@@ -721,6 +739,58 @@ namespace ValheimServerGUI.Forms
                 if (result == DialogResult.Yes)
                 {
                     this.ShowDirectoriesForm();
+                }
+            }
+        }
+
+        private void CheckServerAlreadyRunning()
+        {
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+            if (!prefs.CheckServerRunning) return;
+
+            string serverAppName;
+
+            try
+            {
+                serverAppName = Path.GetFileNameWithoutExtension(this.FileProvider.ServerExe.FullName);
+            }
+            catch
+            {
+                // Server can't possibly be running if we can't locate the server .exe, right?
+                return;
+            }
+
+            var valheimProcesses = this.ProcessProvider.FindExistingProcessesByName(serverAppName);
+
+            if (valheimProcesses.Any())
+            {
+                string message;
+
+                if (valheimProcesses.Count == 1)
+                {
+                    message = "There is already an instance of Valheim Dedicated Server running on your computer. " +
+                        "Would you like to shut down this server so that ValheimServerGUI can manage it?";
+                }
+                else
+                {
+                    message = $"There are already {valheimProcesses.Count} instances of Valheim Dedicated Server running on your computer. " +
+                        "Would you like to shut them all down so that ValheimServerGUI can manage them?";
+                }
+
+                message += $"{NL}{NL}You can disable this message in File > Preferences...";
+
+                var result = MessageBox.Show(                    
+                    message,
+                    "Server Already Running",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    foreach (var process in valheimProcesses)
+                    {
+                        this.ProcessProvider.SafelyKillProcess(process);
+                    }
                 }
             }
         }

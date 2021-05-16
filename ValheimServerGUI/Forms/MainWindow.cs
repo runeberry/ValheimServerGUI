@@ -27,7 +27,6 @@ namespace ValheimServerGUI.Forms
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
         private const string IpLoadingText = "Loading...";
-        private const string ServerAppName = "valheim_server";
         
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
@@ -733,7 +732,20 @@ namespace ValheimServerGUI.Forms
 
         private void CheckServerAlreadyRunning()
         {
-            var valheimProcesses = this.ProcessProvider.FindExistingProcessesByName(ServerAppName);
+            string serverAppName;
+
+            try
+            {
+                serverAppName = Path.GetFileNameWithoutExtension(this.FileProvider.ServerExe.FullName);
+            }
+            catch
+            {
+                // Server can't possibly be running if we can't locate the server .exe, right?
+                return;
+            }
+
+            var valheimProcesses = this.ProcessProvider.FindExistingProcessesByName(serverAppName);
+
             if (valheimProcesses.Any())
             {
                 string message;

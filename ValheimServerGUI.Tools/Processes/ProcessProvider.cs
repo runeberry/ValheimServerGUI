@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace ValheimServerGUI.Tools.Processes
 {
@@ -24,6 +26,13 @@ namespace ValheimServerGUI.Tools.Processes
             if (!this.Processes.TryGetValue(key, out var process)) return null;
             if (process.HasExited) return null;
             return process;
+        }
+
+        public List<Process> FindExistingProcessesByName(string name)
+        {
+            return Process.GetProcesses()
+                .Where(p => p.ProcessName == name)
+                .ToList();
         }
     }
 }

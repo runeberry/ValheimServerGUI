@@ -21,6 +21,8 @@ namespace ValheimServerGUI.Game
 
         public bool StartMinimized { get; set; }
 
+        public bool CheckServerRunning { get; set; } = true;
+
         public bool CheckForUpdates { get; set; } = true;
 
         public string ServerName { get; set; }
@@ -45,6 +47,7 @@ namespace ValheimServerGUI.Game
             prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
             prefs.StartServerAutomatically = file.StartServerAutomatically ?? prefs.StartServerAutomatically;
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
+            prefs.CheckServerRunning = file.CheckServerRunning ?? prefs.CheckServerRunning;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
             
             var server = file.Servers?.FirstOrDefault();
@@ -71,6 +74,7 @@ namespace ValheimServerGUI.Game
                 StartWithWindows = this.StartWithWindows,
                 StartServerAutomatically = this.StartServerAutomatically,
                 StartMinimized = this.StartMinimized,
+                CheckServerRunning = this.CheckServerRunning,
                 CheckForUpdates = this.CheckForUpdates,
                 Servers = new()
                 {

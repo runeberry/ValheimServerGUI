@@ -47,10 +47,14 @@ If you are publishing a Release configuration of this project, you will need a c
 
 _For project maintainers only._
 
+In order to bump the desktop client's application version, simply change the number in the `<Version>` section of **ValheimServerGUI.csproj**, then publish the app using the steps outlined above.
+
 The desktop client queries GitHub to find out if a new release is available. Follow these instructions to ensure that users will be notified about a client update.
 
 1. Start creating a new release [here](https://github.com/runeberry/ValheimServerGUI/releases/new). Set the release title and description to whatever you see fit.
-2. Set the release tag version to a semantic version prefixed with `v`, such as `v1.2.3`. The semver must be greater than the client's current version trigger an update notification.
+2. Set the release tag version to a semantic version prefixed with `v`, such as `v1.2.3`.
+   * This semver should correspond to the `<Version>` set in the .csproj file.
+   * The semver on GitHub must be greater than the client's current version trigger an update notification.
 3. Attach a .zip file containing just the `ValheimServerGUI.exe` file published from the previous section. The release must contain an asset in order to trigger an update notification.
 4. Ensure the Pre-release button is **NOT** checked. Pre-releases will not trigger an update notification.
 5. Click **Publish release**.

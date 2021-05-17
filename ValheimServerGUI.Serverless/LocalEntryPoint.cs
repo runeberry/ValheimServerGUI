@@ -24,7 +24,7 @@ namespace ValheimServerGUI.Serverless
                     webBuilder.ConfigureAppConfiguration(config =>
                     {
                         var executingLocation = System.IO.Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
-                        config.AddJsonFile(System.IO.Path.Join(executingLocation, "appsettings.secret.json"));
+                        config.AddJsonFile(System.IO.Path.Join(executingLocation, "appsettings.secret.json"), optional: true);
                         config.AddJsonFile(System.IO.Path.Join(executingLocation, "appsettings.local.json"), optional: true);
                     });
                     webBuilder.UseStartup<Startup>();

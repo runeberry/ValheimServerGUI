@@ -56,6 +56,10 @@ In order to run ValheimServerGUI, you will need the following:
 
 Why choose a dedicated server, and why use ValheimServerGUI? Find the answers on our [FAQs page](https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions).
 
+## Contributing
+
+Interesting in contributing code to ValheimServerGUI? Check out the guidelines and full developer's guide [here](CONTRIBUTING.md).
+
 ## Support
 
 Got suggestions, feedback, or want to report a bug? Here's how you can reach me:

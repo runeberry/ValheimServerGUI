@@ -15,7 +15,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
-    <Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" />
+    <Compile Include="..\SolutionResources\Secrets.Values.cs" 
+             Link="Properties\Secrets.Values.cs" 
+             Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')"/>
   </ItemGroup>
   <ItemGroup>
     <!-- This setup allows us to include a file outside of the project directory -->

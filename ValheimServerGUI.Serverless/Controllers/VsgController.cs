@@ -81,7 +81,9 @@ namespace ValheimServerGUI.Serverless.Controllers
         }
 
         [HttpGet("player-steam-info")]
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
         public async Task<IActionResult> GetPlayerSteamInfo([FromQuery] string steamId)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
         {
             return Ok("Player steam info");
         }

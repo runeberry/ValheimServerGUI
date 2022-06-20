@@ -5,13 +5,26 @@ namespace ValheimServerGUI.Game
 {
     public interface IValheimFileProvider
     {
+        /// <summary>
+        /// The location of the Valheim game executable.
+        /// </summary>
         FileInfo GameExe { get; }
 
+        /// <summary>
+        /// The location of the Valheim dedicated server executable.
+        /// </summary>
         FileInfo ServerExe { get; }
 
+        /// <summary>
+        /// The location of the Valheim dedicated server save data.
+        /// </summary>
         DirectoryInfo SaveDataFolder { get; }
 
-        DirectoryInfo WorldsFolder { get; }
+        /// <summary>
+        /// The possible locations of Valheim world files.
+        /// These directories may or may not exist.
+        /// </summary>
+        DirectoryInfo[] WorldsFolders { get; }
     }
 
     public class ValheimFileProvider : IValheimFileProvider
@@ -25,13 +38,16 @@ namespace ValheimServerGUI.Game
             this.UserPrefsProvider = userPrefsProvider;
         }
 
-        public FileInfo GameExe => this.GetFileInfo("ValheimGamePath", this.Current().ValheimGamePath, ".exe");
+        public FileInfo GameExe => GetFileInfo("ValheimGamePath", this.Current().ValheimGamePath, ".exe");
 
-        public FileInfo ServerExe => this.GetFileInfo("ValheimServerPath", this.Current().ValheimServerPath, ".exe");
+        public FileInfo ServerExe => GetFileInfo("ValheimServerPath", this.Current().ValheimServerPath, ".exe");
 
-        public DirectoryInfo SaveDataFolder => this.GetDirectoryInfo("ValheimSaveDataFolder", this.Current().ValheimSaveDataFolder);
+        public DirectoryInfo SaveDataFolder => GetDirectoryInfo("ValheimSaveDataFolder", this.Current().ValheimSaveDataFolder);
 
-        public DirectoryInfo WorldsFolder => this.GetDirectoryInfo("ValheimWorldsFolder", Path.Join(this.Current().ValheimSaveDataFolder, "worlds"));
+        public DirectoryInfo[] WorldsFolders => new[] {
+            GetDirectoryInfo("ValheimWorldsFolder", Path.Join(this.Current().ValheimSaveDataFolder, "worlds"), false),
+            GetDirectoryInfo("ValheimWorldsFolder", Path.Join(this.Current().ValheimSaveDataFolder, "worlds_local"), false),
+        };
 
         #region Non-public methods
 
@@ -40,7 +56,7 @@ namespace ValheimServerGUI.Game
             return this.UserPrefsProvider.LoadPreferences();
         }
 
-        private FileInfo GetFileInfo(string prefKey, string path, string extension = null)
+        private static FileInfo GetFileInfo(string prefKey, string path, string extension = null)
         {
             path = Environment.ExpandEnvironmentVariables(path);
 
@@ -62,7 +78,7 @@ namespace ValheimServerGUI.Game
             return new FileInfo(path);
         }
 
-        private DirectoryInfo GetDirectoryInfo(string prefKey, string path)
+        private static DirectoryInfo GetDirectoryInfo(string prefKey, string path, bool checkExists = true)
         {
             path = Environment.ExpandEnvironmentVariables(path);
 
@@ -71,7 +87,7 @@ namespace ValheimServerGUI.Game
                 throw new ArgumentException($"[{prefKey}] Cannot open directory, path is not defined.");
             }
 
-            if (!Directory.Exists(path))
+            if (checkExists && !Directory.Exists(path))
             {
                 throw new DirectoryNotFoundException($"[{prefKey}] Directory not found at path:{NL}{path}");
             }

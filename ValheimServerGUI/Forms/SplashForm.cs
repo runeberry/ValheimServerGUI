@@ -239,13 +239,13 @@ namespace ValheimServerGUI.Forms
         {
             var dotnetVersion = AssemblyHelper.GetDotnetRuntimeVersion();
 
-            if (dotnetVersion.Major < 5)
+            if (dotnetVersion.Major < 6)
             {
                 this.Logger.LogWarning($"Incompatible .NET version detected: {dotnetVersion}");
 
                 var nl = Environment.NewLine;
                 var result = MessageBox.Show(
-                    $"ValheimServerGUI requires the .NET 5.0 Desktop Runtime (or higher) to be installed.{nl}" +
+                    $"ValheimServerGUI requires the .NET 6.0 Desktop Runtime (or higher) to be installed.{nl}" +
                     $"You are currently using .NET {dotnetVersion}.{nl}{nl}" +
                     "Would you like to go to the download page now?",
                     ".NET Upgrade Required",

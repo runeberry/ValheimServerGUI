@@ -47,7 +47,7 @@ namespace ValheimServerGUI.Tools
 
             var deviceId = new DeviceIdBuilder()
                 .AddMacAddress()
-                .AddMotherboardSerialNumber()
+                .AddMachineName()
                 .ToString()
                 .ToLowerInvariant();
 

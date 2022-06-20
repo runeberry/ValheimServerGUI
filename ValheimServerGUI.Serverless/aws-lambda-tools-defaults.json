@@ -12,7 +12,7 @@
     "s3-prefix"     : "ValheimServerGUI.Serverless/",
     "template"      : "serverless.template",
     "template-parameters" : "",
-    "docker-host-build-output-dir" : "./bin/Release/net5.0/linux-x64/publish",
+    "docker-host-build-output-dir" : "./bin/Release/net6.0/linux-x64/publish",
     "s3-bucket"                    : "runeberry-cf-templates",
     "stack-name"                   : "valheim-server-gui-stack"
 }

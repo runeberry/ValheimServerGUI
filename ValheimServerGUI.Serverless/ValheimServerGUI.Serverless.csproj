@@ -7,17 +7,15 @@
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="6.0.1" />
-    <PackageReference Include="AWSSDK.S3" Version="3.7.0.18" />
+    <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="6.1.0" />
+    <PackageReference Include="AWSSDK.S3" Version="3.7.101.10" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
-    <Compile Include="..\SolutionResources\Secrets.Values.cs" 
-             Link="Properties\Secrets.Values.cs" 
-             Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')"/>
+    <Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')" />
   </ItemGroup>
   <ItemGroup>
     <!-- This setup allows us to include a file outside of the project directory -->

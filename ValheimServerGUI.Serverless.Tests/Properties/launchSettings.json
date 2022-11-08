@@ -10,5 +10,13 @@
     "ValheimServerGUI.Serverless.Tests": {
       "commandName": "Project"
     }
+  },
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:55165/",
+      "sslPort": 44357
+    }
   }
 }

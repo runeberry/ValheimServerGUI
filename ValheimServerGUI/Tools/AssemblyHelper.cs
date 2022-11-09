@@ -1,4 +1,5 @@
 ﻿using DeviceId;
+using Semver;
 using System;
 using System.Globalization;
 using System.Linq;
@@ -19,18 +20,27 @@ namespace ValheimServerGUI.Tools
             return attribute?.InformationalVersion ?? "0.0.0";
         }
 
-        public static bool IsNewerVersion(string otherVersion)
+        /// <summary>
+        /// Returns...
+        ///   * 1 if the provided version is newer than...
+        ///   * -1 if the provided version is older than...
+        ///   * 0 if the provided version is the same as...
+        /// ...the current application version.
+        /// Returns -2 if either version could not be parsed.
+        /// </summary>
+        /// <param name="otherVersion"></param>
+        /// <returns></returns>
+        public static int CompareVersion(string version)
         {
             try
             {
-                var appVersion = new Version(GetApplicationVersion());
-                otherVersion = otherVersion.Replace("v", ""); // Get rid of the leading "v" if it exists
-                var v2 = new Version(otherVersion);
-                return v2 > appVersion;
+                var appVersion = SemVersion.Parse(GetApplicationVersion(), SemVersionStyles.Any);
+                var otherVersion = SemVersion.Parse(version, SemVersionStyles.Any);
+                return SemVersion.CompareSortOrder(otherVersion, appVersion);
             }
             catch
             {
-                return false;
+                return -2;
             }
         }
 

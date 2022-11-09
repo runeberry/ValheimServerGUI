@@ -27,7 +27,7 @@ namespace ValheimServerGUI.Forms
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
         private const string IpLoadingText = "Loading...";
-        
+
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
         private readonly Dictionary<ServerStatus, Image> ServerStatusIconMap = new()
@@ -36,7 +36,7 @@ namespace ValheimServerGUI.Forms
             { ServerStatus.Starting, Resources.UnsyncedCommits_16x_Horiz },
             { ServerStatus.Running, Resources.StatusRun_16x },
             { ServerStatus.Stopping, Resources.UnsyncedCommits_16x_Horiz },
-        };      
+        };
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
@@ -409,7 +409,7 @@ namespace ValheimServerGUI.Forms
             {
                 // When going back to the Existing World field, select the New Name if it's already an existing world
                 this.WorldSelectExistingNameField.Value = this.WorldSelectNewNameField.Value;
-                
+
                 // Then, empty out the new name field
                 this.WorldSelectNewNameField.Value = null;
             }
@@ -522,7 +522,7 @@ namespace ValheimServerGUI.Forms
 
             if (this.WorldSaveTimes.Count >= 10) this.WorldSaveTimes.Dequeue();
             this.WorldSaveTimes.Enqueue(duration);
-            
+
             var average = this.WorldSaveTimes.Average();
             this.LabelAverageWorldSave.Value = $"{average:F}ms";
         }
@@ -546,62 +546,59 @@ namespace ValheimServerGUI.Forms
 
         private void SoftwareUpdateProvider_UpdateCheckFinished(SoftwareUpdateEventArgs e)
         {
+            string manualCheckMessage;
+            MessageBoxIcon manualCheckIcon;
+
             if (!e.IsSuccessful)
             {
                 this.SetStatusTextRight($"Update check failed", Resources.StatusCriticalError_16x, true);
 
-                if (e.IsManualCheck)
-                {
-                    var exception = e.Exception.GetPrimaryException();
-                    var result = MessageBox.Show(
-                        $"Update check failed: {exception.Message}" + Environment.NewLine +
-                        "Would you like to go to the download page?",
-                        "Check for Updates",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Error);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
-                    }
-                }
-            }
-            else if (e.IsNewerVersionAvailable)
-            {
-                this.SetStatusTextRight($"Update available ({e.LatestVersion})", Resources.StatusWarning_16x, true);
-
-                if (e.IsManualCheck)
-                {
-                    var result = MessageBox.Show(
-                        $"A newer version of ValheimServerGUI is available." + Environment.NewLine +
-                        "Would you like to go to the download page?",
-                        "Check for Updates",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning);
-
-                    if (result == DialogResult.Yes)
-                    {
-                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
-                    }
-                }
+                var exception = e.Exception.GetPrimaryException();
+                manualCheckMessage = $"Update check failed: {exception.Message}.";
+                manualCheckIcon = MessageBoxIcon.Error;
             }
             else
             {
-                this.SetStatusTextRight($"Up to date ({e.LatestVersion})", Resources.StatusOK_16x, false);
+                var versionCompareResult = AssemblyHelper.CompareVersion(e.LatestVersion);
 
-                if (e.IsManualCheck)
+                if (versionCompareResult > 0)
                 {
-                    var result = MessageBox.Show(
-                        "You are running the latest version of ValheimServerGUI." + Environment.NewLine +
-                        "Would you like to go to the download page?",
-                        "Check for Updates",
-                        MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Question);
+                    this.SetStatusTextRight($"Update available ({e.LatestVersion})", Resources.StatusWarning_16x, true);
+                    manualCheckMessage = "A newer version of ValheimServerGUI is available.";
+                    manualCheckIcon = MessageBoxIcon.Warning;
+                }
+                else if (versionCompareResult == 0)
+                {
+                    this.SetStatusTextRight($"Up to date ({e.LatestVersion})", Resources.StatusOK_16x, false);
+                    manualCheckMessage = "You are running the latest version of ValheimServerGUI.";
+                    manualCheckIcon = MessageBoxIcon.Question;
+                }
+                else if (versionCompareResult == -1)
+                {
+                    this.SetStatusTextRight($"Pre-release build ({AssemblyHelper.GetApplicationVersion()})", Resources.StatusOK_16x, false);
+                    manualCheckMessage = "You are currently running a pre-release version of ValheimServerGUI. " +
+                        $"The latest stable version is ({e.LatestVersion}).";
+                    manualCheckIcon = MessageBoxIcon.Question;
+                }
+                else
+                {
+                    this.SetStatusTextRight($"Unable to parse version ({e.LatestVersion})", Resources.StatusCriticalError_16x, true);
+                    manualCheckMessage = $"Update check failed: Unable to parse version ({e.LatestVersion}).";
+                    manualCheckIcon = MessageBoxIcon.Error;
+                }
+            }
 
-                    if (result == DialogResult.Yes)
-                    {
-                        WebHelper.OpenWebAddress(Resources.UrlUpdates);
-                    }
+            if (e.IsManualCheck)
+            {
+                var result = MessageBox.Show(
+                    $"{manualCheckMessage}{Environment.NewLine}Would you like to go to the download page?",
+                    "Check for Updates",
+                    MessageBoxButtons.YesNo,
+                    manualCheckIcon);
+
+                if (result == DialogResult.Yes)
+                {
+                    WebHelper.OpenWebAddress(Resources.UrlUpdates);
                 }
             }
         }
@@ -636,18 +633,18 @@ namespace ValheimServerGUI.Forms
             if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
             var portFieldValue = this.ServerPortField.Value;
-            if (!this.IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue+1))
+            if (!this.IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue + 1))
             {
                 MessageBox.Show(
-                    $"Port {portFieldValue} or {portFieldValue+1} is already in use.{NL}" +
+                    $"Port {portFieldValue} or {portFieldValue + 1} is already in use.{NL}" +
                     $"Valheim requires two adjacent ports to run a dedicated server.{NL}" +
-                    "Please shut down any UDP applications using these ports, or choose a different port for your server.", 
+                    "Please shut down any UDP applications using these ports, or choose a different port for your server.",
                     "Port in use",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
             }
-            
+
             string worldName;
             bool newWorld = this.WorldSelectRadioNew.Value;
 
@@ -779,7 +776,7 @@ namespace ValheimServerGUI.Forms
 
                 message += $"{NL}{NL}You can disable this message in File > Preferences...";
 
-                var result = MessageBox.Show(                    
+                var result = MessageBox.Show(
                     message,
                     "Server Already Running",
                     MessageBoxButtons.YesNo,

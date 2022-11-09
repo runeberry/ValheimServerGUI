@@ -18,8 +18,6 @@ namespace ValheimServerGUI.Tools
     {
         public string LatestVersion { get; }
 
-        public bool IsNewerVersionAvailable { get; }
-
         public bool IsManualCheck { get; }
 
         public bool IsSuccessful { get; }
@@ -27,22 +25,19 @@ namespace ValheimServerGUI.Tools
         public Exception Exception { get; }
 
         public SoftwareUpdateEventArgs(
-            string latestVersion, 
-            bool isNewerVersionAvailable,
+            string latestVersion,
             bool isManualCheck)
         {
             this.LatestVersion = latestVersion;
-            this.IsNewerVersionAvailable = isNewerVersionAvailable;
             this.IsManualCheck = isManualCheck;
             this.IsSuccessful = true;
         }
 
         public SoftwareUpdateEventArgs(
-            Exception e, 
+            Exception e,
             bool isManualCheck)
         {
             this.Exception = e;
-            this.IsNewerVersionAvailable = false;
             this.IsManualCheck = isManualCheck;
             this.IsSuccessful = false;
         }
@@ -88,12 +83,11 @@ namespace ValheimServerGUI.Tools
             {
                 var currentVersion = AssemblyHelper.GetApplicationVersion();
                 var release = await this.GitHubClient.GetLatestReleaseAsync();
-                var newerVersionAvailable = AssemblyHelper.IsNewerVersion(release?.TagName);
 
                 // In case there was no response from GitHub, consider the current running version as the "latest version"
                 var latestVersion = release?.TagName ?? AssemblyHelper.GetApplicationVersion();
 
-                eventArgs = new SoftwareUpdateEventArgs(latestVersion, newerVersionAvailable, isManualCheck);
+                eventArgs = new SoftwareUpdateEventArgs(latestVersion, isManualCheck);
             }
             catch (Exception e)
             {

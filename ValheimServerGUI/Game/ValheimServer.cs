@@ -19,7 +19,7 @@ namespace ValheimServerGUI.Game
         /// </summary>        
         public IValheimServerOptions Options { get; private set; } = new ValheimServerOptions();
 
-        public ServerStatus Status 
+        public ServerStatus Status
         {
             get => this._status;
             private set
@@ -46,9 +46,9 @@ namespace ValheimServerGUI.Game
         private readonly IPlayerDataRepository PlayerDataRepository;
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger ApplicationLogger;
-        
+
         public ValheimServer(
-            IProcessProvider processProvider, 
+            IProcessProvider processProvider,
             IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataRepository,
             ValheimServerLogger serverLogger,
@@ -71,18 +71,18 @@ namespace ValheimServerGUI.Game
         private void InitializeLogBasedActions()
         {
             LogBasedActions.Add(@"Game server connected", this.OnServerConnected);
-            
+
             LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
             LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
             LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
             LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // Technically "disconnecting" but it's the best terminator I can find
-            
+
             LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", this.OnWorldSaved);
         }
 
         private void InitializeStatusBasedActions()
         {
-            this.StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () => 
+            this.StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () =>
             {
                 if (this.IsRestarting)
                 {
@@ -126,6 +126,12 @@ namespace ValheimServerGUI.Game
             var saveDataFolder = this.FileProvider.SaveDataFolder.FullName;
             var publicFlag = options.Public ? 1 : 0;
             var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}""";
+
+            if (options.Crossplay)
+            {
+                processArgs += " -crossplay";
+            }
+
             var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);

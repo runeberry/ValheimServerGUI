@@ -687,6 +687,7 @@ namespace ValheimServerGUI.Forms
                 NewWorld = newWorld,
                 Public = this.CommunityServerField.Value,
                 Port = this.ServerPortField.Value,
+                Crossplay = this.ServerCrossplayField.Value,
             };
 
             try
@@ -712,6 +713,7 @@ namespace ValheimServerGUI.Forms
             prefs.ServerPassword = this.ServerPasswordField.Value;
             prefs.ServerWorldName = worldName;
             prefs.ServerPublic = this.CommunityServerField.Value;
+            prefs.ServerCrossplay = this.ServerCrossplayField.Value;
 
             this.UserPrefsProvider.SavePreferences(prefs);
         }
@@ -927,6 +929,7 @@ namespace ValheimServerGUI.Forms
             this.ServerPasswordField.Enabled = allowServerChanges;
             this.WorldSelectGroupBox.Enabled = allowServerChanges;
             this.CommunityServerField.Enabled = allowServerChanges;
+            this.ServerCrossplayField.Enabled = allowServerChanges;
 
             this.ButtonStartServer.Enabled = this.Server.CanStart;
             this.ButtonRestartServer.Enabled = this.Server.CanRestart;
@@ -961,6 +964,7 @@ namespace ValheimServerGUI.Forms
             this.ServerPortField.Value = prefs.ServerPort;
             this.ServerPasswordField.Value = prefs.ServerPassword;
             this.CommunityServerField.Value = prefs.ServerPublic;
+            this.ServerCrossplayField.Value = prefs.ServerCrossplay;
             this.ShowPasswordField.Value = false;
 
             this.WorldSelectExistingNameField.Value = prefs.ServerWorldName;

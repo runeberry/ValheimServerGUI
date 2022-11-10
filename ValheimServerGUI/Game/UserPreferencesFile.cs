@@ -52,6 +52,9 @@ namespace ValheimServerGUI.Game
 
             [JsonProperty("port")]
             public int? Port { get; set; }
+
+            [JsonProperty("crossplay")]
+            public bool? Crossplay { get; set; }
         }
     }
 }

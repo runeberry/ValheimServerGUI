@@ -35,6 +35,8 @@ namespace ValheimServerGUI.Game
 
         public int ServerPort { get; set; } = DefaultServerPort;
 
+        public bool ServerCrossplay { get; set; }
+
         public static UserPreferences FromFile(UserPreferencesFile file)
         {
             var prefs = new UserPreferences();
@@ -49,7 +51,7 @@ namespace ValheimServerGUI.Game
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
             prefs.CheckServerRunning = file.CheckServerRunning ?? prefs.CheckServerRunning;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
-            
+
             var server = file.Servers?.FirstOrDefault();
 
             if (server != null)
@@ -59,6 +61,7 @@ namespace ValheimServerGUI.Game
                 prefs.ServerWorldName = server.WorldName ?? prefs.ServerWorldName;
                 prefs.ServerPublic = server.CommunityServer ?? prefs.ServerPublic;
                 prefs.ServerPort = server.Port ?? prefs.ServerPort;
+                prefs.ServerCrossplay = server.Crossplay ?? prefs.ServerCrossplay;
             }
 
             return prefs;
@@ -85,6 +88,7 @@ namespace ValheimServerGUI.Game
                         WorldName = this.ServerWorldName,
                         CommunityServer = this.ServerPublic,
                         Port = this.ServerPort,
+                        Crossplay = this.ServerCrossplay,
                     }
                 }
             };

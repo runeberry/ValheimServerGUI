@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 
 namespace ValheimServerGUI.Game
 {
@@ -16,6 +15,8 @@ namespace ValheimServerGUI.Game
         public bool Public { get; set; }
 
         public int Port { get; set; }
+
+        public bool Crossplay { get; set; }
 
         public void Validate()
         {
@@ -55,5 +56,7 @@ namespace ValheimServerGUI.Game
         bool Public { get; }
 
         int Port { get; set; }
+
+        bool Crossplay { get; }
     }
 }

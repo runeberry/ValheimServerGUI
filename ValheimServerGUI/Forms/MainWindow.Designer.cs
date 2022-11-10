@@ -50,6 +50,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStripLabelRight = new System.Windows.Forms.ToolStripStatusLabel();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
+            this.ServerCrossplayField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.WorldSelectGroupBox = new System.Windows.Forms.GroupBox();
             this.WorldSelectNewNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.WorldSelectRadioNew = new ValheimServerGUI.Controls.RadioFormField();
@@ -254,6 +255,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabServerControls
             // 
+            this.TabServerControls.Controls.Add(this.ServerCrossplayField);
             this.TabServerControls.Controls.Add(this.WorldSelectGroupBox);
             this.TabServerControls.Controls.Add(this.ServerPortField);
             this.TabServerControls.Controls.Add(this.ButtonRestartServer);
@@ -270,6 +272,18 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.TabIndex = 0;
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
+            // 
+            // ServerCrossplayField
+            // 
+            this.ServerCrossplayField.HelpText = "Allow players on other platforms to join your game\r\n(Microsoft Store, Xbox, etc.)" +
+    "\r\n\r\nYou may need to provide other players an Invite Code,\r\nwhich appears in game" +
+    " and in the server logs.";
+            this.ServerCrossplayField.LabelText = "Enable Crossplay";
+            this.ServerCrossplayField.Location = new System.Drawing.Point(151, 94);
+            this.ServerCrossplayField.Name = "ServerCrossplayField";
+            this.ServerCrossplayField.Size = new System.Drawing.Size(133, 17);
+            this.ServerCrossplayField.TabIndex = 18;
+            this.ServerCrossplayField.Value = false;
             // 
             // WorldSelectGroupBox
             // 
@@ -880,5 +894,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Timer UpdateCheckTimer;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFilePreferences;
         private System.Windows.Forms.ToolStripMenuItem MenuItemHelpBugReport;
+        private ValheimServerGUI.Controls.CheckboxFormField ServerCrossplayField;
     }
 }

@@ -236,7 +236,7 @@
     <value>https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server</value>
   </data>
   <data name="UrlRuneberryApi" xml:space="preserve">
-    <value>https://api.runeberry.com/vsg-api</value>
+    <value>https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod</value>
   </data>
   <data name="UrlTwitter" xml:space="preserve">
     <value>https://twitter.com/Runeberries</value>

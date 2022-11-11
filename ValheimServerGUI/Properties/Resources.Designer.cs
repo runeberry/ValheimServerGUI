@@ -437,7 +437,7 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://api.runeberry.com/vsg-api.
+        ///   Looks up a localized string similar to https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod.
         /// </summary>
         internal static string UrlRuneberryApi {
             get {

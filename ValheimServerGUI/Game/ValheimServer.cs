@@ -33,6 +33,7 @@ namespace ValheimServerGUI.Game
         public event EventHandler<ServerStatus> StatusChanged;
 
         public event EventHandler<decimal> WorldSaved;
+        public event EventHandler<string> InviteCodeReady;
 
         public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped);
         public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running);
@@ -78,6 +79,8 @@ namespace ValheimServerGUI.Game
             LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // Technically "disconnecting" but it's the best terminator I can find
 
             LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", this.OnWorldSaved);
+
+            LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", this.OnCrossplayJoinCodeAvailable);
         }
 
         private void InitializeStatusBasedActions()
@@ -269,8 +272,14 @@ namespace ValheimServerGUI.Game
             }
 
             this.WorldSaved?.Invoke(this, timeMs);
+        }
 
-            // todo: something
+        private void OnCrossplayJoinCodeAvailable(object sender, EventLogContext context, params string[] captures)
+        {
+            var inviteCode = captures[0];
+            if (string.IsNullOrWhiteSpace(inviteCode)) return;
+
+            this.InviteCodeReady?.Invoke(this, inviteCode);
         }
 
         #endregion

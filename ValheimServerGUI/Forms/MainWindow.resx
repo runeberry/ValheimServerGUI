@@ -128,6 +128,11 @@ take up to 15 minutes, and rarely not show up at all. You can always "Join by IP
         luQHKWcAAAAASUVORK5CYII=
 </value>
   </data>
+  <data name="LabelInviteCode.HelpText" xml:space="preserve">
+    <value>Invite codes are only available when Crossplay is enabled and change
+each time the server is restarted. Players on any platform can connect
+to your server with an invite code instead of an IP address.</value>
+  </data>
   <data name="LabelLocalIpAddress.HelpText" xml:space="preserve">
     <value>Use this IP address to connect to your server if you're playing on the host machine.
 This will give you the fastest possible connection! (i.e. "the host advantage")

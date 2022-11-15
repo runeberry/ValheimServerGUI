@@ -70,6 +70,8 @@ namespace ValheimServerGUI.Forms
             this.LabelAverageWorldSave = new ValheimServerGUI.Controls.LabelField();
             this.LabelLastWorldSave = new ValheimServerGUI.Controls.LabelField();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.CopyButtonInviteCode = new ValheimServerGUI.Forms.CopyButton();
+            this.LabelInviteCode = new ValheimServerGUI.Controls.LabelField();
             this.CopyButtonLocalIpAddress = new ValheimServerGUI.Forms.CopyButton();
             this.CopyButtonExternalIpAddress = new ValheimServerGUI.Forms.CopyButton();
             this.CopyButtonInternalIpAddress = new ValheimServerGUI.Forms.CopyButton();
@@ -515,6 +517,8 @@ namespace ValheimServerGUI.Forms
             // 
             // groupBox1
             // 
+            this.groupBox1.Controls.Add(this.CopyButtonInviteCode);
+            this.groupBox1.Controls.Add(this.LabelInviteCode);
             this.groupBox1.Controls.Add(this.CopyButtonLocalIpAddress);
             this.groupBox1.Controls.Add(this.CopyButtonExternalIpAddress);
             this.groupBox1.Controls.Add(this.CopyButtonInternalIpAddress);
@@ -528,6 +532,27 @@ namespace ValheimServerGUI.Forms
             this.groupBox1.TabIndex = 3;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Connection Details";
+            // 
+            // CopyButtonInviteCode
+            // 
+            this.CopyButtonInviteCode.CopyFunction = null;
+            this.CopyButtonInviteCode.Location = new System.Drawing.Point(276, 85);
+            this.CopyButtonInviteCode.Name = "CopyButtonInviteCode";
+            this.CopyButtonInviteCode.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonInviteCode.TabIndex = 8;
+            // 
+            // LabelInviteCode
+            // 
+            this.LabelInviteCode.HelpText = resources.GetString("LabelInviteCode.HelpText");
+            this.LabelInviteCode.LabelSplitRatio = 0.455D;
+            this.LabelInviteCode.LabelText = "Invite Code:";
+            this.LabelInviteCode.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            this.LabelInviteCode.Location = new System.Drawing.Point(6, 85);
+            this.LabelInviteCode.Name = "LabelInviteCode";
+            this.LabelInviteCode.Size = new System.Drawing.Size(264, 15);
+            this.LabelInviteCode.TabIndex = 7;
+            this.LabelInviteCode.Value = "N/A";
+            this.LabelInviteCode.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // CopyButtonLocalIpAddress
             // 
@@ -557,12 +582,11 @@ namespace ValheimServerGUI.Forms
             // 
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Italic, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(6, 82);
+            this.label1.Location = new System.Drawing.Point(6, 110);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(286, 45);
+            this.label1.Size = new System.Drawing.Size(261, 15);
             this.label1.TabIndex = 3;
-            this.label1.Text = "Note: Before others can join your server, you\'ll need to\r\nset up port forwarding " +
-    "on your router. Check out the\r\nguide under Help > Port Forwarding.\r\n";
+            this.label1.Text = "Trouble connecting? See Help > Port Forwarding.\r\n";
             // 
             // LabelExternalIpAddress
             // 
@@ -751,26 +775,26 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuSeparator1,
             this.TrayContextMenuClose});
             this.TrayContextMenuStrip.Name = "TrayContextMenuStrip";
-            this.TrayContextMenuStrip.Size = new System.Drawing.Size(181, 148);
+            this.TrayContextMenuStrip.Size = new System.Drawing.Size(146, 126);
             // 
             // TrayContextMenuServerName
             // 
             this.TrayContextMenuServerName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.TrayContextMenuServerName.Name = "TrayContextMenuServerName";
-            this.TrayContextMenuServerName.Size = new System.Drawing.Size(180, 22);
+            this.TrayContextMenuServerName.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuServerName.Text = "ServerName";
             // 
             // TrayContextMenuSeparator2
             // 
             this.TrayContextMenuSeparator2.Name = "TrayContextMenuSeparator2";
-            this.TrayContextMenuSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.TrayContextMenuSeparator2.Size = new System.Drawing.Size(142, 6);
             // 
             // TrayContextMenuStart
             // 
             this.TrayContextMenuStart.Enabled = false;
             this.TrayContextMenuStart.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuStart.Image")));
             this.TrayContextMenuStart.Name = "TrayContextMenuStart";
-            this.TrayContextMenuStart.Size = new System.Drawing.Size(180, 22);
+            this.TrayContextMenuStart.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuStart.Text = "Start Server";
             // 
             // TrayContextMenuRestart
@@ -778,7 +802,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuRestart.Enabled = false;
             this.TrayContextMenuRestart.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuRestart.Image")));
             this.TrayContextMenuRestart.Name = "TrayContextMenuRestart";
-            this.TrayContextMenuRestart.Size = new System.Drawing.Size(180, 22);
+            this.TrayContextMenuRestart.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuRestart.Text = "Restart Server";
             // 
             // TrayContextMenuStop
@@ -786,18 +810,18 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStop.Enabled = false;
             this.TrayContextMenuStop.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuStop.Image")));
             this.TrayContextMenuStop.Name = "TrayContextMenuStop";
-            this.TrayContextMenuStop.Size = new System.Drawing.Size(180, 22);
+            this.TrayContextMenuStop.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuStop.Text = "Stop Server";
             // 
             // TrayContextMenuSeparator1
             // 
             this.TrayContextMenuSeparator1.Name = "TrayContextMenuSeparator1";
-            this.TrayContextMenuSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.TrayContextMenuSeparator1.Size = new System.Drawing.Size(142, 6);
             // 
             // TrayContextMenuClose
             // 
             this.TrayContextMenuClose.Name = "TrayContextMenuClose";
-            this.TrayContextMenuClose.Size = new System.Drawing.Size(180, 22);
+            this.TrayContextMenuClose.Size = new System.Drawing.Size(145, 22);
             this.TrayContextMenuClose.Text = "Close";
             // 
             // ServerRefreshTimer
@@ -914,5 +938,7 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.CheckboxFormField ServerCrossplayField;
         private System.Windows.Forms.ToolStripMenuItem TrayContextMenuServerName;
         private System.Windows.Forms.ToolStripSeparator TrayContextMenuSeparator2;
+        private CopyButton CopyButtonInviteCode;
+        private ValheimServerGUI.Controls.LabelField LabelInviteCode;
     }
 }

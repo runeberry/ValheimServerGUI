@@ -98,6 +98,7 @@ namespace ValheimServerGUI.Forms
             this.ServerLogger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnServerLogReceived);
             this.Server.StatusChanged += this.BuildEventHandler<ServerStatus>(this.OnServerStatusChanged);
             this.Server.WorldSaved += this.BuildEventHandler<decimal>(this.OnWorldSaved);
+            this.Server.InviteCodeReady += this.BuildEventHandler<string>(this.OnInviteCodeReady);
 
             this.PlayerDataProvider.DataReady += this.BuildEventHandler(this.OnPlayerDataReady);
             this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
@@ -151,6 +152,7 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonExternalIpAddress.CopyFunction = () => this.LabelExternalIpAddress.Value;
             this.CopyButtonInternalIpAddress.CopyFunction = () => this.LabelInternalIpAddress.Value;
             this.CopyButtonLocalIpAddress.CopyFunction = () => this.LabelLocalIpAddress.Value;
+            this.CopyButtonInviteCode.CopyFunction = () => this.LabelInviteCode.Value;
             this.StatusStripLabelRight.Click += this.BuildEventHandler(this.StatusStripLabelRight_Click);
 
             // Form fields
@@ -513,6 +515,16 @@ namespace ValheimServerGUI.Forms
             {
                 if (this.ServerUptimeTimer.IsRunning) this.ServerUptimeTimer.Stop();
             }
+
+            if (status == ServerStatus.Stopped)
+            {
+                // Invite codes are only good for the session, clear it out when it's done
+                this.SetInviteCode(null);
+            }
+            else if (status == ServerStatus.Starting && this.ServerCrossplayField.Value)
+            {
+                this.SetInviteCode("Loading...", false);
+            }
         }
 
         private void OnPlayerDataReady()
@@ -537,6 +549,11 @@ namespace ValheimServerGUI.Forms
 
             var average = this.WorldSaveTimes.Average();
             this.LabelAverageWorldSave.Value = $"{average:F}ms";
+        }
+
+        private void OnInviteCodeReady(string inviteCode)
+        {
+            this.SetInviteCode(inviteCode);
         }
 
         private void IpAddressProvider_ExternalIpReceived(string ip)
@@ -889,6 +906,19 @@ namespace ValheimServerGUI.Forms
                 var ip = captures[0];
                 field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
             }
+        }
+
+        private void SetInviteCode(string inviteCode, bool copyable = true)
+        {
+            if (string.IsNullOrWhiteSpace(inviteCode))
+            {
+                this.LabelInviteCode.Value = "N/A";
+                this.CopyButtonInviteCode.Visible = false;
+                return;
+            }
+
+            this.LabelInviteCode.Value = inviteCode;
+            this.CopyButtonInviteCode.Visible = copyable;
         }
 
         private void UpdatePlayerStatus(PlayerInfo player)

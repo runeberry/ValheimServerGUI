@@ -103,6 +103,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.JoinOptionsGroupBox = new System.Windows.Forms.GroupBox();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -114,6 +115,7 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
+            this.JoinOptionsGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // MenuStrip
@@ -259,12 +261,11 @@ namespace ValheimServerGUI.Forms
             // 
             // TabServerControls
             // 
-            this.TabServerControls.Controls.Add(this.ServerCrossplayField);
+            this.TabServerControls.Controls.Add(this.JoinOptionsGroupBox);
             this.TabServerControls.Controls.Add(this.WorldSelectGroupBox);
             this.TabServerControls.Controls.Add(this.ServerPortField);
             this.TabServerControls.Controls.Add(this.ButtonRestartServer);
             this.TabServerControls.Controls.Add(this.ShowPasswordField);
-            this.TabServerControls.Controls.Add(this.CommunityServerField);
             this.TabServerControls.Controls.Add(this.ServerPasswordField);
             this.TabServerControls.Controls.Add(this.ServerNameField);
             this.TabServerControls.Controls.Add(this.ButtonStopServer);
@@ -283,7 +284,7 @@ namespace ValheimServerGUI.Forms
     "\r\n\r\nYou may need to provide other players an Invite Code,\r\nwhich appears in game" +
     " and in the server logs.";
             this.ServerCrossplayField.LabelText = "Enable Crossplay";
-            this.ServerCrossplayField.Location = new System.Drawing.Point(151, 94);
+            this.ServerCrossplayField.Location = new System.Drawing.Point(6, 45);
             this.ServerCrossplayField.Name = "ServerCrossplayField";
             this.ServerCrossplayField.Size = new System.Drawing.Size(133, 17);
             this.ServerCrossplayField.TabIndex = 18;
@@ -295,7 +296,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.Controls.Add(this.WorldSelectRadioNew);
             this.WorldSelectGroupBox.Controls.Add(this.WorldSelectRadioExisting);
             this.WorldSelectGroupBox.Controls.Add(this.WorldSelectExistingNameField);
-            this.WorldSelectGroupBox.Location = new System.Drawing.Point(3, 117);
+            this.WorldSelectGroupBox.Location = new System.Drawing.Point(3, 94);
             this.WorldSelectGroupBox.Name = "WorldSelectGroupBox";
             this.WorldSelectGroupBox.Size = new System.Drawing.Size(240, 96);
             this.WorldSelectGroupBox.TabIndex = 17;
@@ -392,7 +393,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.CommunityServerField.HelpText = resources.GetString("CommunityServerField.HelpText");
             this.CommunityServerField.LabelText = "Community Server";
-            this.CommunityServerField.Location = new System.Drawing.Point(3, 94);
+            this.CommunityServerField.Location = new System.Drawing.Point(6, 22);
             this.CommunityServerField.Name = "CommunityServerField";
             this.CommunityServerField.Size = new System.Drawing.Size(142, 17);
             this.CommunityServerField.TabIndex = 13;
@@ -724,7 +725,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -834,6 +834,17 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
+            // JoinOptionsGroupBox
+            // 
+            this.JoinOptionsGroupBox.Controls.Add(this.CommunityServerField);
+            this.JoinOptionsGroupBox.Controls.Add(this.ServerCrossplayField);
+            this.JoinOptionsGroupBox.Location = new System.Drawing.Point(249, 94);
+            this.JoinOptionsGroupBox.Name = "JoinOptionsGroupBox";
+            this.JoinOptionsGroupBox.Size = new System.Drawing.Size(197, 96);
+            this.JoinOptionsGroupBox.TabIndex = 19;
+            this.JoinOptionsGroupBox.TabStop = false;
+            this.JoinOptionsGroupBox.Text = "Join Options";
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -861,6 +872,7 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TrayContextMenuStrip.ResumeLayout(false);
+            this.JoinOptionsGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -940,5 +952,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripSeparator TrayContextMenuSeparator2;
         private CopyButton CopyButtonInviteCode;
         private ValheimServerGUI.Controls.LabelField LabelInviteCode;
+        private System.Windows.Forms.GroupBox JoinOptionsGroupBox;
     }
 }

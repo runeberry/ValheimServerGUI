@@ -126,6 +126,7 @@ namespace ValheimServerGUI.Forms
 
             // Tray icon
             this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
+            this.TrayContextMenuServerName.Click += this.TrayContextMenuServerName_Click;
             this.TrayContextMenuStart.Click += this.BuildEventHandler(this.StartServer);
             this.TrayContextMenuRestart.Click += this.ButtonRestartServer_Click;
             this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
@@ -153,6 +154,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStripLabelRight.Click += this.BuildEventHandler(this.StatusStripLabelRight_Click);
 
             // Form fields
+            this.ServerNameField.ValueChanged += this.ServerNameField_Changed;
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
             this.WorldSelectRadioExisting.ValueChanged += this.WorldSelectRadioExisting_Changed;
             this.WorldSelectRadioNew.ValueChanged += this.WorldSelectRadioNew_Changed;
@@ -385,6 +387,11 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void ServerNameField_Changed(object sender, string value)
+        {
+            this.RefreshFormStateForServer();
+        }
+
         private void ShowPasswordField_Changed(object sender, bool value)
         {
             this.ServerPasswordField.HideValue = !value;
@@ -463,6 +470,11 @@ namespace ValheimServerGUI.Forms
             if (!this.StatusStripLabelRight.IsLink) return;
 
             this.CheckForUpdates(true);
+        }
+
+        private void TrayContextMenuServerName_Click(object sender, EventArgs e)
+        {
+            this.Focus();
         }
 
         #endregion
@@ -939,6 +951,9 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStart.Enabled = this.ButtonStartServer.Enabled;
             this.TrayContextMenuRestart.Enabled = this.ButtonRestartServer.Enabled;
             this.TrayContextMenuStop.Enabled = this.ButtonStopServer.Enabled;
+
+            this.TrayContextMenuServerName.Text = this.ServerNameField.Value;
+            this.TrayContextMenuServerName.Image = this.ServerStatusIconMap[this.Server.Status];
         }
 
         private void RefreshWorldSelect()

@@ -92,6 +92,8 @@ namespace ValheimServerGUI.Forms
             this.ButtonClearLogs = new System.Windows.Forms.Button();
             this.NotifyIcon = new System.Windows.Forms.NotifyIcon(this.components);
             this.TrayContextMenuStrip = new System.Windows.Forms.ContextMenuStrip(this.components);
+            this.TrayContextMenuServerName = new System.Windows.Forms.ToolStripMenuItem();
+            this.TrayContextMenuSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.TrayContextMenuStart = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayContextMenuRestart = new System.Windows.Forms.ToolStripMenuItem();
             this.TrayContextMenuStop = new System.Windows.Forms.ToolStripMenuItem();
@@ -698,6 +700,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -740,20 +743,34 @@ namespace ValheimServerGUI.Forms
             // TrayContextMenuStrip
             // 
             this.TrayContextMenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.TrayContextMenuServerName,
+            this.TrayContextMenuSeparator2,
             this.TrayContextMenuStart,
             this.TrayContextMenuRestart,
             this.TrayContextMenuStop,
             this.TrayContextMenuSeparator1,
             this.TrayContextMenuClose});
             this.TrayContextMenuStrip.Name = "TrayContextMenuStrip";
-            this.TrayContextMenuStrip.Size = new System.Drawing.Size(146, 98);
+            this.TrayContextMenuStrip.Size = new System.Drawing.Size(181, 148);
+            // 
+            // TrayContextMenuServerName
+            // 
+            this.TrayContextMenuServerName.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.TrayContextMenuServerName.Name = "TrayContextMenuServerName";
+            this.TrayContextMenuServerName.Size = new System.Drawing.Size(180, 22);
+            this.TrayContextMenuServerName.Text = "ServerName";
+            // 
+            // TrayContextMenuSeparator2
+            // 
+            this.TrayContextMenuSeparator2.Name = "TrayContextMenuSeparator2";
+            this.TrayContextMenuSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // TrayContextMenuStart
             // 
             this.TrayContextMenuStart.Enabled = false;
             this.TrayContextMenuStart.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuStart.Image")));
             this.TrayContextMenuStart.Name = "TrayContextMenuStart";
-            this.TrayContextMenuStart.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuStart.Size = new System.Drawing.Size(180, 22);
             this.TrayContextMenuStart.Text = "Start Server";
             // 
             // TrayContextMenuRestart
@@ -761,7 +778,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuRestart.Enabled = false;
             this.TrayContextMenuRestart.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuRestart.Image")));
             this.TrayContextMenuRestart.Name = "TrayContextMenuRestart";
-            this.TrayContextMenuRestart.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuRestart.Size = new System.Drawing.Size(180, 22);
             this.TrayContextMenuRestart.Text = "Restart Server";
             // 
             // TrayContextMenuStop
@@ -769,18 +786,18 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStop.Enabled = false;
             this.TrayContextMenuStop.Image = ((System.Drawing.Image)(resources.GetObject("TrayContextMenuStop.Image")));
             this.TrayContextMenuStop.Name = "TrayContextMenuStop";
-            this.TrayContextMenuStop.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuStop.Size = new System.Drawing.Size(180, 22);
             this.TrayContextMenuStop.Text = "Stop Server";
             // 
             // TrayContextMenuSeparator1
             // 
             this.TrayContextMenuSeparator1.Name = "TrayContextMenuSeparator1";
-            this.TrayContextMenuSeparator1.Size = new System.Drawing.Size(142, 6);
+            this.TrayContextMenuSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // TrayContextMenuClose
             // 
             this.TrayContextMenuClose.Name = "TrayContextMenuClose";
-            this.TrayContextMenuClose.Size = new System.Drawing.Size(145, 22);
+            this.TrayContextMenuClose.Size = new System.Drawing.Size(180, 22);
             this.TrayContextMenuClose.Text = "Close";
             // 
             // ServerRefreshTimer
@@ -895,5 +912,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripMenuItem MenuItemFilePreferences;
         private System.Windows.Forms.ToolStripMenuItem MenuItemHelpBugReport;
         private ValheimServerGUI.Controls.CheckboxFormField ServerCrossplayField;
+        private System.Windows.Forms.ToolStripMenuItem TrayContextMenuServerName;
+        private System.Windows.Forms.ToolStripSeparator TrayContextMenuSeparator2;
     }
 }

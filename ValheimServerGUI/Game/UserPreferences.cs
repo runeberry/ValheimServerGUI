@@ -43,8 +43,6 @@ namespace ValheimServerGUI.Game
 
         public int ServerBackupIntervalLong { get; set; } = int.Parse(Resources.DefaultBackupIntervalLong);
 
-        public string ServerLogDirectory { get; set; }
-
         public static UserPreferences FromFile(UserPreferencesFile file)
         {
             var prefs = new UserPreferences();
@@ -74,7 +72,6 @@ namespace ValheimServerGUI.Game
                 prefs.ServerBackupCount = server.BackupCount ?? prefs.ServerBackupCount;
                 prefs.ServerBackupIntervalShort = server.BackupIntervalShort ?? prefs.ServerBackupIntervalShort;
                 prefs.ServerBackupIntervalLong = server.BackupIntervalLong ?? prefs.ServerBackupIntervalLong;
-                prefs.ServerLogDirectory = server.LogDirectory ?? prefs.ServerLogDirectory;
             }
 
             return prefs;
@@ -106,7 +103,6 @@ namespace ValheimServerGUI.Game
                         BackupCount = this.ServerBackupCount,
                         BackupIntervalShort = this.ServerBackupIntervalShort,
                         BackupIntervalLong = this.ServerBackupIntervalLong,
-                        LogDirectory = this.ServerLogDirectory,
                     }
                 }
             };

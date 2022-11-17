@@ -26,8 +26,6 @@ namespace ValheimServerGUI.Game
 
         public int BackupLong { get; set; }
 
-        public string LogFile { get; set; }
-
         public void Validate()
         {
             // Ensure all required fields exist
@@ -76,7 +74,5 @@ namespace ValheimServerGUI.Game
         int BackupShort { get; }
 
         int BackupLong { get; }
-
-        string LogFile { get; }
     }
 }

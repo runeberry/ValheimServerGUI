@@ -717,13 +717,6 @@ namespace ValheimServerGUI.Forms
 
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
-            string logFile = null;
-            if (!string.IsNullOrWhiteSpace(prefs.ServerLogDirectory))
-            {
-                var logFileName = $"{this.ServerNameField.Value}_{DateTime.UtcNow.ToFileTimeUtc()}.txt";
-                logFile = Path.Join(prefs.ServerLogDirectory, logFileName);
-            }
-
             var options = new ValheimServerOptions
             {
                 Name = this.ServerNameField.Value,
@@ -737,7 +730,6 @@ namespace ValheimServerGUI.Forms
                 Backups = prefs.ServerBackupCount,
                 BackupShort = prefs.ServerBackupIntervalShort,
                 BackupLong = prefs.ServerBackupIntervalLong,
-                LogFile = logFile,
             };
 
             try

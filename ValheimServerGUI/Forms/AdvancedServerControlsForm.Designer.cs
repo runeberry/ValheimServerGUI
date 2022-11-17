@@ -36,7 +36,6 @@
             this.LongBackupIntervalField = new ValheimServerGUI.Controls.NumericFormField();
             this.SaveIntervalField = new ValheimServerGUI.Controls.NumericFormField();
             this.BackupsField = new ValheimServerGUI.Controls.NumericFormField();
-            this.LogFileDirectoryField = new ValheimServerGUI.Controls.FilenameFormField();
             this.SavingGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -137,28 +136,11 @@
             this.BackupsField.TabIndex = 0;
             this.BackupsField.Value = 1;
             // 
-            // LogFileDirectoryField
-            // 
-            this.LogFileDirectoryField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.Directory;
-            this.LogFileDirectoryField.HelpText = "If you would like server logs saved to a file, enter a\r\ndirectory here. A new tim" +
-    "estamped log file will be\r\ncreated when the server is started.\r\n";
-            this.LogFileDirectoryField.InitialPath = null;
-            this.LogFileDirectoryField.LabelText = "Log File Directory";
-            this.LogFileDirectoryField.Location = new System.Drawing.Point(12, 135);
-            this.LogFileDirectoryField.MultiFileSeparator = "; ";
-            this.LogFileDirectoryField.Name = "LogFileDirectoryField";
-            this.LogFileDirectoryField.ReadOnly = false;
-            this.LogFileDirectoryField.Size = new System.Drawing.Size(335, 41);
-            this.LogFileDirectoryField.TabIndex = 10;
-            this.LogFileDirectoryField.Value = "";
-            this.LogFileDirectoryField.Visible = false;
-            // 
             // AdvancedServerControlsForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(359, 217);
-            this.Controls.Add(this.LogFileDirectoryField);
             this.Controls.Add(this.SavingGroupBox);
             this.Controls.Add(this.ButtonOK);
             this.Controls.Add(this.ButtonCancel);
@@ -184,6 +166,5 @@
         private ValheimServerGUI.Controls.NumericFormField SaveIntervalField;
         private ValheimServerGUI.Controls.NumericFormField BackupsField;
         private ValheimServerGUI.Controls.NumericFormField LongBackupIntervalField;
-        private ValheimServerGUI.Controls.FilenameFormField LogFileDirectoryField;
     }
 }

@@ -67,9 +67,6 @@ namespace ValheimServerGUI.Game
 
             [JsonProperty("backupIntervalLong")]
             public int? BackupIntervalLong { get; set; }
-
-            [JsonProperty("logDirectory")]
-            public string LogDirectory { get; set; }
         }
     }
 }

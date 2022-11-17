@@ -1,5 +1,4 @@
 ﻿using System;
-using System.IO;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
@@ -35,7 +34,6 @@ namespace ValheimServerGUI.Forms
             this.BackupsField.Value = prefs.ServerBackupCount;
             this.ShortBackupIntervalField.Value = prefs.ServerBackupIntervalShort;
             this.LongBackupIntervalField.Value = prefs.ServerBackupIntervalLong;
-            this.LogFileDirectoryField.Value = prefs.ServerLogDirectory;
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
@@ -46,7 +44,6 @@ namespace ValheimServerGUI.Forms
             prefs.ServerBackupCount = this.BackupsField.Value;
             prefs.ServerBackupIntervalShort = this.ShortBackupIntervalField.Value;
             prefs.ServerBackupIntervalLong = this.LongBackupIntervalField.Value;
-            prefs.ServerLogDirectory = this.LogFileDirectoryField.Value;
 
             var err = ValidatePrefs(prefs);
             if (err != null)
@@ -76,7 +73,6 @@ namespace ValheimServerGUI.Forms
             this.BackupsField.Value = prefs.ServerBackupCount;
             this.ShortBackupIntervalField.Value = prefs.ServerBackupIntervalShort;
             this.LongBackupIntervalField.Value = prefs.ServerBackupIntervalLong;
-            this.LogFileDirectoryField.Value = prefs.ServerLogDirectory;
         }
 
         private static string ValidatePrefs(UserPreferences prefs)
@@ -90,12 +86,6 @@ namespace ValheimServerGUI.Forms
             if (prefs.ServerBackupIntervalShort > prefs.ServerBackupIntervalLong)
             {
                 return "The short backup interval must be shorter than the long backup interval.";
-            }
-
-            if (!string.IsNullOrWhiteSpace(prefs.ServerLogDirectory) &&
-                !Directory.Exists(prefs.ServerLogDirectory))
-            {
-                return "The specified log file directory does not exist.";
             }
 
             return null;

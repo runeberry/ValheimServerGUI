@@ -150,6 +150,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonSaveLogs.Click += this.ButtonSaveLogs_Click;
             this.ButtonPlayerDetails.Click += this.ButtonPlayerDetails_Click;
             this.ButtonRemovePlayer.Click += this.ButtonRemovePlayer_Click;
+            this.CopyButtonServerPassword.CopyFunction = () => this.ServerPasswordField.Value;
             this.CopyButtonExternalIpAddress.CopyFunction = () => this.LabelExternalIpAddress.Value;
             this.CopyButtonInternalIpAddress.CopyFunction = () => this.LabelInternalIpAddress.Value;
             this.CopyButtonLocalIpAddress.CopyFunction = () => this.LabelLocalIpAddress.Value;

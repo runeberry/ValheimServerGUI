@@ -105,6 +105,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.CopyButtonServerPassword = new ValheimServerGUI.Forms.CopyButton();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -262,6 +263,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabServerControls
             // 
+            this.TabServerControls.Controls.Add(this.CopyButtonServerPassword);
             this.TabServerControls.Controls.Add(this.ButtonAdvancedSettings);
             this.TabServerControls.Controls.Add(this.JoinOptionsGroupBox);
             this.TabServerControls.Controls.Add(this.WorldSelectGroupBox);
@@ -415,7 +417,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ShowPasswordField.HelpText = "";
             this.ShowPasswordField.LabelText = "Show Password";
-            this.ShowPasswordField.Location = new System.Drawing.Point(234, 68);
+            this.ShowPasswordField.Location = new System.Drawing.Point(255, 68);
             this.ShowPasswordField.Name = "ShowPasswordField";
             this.ShowPasswordField.Size = new System.Drawing.Size(150, 17);
             this.ShowPasswordField.TabIndex = 14;
@@ -747,6 +749,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -855,6 +858,14 @@ namespace ValheimServerGUI.Forms
             // 
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
+            // 
+            // CopyButtonServerPassword
+            // 
+            this.CopyButtonServerPassword.CopyFunction = null;
+            this.CopyButtonServerPassword.Location = new System.Drawing.Point(236, 69);
+            this.CopyButtonServerPassword.Name = "CopyButtonServerPassword";
+            this.CopyButtonServerPassword.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonServerPassword.TabIndex = 21;
             // 
             // MainWindow
             // 
@@ -965,5 +976,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.LabelField LabelInviteCode;
         private System.Windows.Forms.GroupBox JoinOptionsGroupBox;
         private System.Windows.Forms.Button ButtonAdvancedSettings;
+        private CopyButton CopyButtonServerPassword;
     }
 }

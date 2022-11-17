@@ -50,6 +50,9 @@ namespace ValheimServerGUI.Forms
             this.StatusStripLabelRight = new System.Windows.Forms.ToolStripStatusLabel();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
+            this.ButtonAdvancedSettings = new System.Windows.Forms.Button();
+            this.JoinOptionsGroupBox = new System.Windows.Forms.GroupBox();
+            this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerCrossplayField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.WorldSelectGroupBox = new System.Windows.Forms.GroupBox();
             this.WorldSelectNewNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
@@ -59,7 +62,6 @@ namespace ValheimServerGUI.Forms
             this.ServerPortField = new ValheimServerGUI.Controls.NumericFormField();
             this.ButtonRestartServer = new System.Windows.Forms.Button();
             this.ShowPasswordField = new ValheimServerGUI.Controls.CheckboxFormField();
-            this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerPasswordField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ServerNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.ButtonStopServer = new System.Windows.Forms.Button();
@@ -103,11 +105,11 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.JoinOptionsGroupBox = new System.Windows.Forms.GroupBox();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
             this.TabServerControls.SuspendLayout();
+            this.JoinOptionsGroupBox.SuspendLayout();
             this.WorldSelectGroupBox.SuspendLayout();
             this.TabServerDetails.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -115,7 +117,6 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
-            this.JoinOptionsGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // MenuStrip
@@ -261,6 +262,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabServerControls
             // 
+            this.TabServerControls.Controls.Add(this.ButtonAdvancedSettings);
             this.TabServerControls.Controls.Add(this.JoinOptionsGroupBox);
             this.TabServerControls.Controls.Add(this.WorldSelectGroupBox);
             this.TabServerControls.Controls.Add(this.ServerPortField);
@@ -277,6 +279,36 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.TabIndex = 0;
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
+            // 
+            // ButtonAdvancedSettings
+            // 
+            this.ButtonAdvancedSettings.Location = new System.Drawing.Point(3, 196);
+            this.ButtonAdvancedSettings.Name = "ButtonAdvancedSettings";
+            this.ButtonAdvancedSettings.Size = new System.Drawing.Size(240, 23);
+            this.ButtonAdvancedSettings.TabIndex = 20;
+            this.ButtonAdvancedSettings.Text = "Advanced Settings...";
+            this.ButtonAdvancedSettings.UseVisualStyleBackColor = true;
+            // 
+            // JoinOptionsGroupBox
+            // 
+            this.JoinOptionsGroupBox.Controls.Add(this.CommunityServerField);
+            this.JoinOptionsGroupBox.Controls.Add(this.ServerCrossplayField);
+            this.JoinOptionsGroupBox.Location = new System.Drawing.Point(249, 94);
+            this.JoinOptionsGroupBox.Name = "JoinOptionsGroupBox";
+            this.JoinOptionsGroupBox.Size = new System.Drawing.Size(197, 96);
+            this.JoinOptionsGroupBox.TabIndex = 19;
+            this.JoinOptionsGroupBox.TabStop = false;
+            this.JoinOptionsGroupBox.Text = "Join Options";
+            // 
+            // CommunityServerField
+            // 
+            this.CommunityServerField.HelpText = resources.GetString("CommunityServerField.HelpText");
+            this.CommunityServerField.LabelText = "Community Server";
+            this.CommunityServerField.Location = new System.Drawing.Point(6, 22);
+            this.CommunityServerField.Name = "CommunityServerField";
+            this.CommunityServerField.Size = new System.Drawing.Size(142, 17);
+            this.CommunityServerField.TabIndex = 13;
+            this.CommunityServerField.Value = false;
             // 
             // ServerCrossplayField
             // 
@@ -388,16 +420,6 @@ namespace ValheimServerGUI.Forms
             this.ShowPasswordField.Size = new System.Drawing.Size(150, 17);
             this.ShowPasswordField.TabIndex = 14;
             this.ShowPasswordField.Value = false;
-            // 
-            // CommunityServerField
-            // 
-            this.CommunityServerField.HelpText = resources.GetString("CommunityServerField.HelpText");
-            this.CommunityServerField.LabelText = "Community Server";
-            this.CommunityServerField.Location = new System.Drawing.Point(6, 22);
-            this.CommunityServerField.Name = "CommunityServerField";
-            this.CommunityServerField.Size = new System.Drawing.Size(142, 17);
-            this.CommunityServerField.TabIndex = 13;
-            this.CommunityServerField.Value = false;
             // 
             // ServerPasswordField
             // 
@@ -834,17 +856,6 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
-            // JoinOptionsGroupBox
-            // 
-            this.JoinOptionsGroupBox.Controls.Add(this.CommunityServerField);
-            this.JoinOptionsGroupBox.Controls.Add(this.ServerCrossplayField);
-            this.JoinOptionsGroupBox.Location = new System.Drawing.Point(249, 94);
-            this.JoinOptionsGroupBox.Name = "JoinOptionsGroupBox";
-            this.JoinOptionsGroupBox.Size = new System.Drawing.Size(197, 96);
-            this.JoinOptionsGroupBox.TabIndex = 19;
-            this.JoinOptionsGroupBox.TabStop = false;
-            this.JoinOptionsGroupBox.Text = "Join Options";
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -864,6 +875,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStrip.PerformLayout();
             this.Tabs.ResumeLayout(false);
             this.TabServerControls.ResumeLayout(false);
+            this.JoinOptionsGroupBox.ResumeLayout(false);
             this.WorldSelectGroupBox.ResumeLayout(false);
             this.TabServerDetails.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -872,7 +884,6 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TrayContextMenuStrip.ResumeLayout(false);
-            this.JoinOptionsGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -953,5 +964,6 @@ namespace ValheimServerGUI.Forms
         private CopyButton CopyButtonInviteCode;
         private ValheimServerGUI.Controls.LabelField LabelInviteCode;
         private System.Windows.Forms.GroupBox JoinOptionsGroupBox;
+        private System.Windows.Forms.Button ButtonAdvancedSettings;
     }
 }

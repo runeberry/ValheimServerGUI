@@ -97,9 +97,15 @@ namespace ValheimServerGUI.Controls
                     }
 
                     dialog.RootFolder = Environment.SpecialFolder.ProgramFilesX86;
-                    dialog.SelectedPath = !string.IsNullOrWhiteSpace(this.InitialPath)
-                        ? new DirectoryInfo(this.InitialPath).FullName
-                        : new DirectoryInfo(this.Value).FullName;
+
+                    if (!string.IsNullOrWhiteSpace(this.InitialPath))
+                    {
+                        dialog.SelectedPath = new DirectoryInfo(this.InitialPath).FullName;
+                    }
+                    else if (!string.IsNullOrWhiteSpace(this.Value))
+                    {
+                        dialog.SelectedPath = new DirectoryInfo(this.Value).FullName;
+                    }
 
                     if (dialog.ShowDialog() != DialogResult.OK) return;
 
@@ -123,7 +129,7 @@ namespace ValheimServerGUI.Controls
                     dialog.Multiselect = this.FileSelectMode == FileSelectMode.MultiFile;
 
                     if (dialog.ShowDialog() != DialogResult.OK) return;
-                    
+
                     result = this.FileSelectMode == FileSelectMode.MultiFile
                         ? string.Join(this.MultiFileSeparator, dialog.FileNames)
                         : dialog.FileName;

@@ -18,6 +18,16 @@ namespace ValheimServerGUI.Game
 
         public bool Crossplay { get; set; }
 
+        public int SaveInterval { get; set; }
+
+        public int Backups { get; set; }
+
+        public int BackupShort { get; set; }
+
+        public int BackupLong { get; set; }
+
+        public string LogFile { get; set; }
+
         public void Validate()
         {
             // Ensure all required fields exist
@@ -58,5 +68,15 @@ namespace ValheimServerGUI.Game
         int Port { get; set; }
 
         bool Crossplay { get; }
+
+        int SaveInterval { get; }
+
+        int Backups { get; }
+
+        int BackupShort { get; }
+
+        int BackupLong { get; }
+
+        string LogFile { get; }
     }
 }

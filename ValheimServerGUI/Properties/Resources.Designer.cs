@@ -91,11 +91,47 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to 4.
+        /// </summary>
+        internal static string DefaultBackupCount {
+            get {
+                return ResourceManager.GetString("DefaultBackupCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 43200.
+        /// </summary>
+        internal static string DefaultBackupIntervalLong {
+            get {
+                return ResourceManager.GetString("DefaultBackupIntervalLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 7200.
+        /// </summary>
+        internal static string DefaultBackupIntervalShort {
+            get {
+                return ResourceManager.GetString("DefaultBackupIntervalShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to %ProgramFiles(x86)%\Steam\steamapps\common\Valheim\valheim.exe.
         /// </summary>
         internal static string DefaultGamePath {
             get {
                 return ResourceManager.GetString("DefaultGamePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to 1800.
+        /// </summary>
+        internal static string DefaultSaveInterval {
+            get {
+                return ResourceManager.GetString("DefaultSaveInterval", resourceCulture);
             }
         }
         

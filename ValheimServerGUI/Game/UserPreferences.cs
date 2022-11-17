@@ -5,8 +5,6 @@ namespace ValheimServerGUI.Game
 {
     public class UserPreferences
     {
-        private static readonly int DefaultServerPort = int.Parse(Resources.DefaultServerPort);
-
         public static UserPreferences GetDefault() => new();
 
         public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
@@ -33,9 +31,19 @@ namespace ValheimServerGUI.Game
 
         public bool ServerPublic { get; set; }
 
-        public int ServerPort { get; set; } = DefaultServerPort;
+        public int ServerPort { get; set; } = int.Parse(Resources.DefaultServerPort);
 
         public bool ServerCrossplay { get; set; }
+
+        public int ServerSaveInterval { get; set; } = int.Parse(Resources.DefaultSaveInterval);
+
+        public int ServerBackupCount { get; set; } = int.Parse(Resources.DefaultBackupCount);
+
+        public int ServerBackupIntervalShort { get; set; } = int.Parse(Resources.DefaultBackupIntervalShort);
+
+        public int ServerBackupIntervalLong { get; set; } = int.Parse(Resources.DefaultBackupIntervalLong);
+
+        public string ServerLogDirectory { get; set; }
 
         public static UserPreferences FromFile(UserPreferencesFile file)
         {
@@ -62,6 +70,11 @@ namespace ValheimServerGUI.Game
                 prefs.ServerPublic = server.CommunityServer ?? prefs.ServerPublic;
                 prefs.ServerPort = server.Port ?? prefs.ServerPort;
                 prefs.ServerCrossplay = server.Crossplay ?? prefs.ServerCrossplay;
+                prefs.ServerSaveInterval = server.SaveInterval ?? prefs.ServerSaveInterval;
+                prefs.ServerBackupCount = server.BackupCount ?? prefs.ServerBackupCount;
+                prefs.ServerBackupIntervalShort = server.BackupIntervalShort ?? prefs.ServerBackupIntervalShort;
+                prefs.ServerBackupIntervalLong = server.BackupIntervalLong ?? prefs.ServerBackupIntervalLong;
+                prefs.ServerLogDirectory = server.LogDirectory ?? prefs.ServerLogDirectory;
             }
 
             return prefs;
@@ -89,6 +102,11 @@ namespace ValheimServerGUI.Game
                         CommunityServer = this.ServerPublic,
                         Port = this.ServerPort,
                         Crossplay = this.ServerCrossplay,
+                        SaveInterval = this.ServerSaveInterval,
+                        BackupCount = this.ServerBackupCount,
+                        BackupIntervalShort = this.ServerBackupIntervalShort,
+                        BackupIntervalLong = this.ServerBackupIntervalLong,
+                        LogDirectory = this.ServerLogDirectory,
                     }
                 }
             };

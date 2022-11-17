@@ -128,12 +128,20 @@ namespace ValheimServerGUI.Game
             var exePath = this.FileProvider.ServerExe.FullName;
             var saveDataFolder = this.FileProvider.SaveDataFolder.FullName;
             var publicFlag = options.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}""";
+            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}"" -saveinterval {options.SaveInterval} -backups {options.Backups} -backupshort {options.BackupShort} -backuplong {options.BackupLong}";
 
             if (options.Crossplay)
             {
                 processArgs += " -crossplay";
             }
+
+            // TODO: can't actually enable this right now, because it stops the process from writing out logs,
+            // which are essential for the app to function. Need to implement my own file logging, or find a way
+            // to read logs from file as they come in.
+            //if (!string.IsNullOrWhiteSpace(options.LogFile))
+            //{
+            //    processArgs += @$" -logFile ""{options.LogFile}""";
+            //}
 
             var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
 

@@ -127,8 +127,24 @@
   <data name="Copy_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Copy_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="DefaultBackupCount" xml:space="preserve">
+    <value>4</value>
+    <comment>From Valheim Dedicated Server Manual.pdf</comment>
+  </data>
+  <data name="DefaultBackupIntervalLong" xml:space="preserve">
+    <value>43200</value>
+    <comment>From Valheim Dedicated Server Manual.pdf</comment>
+  </data>
+  <data name="DefaultBackupIntervalShort" xml:space="preserve">
+    <value>7200</value>
+    <comment>From Valheim Dedicated Server Manual.pdf</comment>
+  </data>
   <data name="DefaultGamePath" xml:space="preserve">
     <value>%ProgramFiles(x86)%\Steam\steamapps\common\Valheim\valheim.exe</value>
+  </data>
+  <data name="DefaultSaveInterval" xml:space="preserve">
+    <value>1800</value>
+    <comment>From Valheim Dedicated Server Manual.pdf</comment>
   </data>
   <data name="DefaultServerPath" xml:space="preserve">
     <value>%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe</value>

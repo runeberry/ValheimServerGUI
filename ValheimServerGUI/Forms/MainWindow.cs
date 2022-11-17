@@ -142,6 +142,7 @@ namespace ValheimServerGUI.Forms
             this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
+            this.ButtonAdvancedSettings.Click += this.ButtonAdvancedSettings_Click;
             this.ButtonStartServer.Click += this.BuildEventHandler(this.StartServer);
             this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
@@ -320,6 +321,11 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Form Field Events
+
+        private void ButtonAdvancedSettings_Click(object sender, EventArgs e)
+        {
+            this.ShowAdvancedSettingsForm();
+        }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
@@ -708,6 +714,15 @@ namespace ValheimServerGUI.Forms
                 }
             }
 
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            string logFile = null;
+            if (!string.IsNullOrWhiteSpace(prefs.ServerLogDirectory))
+            {
+                var logFileName = $"{this.ServerNameField.Value}_{DateTime.UtcNow.ToFileTimeUtc()}.txt";
+                logFile = Path.Join(prefs.ServerLogDirectory, logFileName);
+            }
+
             var options = new ValheimServerOptions
             {
                 Name = this.ServerNameField.Value,
@@ -717,6 +732,11 @@ namespace ValheimServerGUI.Forms
                 Public = this.CommunityServerField.Value,
                 Port = this.ServerPortField.Value,
                 Crossplay = this.ServerCrossplayField.Value,
+                SaveInterval = prefs.ServerSaveInterval,
+                Backups = prefs.ServerBackupCount,
+                BackupShort = prefs.ServerBackupIntervalShort,
+                BackupLong = prefs.ServerBackupIntervalLong,
+                LogFile = logFile,
             };
 
             try
@@ -735,8 +755,6 @@ namespace ValheimServerGUI.Forms
             }
 
             // User preferences are saved each time the server is started
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-
             prefs.ServerName = this.ServerNameField.Value;
             prefs.ServerPort = this.ServerPortField.Value;
             prefs.ServerPassword = this.ServerPasswordField.Value;
@@ -832,6 +850,12 @@ namespace ValheimServerGUI.Forms
         private void ShowDirectoriesForm()
         {
             this.FormProvider.GetForm<DirectoriesForm>().ShowDialog();
+            this.RefreshFormFields();
+        }
+
+        private void ShowAdvancedSettingsForm()
+        {
+            this.FormProvider.GetForm<AdvancedServerControlsForm>().ShowDialog();
             this.RefreshFormFields();
         }
 
@@ -972,6 +996,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.Enabled = allowServerChanges;
             this.CommunityServerField.Enabled = allowServerChanges;
             this.ServerCrossplayField.Enabled = allowServerChanges;
+            this.ButtonAdvancedSettings.Enabled = allowServerChanges;
 
             this.ButtonStartServer.Enabled = this.Server.CanStart;
             this.ButtonRestartServer.Enabled = this.Server.CanRestart;

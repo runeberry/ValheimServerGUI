@@ -55,6 +55,21 @@ namespace ValheimServerGUI.Game
 
             [JsonProperty("crossplay")]
             public bool? Crossplay { get; set; }
+
+            [JsonProperty("saveInterval")]
+            public int? SaveInterval { get; set; }
+
+            [JsonProperty("backupCount")]
+            public int? BackupCount { get; set; }
+
+            [JsonProperty("backupIntervalShort")]
+            public int? BackupIntervalShort { get; set; }
+
+            [JsonProperty("backupIntervalLong")]
+            public int? BackupIntervalLong { get; set; }
+
+            [JsonProperty("logDirectory")]
+            public string LogDirectory { get; set; }
         }
     }
 }

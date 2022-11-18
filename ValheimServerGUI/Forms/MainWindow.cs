@@ -116,6 +116,7 @@ namespace ValheimServerGUI.Forms
             this.Shown += this.BuildEventHandler(this.MainWindow_Load);
 
             // Menu items
+            this.MenuItemFileNew.Click += this.MenuItemFileNew_Click;
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
@@ -276,6 +277,11 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Menu Items
+
+        private void MenuItemFileNew_Click(object sender, EventArgs e)
+        {
+            this.LaunchNewWindow();
+        }
 
         private void MenuItemFilePreferences_Click(object sender, EventArgs e)
         {
@@ -1032,6 +1038,11 @@ namespace ValheimServerGUI.Forms
 
             this.WorldSelectExistingNameField.Value = prefs.ServerWorldName;
             this.WorldSelectRadioExisting.Value = true;
+        }
+
+        private void LaunchNewWindow()
+        {
+            Process.Start(Application.ExecutablePath);
         }
 
         private void CheckForUpdates(bool isManualCheck)

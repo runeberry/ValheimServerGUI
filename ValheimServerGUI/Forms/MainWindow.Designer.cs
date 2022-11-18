@@ -50,6 +50,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStripLabelRight = new System.Windows.Forms.ToolStripStatusLabel();
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
+            this.CopyButtonServerPassword = new ValheimServerGUI.Forms.CopyButton();
             this.ButtonAdvancedSettings = new System.Windows.Forms.Button();
             this.JoinOptionsGroupBox = new System.Windows.Forms.GroupBox();
             this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
@@ -105,7 +106,8 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.CopyButtonServerPassword = new ValheimServerGUI.Forms.CopyButton();
+            this.MenuItemFileNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemFileSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -133,6 +135,8 @@ namespace ValheimServerGUI.Forms
             // MenuItemFile
             // 
             this.MenuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.MenuItemFileNew,
+            this.MenuItemFileSeparator2,
             this.MenuItemFilePreferences,
             this.MenuItemFileDirectories,
             this.MenuItemFileSeparator1,
@@ -145,7 +149,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.MenuItemFilePreferences.Image = global::ValheimServerGUI.Properties.Resources.Settings_16x;
             this.MenuItemFilePreferences.Name = "MenuItemFilePreferences";
-            this.MenuItemFilePreferences.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFilePreferences.Size = new System.Drawing.Size(180, 22);
             this.MenuItemFilePreferences.Text = "&Preferences...";
             // 
             // MenuItemFileDirectories
@@ -153,18 +157,18 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileDirectories.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemFileDirectories.Image")));
             this.MenuItemFileDirectories.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MenuItemFileDirectories.Name = "MenuItemFileDirectories";
-            this.MenuItemFileDirectories.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFileDirectories.Size = new System.Drawing.Size(180, 22);
             this.MenuItemFileDirectories.Text = "Set &Directories...";
             // 
             // MenuItemFileSeparator1
             // 
             this.MenuItemFileSeparator1.Name = "MenuItemFileSeparator1";
-            this.MenuItemFileSeparator1.Size = new System.Drawing.Size(155, 6);
+            this.MenuItemFileSeparator1.Size = new System.Drawing.Size(177, 6);
             // 
             // MenuItemFileClose
             // 
             this.MenuItemFileClose.Name = "MenuItemFileClose";
-            this.MenuItemFileClose.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFileClose.Size = new System.Drawing.Size(180, 22);
             this.MenuItemFileClose.Text = "&Close";
             // 
             // MenuItemHelp
@@ -281,6 +285,14 @@ namespace ValheimServerGUI.Forms
             this.TabServerControls.TabIndex = 0;
             this.TabServerControls.Text = "Server Controls";
             this.TabServerControls.UseVisualStyleBackColor = true;
+            // 
+            // CopyButtonServerPassword
+            // 
+            this.CopyButtonServerPassword.CopyFunction = null;
+            this.CopyButtonServerPassword.Location = new System.Drawing.Point(236, 69);
+            this.CopyButtonServerPassword.Name = "CopyButtonServerPassword";
+            this.CopyButtonServerPassword.Size = new System.Drawing.Size(16, 16);
+            this.CopyButtonServerPassword.TabIndex = 21;
             // 
             // ButtonAdvancedSettings
             // 
@@ -749,7 +761,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -859,13 +870,17 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
-            // CopyButtonServerPassword
+            // MenuItemFileNew
             // 
-            this.CopyButtonServerPassword.CopyFunction = null;
-            this.CopyButtonServerPassword.Location = new System.Drawing.Point(236, 69);
-            this.CopyButtonServerPassword.Name = "CopyButtonServerPassword";
-            this.CopyButtonServerPassword.Size = new System.Drawing.Size(16, 16);
-            this.CopyButtonServerPassword.TabIndex = 21;
+            this.MenuItemFileNew.Image = global::ValheimServerGUI.Properties.Resources.AddImmediateWindow_16x;
+            this.MenuItemFileNew.Name = "MenuItemFileNew";
+            this.MenuItemFileNew.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFileNew.Text = "&New Window...";
+            // 
+            // MenuItemFileSeparator2
+            // 
+            this.MenuItemFileSeparator2.Name = "MenuItemFileSeparator2";
+            this.MenuItemFileSeparator2.Size = new System.Drawing.Size(177, 6);
             // 
             // MainWindow
             // 
@@ -977,5 +992,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.GroupBox JoinOptionsGroupBox;
         private System.Windows.Forms.Button ButtonAdvancedSettings;
         private CopyButton CopyButtonServerPassword;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemFileNew;
+        private System.Windows.Forms.ToolStripSeparator MenuItemFileSeparator2;
     }
 }

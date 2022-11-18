@@ -117,6 +117,7 @@ namespace ValheimServerGUI.Forms
 
             // Menu items
             this.MenuItemFileNew.Click += this.MenuItemFileNew_Click;
+            this.MenuItemFileSaveProfile.Click += this.MenuItemSaveProfile_Click;
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
@@ -180,7 +181,7 @@ namespace ValheimServerGUI.Forms
             this.LogViewSelectField.Value = LogViewServer;
 
             this.RefreshFormFields();
-            this.LoadFormValuesFromUserPrefs(this.UserPrefsProvider.LoadPreferences());
+            this.LoadFormStateFromUserPrefs();
             this.OnServerStatusChanged(ServerStatus.Stopped);
         }
 
@@ -196,7 +197,23 @@ namespace ValheimServerGUI.Forms
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-            this.RunStartupStuff();
+
+            this.CheckFilePaths();
+            this.CheckServerAlreadyRunning();
+
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
+
+            if (prefs.StartServerAutomatically)
+            {
+                this.StartServer();
+            }
+
+            if (prefs.StartMinimized)
+            {
+                this.WindowState = FormWindowState.Minimized;
+            }
         }
 
         protected override void OnResize(EventArgs e)
@@ -281,6 +298,34 @@ namespace ValheimServerGUI.Forms
         private void MenuItemFileNew_Click(object sender, EventArgs e)
         {
             this.LaunchNewWindow();
+        }
+
+        private void MenuItemSaveProfile_Click(object sender, EventArgs e)
+        {
+            this.SaveUserPrefsFromFormState();
+        }
+
+        private void MenuItemFileLoadProfileItem_Click(object sender, EventArgs e)
+        {
+            if (sender is not ToolStripItem item) return;
+
+            this.LoadFormStateFromUserPrefs();
+        }
+
+        private void MenuItemFileRemoveProfileItem_Click(object sender, EventArgs e)
+        {
+            if (sender is not ToolStripItem item) return;
+
+            var result = MessageBox.Show(
+                $"Remove profile for server '{item.Text}'?",
+                "Remove Profile",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                // todo: Remove profile
+            }
         }
 
         private void MenuItemFilePreferences_Click(object sender, EventArgs e)
@@ -544,13 +589,13 @@ namespace ValheimServerGUI.Forms
         {
             foreach (var player in this.PlayerDataProvider.Data)
             {
-                this.UpdatePlayerStatus(player);
+                this.SetPlayerStatus(player);
             }
         }
 
         private void OnPlayerUpdated(PlayerInfo player)
         {
-            this.UpdatePlayerStatus(player);
+            this.SetPlayerStatus(player);
         }
 
         private void OnWorldSaved(decimal duration)
@@ -647,27 +692,271 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
-        #region Common Methods
+        #region Form Links
 
-        private void RunStartupStuff()
+        private void ShowPreferencesForm()
         {
-            this.CheckFilePaths();
-            this.CheckServerAlreadyRunning();
+            this.FormProvider.GetForm<PreferencesForm>().ShowDialog();
+            this.RefreshFormFields();
+        }
+
+        private void ShowDirectoriesForm()
+        {
+            this.FormProvider.GetForm<DirectoriesForm>().ShowDialog();
+            this.RefreshFormFields();
+        }
+
+        private void ShowAdvancedSettingsForm()
+        {
+            this.FormProvider.GetForm<AdvancedServerControlsForm>().ShowDialog();
+            this.RefreshFormFields();
+        }
+
+        #endregion
+
+        #region View Setters
+
+        private void AddLog(string message, string viewName)
+        {
+            this.LogViewer.AddLogToView(message, viewName);
+        }
+
+        private void ClearCurrentLogView()
+        {
+            this.LogViewer.ClearLogView(this.LogViewer.LogView);
+        }
+
+        private void SetInviteCode(string inviteCode, bool copyable = true)
+        {
+            if (string.IsNullOrWhiteSpace(inviteCode))
+            {
+                this.LabelInviteCode.Value = "N/A";
+                this.CopyButtonInviteCode.Visible = false;
+                return;
+            }
+
+            this.LabelInviteCode.Value = inviteCode;
+            this.CopyButtonInviteCode.Visible = copyable;
+        }
+
+        private void SetPlayerStatus(PlayerInfo player)
+        {
+            var playerRows = this.PlayersTable
+                .GetRowsWithType<PlayerInfo>()
+                .Where(p => p.Entity.SteamId == player.SteamId);
+
+            var playerRow = playerRows.FirstOrDefault(p => p.Entity.Key == player.Key) ?? this.PlayersTable.AddRowFromEntity(player);
+            if (playerRow == null) return;
+
+            // Update styles based on player status
+            var imageIndex = -1;
+            var color = this.PlayersTable.ForeColor;
+
+            switch (player.PlayerStatus)
+            {
+                case PlayerStatus.Online:
+                    imageIndex = this.GetImageIndex(nameof(Resources.StatusOK_16x));
+                    break;
+                case PlayerStatus.Joining:
+                    imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
+                    break;
+                case PlayerStatus.Leaving:
+                    imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
+                    break;
+                case PlayerStatus.Offline:
+                    imageIndex = this.GetImageIndex(nameof(Resources.StatusNotStarted_16x));
+                    color = Color.Gray;
+                    break;
+            }
+
+            playerRow.ImageIndex = imageIndex;
+            playerRow.ForeColor = color;
+        }
+
+        private void SetStatusTextLeft(string message, Image icon)
+        {
+            this.StatusStripLabelLeft.Text = message;
+            this.StatusStripLabelLeft.Image = icon;
+        }
+
+        private void SetStatusTextRight(string message, Image icon, bool isLink)
+        {
+            this.StatusStripLabelRight.Text = message;
+            this.StatusStripLabelRight.Image = icon;
+            this.StatusStripLabelRight.IsLink = isLink;
+        }
+
+        #endregion
+
+        #region View Refreshers
+
+        private void RefreshFormFields()
+        {
+            this.RefreshProfileList();
+            this.RefreshWorldSelect();
+            this.RefreshFormStateForServer();
+        }
+
+        private void RefreshFormStateForServer()
+        {
+            // Only allow form field changes when the server is stopped
+            bool allowServerChanges = this.Server.Status == ServerStatus.Stopped;
+
+            this.ServerNameField.Enabled = allowServerChanges;
+            this.ServerPortField.Enabled = allowServerChanges;
+            this.ServerPasswordField.Enabled = allowServerChanges;
+            this.WorldSelectGroupBox.Enabled = allowServerChanges;
+            this.CommunityServerField.Enabled = allowServerChanges;
+            this.ServerCrossplayField.Enabled = allowServerChanges;
+            this.ButtonAdvancedSettings.Enabled = allowServerChanges;
+            this.MenuItemFileLoadProfile.Enabled = allowServerChanges;
+
+            this.ButtonStartServer.Enabled = this.Server.CanStart;
+            this.ButtonRestartServer.Enabled = this.Server.CanRestart;
+            this.ButtonStopServer.Enabled = this.Server.CanStop;
+
+            // Tray items are enabled based on their button equivalents
+            this.TrayContextMenuStart.Enabled = this.ButtonStartServer.Enabled;
+            this.TrayContextMenuRestart.Enabled = this.ButtonRestartServer.Enabled;
+            this.TrayContextMenuStop.Enabled = this.ButtonStopServer.Enabled;
+
+            this.TrayContextMenuServerName.Text = this.ServerNameField.Value;
+            this.TrayContextMenuServerName.Image = this.ServerStatusIconMap[this.Server.Status];
+        }
+
+        private void RefreshIpPorts()
+        {
+            const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
+
+            var fields = new[] { this.LabelExternalIpAddress, this.LabelInternalIpAddress, this.LabelLocalIpAddress };
+            var destPort = this.ServerPortField.Value;
+            var isDefaultPort = destPort.ToString() == Resources.DefaultServerPort;
+
+            foreach (var field in fields)
+            {
+                if (field.Value == null || field.Value == IpLoadingText) continue; // Don't try to modify loading text
+
+                var ipMatch = Regex.Match(field.Value, ipExpr);
+                var captures = (ipMatch.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
+
+                if (captures.Length == 0) continue; // Quit if we can't extract the IP address
+
+                var ip = captures[0];
+                field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
+            }
+        }
+
+        private void RefreshProfileList()
+        {
+            this.MenuItemFileLoadProfile.DropDownItems.Clear();
+            this.MenuItemFileRemoveProfile.DropDownItems.Clear();
 
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
-            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
+            this.MenuItemFileLoadProfile.DropDownItems.Add(
+                prefs.ServerName,
+                null,
+                this.MenuItemFileLoadProfileItem_Click);
+            this.MenuItemFileRemoveProfile.DropDownItems.Add(
+                prefs.ServerName,
+                null,
+                this.MenuItemFileRemoveProfileItem_Click);
+            // todo: disable if there are no profiles
+        }
 
-            if (prefs.StartServerAutomatically)
+        private void RefreshPlayersTable()
+        {
+            foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
             {
-                this.StartServer();
-            }
-
-            if (prefs.StartMinimized)
-            {
-                this.WindowState = FormWindowState.Minimized;
+                row.RefreshValues();
             }
         }
+
+        private void RefreshServerDetails()
+        {
+            if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
+            {
+                var elapsed = this.ServerUptimeTimer.Elapsed;
+                var days = elapsed.Days;
+                var timestr = elapsed.ToString(@"hh\:mm\:ss");
+
+                if (days == 1) timestr = $"1 day + {timestr}";
+                else if (days > 1) timestr = $"{days} days + {timestr}";
+
+                this.LabelSessionDuration.Value = timestr;
+            }
+        }
+
+        private void RefreshWorldSelect()
+        {
+            try
+            {
+                // Refresh the existing worlds list
+                var worlds = this.FileProvider.GetWorldNames();
+                this.WorldSelectExistingNameField.DataSource = worlds;
+                this.WorldSelectExistingNameField.DropdownEnabled = worlds.Any();
+            }
+            catch
+            {
+                // Show no worlds if something goes wrong
+                this.WorldSelectExistingNameField.DataSource = null;
+                this.WorldSelectExistingNameField.DropdownEnabled = false;
+            }
+        }
+
+        #endregion
+
+        #region Save & Load
+
+        private void SaveUserPrefsFromFormState()
+        {
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            var worldName = this.WorldSelectRadioNew.Value
+                ? this.WorldSelectNewNameField.Value
+                : this.WorldSelectExistingNameField.Value;
+
+            prefs.ServerName = this.ServerNameField.Value;
+            prefs.ServerPort = this.ServerPortField.Value;
+            prefs.ServerPassword = this.ServerPasswordField.Value;
+            prefs.ServerWorldName = worldName;
+            prefs.ServerPublic = this.CommunityServerField.Value;
+            prefs.ServerCrossplay = this.ServerCrossplayField.Value;
+
+            this.UserPrefsProvider.SavePreferences(prefs);
+
+            this.RefreshProfileList();
+        }
+
+        private void LoadFormStateFromUserPrefs()
+        {
+            var prefs = this.UserPrefsProvider.LoadPreferences();
+
+            this.ServerNameField.Value = prefs.ServerName;
+            this.ServerPortField.Value = prefs.ServerPort;
+            this.ServerPasswordField.Value = prefs.ServerPassword;
+            this.CommunityServerField.Value = prefs.ServerPublic;
+            this.ServerCrossplayField.Value = prefs.ServerCrossplay;
+            this.ShowPasswordField.Value = false;
+
+            var worldName = prefs.ServerWorldName;
+
+            if (this.WorldSelectExistingNameField.DataSource != null &&
+                this.WorldSelectExistingNameField.DataSource.Contains(worldName))
+            {
+                this.WorldSelectExistingNameField.Value = worldName;
+                this.WorldSelectRadioExisting.Value = true;
+            }
+            else
+            {
+                this.WorldSelectNewNameField.Value = worldName;
+                this.WorldSelectRadioNew.Value = true;
+            }
+        }
+
+        #endregion
+
+        #region Feature Capabiltiies
 
         private void StartServer()
         {
@@ -754,14 +1043,7 @@ namespace ValheimServerGUI.Forms
             }
 
             // User preferences are saved each time the server is started
-            prefs.ServerName = this.ServerNameField.Value;
-            prefs.ServerPort = this.ServerPortField.Value;
-            prefs.ServerPassword = this.ServerPasswordField.Value;
-            prefs.ServerWorldName = worldName;
-            prefs.ServerPublic = this.CommunityServerField.Value;
-            prefs.ServerCrossplay = this.ServerCrossplayField.Value;
-
-            this.UserPrefsProvider.SavePreferences(prefs);
+            this.SaveUserPrefsFromFormState();
         }
 
         private void CheckFilePaths()
@@ -840,206 +1122,6 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void ShowPreferencesForm()
-        {
-            this.FormProvider.GetForm<PreferencesForm>().ShowDialog();
-            this.RefreshFormFields();
-        }
-
-        private void ShowDirectoriesForm()
-        {
-            this.FormProvider.GetForm<DirectoriesForm>().ShowDialog();
-            this.RefreshFormFields();
-        }
-
-        private void ShowAdvancedSettingsForm()
-        {
-            this.FormProvider.GetForm<AdvancedServerControlsForm>().ShowDialog();
-            this.RefreshFormFields();
-        }
-
-        private void AddLog(string message, string viewName)
-        {
-            this.LogViewer.AddLogToView(message, viewName);
-        }
-
-        private void ClearCurrentLogView()
-        {
-            this.LogViewer.ClearLogView(this.LogViewer.LogView);
-        }
-
-        private void SetStatusTextLeft(string message, Image icon)
-        {
-            this.StatusStripLabelLeft.Text = message;
-            this.StatusStripLabelLeft.Image = icon;
-        }
-
-        private void SetStatusTextRight(string message, Image icon, bool isLink)
-        {
-            this.StatusStripLabelRight.Text = message;
-            this.StatusStripLabelRight.Image = icon;
-            this.StatusStripLabelRight.IsLink = isLink;
-        }
-
-        private int GetImageIndex(string key)
-        {
-            return this.ImageList.Images.IndexOfKey(key);
-        }
-
-        private void RefreshPlayersTable()
-        {
-            foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
-            {
-                row.RefreshValues();
-            }
-        }
-
-        private void RefreshServerDetails()
-        {
-            if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
-            {
-                var elapsed = this.ServerUptimeTimer.Elapsed;
-                var days = elapsed.Days;
-                var timestr = elapsed.ToString(@"hh\:mm\:ss");
-
-                if (days == 1) timestr = $"1 day + {timestr}";
-                else if (days > 1) timestr = $"{days} days + {timestr}";
-
-                this.LabelSessionDuration.Value = timestr;
-            }
-        }
-
-        private void RefreshIpPorts()
-        {
-            const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
-
-            var fields = new[] { this.LabelExternalIpAddress, this.LabelInternalIpAddress, this.LabelLocalIpAddress };
-            var destPort = this.ServerPortField.Value;
-            var isDefaultPort = destPort.ToString() == Resources.DefaultServerPort;
-
-            foreach (var field in fields)
-            {
-                if (field.Value == null || field.Value == IpLoadingText) continue; // Don't try to modify loading text
-
-                var ipMatch = Regex.Match(field.Value, ipExpr);
-                var captures = (ipMatch.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
-
-                if (captures.Length == 0) continue; // Quit if we can't extract the IP address
-
-                var ip = captures[0];
-                field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
-            }
-        }
-
-        private void SetInviteCode(string inviteCode, bool copyable = true)
-        {
-            if (string.IsNullOrWhiteSpace(inviteCode))
-            {
-                this.LabelInviteCode.Value = "N/A";
-                this.CopyButtonInviteCode.Visible = false;
-                return;
-            }
-
-            this.LabelInviteCode.Value = inviteCode;
-            this.CopyButtonInviteCode.Visible = copyable;
-        }
-
-        private void UpdatePlayerStatus(PlayerInfo player)
-        {
-            var playerRows = this.PlayersTable
-                .GetRowsWithType<PlayerInfo>()
-                .Where(p => p.Entity.SteamId == player.SteamId);
-
-            var playerRow = playerRows.FirstOrDefault(p => p.Entity.Key == player.Key) ?? this.PlayersTable.AddRowFromEntity(player);
-            if (playerRow == null) return;
-
-            // Update styles based on player status
-            var imageIndex = -1;
-            var color = this.PlayersTable.ForeColor;
-
-            switch (player.PlayerStatus)
-            {
-                case PlayerStatus.Online:
-                    imageIndex = this.GetImageIndex(nameof(Resources.StatusOK_16x));
-                    break;
-                case PlayerStatus.Joining:
-                    imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
-                    break;
-                case PlayerStatus.Leaving:
-                    imageIndex = this.GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
-                    break;
-                case PlayerStatus.Offline:
-                    imageIndex = this.GetImageIndex(nameof(Resources.StatusNotStarted_16x));
-                    color = Color.Gray;
-                    break;
-            }
-
-            playerRow.ImageIndex = imageIndex;
-            playerRow.ForeColor = color;
-        }
-
-        private void RefreshFormFields()
-        {
-            this.RefreshWorldSelect();
-            this.RefreshFormStateForServer();
-        }
-
-        private void RefreshFormStateForServer()
-        {
-            // Only allow form field changes when the server is stopped
-            bool allowServerChanges = this.Server.Status == ServerStatus.Stopped;
-
-            this.ServerNameField.Enabled = allowServerChanges;
-            this.ServerPortField.Enabled = allowServerChanges;
-            this.ServerPasswordField.Enabled = allowServerChanges;
-            this.WorldSelectGroupBox.Enabled = allowServerChanges;
-            this.CommunityServerField.Enabled = allowServerChanges;
-            this.ServerCrossplayField.Enabled = allowServerChanges;
-            this.ButtonAdvancedSettings.Enabled = allowServerChanges;
-
-            this.ButtonStartServer.Enabled = this.Server.CanStart;
-            this.ButtonRestartServer.Enabled = this.Server.CanRestart;
-            this.ButtonStopServer.Enabled = this.Server.CanStop;
-
-            // Tray items are enabled based on their button equivalents
-            this.TrayContextMenuStart.Enabled = this.ButtonStartServer.Enabled;
-            this.TrayContextMenuRestart.Enabled = this.ButtonRestartServer.Enabled;
-            this.TrayContextMenuStop.Enabled = this.ButtonStopServer.Enabled;
-
-            this.TrayContextMenuServerName.Text = this.ServerNameField.Value;
-            this.TrayContextMenuServerName.Image = this.ServerStatusIconMap[this.Server.Status];
-        }
-
-        private void RefreshWorldSelect()
-        {
-            try
-            {
-                // Refresh the existing worlds list
-                var worlds = this.FileProvider.GetWorldNames();
-                this.WorldSelectExistingNameField.DataSource = worlds;
-                this.WorldSelectExistingNameField.DropdownEnabled = worlds.Any();
-            }
-            catch
-            {
-                // Show no worlds if something goes wrong
-                this.WorldSelectExistingNameField.DataSource = null;
-                this.WorldSelectExistingNameField.DropdownEnabled = false;
-            }
-        }
-
-        private void LoadFormValuesFromUserPrefs(UserPreferences prefs)
-        {
-            this.ServerNameField.Value = prefs.ServerName;
-            this.ServerPortField.Value = prefs.ServerPort;
-            this.ServerPasswordField.Value = prefs.ServerPassword;
-            this.CommunityServerField.Value = prefs.ServerPublic;
-            this.ServerCrossplayField.Value = prefs.ServerCrossplay;
-            this.ShowPasswordField.Value = false;
-
-            this.WorldSelectExistingNameField.Value = prefs.ServerWorldName;
-            this.WorldSelectRadioExisting.Value = true;
-        }
-
         private void LaunchNewWindow()
         {
             Process.Start(Application.ExecutablePath);
@@ -1065,6 +1147,15 @@ namespace ValheimServerGUI.Forms
                     Application.Exit();
                 }
             };
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private int GetImageIndex(string key)
+        {
+            return this.ImageList.Images.IndexOfKey(key);
         }
 
         #endregion

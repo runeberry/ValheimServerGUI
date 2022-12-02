@@ -28,7 +28,7 @@ namespace ValheimServerGUI.Tests
         public BaseTest()
         {
             this.ServiceCollection = new ServiceCollection();
-            Program.ConfigureServices(this.ServiceCollection);
+            Program.ConfigureServices(this.ServiceCollection, Array.Empty<string>());
 
             this.MockDataFileProvider = new();
             this.MockProcessProvider = new();

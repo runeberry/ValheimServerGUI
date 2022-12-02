@@ -61,7 +61,7 @@ namespace ValheimServerGUI.Game
             try
             {
                 var file = preferences.ToFile();
-                this.SaveAsync<UserPreferencesFile>(this.UserPrefsFilePath, file).GetAwaiter().GetResult();
+                this.SaveAsync(this.UserPrefsFilePath, file).GetAwaiter().GetResult();
                 this.Logger.LogInformation("User preferences saved");
             }
             catch (Exception e)
@@ -100,11 +100,11 @@ namespace ValheimServerGUI.Game
         {
             { "ValheimGamePath", (p, v) => p.ValheimGamePath = v },
             { "ValheimServerPath", (p, v) => p.ValheimServerPath = v },
-            { "ServerName", (p, v) => p.ServerName = v },
-            { "ServerPassword", (p, v) => p.ServerPassword = v },
-            { "ServerWorldName", (p, v) => p.ServerWorldName = v },
-            { "ServerPublic", (p, v) => p.ServerPublic = bool.TryParse(v, out var v2) ? v2 : false },
-            { "ServerPort", (p, v) => p.ServerPort = int.TryParse(v, out var v2) ? v2 : int.Parse(Resources.DefaultServerPort) },
+            { "ServerName", (p, v) => p.Servers[0].Name = v },
+            { "ServerPassword", (p, v) => p.Servers[0].Password = v },
+            { "ServerWorldName", (p, v) => p.Servers[0].WorldName = v },
+            { "ServerPublic", (p, v) => p.Servers[0].Public = bool.TryParse(v, out var v2) ? v2 : false },
+            { "ServerPort", (p, v) => p.Servers[0].Port = int.TryParse(v, out var v2) ? v2 : int.Parse(Resources.DefaultServerPort) },
         };
 
         private bool TryMigrateLegacyPrefs(out UserPreferences prefs)
@@ -131,6 +131,11 @@ namespace ValheimServerGUI.Game
 
                     if (MigrationActions.TryGetValue(key, out var action))
                     {
+                        if (prefs.Servers.Count == 0)
+                        {
+                            prefs.Servers.Add(new ServerPreferences());
+                        }
+
                         action(prefs, value);
                     }
                 }

@@ -30,20 +30,20 @@ namespace ValheimServerGUI.Forms
         {
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
-            this.SaveIntervalField.Value = prefs.ServerSaveInterval;
-            this.BackupsField.Value = prefs.ServerBackupCount;
-            this.ShortBackupIntervalField.Value = prefs.ServerBackupIntervalShort;
-            this.LongBackupIntervalField.Value = prefs.ServerBackupIntervalLong;
+            this.SaveIntervalField.Value = prefs.Servers[0].SaveInterval;
+            this.BackupsField.Value = prefs.Servers[0].BackupCount;
+            this.ShortBackupIntervalField.Value = prefs.Servers[0].BackupIntervalShort;
+            this.LongBackupIntervalField.Value = prefs.Servers[0].BackupIntervalLong;
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
-            prefs.ServerSaveInterval = this.SaveIntervalField.Value;
-            prefs.ServerBackupCount = this.BackupsField.Value;
-            prefs.ServerBackupIntervalShort = this.ShortBackupIntervalField.Value;
-            prefs.ServerBackupIntervalLong = this.LongBackupIntervalField.Value;
+            prefs.Servers[0].SaveInterval = this.SaveIntervalField.Value;
+            prefs.Servers[0].BackupCount = this.BackupsField.Value;
+            prefs.Servers[0].BackupIntervalShort = this.ShortBackupIntervalField.Value;
+            prefs.Servers[0].BackupIntervalLong = this.LongBackupIntervalField.Value;
 
             var err = ValidatePrefs(prefs);
             if (err != null)
@@ -69,21 +69,21 @@ namespace ValheimServerGUI.Forms
         {
             var prefs = UserPreferences.GetDefault();
 
-            this.SaveIntervalField.Value = prefs.ServerSaveInterval;
-            this.BackupsField.Value = prefs.ServerBackupCount;
-            this.ShortBackupIntervalField.Value = prefs.ServerBackupIntervalShort;
-            this.LongBackupIntervalField.Value = prefs.ServerBackupIntervalLong;
+            this.SaveIntervalField.Value = prefs.Servers[0].SaveInterval;
+            this.BackupsField.Value = prefs.Servers[0].BackupCount;
+            this.ShortBackupIntervalField.Value = prefs.Servers[0].BackupIntervalShort;
+            this.LongBackupIntervalField.Value = prefs.Servers[0].BackupIntervalLong;
         }
 
         private static string ValidatePrefs(UserPreferences prefs)
         {
-            if (prefs.ServerSaveInterval > prefs.ServerBackupIntervalShort ||
-                prefs.ServerSaveInterval > prefs.ServerBackupIntervalLong)
+            if (prefs.Servers[0].SaveInterval > prefs.Servers[0].BackupIntervalShort ||
+                prefs.Servers[0].SaveInterval > prefs.Servers[0].BackupIntervalLong)
             {
                 return "The save interval must be shorter than the backup intervals.";
             }
 
-            if (prefs.ServerBackupIntervalShort > prefs.ServerBackupIntervalLong)
+            if (prefs.Servers[0].BackupIntervalShort > prefs.Servers[0].BackupIntervalLong)
             {
                 return "The short backup interval must be shorter than the long backup interval.";
             }

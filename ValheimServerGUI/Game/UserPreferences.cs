@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Game
@@ -23,25 +24,9 @@ namespace ValheimServerGUI.Game
 
         public bool CheckForUpdates { get; set; } = true;
 
-        public string ServerName { get; set; }
+        public List<ServerPreferences> Servers { get; set; } = new();
 
-        public string ServerPassword { get; set; }
 
-        public string ServerWorldName { get; set; }
-
-        public bool ServerPublic { get; set; }
-
-        public int ServerPort { get; set; } = int.Parse(Resources.DefaultServerPort);
-
-        public bool ServerCrossplay { get; set; }
-
-        public int ServerSaveInterval { get; set; } = int.Parse(Resources.DefaultSaveInterval);
-
-        public int ServerBackupCount { get; set; } = int.Parse(Resources.DefaultBackupCount);
-
-        public int ServerBackupIntervalShort { get; set; } = int.Parse(Resources.DefaultBackupIntervalShort);
-
-        public int ServerBackupIntervalLong { get; set; } = int.Parse(Resources.DefaultBackupIntervalLong);
 
         public static UserPreferences FromFile(UserPreferencesFile file)
         {
@@ -58,20 +43,9 @@ namespace ValheimServerGUI.Game
             prefs.CheckServerRunning = file.CheckServerRunning ?? prefs.CheckServerRunning;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
 
-            var server = file.Servers?.FirstOrDefault();
-
-            if (server != null)
+            if (file.Servers != null)
             {
-                prefs.ServerName = server.Name ?? prefs.ServerName;
-                prefs.ServerPassword = server.Password ?? prefs.ServerPassword;
-                prefs.ServerWorldName = server.WorldName ?? prefs.ServerWorldName;
-                prefs.ServerPublic = server.CommunityServer ?? prefs.ServerPublic;
-                prefs.ServerPort = server.Port ?? prefs.ServerPort;
-                prefs.ServerCrossplay = server.Crossplay ?? prefs.ServerCrossplay;
-                prefs.ServerSaveInterval = server.SaveInterval ?? prefs.ServerSaveInterval;
-                prefs.ServerBackupCount = server.BackupCount ?? prefs.ServerBackupCount;
-                prefs.ServerBackupIntervalShort = server.BackupIntervalShort ?? prefs.ServerBackupIntervalShort;
-                prefs.ServerBackupIntervalLong = server.BackupIntervalLong ?? prefs.ServerBackupIntervalLong;
+                prefs.Servers = file.Servers.Select(f => ServerPreferences.FromFile(f)).ToList();
             }
 
             return prefs;
@@ -89,23 +63,18 @@ namespace ValheimServerGUI.Game
                 StartMinimized = this.StartMinimized,
                 CheckServerRunning = this.CheckServerRunning,
                 CheckForUpdates = this.CheckForUpdates,
-                Servers = new()
-                {
-                    new()
-                    {
-                        Name = this.ServerName,
-                        Password = this.ServerPassword,
-                        WorldName = this.ServerWorldName,
-                        CommunityServer = this.ServerPublic,
-                        Port = this.ServerPort,
-                        Crossplay = this.ServerCrossplay,
-                        SaveInterval = this.ServerSaveInterval,
-                        BackupCount = this.ServerBackupCount,
-                        BackupIntervalShort = this.ServerBackupIntervalShort,
-                        BackupIntervalLong = this.ServerBackupIntervalLong,
-                    }
-                }
+                Servers = new(),
             };
+
+            if (this.Servers != null)
+            {
+                var servers = this.Servers
+                    .Where(p => !string.IsNullOrWhiteSpace(p.Name)) // Remove servers with no name
+                    .DistinctBy(p => p.Name) // Remove duplicate entries by server name
+                    .Select(p => p.ToFile());
+
+                file.Servers.AddRange(servers);
+            }
 
             return file;
         }

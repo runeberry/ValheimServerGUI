@@ -50,6 +50,13 @@ namespace ValheimServerGUI.Game
 
             // Port validation
             if (this.Port < 1 || this.Port > 65535) throw new ArgumentException($"{nameof(Port)} must be between 1 - 65535");
+
+            // Save and Backup validation
+            if (this.SaveInterval < 1) throw new ArgumentException($"{nameof(SaveInterval)} must be greater than 0.");
+            if (this.BackupShort < 1) throw new ArgumentException($"{nameof(BackupShort)} must be greater than 0.");
+            if (this.BackupLong < 1) throw new ArgumentException($"{nameof(BackupLong)} must be greater than 0.");
+            if (this.SaveInterval > this.BackupShort || this.SaveInterval > this.BackupLong) throw new ArgumentException($"{nameof(SaveInterval)} must be less than or equal to the backup intervals.");
+            if (this.BackupShort > this.BackupLong) throw new ArgumentException($"{nameof(BackupShort)} must be less than or equal to {nameof(BackupLong)}.");
         }
     }
 

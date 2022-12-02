@@ -40,6 +40,7 @@ namespace ValheimServerGUI.Forms
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
+        private readonly IServerPreferencesProvider ServerPrefsProvider;
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
@@ -48,10 +49,12 @@ namespace ValheimServerGUI.Forms
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
         private readonly IProcessProvider ProcessProvider;
+        private readonly IStartupArgsProvider StartupArgsProvider;
 
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferencesProvider userPrefsProvider,
+            IServerPreferencesProvider serverPrefsProvider,
             IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
@@ -59,13 +62,15 @@ namespace ValheimServerGUI.Forms
             IEventLogger appLogger,
             IIpAddressProvider ipAddressProvider,
             ISoftwareUpdateProvider softwareUpdateProvider,
-            IProcessProvider processProvider)
+            IProcessProvider processProvider,
+            IStartupArgsProvider startupArgsProvider)
         {
 #if DEBUG
             if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
             this.FormProvider = formProvider;
             this.UserPrefsProvider = userPrefsProvider;
+            this.ServerPrefsProvider = serverPrefsProvider;
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
@@ -74,6 +79,7 @@ namespace ValheimServerGUI.Forms
             this.IpAddressProvider = ipAddressProvider;
             this.SoftwareUpdateProvider = softwareUpdateProvider;
             this.ProcessProvider = processProvider;
+            this.StartupArgsProvider = startupArgsProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             this.AddApplicationIcon();
@@ -181,8 +187,27 @@ namespace ValheimServerGUI.Forms
             this.LogViewSelectField.Value = LogViewServer;
 
             this.RefreshFormFields();
-            this.LoadFormStateFromUserPrefs();
+            this.InitializeFormStateForServer();
             this.OnServerStatusChanged(ServerStatus.Stopped);
+        }
+
+        private void InitializeFormStateForServer()
+        {
+            var serverName = this.StartupArgsProvider.ServerName;
+            if (!string.IsNullOrWhiteSpace(serverName))
+            {
+                this.Logger.LogInformation($"Loading profile from command-line arg: {serverName}");
+                this.LoadFormStateFromPrefs(serverName);
+                return;
+            }
+
+            serverName = this.ServerPrefsProvider.LoadPreferences()?.Last()?.Name;
+            if (!string.IsNullOrWhiteSpace(serverName))
+            {
+                this.Logger.LogInformation($"Loading most recently saved profile: {serverName}");
+                this.LoadFormStateFromPrefs(serverName);
+                return;
+            }
         }
 
         #endregion
@@ -302,14 +327,14 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemSaveProfile_Click(object sender, EventArgs e)
         {
-            this.SaveUserPrefsFromFormState();
+            this.SavePrefsFromFormState();
         }
 
         private void MenuItemFileLoadProfileItem_Click(object sender, EventArgs e)
         {
             if (sender is not ToolStripItem item) return;
 
-            this.LoadFormStateFromUserPrefs();
+            this.LoadFormStateFromPrefs(item.Text);
         }
 
         private void MenuItemFileRemoveProfileItem_Click(object sender, EventArgs e)
@@ -848,20 +873,29 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshProfileList()
         {
+            this.MenuItemFileLoadProfile.Enabled = false;
             this.MenuItemFileLoadProfile.DropDownItems.Clear();
+
+            this.MenuItemFileRemoveProfile.Enabled = false;
             this.MenuItemFileRemoveProfile.DropDownItems.Clear();
 
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var prefs = this.ServerPrefsProvider.LoadPreferences();
+            if (prefs == null || !prefs.Any()) return;
 
-            this.MenuItemFileLoadProfile.DropDownItems.Add(
-                prefs.ServerName,
-                null,
-                this.MenuItemFileLoadProfileItem_Click);
-            this.MenuItemFileRemoveProfile.DropDownItems.Add(
-                prefs.ServerName,
-                null,
-                this.MenuItemFileRemoveProfileItem_Click);
-            // todo: disable if there are no profiles
+            this.MenuItemFileLoadProfile.Enabled = true;
+            this.MenuItemFileRemoveProfile.Enabled = true;
+
+            foreach (var pref in prefs)
+            {
+                this.MenuItemFileLoadProfile.DropDownItems.Add(
+                    pref.Name,
+                    null,
+                    this.MenuItemFileLoadProfileItem_Click);
+                this.MenuItemFileRemoveProfile.DropDownItems.Add(
+                    pref.Name,
+                    null,
+                    this.MenuItemFileRemoveProfileItem_Click);
+            }
         }
 
         private void RefreshPlayersTable()
@@ -908,38 +942,49 @@ namespace ValheimServerGUI.Forms
 
         #region Save & Load
 
-        private void SaveUserPrefsFromFormState()
+        private void SavePrefsFromFormState()
         {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var serverName = this.ServerNameField.Value;
+            if (string.IsNullOrWhiteSpace(serverName)) return;
 
             var worldName = this.WorldSelectRadioNew.Value
                 ? this.WorldSelectNewNameField.Value
                 : this.WorldSelectExistingNameField.Value;
 
-            prefs.ServerName = this.ServerNameField.Value;
-            prefs.ServerPort = this.ServerPortField.Value;
-            prefs.ServerPassword = this.ServerPasswordField.Value;
-            prefs.ServerWorldName = worldName;
-            prefs.ServerPublic = this.CommunityServerField.Value;
-            prefs.ServerCrossplay = this.ServerCrossplayField.Value;
+            // Update existing prefs if they exist with this server name
+            // Otherwise, create new prefs
+            var prefs = this.ServerPrefsProvider.LoadPreferences(serverName) ?? new ServerPreferences();
 
-            this.UserPrefsProvider.SavePreferences(prefs);
+            prefs.Name = serverName;
+            prefs.Port = this.ServerPortField.Value;
+            prefs.Password = this.ServerPasswordField.Value;
+            prefs.WorldName = worldName;
+            prefs.Public = this.CommunityServerField.Value;
+            prefs.Crossplay = this.ServerCrossplayField.Value;
+
+            this.ServerPrefsProvider.SavePreferences(prefs);
 
             this.RefreshProfileList();
         }
 
-        private void LoadFormStateFromUserPrefs()
+        private void LoadFormStateFromPrefs(string serverName)
         {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var prefs = this.ServerPrefsProvider.LoadPreferences(serverName);
 
-            this.ServerNameField.Value = prefs.ServerName;
-            this.ServerPortField.Value = prefs.ServerPort;
-            this.ServerPasswordField.Value = prefs.ServerPassword;
-            this.CommunityServerField.Value = prefs.ServerPublic;
-            this.ServerCrossplayField.Value = prefs.ServerCrossplay;
+            if (prefs == null)
+            {
+                this.Logger.LogWarning($"Unable to load form state: no server profile exists with name '{serverName}'");
+                return;
+            }
+
+            this.ServerNameField.Value = prefs.Name;
+            this.ServerPortField.Value = prefs.Port;
+            this.ServerPasswordField.Value = prefs.Password;
+            this.CommunityServerField.Value = prefs.Public;
+            this.ServerCrossplayField.Value = prefs.Crossplay;
             this.ShowPasswordField.Value = false;
 
-            var worldName = prefs.ServerWorldName;
+            var worldName = prefs.WorldName;
 
             if (this.WorldSelectExistingNameField.DataSource != null &&
                 this.WorldSelectExistingNameField.DataSource.Contains(worldName))
@@ -1010,21 +1055,22 @@ namespace ValheimServerGUI.Forms
                 }
             }
 
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var serverName = this.ServerNameField.Value;
+            var prefs = this.ServerPrefsProvider.LoadPreferences(serverName) ?? new ServerPreferences();
 
             var options = new ValheimServerOptions
             {
-                Name = this.ServerNameField.Value,
+                Name = serverName,
                 Password = this.ServerPasswordField.Value,
                 WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
                 NewWorld = newWorld,
                 Public = this.CommunityServerField.Value,
                 Port = this.ServerPortField.Value,
                 Crossplay = this.ServerCrossplayField.Value,
-                SaveInterval = prefs.ServerSaveInterval,
-                Backups = prefs.ServerBackupCount,
-                BackupShort = prefs.ServerBackupIntervalShort,
-                BackupLong = prefs.ServerBackupIntervalLong,
+                SaveInterval = prefs.SaveInterval,
+                Backups = prefs.BackupCount,
+                BackupShort = prefs.BackupIntervalShort,
+                BackupLong = prefs.BackupIntervalLong,
             };
 
             try
@@ -1043,7 +1089,7 @@ namespace ValheimServerGUI.Forms
             }
 
             // User preferences are saved each time the server is started
-            this.SaveUserPrefsFromFormState();
+            this.SavePrefsFromFormState();
         }
 
         private void CheckFilePaths()

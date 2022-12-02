@@ -122,7 +122,8 @@ namespace ValheimServerGUI.Forms
             this.Shown += this.BuildEventHandler(this.MainWindow_Load);
 
             // Menu items
-            this.MenuItemFileNew.Click += this.MenuItemFileNew_Click;
+            this.MenuItemFileNewWindow.Click += this.MenuItemFileNewWindow_Click;
+            this.MenuItemFileNewProfile.Click += this.MenuItemFileNewProfile_Click;
             this.MenuItemFileSaveProfile.Click += this.MenuItemSaveProfile_Click;
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
@@ -320,9 +321,14 @@ namespace ValheimServerGUI.Forms
 
         #region Menu Items
 
-        private void MenuItemFileNew_Click(object sender, EventArgs e)
+        private void MenuItemFileNewWindow_Click(object sender, EventArgs e)
         {
             this.LaunchNewWindow();
+        }
+
+        private void MenuItemFileNewProfile_Click(object sender, EventArgs e)
+        {
+            this.LoadFormStateFromPrefs(new ServerPreferences());
         }
 
         private void MenuItemSaveProfile_Click(object sender, EventArgs e)
@@ -974,6 +980,17 @@ namespace ValheimServerGUI.Forms
             if (prefs == null)
             {
                 this.Logger.LogWarning($"Unable to load form state: no server profile exists with name '{serverName}'");
+                return;
+            }
+
+            this.LoadFormStateFromPrefs(prefs);
+        }
+
+        private void LoadFormStateFromPrefs(ServerPreferences prefs)
+        {
+            if (prefs == null)
+            {
+                this.Logger.LogWarning($"Unable to load form state: {nameof(prefs)} cannot be null");
                 return;
             }
 

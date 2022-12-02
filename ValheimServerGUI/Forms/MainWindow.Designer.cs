@@ -33,7 +33,7 @@ namespace ValheimServerGUI.Forms
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainWindow));
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.MenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItemFileNew = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemFileNewWindow = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileSaveProfile = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileLoadProfile = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileRemoveProfile = new System.Windows.Forms.ToolStripMenuItem();
@@ -111,6 +111,8 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.MenuItemFileNewProfile = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemFileSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -138,7 +140,9 @@ namespace ValheimServerGUI.Forms
             // MenuItemFile
             // 
             this.MenuItemFile.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.MenuItemFileNew,
+            this.MenuItemFileNewWindow,
+            this.MenuItemFileSeparator3,
+            this.MenuItemFileNewProfile,
             this.MenuItemFileSaveProfile,
             this.MenuItemFileLoadProfile,
             this.MenuItemFileRemoveProfile,
@@ -151,44 +155,44 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFile.Size = new System.Drawing.Size(37, 20);
             this.MenuItemFile.Text = "&File";
             // 
-            // MenuItemFileNew
+            // MenuItemFileNewWindow
             // 
-            this.MenuItemFileNew.Image = global::ValheimServerGUI.Properties.Resources.AddImmediateWindow_16x;
-            this.MenuItemFileNew.Name = "MenuItemFileNew";
-            this.MenuItemFileNew.Size = new System.Drawing.Size(180, 22);
-            this.MenuItemFileNew.Text = "&New Window";
+            this.MenuItemFileNewWindow.Image = global::ValheimServerGUI.Properties.Resources.AddImmediateWindow_16x;
+            this.MenuItemFileNewWindow.Name = "MenuItemFileNewWindow";
+            this.MenuItemFileNewWindow.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFileNewWindow.Text = "&New Window";
             // 
             // MenuItemFileSaveProfile
             // 
             this.MenuItemFileSaveProfile.Image = global::ValheimServerGUI.Properties.Resources.Save_16x;
             this.MenuItemFileSaveProfile.Name = "MenuItemFileSaveProfile";
-            this.MenuItemFileSaveProfile.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFileSaveProfile.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFileSaveProfile.Text = "&Save Profile";
             // 
             // MenuItemFileLoadProfile
             // 
             this.MenuItemFileLoadProfile.Image = global::ValheimServerGUI.Properties.Resources.OpenFile_16x;
             this.MenuItemFileLoadProfile.Name = "MenuItemFileLoadProfile";
-            this.MenuItemFileLoadProfile.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFileLoadProfile.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFileLoadProfile.Text = "&Load Profile";
             // 
             // MenuItemFileRemoveProfile
             // 
             this.MenuItemFileRemoveProfile.Image = global::ValheimServerGUI.Properties.Resources.Cancel_16x;
             this.MenuItemFileRemoveProfile.Name = "MenuItemFileRemoveProfile";
-            this.MenuItemFileRemoveProfile.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFileRemoveProfile.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFileRemoveProfile.Text = "&Remove Profile";
             // 
             // MenuItemFileSeparator2
             // 
             this.MenuItemFileSeparator2.Name = "MenuItemFileSeparator2";
-            this.MenuItemFileSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.MenuItemFileSeparator2.Size = new System.Drawing.Size(155, 6);
             // 
             // MenuItemFilePreferences
             // 
             this.MenuItemFilePreferences.Image = global::ValheimServerGUI.Properties.Resources.Settings_16x;
             this.MenuItemFilePreferences.Name = "MenuItemFilePreferences";
-            this.MenuItemFilePreferences.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFilePreferences.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFilePreferences.Text = "&Preferences...";
             // 
             // MenuItemFileDirectories
@@ -196,18 +200,18 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileDirectories.Image = ((System.Drawing.Image)(resources.GetObject("MenuItemFileDirectories.Image")));
             this.MenuItemFileDirectories.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.MenuItemFileDirectories.Name = "MenuItemFileDirectories";
-            this.MenuItemFileDirectories.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFileDirectories.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFileDirectories.Text = "Set &Directories...";
             // 
             // MenuItemFileSeparator1
             // 
             this.MenuItemFileSeparator1.Name = "MenuItemFileSeparator1";
-            this.MenuItemFileSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.MenuItemFileSeparator1.Size = new System.Drawing.Size(155, 6);
             // 
             // MenuItemFileClose
             // 
             this.MenuItemFileClose.Name = "MenuItemFileClose";
-            this.MenuItemFileClose.Size = new System.Drawing.Size(180, 22);
+            this.MenuItemFileClose.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFileClose.Text = "&Close";
             // 
             // MenuItemHelp
@@ -800,7 +804,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -910,6 +913,18 @@ namespace ValheimServerGUI.Forms
             // 
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
+            // 
+            // MenuItemFileNewProfile
+            // 
+            this.MenuItemFileNewProfile.Image = global::ValheimServerGUI.Properties.Resources.NewFile_16x;
+            this.MenuItemFileNewProfile.Name = "MenuItemFileNewProfile";
+            this.MenuItemFileNewProfile.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFileNewProfile.Text = "New Profile";
+            // 
+            // MenuItemFileSeparator3
+            // 
+            this.MenuItemFileSeparator3.Name = "MenuItemFileSeparator3";
+            this.MenuItemFileSeparator3.Size = new System.Drawing.Size(6, 6);
             // 
             // MainWindow
             // 
@@ -1021,10 +1036,12 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.GroupBox JoinOptionsGroupBox;
         private System.Windows.Forms.Button ButtonAdvancedSettings;
         private CopyButton CopyButtonServerPassword;
-        private System.Windows.Forms.ToolStripMenuItem MenuItemFileNew;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemFileNewWindow;
         private System.Windows.Forms.ToolStripSeparator MenuItemFileSeparator2;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileSaveProfile;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileLoadProfile;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileRemoveProfile;
+        private System.Windows.Forms.ToolStripSeparator MenuItemFileSeparator3;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemFileNewProfile;
     }
 }

@@ -45,7 +45,10 @@ namespace ValheimServerGUI.Game
 
             if (file.Servers != null)
             {
-                prefs.Servers = file.Servers.Select(f => ServerPreferences.FromFile(f)).ToList();
+                prefs.Servers = file.Servers
+                    .Select(f => ServerPreferences.FromFile(f))
+                    .DistinctBy(f => f.ProfileName)
+                    .ToList();
             }
 
             return prefs;

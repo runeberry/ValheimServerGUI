@@ -1,9 +1,16 @@
 ﻿using Newtonsoft.Json;
+using System;
 
 namespace ValheimServerGUI.Game
 {
     public class ServerPreferencesFile
     {
+        [JsonProperty("profileName")]
+        public string ProfileName { get; set; }
+
+        [JsonProperty("lastSaved")]
+        public DateTime? LastSaved { get; set; }
+
         [JsonProperty("name")]
         public string Name { get; set; }
 

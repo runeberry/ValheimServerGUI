@@ -155,6 +155,9 @@
   <data name="DefaultServerPort" xml:space="preserve">
     <value>2456</value>
   </data>
+  <data name="DefaultServerProfileName" xml:space="preserve">
+    <value>Default</value>
+  </data>
   <data name="DefaultValheimSaveFolder" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim</value>
   </data>

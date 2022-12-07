@@ -9,13 +9,11 @@ namespace ValheimServerGUI.Game
     {
         event EventHandler<List<ServerPreferences>> PreferencesSaved;
 
-        ServerPreferences LoadPreferences(string serverName);
+        ServerPreferences LoadPreferences(string profileName);
 
         IEnumerable<ServerPreferences> LoadPreferences();
 
         void SavePreferences(ServerPreferences preferences);
-
-        void SavePreferences(IEnumerable<ServerPreferences> preferences);
     }
 
     public class ServerPreferencesProvider : IServerPreferencesProvider
@@ -35,11 +33,11 @@ namespace ValheimServerGUI.Game
 
         public event EventHandler<List<ServerPreferences>> PreferencesSaved;
 
-        public ServerPreferences LoadPreferences(string serverName)
+        public ServerPreferences LoadPreferences(string profileName)
         {
-            if (string.IsNullOrWhiteSpace(serverName)) throw new ArgumentException($"{nameof(serverName)} must not be null or whitespace");
+            if (string.IsNullOrWhiteSpace(profileName)) throw new ArgumentException($"{nameof(profileName)} must not be null or whitespace");
 
-            var prefs = this.LoadPreferences().Where(p => p.Name == serverName).ToList();
+            var prefs = this.LoadPreferences().Where(p => p.ProfileName == profileName).ToList();
 
             if (prefs.Count == 0)
             {
@@ -47,8 +45,8 @@ namespace ValheimServerGUI.Game
             }
             else if (prefs.Count > 1)
             {
-                this.Logger.LogWarning($"Multiple configurations found for server '{serverName}'. Returning the most recently updated one.");
-                return prefs.Last();
+                this.Logger.LogWarning($"Multiple configurations found for server '{profileName}'. Returning the most recently updated one.");
+                return prefs.OrderByDescending(p => p.LastSaved).First();
             }
 
             return prefs.Single();
@@ -65,20 +63,14 @@ namespace ValheimServerGUI.Game
 
             var userPrefs = this.UserPreferencesProvider.LoadPreferences();
 
-            // Remove any existing server configurations with this name
-            userPrefs.Servers.RemoveAll(p => p.Name == preferences.Name);
+            // Remove any existing server profiles with this name
+            userPrefs.Servers.RemoveAll(p => p.ProfileName == preferences.ProfileName);
             userPrefs.Servers.Add(preferences);
 
-            this.UserPreferencesProvider.SavePreferences(userPrefs);
-        }
-
-        public void SavePreferences(IEnumerable<ServerPreferences> preferences)
-        {
-            var userPrefs = this.UserPreferencesProvider.LoadPreferences();
-
-            userPrefs.Servers = preferences?.ToList() ?? new();
+            preferences.LastSaved = DateTime.UtcNow;
 
             this.UserPreferencesProvider.SavePreferences(userPrefs);
+            this.Logger.LogInformation("Saved preferences for server profile: {profileName}", preferences.ProfileName);
         }
 
         #endregion

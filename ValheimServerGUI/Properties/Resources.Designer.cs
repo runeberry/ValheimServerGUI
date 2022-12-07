@@ -164,6 +164,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Default.
+        /// </summary>
+        internal static string DefaultServerProfileName {
+            get {
+                return ResourceManager.GetString("DefaultServerProfileName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\IronGate\Valheim.
         /// </summary>
         internal static string DefaultValheimSaveFolder {

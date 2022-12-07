@@ -1,9 +1,14 @@
-﻿using ValheimServerGUI.Properties;
+﻿using System;
+using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Game
 {
     public class ServerPreferences
     {
+        public string ProfileName { get; set; } = Resources.DefaultServerProfileName;
+
+        public DateTime LastSaved { get; set; } = DateTime.UnixEpoch;
+
         public string Name { get; set; }
 
         public string Password { get; set; }
@@ -32,6 +37,8 @@ namespace ValheimServerGUI.Game
 
             if (file == null) return prefs;
 
+            prefs.ProfileName = !string.IsNullOrWhiteSpace(file.ProfileName) ? file.ProfileName : prefs.ProfileName;
+            prefs.LastSaved = file.LastSaved ?? prefs.LastSaved;
             prefs.Name = file.Name ?? prefs.Name;
             prefs.Password = file.Password ?? prefs.Password;
             prefs.WorldName = file.WorldName ?? prefs.WorldName;
@@ -51,6 +58,8 @@ namespace ValheimServerGUI.Game
         {
             var file = new ServerPreferencesFile
             {
+                ProfileName = this.ProfileName,
+                LastSaved = this.LastSaved,
                 Name = this.Name,
                 Password = this.Password,
                 WorldName = this.WorldName,

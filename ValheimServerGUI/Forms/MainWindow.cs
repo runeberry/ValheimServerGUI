@@ -841,6 +841,7 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshFormFields()
         {
+            this.RefreshApplicationTitle();
             this.RefreshProfileList();
             this.RefreshWorldSelect();
             this.RefreshFormStateForServer();
@@ -963,6 +964,18 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void RefreshApplicationTitle()
+        {
+            var title = Resources.ApplicationTitle;
+
+            if (this.CurrentProfile != null)
+            {
+                title += $" - {this.CurrentProfile}";
+            }
+
+            this.Text = title;
+        }
+
         #endregion
 
         #region Save & Load
@@ -1014,6 +1027,7 @@ namespace ValheimServerGUI.Forms
             }
 
             this.CurrentProfile = prefs.ProfileName;
+            this.RefreshApplicationTitle();
 
             this.ServerNameField.Value = prefs.Name;
             this.ServerPortField.Value = prefs.Port;

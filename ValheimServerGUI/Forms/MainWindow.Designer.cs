@@ -34,6 +34,8 @@ namespace ValheimServerGUI.Forms
             this.MenuStrip = new System.Windows.Forms.MenuStrip();
             this.MenuItemFile = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileNewWindow = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemFileSeparator3 = new System.Windows.Forms.ToolStripSeparator();
+            this.MenuItemFileNewProfile = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileSaveProfile = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileLoadProfile = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemFileRemoveProfile = new System.Windows.Forms.ToolStripMenuItem();
@@ -111,8 +113,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.MenuItemFileNewProfile = new System.Windows.Forms.ToolStripMenuItem();
-            this.MenuItemFileSeparator3 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -161,6 +161,18 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileNewWindow.Name = "MenuItemFileNewWindow";
             this.MenuItemFileNewWindow.Size = new System.Drawing.Size(158, 22);
             this.MenuItemFileNewWindow.Text = "&New Window";
+            // 
+            // MenuItemFileSeparator3
+            // 
+            this.MenuItemFileSeparator3.Name = "MenuItemFileSeparator3";
+            this.MenuItemFileSeparator3.Size = new System.Drawing.Size(155, 6);
+            // 
+            // MenuItemFileNewProfile
+            // 
+            this.MenuItemFileNewProfile.Image = global::ValheimServerGUI.Properties.Resources.NewFile_16x;
+            this.MenuItemFileNewProfile.Name = "MenuItemFileNewProfile";
+            this.MenuItemFileNewProfile.Size = new System.Drawing.Size(158, 22);
+            this.MenuItemFileNewProfile.Text = "New Profile";
             // 
             // MenuItemFileSaveProfile
             // 
@@ -804,6 +816,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -914,18 +927,6 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
-            // MenuItemFileNewProfile
-            // 
-            this.MenuItemFileNewProfile.Image = global::ValheimServerGUI.Properties.Resources.NewFile_16x;
-            this.MenuItemFileNewProfile.Name = "MenuItemFileNewProfile";
-            this.MenuItemFileNewProfile.Size = new System.Drawing.Size(158, 22);
-            this.MenuItemFileNewProfile.Text = "New Profile";
-            // 
-            // MenuItemFileSeparator3
-            // 
-            this.MenuItemFileSeparator3.Name = "MenuItemFileSeparator3";
-            this.MenuItemFileSeparator3.Size = new System.Drawing.Size(6, 6);
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -938,7 +939,7 @@ namespace ValheimServerGUI.Forms
             this.MaximizeBox = false;
             this.MinimumSize = new System.Drawing.Size(500, 371);
             this.Name = "MainWindow";
-            this.Text = "(Unofficial) Valheim Dedicated Server GUI";
+            this.Text = "ApplicationTitle";
             this.MenuStrip.ResumeLayout(false);
             this.MenuStrip.PerformLayout();
             this.StatusStrip.ResumeLayout(false);

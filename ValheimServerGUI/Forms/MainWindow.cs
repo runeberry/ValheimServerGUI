@@ -335,7 +335,13 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemFileNewProfile_Click(object sender, EventArgs e)
         {
-            this.LoadFormStateFromPrefs(new ServerPreferences());
+            var profileName = this.PromptForProfileName();
+            if (profileName == null) return;
+
+            var prefs = new ServerPreferences { ProfileName = profileName };
+            this.ServerPrefsProvider.SavePreferences(prefs);
+
+            this.LoadFormStateFromPrefs(prefs);
         }
 
         private void MenuItemSaveProfile_Click(object sender, EventArgs e)
@@ -852,6 +858,7 @@ namespace ValheimServerGUI.Forms
             this.CommunityServerField.Enabled = allowServerChanges;
             this.ServerCrossplayField.Enabled = allowServerChanges;
             this.ButtonAdvancedSettings.Enabled = allowServerChanges;
+            this.MenuItemFileNewProfile.Enabled = allowServerChanges;
             this.MenuItemFileLoadProfile.Enabled = allowServerChanges;
 
             this.ButtonStartServer.Enabled = this.Server.CanStart;
@@ -1005,6 +1012,8 @@ namespace ValheimServerGUI.Forms
                 this.Logger.LogWarning($"Unable to load form state: {nameof(prefs)} cannot be null");
                 return;
             }
+
+            this.CurrentProfile = prefs.ProfileName;
 
             this.ServerNameField.Value = prefs.Name;
             this.ServerPortField.Value = prefs.Port;
@@ -1194,6 +1203,25 @@ namespace ValheimServerGUI.Forms
                     }
                 }
             }
+        }
+
+        private string PromptForProfileName()
+        {
+            var dialog = new TextPromptPopout("Server Profile Name", "Enter a server profile name:");
+            dialog.SetValidation(
+                "Profile name must be 1-30 characters, and must not match an existing profile name.",
+                (input) =>
+                {
+                    if (string.IsNullOrWhiteSpace(input) || input.Length > 30) return false;
+
+                    var prefs = this.ServerPrefsProvider.LoadPreferences(input);
+                    return prefs == null;
+                });
+
+            var result = dialog.ShowDialog();
+            if (result != DialogResult.OK) return null;
+
+            return dialog.Value;
         }
 
         private void LaunchNewWindow()

@@ -15,11 +15,6 @@ namespace ValheimServerGUI.Forms
             this.VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
         }
 
-        private void ButtonTwitter_Click(object sender, EventArgs e)
-        {
-            WebHelper.OpenWebAddress(Resources.UrlTwitter);
-        }
-
         private void ButtonDonate_Click(object sender, EventArgs e)
         {
             WebHelper.OpenWebAddress(Resources.UrlDonate);

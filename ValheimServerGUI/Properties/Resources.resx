@@ -272,9 +272,6 @@
   <data name="UrlRuneberryApi" xml:space="preserve">
     <value>https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod</value>
   </data>
-  <data name="UrlTwitter" xml:space="preserve">
-    <value>https://twitter.com/Runeberries</value>
-  </data>
   <data name="UrlUpdates" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/releases</value>
   </data>

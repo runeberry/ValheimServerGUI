@@ -35,7 +35,6 @@ namespace ValheimServerGUI.Forms
             this.label2 = new System.Windows.Forms.Label();
             this.VersionLabel = new System.Windows.Forms.Label();
             this.ButtonGitHub = new System.Windows.Forms.Button();
-            this.ButtonTwitter = new System.Windows.Forms.Button();
             this.ButtonDonate = new System.Windows.Forms.Button();
             this.ButtonValheimSite = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -97,21 +96,6 @@ namespace ValheimServerGUI.Forms
             this.ButtonGitHub.UseVisualStyleBackColor = true;
             this.ButtonGitHub.Click += new System.EventHandler(this.ButtonGitHub_Click);
             // 
-            // ButtonTwitter
-            // 
-            this.ButtonTwitter.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonTwitter.Image = ((System.Drawing.Image)(resources.GetObject("ButtonTwitter.Image")));
-            this.ButtonTwitter.Location = new System.Drawing.Point(159, 216);
-            this.ButtonTwitter.Name = "ButtonTwitter";
-            this.ButtonTwitter.Size = new System.Drawing.Size(110, 23);
-            this.ButtonTwitter.TabIndex = 10;
-            this.ButtonTwitter.Text = "@Runeberries";
-            this.ButtonTwitter.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
-            this.ButtonTwitter.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.ButtonTwitter.UseVisualStyleBackColor = true;
-            this.ButtonTwitter.Click += new System.EventHandler(this.ButtonTwitter_Click);
-            // 
             // ButtonDonate
             // 
             this.ButtonDonate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
@@ -149,7 +133,6 @@ namespace ValheimServerGUI.Forms
             this.ClientSize = new System.Drawing.Size(384, 251);
             this.Controls.Add(this.ButtonValheimSite);
             this.Controls.Add(this.ButtonDonate);
-            this.Controls.Add(this.ButtonTwitter);
             this.Controls.Add(this.ButtonGitHub);
             this.Controls.Add(this.VersionLabel);
             this.Controls.Add(this.label2);
@@ -173,7 +156,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label VersionLabel;
         private System.Windows.Forms.Button ButtonGitHub;
-        private System.Windows.Forms.Button ButtonTwitter;
         private System.Windows.Forms.Button ButtonDonate;
         private System.Windows.Forms.Button ButtonValheimSite;
     }

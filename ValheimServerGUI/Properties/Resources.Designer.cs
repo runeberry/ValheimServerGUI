@@ -540,15 +540,6 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://twitter.com/Runeberries.
-        /// </summary>
-        internal static string UrlTwitter {
-            get {
-                return ResourceManager.GetString("UrlTwitter", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/releases.
         /// </summary>
         internal static string UrlUpdates {

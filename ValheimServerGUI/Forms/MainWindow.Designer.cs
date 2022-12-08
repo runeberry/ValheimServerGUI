@@ -58,7 +58,6 @@ namespace ValheimServerGUI.Forms
             this.Tabs = new System.Windows.Forms.TabControl();
             this.TabServerControls = new System.Windows.Forms.TabPage();
             this.CopyButtonServerPassword = new ValheimServerGUI.Forms.CopyButton();
-            this.ButtonAdvancedSettings = new System.Windows.Forms.Button();
             this.JoinOptionsGroupBox = new System.Windows.Forms.GroupBox();
             this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerCrossplayField = new ValheimServerGUI.Controls.CheckboxFormField();
@@ -113,6 +112,12 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.TabAdvancedControls = new System.Windows.Forms.TabPage();
+            this.SavingGroupBox = new System.Windows.Forms.GroupBox();
+            this.ServerSaveIntervalField = new ValheimServerGUI.Controls.NumericFormField();
+            this.ServerBackupsField = new ValheimServerGUI.Controls.NumericFormField();
+            this.ServerShortBackupIntervalField = new ValheimServerGUI.Controls.NumericFormField();
+            this.ServerLongBackupIntervalField = new ValheimServerGUI.Controls.NumericFormField();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -125,6 +130,8 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
+            this.TabAdvancedControls.SuspendLayout();
+            this.SavingGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // MenuStrip
@@ -311,6 +318,7 @@ namespace ValheimServerGUI.Forms
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.Tabs.Controls.Add(this.TabServerControls);
+            this.Tabs.Controls.Add(this.TabAdvancedControls);
             this.Tabs.Controls.Add(this.TabServerDetails);
             this.Tabs.Controls.Add(this.TabPlayers);
             this.Tabs.Controls.Add(this.TabLogs);
@@ -323,7 +331,6 @@ namespace ValheimServerGUI.Forms
             // TabServerControls
             // 
             this.TabServerControls.Controls.Add(this.CopyButtonServerPassword);
-            this.TabServerControls.Controls.Add(this.ButtonAdvancedSettings);
             this.TabServerControls.Controls.Add(this.JoinOptionsGroupBox);
             this.TabServerControls.Controls.Add(this.WorldSelectGroupBox);
             this.TabServerControls.Controls.Add(this.ServerPortField);
@@ -348,15 +355,6 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonServerPassword.Name = "CopyButtonServerPassword";
             this.CopyButtonServerPassword.Size = new System.Drawing.Size(16, 16);
             this.CopyButtonServerPassword.TabIndex = 21;
-            // 
-            // ButtonAdvancedSettings
-            // 
-            this.ButtonAdvancedSettings.Location = new System.Drawing.Point(3, 196);
-            this.ButtonAdvancedSettings.Name = "ButtonAdvancedSettings";
-            this.ButtonAdvancedSettings.Size = new System.Drawing.Size(240, 23);
-            this.ButtonAdvancedSettings.TabIndex = 20;
-            this.ButtonAdvancedSettings.Text = "Advanced Settings...";
-            this.ButtonAdvancedSettings.UseVisualStyleBackColor = true;
             // 
             // JoinOptionsGroupBox
             // 
@@ -927,6 +925,81 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
+            // TabAdvancedControls
+            // 
+            this.TabAdvancedControls.Controls.Add(this.SavingGroupBox);
+            this.TabAdvancedControls.Location = new System.Drawing.Point(4, 24);
+            this.TabAdvancedControls.Name = "TabAdvancedControls";
+            this.TabAdvancedControls.Padding = new System.Windows.Forms.Padding(3);
+            this.TabAdvancedControls.Size = new System.Drawing.Size(452, 252);
+            this.TabAdvancedControls.TabIndex = 5;
+            this.TabAdvancedControls.Text = "Advanced Controls";
+            this.TabAdvancedControls.UseVisualStyleBackColor = true;
+            // 
+            // SavingGroupBox
+            // 
+            this.SavingGroupBox.Controls.Add(this.ServerLongBackupIntervalField);
+            this.SavingGroupBox.Controls.Add(this.ServerShortBackupIntervalField);
+            this.SavingGroupBox.Controls.Add(this.ServerBackupsField);
+            this.SavingGroupBox.Controls.Add(this.ServerSaveIntervalField);
+            this.SavingGroupBox.Location = new System.Drawing.Point(6, 6);
+            this.SavingGroupBox.Name = "SavingGroupBox";
+            this.SavingGroupBox.Size = new System.Drawing.Size(307, 129);
+            this.SavingGroupBox.TabIndex = 0;
+            this.SavingGroupBox.TabStop = false;
+            this.SavingGroupBox.Text = "Saving and Backups";
+            // 
+            // ServerSaveIntervalField
+            // 
+            this.ServerSaveIntervalField.HelpText = "How often the world is saved, in seconds.";
+            this.ServerSaveIntervalField.LabelText = "Save Interval";
+            this.ServerSaveIntervalField.Location = new System.Drawing.Point(6, 22);
+            this.ServerSaveIntervalField.Maximum = 86400;
+            this.ServerSaveIntervalField.Minimum = 60;
+            this.ServerSaveIntervalField.Name = "ServerSaveIntervalField";
+            this.ServerSaveIntervalField.Size = new System.Drawing.Size(116, 41);
+            this.ServerSaveIntervalField.TabIndex = 0;
+            this.ServerSaveIntervalField.Value = 60;
+            // 
+            // ServerBackupsField
+            // 
+            this.ServerBackupsField.HelpText = "Number of world data backups to maintain. One rolling backup\r\nis created on the s" +
+    "hort backup interval, and subsequent backups are\r\ncreated on the long backup int" +
+    "erval.";
+            this.ServerBackupsField.LabelText = "Backups";
+            this.ServerBackupsField.Location = new System.Drawing.Point(6, 69);
+            this.ServerBackupsField.Maximum = 1000;
+            this.ServerBackupsField.Minimum = 1;
+            this.ServerBackupsField.Name = "ServerBackupsField";
+            this.ServerBackupsField.Size = new System.Drawing.Size(116, 41);
+            this.ServerBackupsField.TabIndex = 1;
+            this.ServerBackupsField.Value = 1;
+            // 
+            // ServerShortBackupIntervalField
+            // 
+            this.ServerShortBackupIntervalField.HelpText = "How often to create a rolling backup of the world\r\nsave data, in seconds.";
+            this.ServerShortBackupIntervalField.LabelText = "Short Backup Interval";
+            this.ServerShortBackupIntervalField.Location = new System.Drawing.Point(128, 22);
+            this.ServerShortBackupIntervalField.Maximum = 2592000;
+            this.ServerShortBackupIntervalField.Minimum = 300;
+            this.ServerShortBackupIntervalField.Name = "ServerShortBackupIntervalField";
+            this.ServerShortBackupIntervalField.Size = new System.Drawing.Size(173, 41);
+            this.ServerShortBackupIntervalField.TabIndex = 2;
+            this.ServerShortBackupIntervalField.Value = 300;
+            // 
+            // ServerLongBackupIntervalField
+            // 
+            this.ServerLongBackupIntervalField.HelpText = "How often to create additional backups of the world\r\nsave data, in seconds. This " +
+    "interval must be longer than\r\nthe short backup interval.";
+            this.ServerLongBackupIntervalField.LabelText = "Long Backup Interval";
+            this.ServerLongBackupIntervalField.Location = new System.Drawing.Point(128, 69);
+            this.ServerLongBackupIntervalField.Maximum = 2592000;
+            this.ServerLongBackupIntervalField.Minimum = 300;
+            this.ServerLongBackupIntervalField.Name = "ServerLongBackupIntervalField";
+            this.ServerLongBackupIntervalField.Size = new System.Drawing.Size(173, 41);
+            this.ServerLongBackupIntervalField.TabIndex = 1;
+            this.ServerLongBackupIntervalField.Value = 300;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -955,6 +1028,8 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TrayContextMenuStrip.ResumeLayout(false);
+            this.TabAdvancedControls.ResumeLayout(false);
+            this.SavingGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1035,7 +1110,6 @@ namespace ValheimServerGUI.Forms
         private CopyButton CopyButtonInviteCode;
         private ValheimServerGUI.Controls.LabelField LabelInviteCode;
         private System.Windows.Forms.GroupBox JoinOptionsGroupBox;
-        private System.Windows.Forms.Button ButtonAdvancedSettings;
         private CopyButton CopyButtonServerPassword;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileNewWindow;
         private System.Windows.Forms.ToolStripSeparator MenuItemFileSeparator2;
@@ -1044,5 +1118,11 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileRemoveProfile;
         private System.Windows.Forms.ToolStripSeparator MenuItemFileSeparator3;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileNewProfile;
+        private System.Windows.Forms.TabPage TabAdvancedControls;
+        private System.Windows.Forms.GroupBox SavingGroupBox;
+        private ValheimServerGUI.Controls.NumericFormField ServerLongBackupIntervalField;
+        private ValheimServerGUI.Controls.NumericFormField ServerShortBackupIntervalField;
+        private ValheimServerGUI.Controls.NumericFormField ServerBackupsField;
+        private ValheimServerGUI.Controls.NumericFormField ServerSaveIntervalField;
     }
 }

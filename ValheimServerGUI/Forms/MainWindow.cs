@@ -155,7 +155,6 @@ namespace ValheimServerGUI.Forms
             this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
-            this.ButtonAdvancedSettings.Click += this.ButtonAdvancedSettings_Click;
             this.ButtonStartServer.Click += this.BuildEventHandler(this.StartServer);
             this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
             this.ButtonStopServer.Click += this.ButtonStopServer_Click;
@@ -338,7 +337,7 @@ namespace ValheimServerGUI.Forms
             var profileName = this.PromptForProfileName();
             if (profileName == null) return;
 
-            var prefs = new ServerPreferences { ProfileName = profileName };
+            var prefs = new ServerPreferences { ProfileName = profileName, Name = profileName };
             this.ServerPrefsProvider.SavePreferences(prefs);
 
             this.LoadFormStateFromPrefs(prefs);
@@ -417,11 +416,6 @@ namespace ValheimServerGUI.Forms
         #endregion
 
         #region Form Field Events
-
-        private void ButtonAdvancedSettings_Click(object sender, EventArgs e)
-        {
-            this.ShowAdvancedSettingsForm();
-        }
 
         private void ButtonStopServer_Click(object sender, EventArgs e)
         {
@@ -755,12 +749,6 @@ namespace ValheimServerGUI.Forms
             this.RefreshFormFields();
         }
 
-        private void ShowAdvancedSettingsForm()
-        {
-            this.FormProvider.GetForm<AdvancedServerControlsForm>().ShowDialog();
-            this.RefreshFormFields();
-        }
-
         #endregion
 
         #region View Setters
@@ -858,7 +846,10 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.Enabled = allowServerChanges;
             this.CommunityServerField.Enabled = allowServerChanges;
             this.ServerCrossplayField.Enabled = allowServerChanges;
-            this.ButtonAdvancedSettings.Enabled = allowServerChanges;
+            this.ServerSaveIntervalField.Enabled = allowServerChanges;
+            this.ServerBackupsField.Enabled = allowServerChanges;
+            this.ServerShortBackupIntervalField.Enabled = allowServerChanges;
+            this.ServerLongBackupIntervalField.Enabled = allowServerChanges;
             this.MenuItemFileNewProfile.Enabled = allowServerChanges;
             this.MenuItemFileLoadProfile.Enabled = allowServerChanges;
 
@@ -905,7 +896,8 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileRemoveProfile.Enabled = false;
             this.MenuItemFileRemoveProfile.DropDownItems.Clear();
 
-            var prefs = this.ServerPrefsProvider.LoadPreferences();
+            var prefs = this.ServerPrefsProvider.LoadPreferences()
+                .OrderByDescending(p => p.LastSaved);
             if (prefs == null || !prefs.Any()) return;
 
             this.MenuItemFileLoadProfile.Enabled = true;
@@ -999,6 +991,10 @@ namespace ValheimServerGUI.Forms
                 : this.WorldSelectExistingNameField.Value;
             prefs.Public = this.CommunityServerField.Value;
             prefs.Crossplay = this.ServerCrossplayField.Value;
+            prefs.SaveInterval = this.ServerSaveIntervalField.Value;
+            prefs.BackupCount = this.ServerBackupsField.Value;
+            prefs.BackupIntervalShort = this.ServerShortBackupIntervalField.Value;
+            prefs.BackupIntervalLong = this.ServerLongBackupIntervalField.Value;
 
             this.ServerPrefsProvider.SavePreferences(prefs);
 
@@ -1032,9 +1028,13 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField.Value = prefs.Name;
             this.ServerPortField.Value = prefs.Port;
             this.ServerPasswordField.Value = prefs.Password;
+            this.ShowPasswordField.Value = false;
             this.CommunityServerField.Value = prefs.Public;
             this.ServerCrossplayField.Value = prefs.Crossplay;
-            this.ShowPasswordField.Value = false;
+            this.ServerSaveIntervalField.Value = prefs.SaveInterval;
+            this.ServerBackupsField.Value = prefs.BackupCount;
+            this.ServerShortBackupIntervalField.Value = prefs.BackupIntervalShort;
+            this.ServerLongBackupIntervalField.Value = prefs.BackupIntervalLong;
 
             var worldName = prefs.WorldName;
 
@@ -1080,6 +1080,16 @@ namespace ValheimServerGUI.Forms
             {
                 // Creating a new world, ensure that the name is available
                 worldName = this.WorldSelectNewNameField.Value;
+                if (string.IsNullOrWhiteSpace(worldName))
+                {
+                    MessageBox.Show(
+                        "You must enter a world name, or choose an existing world.",
+                        "Server Configuration Error",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+
                 if (!this.FileProvider.IsWorldNameAvailable(worldName))
                 {
                     MessageBox.Show(
@@ -1088,6 +1098,7 @@ namespace ValheimServerGUI.Forms
                         MessageBoxButtons.OK,
                         MessageBoxIcon.Error);
                     this.WorldSelectRadioExisting.Value = true;
+                    this.WorldSelectExistingNameField.Value = worldName;
                     return;
                 }
             }

@@ -23,13 +23,15 @@ namespace ValheimServerGUI.Controls
 
         public int Value
         {
-            get => (int)this.NumericUpDown.Value;
-            set 
+            get => this.GetValidatedValue((int)this.NumericUpDown.Value);
+            set
             {
-                if (this.NumericUpDown.Value == value) return;
-
-                this.NumericUpDown.Value = value;
-                this.ValueChanged?.Invoke(this, Value);
+                var validValue = this.GetValidatedValue(value);
+                if (validValue != this.NumericUpDown.Value)
+                {
+                    this.NumericUpDown.Value = validValue;
+                    this.ValueChanged?.Invoke(this, Value);
+                }
             }
         }
 
@@ -59,6 +61,20 @@ namespace ValheimServerGUI.Controls
         private void OnValueChanged(object sender, EventArgs args)
         {
             this.ValueChanged?.Invoke(this, this.Value);
+        }
+
+        private int GetValidatedValue(int val)
+        {
+            if (val < this.NumericUpDown.Minimum)
+            {
+                val = (int)this.NumericUpDown.Minimum;
+            }
+            else if (val > this.NumericUpDown.Maximum)
+            {
+                val = (int)this.NumericUpDown.Maximum;
+            }
+
+            return val;
         }
     }
 }

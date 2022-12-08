@@ -76,7 +76,6 @@ namespace ValheimServerGUI
             services
                 .AddSingleton<SplashForm>()
                 .AddSingleton<MainWindow>()
-                .AddSingleton<AdvancedServerControlsForm>()
                 .AddSingleton<DirectoriesForm>()
                 .AddSingleton<PreferencesForm>()
                 .AddSingleton<BugReportForm>()

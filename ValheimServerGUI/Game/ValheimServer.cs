@@ -71,16 +71,24 @@ namespace ValheimServerGUI.Game
 
         private void InitializeLogBasedActions()
         {
+
             LogBasedActions.Add(@"Game server connected", this.OnServerConnected);
-
-            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
-            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
-            LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
-            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // Technically "disconnecting" but it's the best terminator I can find
-
             LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", this.OnWorldSaved);
-
             LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", this.OnCrossplayJoinCodeAvailable);
+
+            // Connecting
+            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
+            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID Steam_(\d+?)$", this.OnPlayerConnecting); // Crossplay
+
+            // Connected - NOTE: ZDOID can be a negative number, account for that w/ regex!
+            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
+
+            // Disconnecting
+            LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
+
+            // Disconnected
+            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // This is technically "disconnecting" but it's the best terminator I can find
+            LogBasedActions.Add(@"Destroying abandoned non persistent zdo ([\d-]+?):.*$", this.OnPlayerDisconnected); // Crossplay
         }
 
         private void InitializeStatusBasedActions()
@@ -244,18 +252,18 @@ namespace ValheimServerGUI.Game
 
         private void OnPlayerDisconnecting(object sender, EventLogContext context, params string[] captures)
         {
-            var steamId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamId)) return;
+            var steamOrZdoId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
 
-            this.PlayerDataRepository.SetPlayerLeaving(steamId);
+            this.PlayerDataRepository.SetPlayerLeaving(steamOrZdoId);
         }
 
         private void OnPlayerDisconnected(object sender, EventLogContext context, params string[] captures)
         {
-            var steamId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamId)) return;
+            var steamOrZdoId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
 
-            this.PlayerDataRepository.SetPlayerOffline(steamId);
+            this.PlayerDataRepository.SetPlayerOffline(steamOrZdoId);
         }
 
         private void OnWorldSaved(object sender, EventLogContext context, params string[] captures)

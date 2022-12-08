@@ -31,6 +31,8 @@ namespace ValheimServerGUI.Game
 
         public bool StartWithWindows { get; set; }
 
+        public string AdditionalArgs { get; set; }
+
         public static ServerPreferences FromFile(ServerPreferencesFile file)
         {
             var prefs = new ServerPreferences();
@@ -50,6 +52,7 @@ namespace ValheimServerGUI.Game
             prefs.BackupIntervalShort = file.BackupIntervalShort ?? prefs.BackupIntervalShort;
             prefs.BackupIntervalLong = file.BackupIntervalLong ?? prefs.BackupIntervalLong;
             prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
+            prefs.AdditionalArgs = file.AdditionalArgs ?? prefs.AdditionalArgs;
 
             return prefs;
         }
@@ -71,6 +74,7 @@ namespace ValheimServerGUI.Game
                 BackupIntervalShort = this.BackupIntervalShort,
                 BackupIntervalLong = this.BackupIntervalLong,
                 StartWithWindows = this.StartWithWindows,
+                AdditionalArgs = this.AdditionalArgs,
             };
 
             return file;

@@ -850,6 +850,7 @@ namespace ValheimServerGUI.Forms
             this.ServerBackupsField.Enabled = allowServerChanges;
             this.ServerShortBackupIntervalField.Enabled = allowServerChanges;
             this.ServerLongBackupIntervalField.Enabled = allowServerChanges;
+            this.ServerAdditionalArgsField.Enabled = allowServerChanges;
             this.MenuItemFileNewProfile.Enabled = allowServerChanges;
             this.MenuItemFileLoadProfile.Enabled = allowServerChanges;
 
@@ -995,6 +996,7 @@ namespace ValheimServerGUI.Forms
             prefs.BackupCount = this.ServerBackupsField.Value;
             prefs.BackupIntervalShort = this.ServerShortBackupIntervalField.Value;
             prefs.BackupIntervalLong = this.ServerLongBackupIntervalField.Value;
+            prefs.AdditionalArgs = this.ServerAdditionalArgsField.Value;
 
             this.ServerPrefsProvider.SavePreferences(prefs);
 
@@ -1035,6 +1037,7 @@ namespace ValheimServerGUI.Forms
             this.ServerBackupsField.Value = prefs.BackupCount;
             this.ServerShortBackupIntervalField.Value = prefs.BackupIntervalShort;
             this.ServerLongBackupIntervalField.Value = prefs.BackupIntervalLong;
+            this.ServerAdditionalArgsField.Value = prefs.AdditionalArgs;
 
             var worldName = prefs.WorldName;
 
@@ -1133,6 +1136,7 @@ namespace ValheimServerGUI.Forms
                 Backups = prefs.BackupCount,
                 BackupShort = prefs.BackupIntervalShort,
                 BackupLong = prefs.BackupIntervalLong,
+                AdditionalArgs = prefs.AdditionalArgs,
             };
 
             try

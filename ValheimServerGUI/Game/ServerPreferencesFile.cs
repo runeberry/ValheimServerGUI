@@ -43,5 +43,8 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("startWithWindows")]
         public bool? StartWithWindows { get; set; }
+
+        [JsonProperty("additionalArgs")]
+        public string AdditionalArgs { get; set; }
     }
 }

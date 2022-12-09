@@ -140,13 +140,14 @@ namespace ValheimServerGUI.Forms
             this.MenuItemFileSaveProfile.Click += this.MenuItemFileSaveProfile_Click;
             this.MenuItemFileSaveProfileAs.Click += this.MenuItemFileSaveProfileAs_Click;
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
-            this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
-            this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
+            this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Click;
+            this.MenuItemFileOpenSettings.Click += this.MenuItemFileOpenSettings_Click;
+            this.MenuItemFileClose.Click += this.MenuItemFileClose_Click;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
-            this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
+            this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Click;
             this.MenuItemHelpBugReport.Click += this.MenuItemHelpBugReport_Click;
-            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
-            this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
+            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Click;
+            this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Click;
 
             // Tray icon
             this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
@@ -154,7 +155,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuStart.Click += this.BuildEventHandler(this.StartServer);
             this.TrayContextMenuRestart.Click += this.ButtonRestartServer_Click;
             this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
-            this.TrayContextMenuClose.Click += this.MenuItemFileClose_Clicked;
+            this.TrayContextMenuClose.Click += this.MenuItemFileClose_Click;
 
             // Timers
             this.ServerRefreshTimer.Tick += this.ServerRefreshTimer_Tick;
@@ -400,24 +401,30 @@ namespace ValheimServerGUI.Forms
             this.ShowPreferencesForm();
         }
 
-        private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
+        private void MenuItemFileDirectories_Click(object sender, EventArgs e)
         {
             this.ShowDirectoriesForm();
         }
 
-        private void MenuItemFileClose_Clicked(object sender, EventArgs e)
+        private void MenuItemFileOpenSettings_Click(object sender, EventArgs e)
+        {
+            var prefsDir = Path.GetDirectoryName(Resources.UserPrefsFilePathV2);
+            OpenHelper.OpenDirectory(prefsDir);
+        }
+
+        private void MenuItemFileClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
         private void MenuItemHelpManual_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.UrlHelp);
+            OpenHelper.OpenWebAddress(Resources.UrlHelp);
         }
 
-        private void MenuItemHelpPortForwarding_Clicked(object sender, EventArgs e)
+        private void MenuItemHelpPortForwarding_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
+            OpenHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
         private void MenuItemHelpBugReport_Click(object sender, EventArgs e)
@@ -426,12 +433,12 @@ namespace ValheimServerGUI.Forms
             bugReportForm.ShowDialog();
         }
 
-        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
+        private void MenuItemHelpUpdates_Click(object sender, EventArgs e)
         {
             this.CheckForUpdates(true);
         }
 
-        private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
+        private void MenuItemHelpAbout_Click(object sender, EventArgs e)
         {
             var aboutForm = FormProvider.GetForm<AboutForm>();
             aboutForm.ShowDialog();
@@ -747,7 +754,7 @@ namespace ValheimServerGUI.Forms
 
                 if (result == DialogResult.Yes)
                 {
-                    WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    OpenHelper.OpenWebAddress(Resources.UrlUpdates);
                 }
             }
         }

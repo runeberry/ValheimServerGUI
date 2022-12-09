@@ -17,17 +17,17 @@ namespace ValheimServerGUI.Forms
 
         private void ButtonDonate_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.UrlDonate);
+            OpenHelper.OpenWebAddress(Resources.UrlDonate);
         }
 
         private void ButtonGitHub_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.UrlGithubApplication);
+            OpenHelper.OpenWebAddress(Resources.UrlGithubApplication);
         }
 
         private void ButtonValheimSite_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.ValheimGameSiteUrl);
+            OpenHelper.OpenWebAddress(Resources.ValheimGameSiteUrl);
         }
     }
 }

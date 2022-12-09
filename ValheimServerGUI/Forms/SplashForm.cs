@@ -282,7 +282,7 @@ namespace ValheimServerGUI.Forms
 
                 if (result == DialogResult.Yes)
                 {
-                    WebHelper.OpenWebAddress(Resources.UrlDotnetDownload);
+                    OpenHelper.OpenWebAddress(Resources.UrlDotnetDownload);
                 }
 
                 return false;

@@ -19,6 +19,11 @@ namespace ValheimServerGUI.Game
         /// </summary>        
         public IValheimServerOptions Options { get; private set; } = new ValheimServerOptions();
 
+        /// <summary>
+        /// Exposed for testing.
+        /// </summary>
+        public ValheimServerLogger Logger => this.ServerLogger;
+
         public ServerStatus Status
         {
             get => this._status;
@@ -30,17 +35,18 @@ namespace ValheimServerGUI.Game
             }
         }
         private ServerStatus _status = ServerStatus.Stopped;
-        public event EventHandler<ServerStatus> StatusChanged;
-
-        public event EventHandler<decimal> WorldSaved;
-        public event EventHandler<string> InviteCodeReady;
-
-        public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped);
-        public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running);
-        public bool CanRestart => this.IsAnyStatus(ServerStatus.Running);
-
+        private string ProcessKey;
         private bool IsRestarting;
         private readonly Dictionary<string, LogEventHandler> LogBasedActions = new();
+
+        public event EventHandler<ServerStatus> StatusChanged;
+        public event EventHandler<decimal> WorldSaved;
+        public event EventHandler<string> InviteCodeReady;
+        public event EventHandler<EventLogContext> LogReceived;
+
+        public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped) && this.ProcessKey == null;
+        public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && this.ProcessKey != null;
+        public bool CanRestart => this.IsAnyStatus(ServerStatus.Running) && this.ProcessKey != null;
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
@@ -131,18 +137,23 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStart) return;
 
-            this.ApplicationLogger.LogInformation("Starting server...");
+            this.ApplicationLogger.LogInformation("Starting server: {name}", options.Name);
 
             var exePath = this.FileProvider.ServerExe.FullName;
             var processArgs = this.GenerateArgs(options);
             this.ApplicationLogger.LogInformation("Server run command: {exePath} {processArgs}", exePath, processArgs);
 
-            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
+            this.ProcessKey = Guid.NewGuid().ToString();
+            var process = this.ProcessProvider.AddBackgroundProcess(this.ProcessKey, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
             process.OutputDataReceived += this.Process_OnDataReceived;
             process.ErrorDataReceived += this.Process_OnErrorReceived;
-            process.Exited += (obj, e) => this.Status = ServerStatus.Stopped;
+            process.Exited += (obj, e) =>
+            {
+                this.ProcessKey = null;
+                this.Status = ServerStatus.Stopped;
+            };
 
             process.StartIO();
 
@@ -158,9 +169,9 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStop) return;
 
-            this.ApplicationLogger.LogInformation("Stopping server...");
+            this.ApplicationLogger.LogInformation("Stopping server: {name}", this.Options.Name);
 
-            this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
+            this.ProcessProvider.SafelyKillProcess(this.ProcessKey);
 
             this.IsRestarting = false;
             this.Status = ServerStatus.Stopping;
@@ -174,9 +185,9 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanRestart) return;
 
-            this.ApplicationLogger.LogInformation("Restarting server...");
+            this.ApplicationLogger.LogInformation("Restarting server: {name}", this.Options.Name);
 
-            this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
+            this.ProcessProvider.SafelyKillProcess(this.ProcessKey);
 
             this.Options = options ?? this.Options;
             this.IsRestarting = true;
@@ -217,9 +228,11 @@ namespace ValheimServerGUI.Game
                 }
                 catch (Exception e)
                 {
-                    this.ApplicationLogger.LogError(e, "Error parsing server log: {0}", context.Message);
+                    this.ApplicationLogger.LogError(e, "Error parsing server log: {message}", context.Message);
                 }
             }
+
+            this.LogReceived?.Invoke(obj, context);
         }
 
         #endregion

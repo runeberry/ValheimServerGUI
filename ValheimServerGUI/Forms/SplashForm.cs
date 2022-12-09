@@ -16,7 +16,7 @@ namespace ValheimServerGUI.Forms
         private static readonly bool SimulateStartupTaskException = false;
         private static readonly bool SimulateAsyncPopoutOnStart = false;
 #endif
-        private Form MainForm;
+        private readonly List<MainWindow> MainWindows = new();
         private bool IsFirstShown = true;
         private bool CloseAfterExceptionHandled = false;
 
@@ -59,6 +59,8 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        #region Initialization
+
         private void InitializeAppName()
         {
             this.AppNameLabel.Text = $"ValheimServerGUI v{AssemblyHelper.GetApplicationVersion()}";
@@ -70,6 +72,27 @@ namespace ValheimServerGUI.Forms
             this.ExceptionHandler.ExceptionHandled += this.BuildEventHandler(this.OnExceptionHandled);
         }
 
+        #endregion
+
+        #region Public methods
+
+        public MainWindow CreateNewMainWindow()
+        {
+            var mainWindow = this.FormProvider.GetForm<MainWindow>();
+
+            // Since the splash screen is the application's main form, it must continue running in the background
+            // So listen for whenever the MainWindow closes, and close the splash screen as well, in order to close the application
+            mainWindow.FormClosed += this.OnMainWindowClosed;
+
+            mainWindow.SplashIndex = this.MainWindows.Count;
+            this.MainWindows.Add(mainWindow);
+
+            this.Logger.LogDebug("Created {name} [{index}]", nameof(MainWindow), mainWindow.SplashIndex);
+            return mainWindow;
+        }
+
+        #endregion
+
         #region Form events
 
         protected void SplashForm_OnShown()
@@ -77,7 +100,7 @@ namespace ValheimServerGUI.Forms
             if (this.IsFirstShown)
             {
                 this.IsFirstShown = false;
-                
+
                 // For some reason the form is not actually fully rendered at this point
                 // (labels appear as white boxes) so I'm forcing a redraw here
                 this.Refresh();
@@ -96,50 +119,14 @@ namespace ValheimServerGUI.Forms
                     return;
                 }
 
-                InitializeMainForm();
-                InitializeStartupTasks();
+                CreateNewMainWindow();
+                PrepareStartupTasks();
                 RunStartupTasks();
             }
             catch (Exception ex)
             {
                 this.HandleException(ex, "Startup Run Exception", true);
             }
-        }
-
-        private void InitializeMainForm()
-        {
-            this.MainForm = this.FormProvider.GetForm<MainWindow>();
-
-            // Since the splash screen is the application's main form, it must continue running in the background
-            // So listen for whenever the MainWindow closes, and close the splash screen as well, in order to close the application
-            this.MainForm.FormClosed += this.OnMainFormClosed;
-        }
-
-        private void InitializeStartupTasks()
-        {
-            this.TaskFinished += this.BuildEventHandler<Task>(this.OnTaskFinished);
-
-            this.AddStartupTask(this.IpAddressProvider.GetExternalIpAddressAsync);
-            this.AddStartupTask(this.IpAddressProvider.GetInternalIpAddressAsync);
-            this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false));
-
-#if DEBUG
-            if (SimulateLongRunningStartup)
-            {
-                this.AddStartupTask(() => Task.Delay(2000));
-                this.AddStartupTask(() => Task.Delay(2500));
-                this.AddStartupTask(() => Task.Delay(3000));
-            }
-            
-            if (SimulateStartupTaskException)
-            {
-                this.AddStartupTask(async () =>
-                {
-                    await Task.Delay(500);
-                    throw new InvalidOperationException("Intentional exception thrown for testing");
-                });
-            }
-#endif
         }
 
         #endregion
@@ -185,14 +172,14 @@ namespace ValheimServerGUI.Forms
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            var isMainFormVisible = this.MainForm != null && this.MainForm.Visible;
-            this.HandleException(e.ExceptionObject as Exception, "Unhandled Exception", !isMainFormVisible);
+            var isMainWindowVisible = this.MainWindows.Any((m) => m.Visible);
+            this.HandleException(e.ExceptionObject as Exception, "Unhandled Exception", !isMainWindowVisible);
         }
 
         private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            var isMainFormVisible = this.MainForm != null && this.MainForm.Visible;
-            this.HandleException(e.Exception, "Thread Exception", !isMainFormVisible);
+            var isMainWindowVisible = this.MainWindows.Any((m) => m.Visible);
+            this.HandleException(e.Exception, "Thread Exception", !isMainWindowVisible);
         }
 
         private void OnExceptionHandled()
@@ -200,14 +187,28 @@ namespace ValheimServerGUI.Forms
             if (CloseAfterExceptionHandled) this.Close();
         }
 
-        private void OnMainFormClosed(object sender, FormClosedEventArgs e)
+        private void OnMainWindowClosed(object sender, FormClosedEventArgs e)
         {
             if (this.InvokeRequired)
             {
-                this.Invoke(new Action<object, FormClosedEventArgs>(this.OnMainFormClosed), new object[] { sender, e });
+                this.Invoke(new Action<object, FormClosedEventArgs>(this.OnMainWindowClosed), new object[] { sender, e });
                 return;
             }
 
+            if (sender is not MainWindow mainWindow) return;
+
+            this.Logger.LogDebug("Closed {name} [{index}]", nameof(MainWindow), mainWindow.SplashIndex);
+
+            this.MainWindows[mainWindow.SplashIndex] = null;
+            var stillOpen = this.MainWindows.Count(m => m != null);
+            if (stillOpen > 0)
+            {
+
+                this.Logger.LogDebug("{stillOpen} windows are still open", stillOpen);
+                return;
+            }
+
+            this.Logger.LogDebug($"All windows closed, shutting down application");
             this.Close();
         }
 
@@ -218,6 +219,33 @@ namespace ValheimServerGUI.Forms
         private void AddStartupTask(Func<Task> taskFunc)
         {
             this.StartupTasks.Add(taskFunc);
+        }
+
+        private void PrepareStartupTasks()
+        {
+            this.TaskFinished += this.BuildEventHandler<Task>(this.OnTaskFinished);
+
+            this.AddStartupTask(this.IpAddressProvider.GetExternalIpAddressAsync);
+            this.AddStartupTask(this.IpAddressProvider.GetInternalIpAddressAsync);
+            this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false));
+
+#if DEBUG
+            if (SimulateLongRunningStartup)
+            {
+                this.AddStartupTask(() => Task.Delay(2000));
+                this.AddStartupTask(() => Task.Delay(2500));
+                this.AddStartupTask(() => Task.Delay(3000));
+            }
+
+            if (SimulateStartupTaskException)
+            {
+                this.AddStartupTask(async () =>
+                {
+                    await Task.Delay(500);
+                    throw new InvalidOperationException("Intentional exception thrown for testing");
+                });
+            }
+#endif
         }
 
         private void RunStartupTasks()
@@ -274,7 +302,7 @@ namespace ValheimServerGUI.Forms
 
         private void FinishStartup()
         {
-            this.MainForm.Show();
+            this.MainWindows[0].Show();
 #if DEBUG
             if (SimulateAsyncPopoutOnStart)
             {

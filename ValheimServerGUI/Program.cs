@@ -69,13 +69,13 @@ namespace ValheimServerGUI
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
                 .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
-                .AddSingleton<ValheimServerLogger>()
-                .AddSingleton<ValheimServer>();
+                .AddTransient<ValheimServerLogger>()
+                .AddTransient<ValheimServer>();
 
             // Forms
             services
                 .AddSingleton<SplashForm>()
-                .AddSingleton<MainWindow>()
+                .AddTransient<MainWindow>()
                 .AddSingleton<DirectoriesForm>()
                 .AddSingleton<PreferencesForm>()
                 .AddSingleton<BugReportForm>()

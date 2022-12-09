@@ -23,6 +23,9 @@ namespace ValheimServerGUI.Forms
         private static readonly bool SimulateStartServerException = false;
         private static readonly bool SimulateStopServerException = false;
 #endif
+        public string CurrentProfile { get; set; }
+        public int SplashIndex { get; set; }
+
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
@@ -44,14 +47,11 @@ namespace ValheimServerGUI.Forms
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
-        private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
         private readonly IProcessProvider ProcessProvider;
         private readonly IStartupArgsProvider StartupArgsProvider;
-
-        private string CurrentProfile;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -60,7 +60,6 @@ namespace ValheimServerGUI.Forms
             IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
-            ValheimServerLogger serverLogger,
             IEventLogger appLogger,
             IIpAddressProvider ipAddressProvider,
             ISoftwareUpdateProvider softwareUpdateProvider,
@@ -76,7 +75,6 @@ namespace ValheimServerGUI.Forms
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
-            this.ServerLogger = serverLogger;
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
             this.SoftwareUpdateProvider = softwareUpdateProvider;
@@ -103,7 +101,7 @@ namespace ValheimServerGUI.Forms
         private void InitializeServices()
         {
             this.Logger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnApplicationLogReceived);
-            this.ServerLogger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnServerLogReceived);
+            this.Server.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnServerLogReceived);
             this.Server.StatusChanged += this.BuildEventHandler<ServerStatus>(this.OnServerStatusChanged);
             this.Server.WorldSaved += this.BuildEventHandler<decimal>(this.OnWorldSaved);
             this.Server.InviteCodeReady += this.BuildEventHandler<string>(this.OnInviteCodeReady);
@@ -231,7 +229,8 @@ namespace ValheimServerGUI.Forms
             base.OnShown(e);
 
             this.CheckFilePaths();
-            this.CheckServerAlreadyRunning();
+            // Disabling for multi-server support. Is there any use case for re-enabling this?
+            //this.CheckServerAlreadyRunning();
 
             var prefs = this.UserPrefsProvider.LoadPreferences();
 
@@ -271,10 +270,9 @@ namespace ValheimServerGUI.Forms
                 if (this.Server.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running))
                 {
                     // Server is still running, prompt the user to confirm they want to stop it
-
                     var result = MessageBox.Show(
                         "The Valheim server is still running. Do you want to stop the server " +
-                        "and close this application?",
+                        "and close this window?",
                         "Warning",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
@@ -282,7 +280,7 @@ namespace ValheimServerGUI.Forms
                     if (result == DialogResult.Yes)
                     {
                         this.Server.Stop();
-                        this.CloseApplicationOnServerStopped();
+                        this.CloseWindowOnServerStopped();
                     }
 
                     // Cancel the form close regardless of the user's choice
@@ -313,7 +311,7 @@ namespace ValheimServerGUI.Forms
             {
                 // Try to stop the server, and keep the app running until we're sure it's stopped
                 this.Server.Stop();
-                this.CloseApplicationOnServerStopped();
+                this.CloseWindowOnServerStopped();
                 e.Cancel = true;
             }
             else
@@ -1056,7 +1054,7 @@ namespace ValheimServerGUI.Forms
 
         #endregion
 
-        #region Feature Capabiltiies
+        #region Feature Capabilities
 
         private void StartServer()
         {
@@ -1255,7 +1253,9 @@ namespace ValheimServerGUI.Forms
 
         private void LaunchNewWindow()
         {
-            Process.Start(Application.ExecutablePath);
+            var splashForm = this.FormProvider.GetForm<SplashForm>();
+            var mainWindow = splashForm.CreateNewMainWindow();
+            mainWindow.Show();
         }
 
         private void CheckForUpdates(bool isManualCheck)
@@ -1263,21 +1263,21 @@ namespace ValheimServerGUI.Forms
             Task.Run(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(isManualCheck));
         }
 
-        private void CloseApplicationOnServerStopped()
+        private void CloseWindowOnServerStopped()
         {
             if (this.Server.IsAnyStatus(ServerStatus.Stopped))
             {
-                Application.Exit();
+                this.Close();
                 return;
             }
 
-            this.Server.StatusChanged += (_, status) =>
+            this.Server.StatusChanged += this.BuildEventHandler<ServerStatus>((status) =>
             {
                 if (status == ServerStatus.Stopped)
                 {
-                    Application.Exit();
+                    this.Close();
                 }
-            };
+            });
         }
 
         #endregion

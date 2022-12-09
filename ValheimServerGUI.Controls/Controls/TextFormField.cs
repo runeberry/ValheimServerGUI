@@ -37,7 +37,7 @@ namespace ValheimServerGUI.Forms.Controls
         }
 
         public event EventHandler<string> ValueChanged;
-        
+
         #endregion
 
         public bool HideValue
@@ -63,6 +63,11 @@ namespace ValheimServerGUI.Forms.Controls
             InitializeComponent();
 
             this.TextBox.TextChanged += this.OnTextChanged;
+        }
+
+        public void SelectAll()
+        {
+            this.TextBox.SelectAll();
         }
 
         private void OnTextChanged(object sender, EventArgs args)

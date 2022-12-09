@@ -11,12 +11,19 @@ namespace ValheimServerGUI.Forms
 
         public TextPromptPopout(
             string title,
-            string message)
+            string message,
+            string startingText = null)
         {
             InitializeComponent();
 
             this.Text = title;
             this.TextInputField.LabelText = message;
+
+            if (!string.IsNullOrWhiteSpace(startingText))
+            {
+                this.TextInputField.Value = startingText;
+                this.TextInputField.SelectAll();
+            }
 
             this.ButtonOK.Click += this.ButtonOK_Click;
             this.ButtonCancel.Click += this.ButtonCancel_Click;

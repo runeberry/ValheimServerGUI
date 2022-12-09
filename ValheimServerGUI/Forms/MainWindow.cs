@@ -23,7 +23,17 @@ namespace ValheimServerGUI.Forms
         private static readonly bool SimulateStartServerException = false;
         private static readonly bool SimulateStopServerException = false;
 #endif
-        public string CurrentProfile { get; set; }
+        private string _currentProfile;
+        public string CurrentProfile
+        {
+            get => this._currentProfile;
+            set
+            {
+                this._currentProfile = value;
+                this.ProfileChanged?.Invoke(this, this._currentProfile);
+            }
+        }
+        public EventHandler<string> ProfileChanged;
         public int SplashIndex { get; set; }
 
         private static readonly string NL = Environment.NewLine;
@@ -122,18 +132,20 @@ namespace ValheimServerGUI.Forms
         {
             // MainWindow
             this.Shown += this.BuildEventHandler(this.MainWindow_Load);
+            this.ProfileChanged += this.BuildEventHandler<string>(this.OnProfileChanged);
 
             // Menu items
             this.MenuItemFileNewWindow.Click += this.MenuItemFileNewWindow_Click;
             this.MenuItemFileNewProfile.Click += this.MenuItemFileNewProfile_Click;
-            this.MenuItemFileSaveProfile.Click += this.MenuItemSaveProfile_Click;
+            this.MenuItemFileSaveProfile.Click += this.MenuItemFileSaveProfile_Click;
+            this.MenuItemFileSaveProfileAs.Click += this.MenuItemFileSaveProfileAs_Click;
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
             this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
             this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
             this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
             this.MenuItemHelpBugReport.Click += this.MenuItemHelpBugReport_Click;
-            this.MenuItemHelpUpdates.Click += this.BuildEventHandler(this.MenuItemHelpUpdates_Clicked);
+            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Clicked;
             this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
 
             // Tray icon
@@ -222,6 +234,11 @@ namespace ValheimServerGUI.Forms
         private void MainWindow_Load()
         {
             this.Logger.LogInformation($"Valheim Server GUI v{AssemblyHelper.GetApplicationVersion()} - Loaded OK");
+        }
+
+        private void OnProfileChanged(string _)
+        {
+            this.RefreshApplicationTitle();
         }
 
         protected override void OnShown(EventArgs e)
@@ -341,9 +358,17 @@ namespace ValheimServerGUI.Forms
             this.LoadFormStateFromPrefs(prefs);
         }
 
-        private void MenuItemSaveProfile_Click(object sender, EventArgs e)
+        private void MenuItemFileSaveProfile_Click(object sender, EventArgs e)
         {
-            this.SavePrefsFromFormState();
+            this.SavePrefsFromFormState(this.CurrentProfile);
+        }
+
+        private void MenuItemFileSaveProfileAs_Click(object sender, EventArgs e)
+        {
+            var profileName = this.PromptForProfileName($"Copy of {this.CurrentProfile}");
+            if (profileName == null) return;
+
+            this.SavePrefsFromFormState(profileName);
         }
 
         private void MenuItemFileLoadProfileItem_Click(object sender, EventArgs e)
@@ -400,7 +425,7 @@ namespace ValheimServerGUI.Forms
             bugReportForm.ShowDialog();
         }
 
-        private void MenuItemHelpUpdates_Clicked()
+        private void MenuItemHelpUpdates_Clicked(object sender, EventArgs e)
         {
             this.CheckForUpdates(true);
         }
@@ -827,7 +852,6 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshFormFields()
         {
-            this.RefreshApplicationTitle();
             this.RefreshProfileList();
             this.RefreshWorldSelect();
             this.RefreshFormStateForServer();
@@ -971,16 +995,17 @@ namespace ValheimServerGUI.Forms
 
         #region Save & Load
 
-        private ServerPreferences SavePrefsFromFormState()
+        private ServerPreferences SavePrefsFromFormState(string profileName)
         {
-            if (string.IsNullOrWhiteSpace(this.CurrentProfile))
+            if (string.IsNullOrWhiteSpace(profileName))
             {
-                this.CurrentProfile = Resources.DefaultServerProfileName;
+                profileName = Resources.DefaultServerProfileName;
             }
 
             // Update existing prefs if they exist with this server name
-            // Otherwise, create new prefs
-            var prefs = this.ServerPrefsProvider.LoadPreferences(this.CurrentProfile) ?? new ServerPreferences();
+            // Otherwise, create new prefs with this profile name
+            var prefs = this.ServerPrefsProvider.LoadPreferences(profileName)
+                ?? new ServerPreferences { ProfileName = profileName };
 
             prefs.Name = this.ServerNameField.Value;
             prefs.Port = this.ServerPortField.Value;
@@ -996,6 +1021,7 @@ namespace ValheimServerGUI.Forms
             prefs.BackupIntervalLong = this.ServerLongBackupIntervalField.Value;
             prefs.AdditionalArgs = this.ServerAdditionalArgsField.Value;
 
+            this.CurrentProfile = profileName;
             this.ServerPrefsProvider.SavePreferences(prefs);
 
             return prefs;
@@ -1023,7 +1049,6 @@ namespace ValheimServerGUI.Forms
             }
 
             this.CurrentProfile = prefs.ProfileName;
-            this.RefreshApplicationTitle();
 
             this.ServerNameField.Value = prefs.Name;
             this.ServerPortField.Value = prefs.Port;
@@ -1119,7 +1144,7 @@ namespace ValheimServerGUI.Forms
                 }
             }
 
-            var prefs = this.SavePrefsFromFormState();
+            var prefs = this.SavePrefsFromFormState(this.CurrentProfile);
 
             var options = new ValheimServerOptions
             {
@@ -1151,9 +1176,6 @@ namespace ValheimServerGUI.Forms
                     MessageBoxIcon.Error);
                 return;
             }
-
-            // User preferences are saved each time the server is started
-            this.SavePrefsFromFormState();
         }
 
         private void CheckFilePaths()
@@ -1232,9 +1254,9 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private string PromptForProfileName()
+        private string PromptForProfileName(string startingText = null)
         {
-            var dialog = new TextPromptPopout("Server Profile Name", "Enter a server profile name:");
+            var dialog = new TextPromptPopout("Server Profile Name", "Enter a server profile name:", startingText);
             dialog.SetValidation(
                 "Profile name must be 1-30 characters, and must not match an existing profile name.",
                 (input) =>

@@ -14,6 +14,8 @@ namespace ValheimServerGUI.Game
         IEnumerable<ServerPreferences> LoadPreferences();
 
         void SavePreferences(ServerPreferences preferences);
+
+        void RemovePreferences(string profileName);
     }
 
     public class ServerPreferencesProvider : IServerPreferencesProvider
@@ -71,6 +73,22 @@ namespace ValheimServerGUI.Game
 
             this.UserPreferencesProvider.SavePreferences(userPrefs);
             this.Logger.LogInformation("Saved preferences for server profile: {profileName}", preferences.ProfileName);
+        }
+
+        public void RemovePreferences(string profileName)
+        {
+            if (string.IsNullOrWhiteSpace(profileName)) return;
+
+            var userPrefs = this.UserPreferencesProvider.LoadPreferences();
+
+            if (userPrefs.Servers.Any(p => p.ProfileName == profileName))
+            {
+                // Remove any existing server profiles with this name
+                userPrefs.Servers.RemoveAll(p => p.ProfileName == profileName);
+
+                this.UserPreferencesProvider.SavePreferences(userPrefs);
+                this.Logger.LogInformation("Removed preferences for server profile: {profileName}", profileName);
+            }
         }
 
         #endregion

@@ -382,15 +382,16 @@ namespace ValheimServerGUI.Forms
         {
             if (sender is not ToolStripItem item) return;
 
+            var profileName = item.Text;
             var result = MessageBox.Show(
-                $"Remove server profile '{item.Text}'?",
+                $"Remove server profile '{profileName}'?",
                 "Remove Profile",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
 
             if (result == DialogResult.Yes)
             {
-                // todo: Remove profile
+                this.ServerPrefsProvider.RemovePreferences(profileName);
             }
         }
 

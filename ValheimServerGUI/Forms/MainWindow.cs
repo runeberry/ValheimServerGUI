@@ -208,14 +208,6 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormStateForServer()
         {
-            var profileName = this.StartupArgsProvider.ServerProfileName;
-            if (!string.IsNullOrWhiteSpace(profileName))
-            {
-                this.Logger.LogInformation($"Loading profile from command-line arg: {profileName}");
-                this.LoadFormStateFromPrefs(profileName);
-                return;
-            }
-
             var mostRecentPrefs = this.ServerPrefsProvider.LoadPreferences()
                 .OrderByDescending(p => p.LastSaved)
                 .FirstOrDefault();
@@ -223,7 +215,7 @@ namespace ValheimServerGUI.Forms
             if (mostRecentPrefs != null)
             {
                 this.Logger.LogInformation($"Loading most recently saved profile: {mostRecentPrefs.ProfileName}");
-                this.LoadFormStateFromPrefs(mostRecentPrefs);
+                this.SetFormStateFromPrefs(mostRecentPrefs);
                 return;
             }
         }
@@ -247,22 +239,8 @@ namespace ValheimServerGUI.Forms
             base.OnShown(e);
 
             this.CheckFilePaths();
-            // Disabling for multi-server support. Is there any use case for re-enabling this?
-            //this.CheckServerAlreadyRunning();
 
             var prefs = this.UserPrefsProvider.LoadPreferences();
-
-            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
-
-            if (prefs.StartServerAutomatically)
-            {
-                this.StartServer();
-            }
-
-            if (prefs.StartMinimized)
-            {
-                this.WindowState = FormWindowState.Minimized;
-            }
 
             this.NotifyIcon.Visible = true;
         }
@@ -358,12 +336,13 @@ namespace ValheimServerGUI.Forms
             var prefs = new ServerPreferences { ProfileName = profileName, Name = profileName };
             this.ServerPrefsProvider.SavePreferences(prefs);
 
-            this.LoadFormStateFromPrefs(prefs);
+            this.SetFormStateFromPrefs(prefs);
         }
 
         private void MenuItemFileSaveProfile_Click(object sender, EventArgs e)
         {
-            this.SavePrefsFromFormState(this.CurrentProfile);
+            var prefs = this.GetPrefsFromFormState();
+            this.ServerPrefsProvider.SavePreferences(prefs);
         }
 
         private void MenuItemFileSaveProfileAs_Click(object sender, EventArgs e)
@@ -371,14 +350,17 @@ namespace ValheimServerGUI.Forms
             var profileName = this.PromptForProfileName($"Copy of {this.CurrentProfile}");
             if (profileName == null) return;
 
-            this.SavePrefsFromFormState(profileName);
+            var prefs = this.GetPrefsFromFormState();
+            prefs.ProfileName = profileName;
+            this.ServerPrefsProvider.SavePreferences(prefs);
+            this.CurrentProfile = profileName;
         }
 
         private void MenuItemFileLoadProfileItem_Click(object sender, EventArgs e)
         {
             if (sender is not ToolStripItem item) return;
 
-            this.LoadFormStateFromPrefs(item.Text);
+            this.SetFormStateFromPrefs(item.Text);
         }
 
         private void MenuItemFileRemoveProfileItem_Click(object sender, EventArgs e)
@@ -1007,12 +989,9 @@ namespace ValheimServerGUI.Forms
 
         #region Save & Load
 
-        private ServerPreferences SavePrefsFromFormState(string profileName)
+        private ServerPreferences GetPrefsFromFormState()
         {
-            if (string.IsNullOrWhiteSpace(profileName))
-            {
-                profileName = Resources.DefaultServerProfileName;
-            }
+            var profileName = this.CurrentProfile;
 
             // Update existing prefs if they exist with this server name
             // Otherwise, create new prefs with this profile name
@@ -1033,30 +1012,27 @@ namespace ValheimServerGUI.Forms
             prefs.BackupIntervalLong = this.ServerLongBackupIntervalField.Value;
             prefs.AdditionalArgs = this.ServerAdditionalArgsField.Value;
 
-            this.CurrentProfile = profileName;
-            this.ServerPrefsProvider.SavePreferences(prefs);
-
             return prefs;
         }
 
-        private void LoadFormStateFromPrefs(string profileName)
+        private void SetFormStateFromPrefs(string profileName)
         {
             var prefs = this.ServerPrefsProvider.LoadPreferences(profileName);
 
             if (prefs == null)
             {
-                this.Logger.LogWarning($"Unable to load form state: no server profile exists with name '{profileName}'");
+                this.Logger.LogWarning($"Unable to set form state: no server profile exists with name '{profileName}'");
                 return;
             }
 
-            this.LoadFormStateFromPrefs(prefs);
+            this.SetFormStateFromPrefs(prefs);
         }
 
-        private void LoadFormStateFromPrefs(ServerPreferences prefs)
+        private void SetFormStateFromPrefs(ServerPreferences prefs)
         {
             if (prefs == null)
             {
-                this.Logger.LogWarning($"Unable to load form state: {nameof(prefs)} cannot be null");
+                this.Logger.LogWarning($"Unable to set form state: {nameof(prefs)} cannot be null");
                 return;
             }
 
@@ -1156,22 +1132,23 @@ namespace ValheimServerGUI.Forms
                 }
             }
 
-            var prefs = this.SavePrefsFromFormState(this.CurrentProfile);
+            var userPrefs = this.UserPrefsProvider.LoadPreferences();
+            var serverPrefs = this.GetPrefsFromFormState();
 
             var options = new ValheimServerOptions
             {
-                Name = prefs.Name,
-                Password = prefs.Password,
+                Name = serverPrefs.Name,
+                Password = serverPrefs.Password,
                 WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
                 NewWorld = newWorld,
-                Public = prefs.Public,
-                Port = prefs.Port,
-                Crossplay = prefs.Crossplay,
-                SaveInterval = prefs.SaveInterval,
-                Backups = prefs.BackupCount,
-                BackupShort = prefs.BackupIntervalShort,
-                BackupLong = prefs.BackupIntervalLong,
-                AdditionalArgs = prefs.AdditionalArgs,
+                Public = serverPrefs.Public,
+                Port = serverPrefs.Port,
+                Crossplay = serverPrefs.Crossplay,
+                SaveInterval = serverPrefs.SaveInterval,
+                Backups = serverPrefs.BackupCount,
+                BackupShort = serverPrefs.BackupIntervalShort,
+                BackupLong = serverPrefs.BackupIntervalLong,
+                AdditionalArgs = serverPrefs.AdditionalArgs,
             };
 
             try
@@ -1187,6 +1164,11 @@ namespace ValheimServerGUI.Forms
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
                 return;
+            }
+
+            if (userPrefs.SaveProfileOnStart)
+            {
+                this.ServerPrefsProvider.SavePreferences(serverPrefs);
             }
         }
 
@@ -1210,58 +1192,6 @@ namespace ValheimServerGUI.Forms
                 if (result == DialogResult.Yes)
                 {
                     this.ShowDirectoriesForm();
-                }
-            }
-        }
-
-        private void CheckServerAlreadyRunning()
-        {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-            if (!prefs.CheckServerRunning) return;
-
-            string serverAppName;
-
-            try
-            {
-                serverAppName = Path.GetFileNameWithoutExtension(this.FileProvider.ServerExe.FullName);
-            }
-            catch
-            {
-                // Server can't possibly be running if we can't locate the server .exe, right?
-                return;
-            }
-
-            var valheimProcesses = this.ProcessProvider.FindExistingProcessesByName(serverAppName);
-
-            if (valheimProcesses.Any())
-            {
-                string message;
-
-                if (valheimProcesses.Count == 1)
-                {
-                    message = "There is already an instance of Valheim Dedicated Server running on your computer. " +
-                        "Would you like to shut down this server so that ValheimServerGUI can manage it?";
-                }
-                else
-                {
-                    message = $"There are already {valheimProcesses.Count} instances of Valheim Dedicated Server running on your computer. " +
-                        "Would you like to shut them all down so that ValheimServerGUI can manage them?";
-                }
-
-                message += $"{NL}{NL}You can disable this message in File > Preferences...";
-
-                var result = MessageBox.Show(
-                    message,
-                    "Server Already Running",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-
-                if (result == DialogResult.Yes)
-                {
-                    foreach (var process in valheimProcesses)
-                    {
-                        this.ProcessProvider.SafelyKillProcess(process);
-                    }
                 }
             }
         }

@@ -23,7 +23,8 @@ namespace ValheimServerGUI.Game
         private readonly string UserPrefsFilePath;
         private readonly string LegacyPath;
 
-        private UserPreferences CurrentPreferences;
+        private string CachedPreferences;
+        private FileSystemWatcher FileSystemWatcher;
 
         public UserPreferencesProvider(ILogger logger) : base(logger)
         {
@@ -37,19 +38,24 @@ namespace ValheimServerGUI.Game
 
         public UserPreferences LoadPreferences()
         {
-            if (this.CurrentPreferences == null)
-            {
-                this.CurrentPreferences = LoadInternal();
-            }
-
-            return this.CurrentPreferences;
+            return this.LoadInternal();
         }
 
         public void SavePreferences(UserPreferences preferences)
         {
-            this.CurrentPreferences = preferences;
             this.SaveInternal(preferences);
-            this.PreferencesSaved?.Invoke(this, preferences);
+        }
+
+        #endregion
+
+        #region System Events
+
+        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        {
+            if (e.FullPath != this.UserPrefsFilePath) return;
+
+            var prefs = this.LoadInternal();
+            this.PreferencesSaved?.Invoke(this, prefs);
         }
 
         #endregion
@@ -63,6 +69,7 @@ namespace ValheimServerGUI.Game
                 var file = preferences.ToFile();
                 this.SaveAsync(this.UserPrefsFilePath, file).GetAwaiter().GetResult();
                 this.Logger.LogInformation("User preferences saved");
+                this.SetupFileWatcher();
             }
             catch (Exception e)
             {
@@ -70,7 +77,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        public UserPreferences LoadInternal()
+        private UserPreferences LoadInternal()
         {
             try
             {
@@ -87,6 +94,8 @@ namespace ValheimServerGUI.Game
                 }
 
                 var file = this.LoadAsync<UserPreferencesFile>(this.UserPrefsFilePath).GetAwaiter().GetResult();
+                this.SetupFileWatcher();
+
                 return UserPreferences.FromFile(file);
             }
             catch (Exception e)
@@ -94,6 +103,20 @@ namespace ValheimServerGUI.Game
                 this.Logger.LogException(e, "Failed to load user preferences");
                 return UserPreferences.GetDefault();
             }
+        }
+
+        private void SetupFileWatcher()
+        {
+            if (this.FileSystemWatcher != null) return;
+
+            var userPrefsDirectory = Path.GetDirectoryName(this.UserPrefsFilePath);
+            if (!Directory.Exists(userPrefsDirectory)) return;
+
+            this.FileSystemWatcher = new FileSystemWatcher(userPrefsDirectory);
+            this.FileSystemWatcher.Changed += this.OnFileChanged;
+            this.FileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
+
+            this.Logger.LogInformation("Now watching for user prefs file changes");
         }
 
         private static readonly Dictionary<string, Action<UserPreferences, string>> MigrationActions = new()

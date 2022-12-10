@@ -63,10 +63,4 @@ when the app starts up, and again every {startupInterval}.
 
 If disabled, you can check for updates anytime from Help &gt; Check for updates.</value>
   </data>
-  <data name="CheckServerRunningField.HelpText" xml:space="preserve">
-    <value>Checks if an instance of Valheim Dedicated Server is already running
-in the background on startup, and prompts you to shut it down.
-You may want to disable this warning if you're intentionally hosting
-multiple servers on your computer.</value>
-  </data>
 </root>

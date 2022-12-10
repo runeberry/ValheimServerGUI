@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace ValheimServerGUI.Game
@@ -18,20 +19,23 @@ namespace ValheimServerGUI.Game
         [JsonProperty("valheimSaveDataFolder")]
         public string ValheimSaveDataFolder { get; set; }
 
-        [JsonProperty("startWithWindows")]
+        [JsonProperty("startWithWindows"), Obsolete("Moved to server preferences", true)]
         public bool? StartWithWindows { get; set; }
 
-        [JsonProperty("startServerAutomatically")]
+        [JsonProperty("startServerAutomatically"), Obsolete("Moved to server preferences", true)]
         public bool? StartServerAutomatically { get; set; }
 
-        [JsonProperty("startMinimized")]
+        [JsonProperty("startMinimized"), Obsolete("Moved to server preferences", true)]
         public bool? StartMinimized { get; set; }
 
-        [JsonProperty("checkServerRunning")]
+        [JsonProperty("checkServerRunning"), Obsolete("Removed with multi-server support", true)]
         public bool? CheckServerRunning { get; set; }
 
         [JsonProperty("checkForUpdates")]
         public bool? CheckForUpdates { get; set; }
+
+        [JsonProperty("saveProfileOnStart")]
+        public bool? SaveProfileOnStart { get; set; }
 
         [JsonProperty("servers")]
         public List<ServerPreferencesFile> Servers { get; set; }

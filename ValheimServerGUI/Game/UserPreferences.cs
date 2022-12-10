@@ -14,19 +14,11 @@ namespace ValheimServerGUI.Game
 
         public string ValheimSaveDataFolder { get; set; } = Resources.DefaultValheimSaveFolder;
 
-        public bool StartWithWindows { get; set; }
-
-        public bool StartServerAutomatically { get; set; }
-
-        public bool StartMinimized { get; set; }
-
-        public bool CheckServerRunning { get; set; } = true;
-
         public bool CheckForUpdates { get; set; } = true;
 
+        public bool SaveProfileOnStart { get; set; } = true;
+
         public List<ServerPreferences> Servers { get; set; } = new();
-
-
 
         public static UserPreferences FromFile(UserPreferencesFile file)
         {
@@ -37,11 +29,8 @@ namespace ValheimServerGUI.Game
             prefs.ValheimGamePath = file.ValheimGamePath ?? prefs.ValheimGamePath;
             prefs.ValheimServerPath = file.ValheimServerPath ?? prefs.ValheimServerPath;
             prefs.ValheimSaveDataFolder = file.ValheimSaveDataFolder ?? prefs.ValheimSaveDataFolder;
-            prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
-            prefs.StartServerAutomatically = file.StartServerAutomatically ?? prefs.StartServerAutomatically;
-            prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
-            prefs.CheckServerRunning = file.CheckServerRunning ?? prefs.CheckServerRunning;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
+            prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
 
             if (file.Servers != null)
             {
@@ -61,11 +50,8 @@ namespace ValheimServerGUI.Game
                 ValheimGamePath = this.ValheimGamePath,
                 ValheimServerPath = this.ValheimServerPath,
                 ValheimSaveDataFolder = this.ValheimSaveDataFolder,
-                StartWithWindows = this.StartWithWindows,
-                StartServerAutomatically = this.StartServerAutomatically,
-                StartMinimized = this.StartMinimized,
-                CheckServerRunning = this.CheckServerRunning,
                 CheckForUpdates = this.CheckForUpdates,
+                SaveProfileOnStart = this.SaveProfileOnStart,
                 Servers = new(),
             };
 

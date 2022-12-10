@@ -23,7 +23,6 @@ namespace ValheimServerGUI.Game
         private readonly string UserPrefsFilePath;
         private readonly string LegacyPath;
 
-        private string CachedPreferences;
         private FileSystemWatcher FileSystemWatcher;
 
         public UserPreferencesProvider(ILogger logger) : base(logger)

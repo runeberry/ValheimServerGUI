@@ -35,7 +35,7 @@ namespace ValheimServerGUI.Tools
             e = e.GetPrimaryException();
 
             contextMessage ??= "Unknown Exception";
-            var userMessage = "A fatal error has occured. Would you like to send an automated crash report to the developer?";
+            var userMessage = $"A fatal error has occured: {e.Message}{Environment.NewLine}{Environment.NewLine}Would you like to send an automated crash report to the developer?";
 
             var result = MessageBox.Show(
                 userMessage,

@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -216,25 +217,33 @@ namespace ValheimServerGUI.Forms
 
         #region Common methods
 
-        private void AddStartupTask(Func<Task> taskFunc)
+        private void AddStartupTask(Func<Task> taskFunc, string taskName)
         {
-            this.StartupTasks.Add(taskFunc);
+            this.StartupTasks.Add(async () =>
+            {
+                this.Logger.LogInformation("Starting startup task: {name}", taskName);
+                var sw = Stopwatch.StartNew();
+
+                await taskFunc();
+
+                this.Logger.LogInformation("Finished startup task: {name} ({dur}ms)", taskName, sw.ElapsedMilliseconds);
+            });
         }
 
         private void PrepareStartupTasks()
         {
             this.TaskFinished += this.BuildEventHandler<Task>(this.OnTaskFinished);
 
-            this.AddStartupTask(this.IpAddressProvider.GetExternalIpAddressAsync);
-            this.AddStartupTask(this.IpAddressProvider.GetInternalIpAddressAsync);
-            this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false));
+            this.AddStartupTask(this.IpAddressProvider.GetExternalIpAddressAsync, "Get external IP address");
+            this.AddStartupTask(this.IpAddressProvider.GetInternalIpAddressAsync, "Get internal IP address");
+            this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false), "Check for updates");
 
 #if DEBUG
             if (SimulateLongRunningStartup)
             {
-                this.AddStartupTask(() => Task.Delay(2000));
-                this.AddStartupTask(() => Task.Delay(2500));
-                this.AddStartupTask(() => Task.Delay(3000));
+                this.AddStartupTask(() => Task.Delay(2000), "2s delay");
+                this.AddStartupTask(() => Task.Delay(2500), "2.5 delay");
+                this.AddStartupTask(() => Task.Delay(3000), "3s delay");
             }
 
             if (SimulateStartupTaskException)
@@ -243,7 +252,7 @@ namespace ValheimServerGUI.Forms
                 {
                     await Task.Delay(500);
                     throw new InvalidOperationException("Intentional exception thrown for testing");
-                });
+                }, "Intentional exception");
             }
 #endif
         }

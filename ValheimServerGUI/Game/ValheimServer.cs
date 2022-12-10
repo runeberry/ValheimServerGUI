@@ -141,7 +141,7 @@ namespace ValheimServerGUI.Game
 
             var exePath = this.FileProvider.ServerExe.FullName;
             var processArgs = this.GenerateArgs(options);
-            this.ApplicationLogger.LogInformation("Server run command: {exePath} {processArgs}", exePath, processArgs);
+            this.ApplicationLogger.LogInformation(@"Server run command: ""{exePath}"" {processArgs}", exePath, processArgs);
 
             this.ProcessKey = Guid.NewGuid().ToString();
             var process = this.ProcessProvider.AddBackgroundProcess(this.ProcessKey, exePath, processArgs);

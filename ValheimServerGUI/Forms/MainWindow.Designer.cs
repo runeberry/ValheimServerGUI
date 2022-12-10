@@ -973,7 +973,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuSeparator1,
             this.TrayContextMenuClose});
             this.TrayContextMenuStrip.Name = "TrayContextMenuStrip";
-            this.TrayContextMenuStrip.OwnerItem = this.MenuItemFileRemoveProfile;
             this.TrayContextMenuStrip.Size = new System.Drawing.Size(146, 126);
             // 
             // TrayContextMenuServerName

@@ -263,6 +263,8 @@ namespace ValheimServerGUI.Forms
             {
                 this.WindowState = FormWindowState.Minimized;
             }
+
+            this.NotifyIcon.Visible = true;
         }
 
         protected override void OnResize(EventArgs e)
@@ -534,6 +536,8 @@ namespace ValheimServerGUI.Forms
                 {
                     this.WindowState = FormWindowState.Normal;
                 }
+
+                this.Activate();
             }
         }
 

@@ -923,6 +923,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -960,7 +961,6 @@ namespace ValheimServerGUI.Forms
             this.NotifyIcon.ContextMenuStrip = this.TrayContextMenuStrip;
             this.NotifyIcon.Icon = ((System.Drawing.Icon)(resources.GetObject("NotifyIcon.Icon")));
             this.NotifyIcon.Text = "ValheimServerGUI";
-            this.NotifyIcon.Visible = true;
             // 
             // TrayContextMenuStrip
             // 

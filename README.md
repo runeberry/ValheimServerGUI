@@ -11,11 +11,11 @@ Need help? You can find support articles in the [Online Manual here](https://git
 <table width="100%" align="center">
   <tr>
     <td><a href="img/Screenshot-ServerControls.png"><img src="img/Screenshot-ServerControls.png"></a></td>
-    <td><a href="img/Screenshot-ServerDetails.png"><img src="img/Screenshot-ServerDetails.png"></a></td>
+    <td><a href="img/Screenshot-AdvancedControls.png"><img src="img/Screenshot-AdvancedControls.png"></a></td>
   </tr>
   <tr>
+    <td><a href="img/Screenshot-ServerDetails.png"><img src="img/Screenshot-ServerDetails.png"></a></td>
     <td><a href="img/Screenshot-Players.png"><img src="img/Screenshot-Players.png"></a></td>
-    <td><a href="img/Screenshot-Logs.png"><img src="img/Screenshot-Logs.png"></a></td>
   </tr>
 </table>
 
@@ -24,7 +24,7 @@ Need help? You can find support articles in the [Online Manual here](https://git
 In order to run ValheimServerGUI, you will need the following:
 
 * **Windows 10 x64-based PC** - Other Windows configurations may or may not work. 🤷‍♀
-* **.NET 5 Desktop Runtime** - If you don't have it, you should be prompted to install it when you first run this app. Otherwise, you can install the latest release [here](https://dotnet.microsoft.com/download/dotnet/5.0) (under ".NET Desktop Runtime 5.X.X").
+* **.NET 6 Desktop Runtime** - If you don't have it, you should be prompted to install it when you first run this app. Otherwise, you can install the latest release [here](https://dotnet.microsoft.com/download/dotnet/6.0) (under ".NET Desktop Runtime 6.X.X").
 * **Valheim Dedicated Server** - Comes free with your purchase of Valheim. See the installation guide [here](https://github.com/runeberry/ValheimServerGUI/wiki/Installing-Valheim-Dedicated-Server).
 
 ## Features
@@ -38,19 +38,18 @@ In order to run ValheimServerGUI, you will need the following:
 * **Safe shutdowns** - Safely stops the server when you close the app or shut down Windows
 * **Automatic startup** - If enabled, can automatically start up your server when Windows starts
 * **Minimize to tray** - Minimize this app and control your server entirely from the Windows system tray
-
-### Coming soon...
-
-* **Worlds manager** - View, delete, or backup your worlds from within the app
-* **Ban list management** - Manage your servers ban/allow lists from within the app
+* **Multi-server support** - Run multiple servers at once by creating separate server profiles (see [FAQs](https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions) for details)
+* **Works with mods!** - Tested and working with server-side mods such as [Valheim Plus](https://www.nexusmods.com/valheim/mods/4).
 
 ## Quick guide
 
 1. Launch ValheimServerGUI.exe.
 2. Enter your desired Server Name and Password. You don't need to change the Port in most cases.
 3. Select the world you want to host, or enter a new world name.
-4. If you want your server to appear in the Community Server list within Valheim, check "Community Server". If you leave it unchecked, players will need to "Join by IP" in-game.
-5. Click "Start Server". When the status bar reads "Running", you're ready to play!
+4. Eheck any additional join options you want enabled:
+  * **Community Server** will show your server in the server browser in-game.
+  * **Enable Crossplay** will allow players on any platform to join with an Invite Code
+1. Click "Start Server". When the status bar reads "Running", you're ready to play! You can copy your server's IP address or Invite Code from the Server Details tab to share with friends.
 
 ## FAQs
 
@@ -65,7 +64,7 @@ Interesting in contributing code to ValheimServerGUI? Check out the guidelines a
 Got suggestions, feedback, or want to report a bug? Here's how you can reach me:
 
 * Create a [GitHub issue](https://github.com/runeberry/ValheimServerGUI/issues/new) - Include as many details as you can for bug reports!
-* Tweet me - [@Runeberries](https://twitter.com/Runeberries)
+* Submit a bug report in the app itself (Help > Submit a Bug Report). This will include logs & machine info to help troubleshoot the problem.
 * Send me an email - feedback@runeberry.com
 
 ## Donate

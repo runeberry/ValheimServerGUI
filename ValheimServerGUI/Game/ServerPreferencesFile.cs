@@ -41,8 +41,8 @@ namespace ValheimServerGUI.Game
         [JsonProperty("backupIntervalLong")]
         public int? BackupIntervalLong { get; set; }
 
-        [JsonProperty("startWithWindows")]
-        public bool? StartWithWindows { get; set; }
+        [JsonProperty("autoStart")]
+        public bool? AutoStart { get; set; }
 
         [JsonProperty("additionalArgs")]
         public string AdditionalArgs { get; set; }

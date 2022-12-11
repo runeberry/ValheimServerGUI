@@ -29,7 +29,7 @@ namespace ValheimServerGUI.Game
 
         public int BackupIntervalLong { get; set; } = int.Parse(Resources.DefaultBackupIntervalLong);
 
-        public bool StartWithWindows { get; set; }
+        public bool AutoStart { get; set; }
 
         public string AdditionalArgs { get; set; }
 
@@ -51,7 +51,7 @@ namespace ValheimServerGUI.Game
             prefs.BackupCount = file.BackupCount ?? prefs.BackupCount;
             prefs.BackupIntervalShort = file.BackupIntervalShort ?? prefs.BackupIntervalShort;
             prefs.BackupIntervalLong = file.BackupIntervalLong ?? prefs.BackupIntervalLong;
-            prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
+            prefs.AutoStart = file.AutoStart ?? prefs.AutoStart;
             prefs.AdditionalArgs = file.AdditionalArgs ?? prefs.AdditionalArgs;
 
             return prefs;
@@ -73,7 +73,7 @@ namespace ValheimServerGUI.Game
                 BackupCount = this.BackupCount,
                 BackupIntervalShort = this.BackupIntervalShort,
                 BackupIntervalLong = this.BackupIntervalLong,
-                StartWithWindows = this.StartWithWindows,
+                AutoStart = this.AutoStart,
                 AdditionalArgs = this.AdditionalArgs,
             };
 

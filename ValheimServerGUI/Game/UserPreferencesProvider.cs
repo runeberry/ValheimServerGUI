@@ -23,8 +23,6 @@ namespace ValheimServerGUI.Game
         private readonly string UserPrefsFilePath;
         private readonly string LegacyPath;
 
-        private FileSystemWatcher FileSystemWatcher;
-
         public UserPreferencesProvider(ILogger logger) : base(logger)
         {
             this.UserPrefsFilePath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePathV2);
@@ -68,12 +66,14 @@ namespace ValheimServerGUI.Game
                 var file = preferences.ToFile();
                 this.SaveAsync(this.UserPrefsFilePath, file).GetAwaiter().GetResult();
                 this.Logger.LogInformation("User preferences saved");
-                this.SetupFileWatcher();
             }
             catch (Exception e)
             {
                 this.Logger.LogException(e, "Failed to save user preferences");
+                return;
             }
+
+            this.PreferencesSaved?.Invoke(this, preferences);
         }
 
         private UserPreferences LoadInternal()
@@ -93,8 +93,6 @@ namespace ValheimServerGUI.Game
                 }
 
                 var file = this.LoadAsync<UserPreferencesFile>(this.UserPrefsFilePath).GetAwaiter().GetResult();
-                this.SetupFileWatcher();
-
                 return UserPreferences.FromFile(file);
             }
             catch (Exception e)
@@ -102,20 +100,6 @@ namespace ValheimServerGUI.Game
                 this.Logger.LogException(e, "Failed to load user preferences");
                 return UserPreferences.GetDefault();
             }
-        }
-
-        private void SetupFileWatcher()
-        {
-            if (this.FileSystemWatcher != null) return;
-
-            var userPrefsDirectory = Path.GetDirectoryName(this.UserPrefsFilePath);
-            if (!Directory.Exists(userPrefsDirectory)) return;
-
-            this.FileSystemWatcher = new FileSystemWatcher(userPrefsDirectory);
-            this.FileSystemWatcher.Changed += this.OnFileChanged;
-            this.FileSystemWatcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
-
-            this.Logger.LogInformation("Now watching for user prefs file changes");
         }
 
         private static readonly Dictionary<string, Action<UserPreferences, string>> MigrationActions = new()

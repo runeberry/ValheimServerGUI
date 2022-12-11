@@ -87,18 +87,19 @@ namespace ValheimServerGUI.Forms
 
         #region Public methods
 
-        public MainWindow CreateNewMainWindow(string profileName)
+        public MainWindow CreateNewMainWindow(string startProfile, bool startServer)
         {
             var mainWindow = this.FormProvider.GetForm<MainWindow>();
 
             // Since the splash screen is the application's main form, it must continue running in the background
             // So listen for whenever the MainWindow closes, and close the splash screen as well, in order to close the application
             mainWindow.FormClosed += this.OnMainWindowClosed;
-            mainWindow.StartProfile = profileName;
+            mainWindow.StartProfile = startProfile;
+            mainWindow.StartServerAutomatically = startServer;
             mainWindow.SplashIndex = this.MainWindows.Count;
 
             this.MainWindows.Add(mainWindow);
-            this.Logger.LogDebug("Created {name} [{index}] for profile {name}", nameof(MainWindow), mainWindow.SplashIndex, profileName);
+            this.Logger.LogDebug("Created {name} [{index}] for profile {name}", nameof(MainWindow), mainWindow.SplashIndex, startProfile);
 
             return mainWindow;
         }
@@ -236,7 +237,7 @@ namespace ValheimServerGUI.Forms
                 this.Logger.LogInformation("Loading server profiles with auto-start enabled");
                 foreach (var prefs in autoStartServers)
                 {
-                    this.CreateNewMainWindow(prefs.ProfileName);
+                    this.CreateNewMainWindow(prefs.ProfileName, true);
                 }
             }
             else
@@ -248,7 +249,7 @@ namespace ValheimServerGUI.Forms
                 if (prefs != null)
                 {
                     this.Logger.LogInformation("Loading most recently saved profile: {name}", prefs.ProfileName);
-                    this.CreateNewMainWindow(prefs.ProfileName);
+                    this.CreateNewMainWindow(prefs.ProfileName, false);
                     return;
                 }
             }

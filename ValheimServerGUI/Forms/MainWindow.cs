@@ -35,7 +35,17 @@ namespace ValheimServerGUI.Forms
         }
         public EventHandler<string> ProfileChanged;
         public int SplashIndex { get; set; }
+
+        /// <summary>
+        /// Load this profile into the form when the window is first loaded.
+        /// </summary>
         public string StartProfile { get; set; }
+
+        /// <summary>
+        /// If true, start the server from the StartProfile settings as soon
+        /// as the window is loaded.
+        /// </summary>
+        public bool StartServerAutomatically { get; set; }
 
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
@@ -201,7 +211,7 @@ namespace ValheimServerGUI.Forms
             if (this.StartProfile != null)
             {
                 var serverPrefs = this.SetFormStateFromPrefs(this.StartProfile);
-                if (serverPrefs != null && serverPrefs.AutoStart)
+                if (serverPrefs != null && this.StartServerAutomatically)
                 {
                     this.StartServer(false);
                 }
@@ -1234,7 +1244,7 @@ namespace ValheimServerGUI.Forms
         private void LaunchNewWindow()
         {
             var splashForm = this.FormProvider.GetForm<SplashForm>();
-            var mainWindow = splashForm.CreateNewMainWindow(this.CurrentProfile);
+            var mainWindow = splashForm.CreateNewMainWindow(this.CurrentProfile, false);
             mainWindow.Show();
         }
 

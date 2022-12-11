@@ -34,7 +34,6 @@ namespace ValheimServerGUI.Game
         public PlayerDataRepository(IDataFileRepositoryContext context)
             : base(context, Resources.PlayerListFilePath)
         {
-            this.DataFileProvider.DataLoaded += this.OnDataLoaded;
             this.EntityUpdated += this.OnEntityUpdated;
         }
 
@@ -247,8 +246,10 @@ namespace ValheimServerGUI.Game
 
         #region Non-public methods
 
-        private void OnDataLoaded(object sender, EventArgs args)
+        protected override void OnDataLoaded(object sender, object dataFile)
         {
+            base.OnDataLoaded(sender, dataFile);
+
             this.PlayerStatusMap.Clear();
 
             foreach (var player in this.Data)

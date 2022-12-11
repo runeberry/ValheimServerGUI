@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
@@ -20,7 +21,7 @@ namespace ValheimServerGUI.Game
 
         void SetPlayerOffline(string steamOrZdoId);
 
-        void Load(); // todo: find a way to automatically load data without an explicit call
+        Task LoadAsync(); // todo: find a way to automatically load data without exposing this
     }
 
     public class PlayerDataRepository : DataFileRepository<PlayerInfo>, IPlayerDataRepository
@@ -244,11 +245,9 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        #region Non-public methods
-
-        protected override void OnDataLoaded(object sender, object dataFile)
+        public override async Task LoadAsync()
         {
-            base.OnDataLoaded(sender, dataFile);
+            await base.LoadAsync();
 
             this.PlayerStatusMap.Clear();
 
@@ -258,6 +257,8 @@ namespace ValheimServerGUI.Game
                 this.LastOfflineCache[player.Key] = player.LastStatusChange;
             }
         }
+
+        #region Non-public methods
 
         private void OnEntityUpdated(object sender, PlayerInfo player)
         {

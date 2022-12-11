@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace ValheimServerGUI.Tools.Data
 {
@@ -29,9 +30,19 @@ namespace ValheimServerGUI.Tools.Data
             this.DataFileProvider.Load<JsonDataFile<TEntity>>(this.FilePath);
         }
 
+        public virtual Task LoadAsync()
+        {
+            return this.DataFileProvider.LoadAsync<JsonDataFile<TEntity>>(this.FilePath);
+        }
+
         public virtual void Save()
         {
             this.DataFileProvider.Save(this.FilePath, new JsonDataFile<TEntity>(this.Entities));
+        }
+
+        public virtual Task SaveAsync()
+        {
+            return this.DataFileProvider.SaveAsync(this.FilePath, new JsonDataFile<TEntity>(this.Entities));
         }
 
         protected virtual void OnDataLoaded(object sender, object dataFile)

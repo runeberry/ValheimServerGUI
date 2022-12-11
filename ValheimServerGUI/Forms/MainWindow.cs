@@ -557,12 +557,7 @@ namespace ValheimServerGUI.Forms
         {
             if (e.Button == MouseButtons.Left)
             {
-                if (this.WindowState == FormWindowState.Minimized)
-                {
-                    this.WindowState = FormWindowState.Normal;
-                }
-
-                this.Activate();
+                this.RefocusWindow();
             }
         }
 
@@ -637,7 +632,7 @@ namespace ValheimServerGUI.Forms
 
         private void TrayContextMenuServerName_Click(object sender, EventArgs e)
         {
-            this.Focus();
+            this.RefocusWindow();
         }
 
         #endregion
@@ -1259,6 +1254,16 @@ namespace ValheimServerGUI.Forms
             var splashForm = this.FormProvider.GetForm<SplashForm>();
             var mainWindow = splashForm.CreateNewMainWindow(this.CurrentProfile, false);
             mainWindow.Show();
+        }
+
+        private void RefocusWindow()
+        {
+            if (this.WindowState == FormWindowState.Minimized)
+            {
+                this.WindowState = FormWindowState.Normal;
+            }
+
+            this.Activate();
         }
 
         private void CheckForUpdates(bool isManualCheck)

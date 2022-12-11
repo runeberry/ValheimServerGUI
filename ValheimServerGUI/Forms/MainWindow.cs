@@ -192,6 +192,7 @@ namespace ValheimServerGUI.Forms
             this.ShowPasswordField.ValueChanged += this.ShowPasswordField_Changed;
             this.WorldSelectRadioExisting.ValueChanged += this.WorldSelectRadioExisting_Changed;
             this.WorldSelectRadioNew.ValueChanged += this.WorldSelectRadioNew_Changed;
+            this.WorldSelectExistingNameField.EnabledChanged += this.WorldSelectExistingNameField_EnabledChanged;
             this.LogViewSelectField.ValueChanged += this.LogViewSelectField_Changed;
             this.PlayersTable.SelectionChanged += this.PlayersTable_SelectionChanged;
         }
@@ -582,6 +583,11 @@ namespace ValheimServerGUI.Forms
         private void WorldSelectRadioNew_Changed(object sender, bool value)
         {
             this.WorldSelectNewNameField.Visible = value;
+        }
+
+        private void WorldSelectExistingNameField_EnabledChanged(object sender, EventArgs e)
+        {
+            this.RefreshWorldSelect();
         }
 
         private void TabPlayers_VisibleChanged(object sender, EventArgs e)
@@ -993,18 +999,25 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshWorldSelect()
         {
+            // Don't change the dropdown unless it's in a state where it can be modified
+            if (!this.WorldSelectExistingNameField.Enabled) return;
+
             try
             {
-                // Refresh the existing worlds list
+                // Refresh the existing worlds list, then re-select whatever was originally selected
+                var selectedWorld = this.WorldSelectExistingNameField.Value;
                 var worlds = this.FileProvider.GetWorldNames();
+
                 this.WorldSelectExistingNameField.DataSource = worlds;
                 this.WorldSelectExistingNameField.DropdownEnabled = worlds.Any();
+                this.WorldSelectExistingNameField.Value = selectedWorld;
             }
-            catch
+            catch (Exception e)
             {
                 // Show no worlds if something goes wrong
                 this.WorldSelectExistingNameField.DataSource = null;
                 this.WorldSelectExistingNameField.DropdownEnabled = false;
+                this.Logger.LogError("Error refreshing world select: {message}", e.Message);
             }
         }
 

@@ -276,8 +276,7 @@ namespace ValheimServerGUI.Forms
 
         private void OnProfileChanged(string _)
         {
-            this.TrayContextMenuServerName.Text = this.CurrentProfile;
-            this.RefreshApplicationTitle();
+            this.RefreshCurrentProfileDisplayed();
         }
 
         protected override void OnResize(EventArgs e)
@@ -1016,16 +1015,20 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void RefreshApplicationTitle()
+        private void RefreshCurrentProfileDisplayed()
         {
-            var title = Resources.ApplicationTitle;
-
-            if (this.CurrentProfile != null)
+            if (this.CurrentProfile == null)
             {
-                title += $" - {this.CurrentProfile}";
+                this.Text = Resources.ApplicationTitle;
+                this.NotifyIcon.Text = "ValheimServerGUI";
+                this.TrayContextMenuServerName.Text = "No Profile Selected";
             }
-
-            this.Text = title;
+            else
+            {
+                this.Text = $"{Resources.ApplicationTitle} - {this.CurrentProfile}";
+                this.NotifyIcon.Text = $"ValheimServerGUI - {this.CurrentProfile}";
+                this.TrayContextMenuServerName.Text = $"Profile: {this.CurrentProfile}";
+            }
         }
 
         #endregion

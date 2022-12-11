@@ -33,11 +33,10 @@ namespace ValheimServerGUI.Forms
             this.ButtonCancel = new System.Windows.Forms.Button();
             this.ButtonOK = new System.Windows.Forms.Button();
             this.ButtonDefaults = new System.Windows.Forms.Button();
-            this.WindowsStartField = new ValheimServerGUI.Controls.CheckboxFormField();
-            this.ServerStartField = new ValheimServerGUI.Controls.CheckboxFormField();
-            this.StartMinimizedField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.CheckForUpdatesField = new ValheimServerGUI.Controls.CheckboxFormField();
-            this.CheckServerRunningField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.SaveProfileOnStartField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.StartWithWindowsField = new ValheimServerGUI.Controls.CheckboxFormField();
+            this.StartMinimizedField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.SuspendLayout();
             // 
             // ButtonCancel
@@ -73,66 +72,58 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults.UseVisualStyleBackColor = true;
             this.ButtonDefaults.Click += new System.EventHandler(this.ButtonDefaults_Click);
             // 
-            // WindowsStartField
-            // 
-            this.WindowsStartField.HelpText = "";
-            this.WindowsStartField.LabelText = "Start ValheimServerGUI when Windows starts";
-            this.WindowsStartField.Location = new System.Drawing.Point(12, 12);
-            this.WindowsStartField.Name = "WindowsStartField";
-            this.WindowsStartField.Size = new System.Drawing.Size(335, 17);
-            this.WindowsStartField.TabIndex = 6;
-            this.WindowsStartField.Value = false;
-            // 
-            // ServerStartField
-            // 
-            this.ServerStartField.HelpText = "";
-            this.ServerStartField.LabelText = "Start your server when ValheimServerGUI starts";
-            this.ServerStartField.Location = new System.Drawing.Point(12, 35);
-            this.ServerStartField.Name = "ServerStartField";
-            this.ServerStartField.Size = new System.Drawing.Size(334, 17);
-            this.ServerStartField.TabIndex = 7;
-            this.ServerStartField.Value = false;
-            // 
-            // StartMinimizedField
-            // 
-            this.StartMinimizedField.HelpText = "";
-            this.StartMinimizedField.LabelText = "Start ValheimServerGUI minimized";
-            this.StartMinimizedField.Location = new System.Drawing.Point(12, 58);
-            this.StartMinimizedField.Name = "StartMinimizedField";
-            this.StartMinimizedField.Size = new System.Drawing.Size(334, 17);
-            this.StartMinimizedField.TabIndex = 8;
-            this.StartMinimizedField.Value = false;
-            // 
             // CheckForUpdatesField
             // 
             this.CheckForUpdatesField.HelpText = resources.GetString("CheckForUpdatesField.HelpText");
             this.CheckForUpdatesField.LabelText = "Automatically check for updates";
-            this.CheckForUpdatesField.Location = new System.Drawing.Point(12, 104);
+            this.CheckForUpdatesField.Location = new System.Drawing.Point(12, 35);
             this.CheckForUpdatesField.Name = "CheckForUpdatesField";
             this.CheckForUpdatesField.Size = new System.Drawing.Size(334, 17);
             this.CheckForUpdatesField.TabIndex = 9;
             this.CheckForUpdatesField.Value = false;
             // 
-            // CheckServerRunningField
+            // SaveProfileOnStartField
             // 
-            this.CheckServerRunningField.HelpText = resources.GetString("CheckServerRunningField.HelpText");
-            this.CheckServerRunningField.LabelText = "Check if server is already running on startup";
-            this.CheckServerRunningField.Location = new System.Drawing.Point(12, 81);
-            this.CheckServerRunningField.Name = "CheckServerRunningField";
-            this.CheckServerRunningField.Size = new System.Drawing.Size(334, 17);
-            this.CheckServerRunningField.TabIndex = 10;
-            this.CheckServerRunningField.Value = false;
+            this.SaveProfileOnStartField.HelpText = "If enabled, any changes you made to your server profile\r\nwill be saved when you c" +
+    "lick Start Server. Otherwise, you\r\nmust manually save changes with File > Save.";
+            this.SaveProfileOnStartField.LabelText = "Auto save profile when starting server";
+            this.SaveProfileOnStartField.Location = new System.Drawing.Point(12, 12);
+            this.SaveProfileOnStartField.Name = "SaveProfileOnStartField";
+            this.SaveProfileOnStartField.Size = new System.Drawing.Size(334, 17);
+            this.SaveProfileOnStartField.TabIndex = 10;
+            this.SaveProfileOnStartField.Value = false;
+            // 
+            // StartWithWindowsField
+            // 
+            this.StartWithWindowsField.HelpText = "To start your server(s) on Windows startup, enable this setting \r\nalong with \"Sta" +
+    "rt this server when ValheimServerGUI starts\"\r\nunder Advanced Controls for each s" +
+    "erver.";
+            this.StartWithWindowsField.LabelText = "Start ValheimServerGUI with Windows";
+            this.StartWithWindowsField.Location = new System.Drawing.Point(12, 58);
+            this.StartWithWindowsField.Name = "StartWithWindowsField";
+            this.StartWithWindowsField.Size = new System.Drawing.Size(334, 17);
+            this.StartWithWindowsField.TabIndex = 11;
+            this.StartWithWindowsField.Value = false;
+            // 
+            // StartMinimizedField
+            // 
+            this.StartMinimizedField.HelpText = "";
+            this.StartMinimizedField.LabelText = "Start ValheimServerGUI minimized";
+            this.StartMinimizedField.Location = new System.Drawing.Point(12, 81);
+            this.StartMinimizedField.Name = "StartMinimizedField";
+            this.StartMinimizedField.Size = new System.Drawing.Size(334, 17);
+            this.StartMinimizedField.TabIndex = 12;
+            this.StartMinimizedField.Value = false;
             // 
             // PreferencesForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(359, 217);
-            this.Controls.Add(this.CheckServerRunningField);
-            this.Controls.Add(this.CheckForUpdatesField);
             this.Controls.Add(this.StartMinimizedField);
-            this.Controls.Add(this.ServerStartField);
-            this.Controls.Add(this.WindowsStartField);
+            this.Controls.Add(this.StartWithWindowsField);
+            this.Controls.Add(this.SaveProfileOnStartField);
+            this.Controls.Add(this.CheckForUpdatesField);
             this.Controls.Add(this.ButtonDefaults);
             this.Controls.Add(this.ButtonOK);
             this.Controls.Add(this.ButtonCancel);
@@ -150,10 +141,9 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOK;
         private System.Windows.Forms.Button ButtonDefaults;
-        private ValheimServerGUI.Controls.CheckboxFormField WindowsStartField;
-        private ValheimServerGUI.Controls.CheckboxFormField ServerStartField;
-        private ValheimServerGUI.Controls.CheckboxFormField StartMinimizedField;
         private ValheimServerGUI.Controls.CheckboxFormField CheckForUpdatesField;
-        private ValheimServerGUI.Controls.CheckboxFormField CheckServerRunningField;
+        private ValheimServerGUI.Controls.CheckboxFormField SaveProfileOnStartField;
+        private ValheimServerGUI.Controls.CheckboxFormField StartWithWindowsField;
+        private ValheimServerGUI.Controls.CheckboxFormField StartMinimizedField;
     }
 }

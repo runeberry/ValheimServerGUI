@@ -23,6 +23,30 @@ namespace ValheimServerGUI.Forms
         private static readonly bool SimulateStartServerException = false;
         private static readonly bool SimulateStopServerException = false;
 #endif
+        private string _currentProfile;
+        public string CurrentProfile
+        {
+            get => this._currentProfile;
+            set
+            {
+                this._currentProfile = value;
+                this.ProfileChanged?.Invoke(this, this._currentProfile);
+            }
+        }
+        public EventHandler<string> ProfileChanged;
+        public int SplashIndex { get; set; }
+
+        /// <summary>
+        /// Load this profile into the form when the window is first loaded.
+        /// </summary>
+        public string StartProfile { get; set; }
+
+        /// <summary>
+        /// If true, start the server from the StartProfile settings as soon
+        /// as the window is loaded.
+        /// </summary>
+        public bool StartServerAutomatically { get; set; }
+
         private static readonly string NL = Environment.NewLine;
         private const string LogViewServer = "Server";
         private const string LogViewApplication = "Application";
@@ -40,49 +64,50 @@ namespace ValheimServerGUI.Forms
 
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
+        private readonly IServerPreferencesProvider ServerPrefsProvider;
         private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
-        private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
         private readonly IProcessProvider ProcessProvider;
+        private readonly IStartupArgsProvider StartupArgsProvider;
 
         public MainWindow(
             IFormProvider formProvider,
             IUserPreferencesProvider userPrefsProvider,
+            IServerPreferencesProvider serverPrefsProvider,
             IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
-            ValheimServerLogger serverLogger,
             IEventLogger appLogger,
             IIpAddressProvider ipAddressProvider,
             ISoftwareUpdateProvider softwareUpdateProvider,
-            IProcessProvider processProvider)
+            IProcessProvider processProvider,
+            IStartupArgsProvider startupArgsProvider)
         {
 #if DEBUG
             if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
             this.FormProvider = formProvider;
             this.UserPrefsProvider = userPrefsProvider;
+            this.ServerPrefsProvider = serverPrefsProvider;
             this.FileProvider = fileProvider;
             this.PlayerDataProvider = playerDataProvider;
             this.Server = server;
-            this.ServerLogger = serverLogger;
             this.Logger = appLogger;
             this.IpAddressProvider = ipAddressProvider;
             this.SoftwareUpdateProvider = softwareUpdateProvider;
             this.ProcessProvider = processProvider;
+            this.StartupArgsProvider = startupArgsProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             this.AddApplicationIcon();
             InitializeImages();
-            InitializeServer();
+            InitializeServices();
             InitializeFormEvents();
             InitializeFormFields(); // Display data back to user, always last
-
-            this.PlayerDataProvider.Load(); // todo: find a better way
         }
 
         #region Initialization
@@ -92,46 +117,52 @@ namespace ValheimServerGUI.Forms
             this.ImageList.AddImagesFromResourceFile(typeof(Resources));
         }
 
-        private void InitializeServer()
+        private void InitializeServices()
         {
             this.Logger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnApplicationLogReceived);
-            this.ServerLogger.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnServerLogReceived);
+            this.Server.LogReceived += this.BuildEventHandler<EventLogContext>(this.OnServerLogReceived);
             this.Server.StatusChanged += this.BuildEventHandler<ServerStatus>(this.OnServerStatusChanged);
             this.Server.WorldSaved += this.BuildEventHandler<decimal>(this.OnWorldSaved);
             this.Server.InviteCodeReady += this.BuildEventHandler<string>(this.OnInviteCodeReady);
 
-            this.PlayerDataProvider.DataReady += this.BuildEventHandler(this.OnPlayerDataReady);
             this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
 
-            this.IpAddressProvider.ExternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_ExternalIpReceived);
-            this.IpAddressProvider.InternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_InternalIpReceived);
+            this.IpAddressProvider.ExternalIpChanged += this.BuildEventHandler<string>(this.IpAddressProvider_ExternalIpChanged);
+            this.IpAddressProvider.InternalIpChanged += this.BuildEventHandler<string>(this.IpAddressProvider_InternalIpChanged);
 
             this.SoftwareUpdateProvider.UpdateCheckStarted += this.BuildEventHandler(this.SoftwareUpdateProvider_UpdateCheckStarted);
             this.SoftwareUpdateProvider.UpdateCheckFinished += this.BuildEventHandler<SoftwareUpdateEventArgs>(this.SoftwareUpdateProvider_UpdateCheckFinished);
+
+            this.ServerPrefsProvider.PreferencesSaved += this.BuildEventHandler<List<ServerPreferences>>(this.OnPreferencesSaved);
         }
 
         private void InitializeFormEvents()
         {
             // MainWindow
-            this.Shown += this.BuildEventHandler(this.MainWindow_Load);
+            this.ProfileChanged += this.BuildEventHandler<string>(this.OnProfileChanged);
 
             // Menu items
+            this.MenuItemFileNewWindow.Click += this.MenuItemFileNewWindow_Click;
+            this.MenuItemFileNewProfile.Click += this.MenuItemFileNewProfile_Click;
+            this.MenuItemFileSaveProfile.Click += this.MenuItemFileSaveProfile_Click;
+            this.MenuItemFileSaveProfileAs.Click += this.MenuItemFileSaveProfileAs_Click;
             this.MenuItemFilePreferences.Click += this.MenuItemFilePreferences_Click;
-            this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Clicked;
-            this.MenuItemFileClose.Click += this.MenuItemFileClose_Clicked;
+            this.MenuItemFileDirectories.Click += this.MenuItemFileDirectories_Click;
+            this.MenuItemFileOpenSettings.Click += this.MenuItemFileOpenSettings_Click;
+            this.MenuItemFileClose.Click += this.MenuItemFileClose_Click;
             this.MenuItemHelpManual.Click += this.MenuItemHelpManual_Click;
-            this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Clicked;
+            this.MenuItemHelpPortForwarding.Click += this.MenuItemHelpPortForwarding_Click;
             this.MenuItemHelpBugReport.Click += this.MenuItemHelpBugReport_Click;
-            this.MenuItemHelpUpdates.Click += this.BuildEventHandler(this.MenuItemHelpUpdates_Clicked);
-            this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Clicked;
+            this.MenuItemHelpUpdates.Click += this.MenuItemHelpUpdates_Click;
+            this.MenuItemHelpAbout.Click += this.MenuItemHelpAbout_Click;
 
             // Tray icon
             this.NotifyIcon.MouseClick += this.NotifyIcon_MouseClick;
             this.TrayContextMenuServerName.Click += this.TrayContextMenuServerName_Click;
-            this.TrayContextMenuStart.Click += this.BuildEventHandler(this.StartServer);
-            this.TrayContextMenuRestart.Click += this.ButtonRestartServer_Click;
-            this.TrayContextMenuStop.Click += this.ButtonStopServer_Click;
-            this.TrayContextMenuClose.Click += this.MenuItemFileClose_Clicked;
+            this.TrayContextMenuStart.Click += this.BuildEventHandler(this.ButtonStartServer_Click);
+            this.TrayContextMenuRestart.Click += this.BuildEventHandler(this.ButtonRestartServer_Click);
+            this.TrayContextMenuStop.Click += this.BuildEventHandler(this.ButtonStopServer_Click);
+            this.TrayContextMenuClose.Click += this.MenuItemFileClose_Click;
 
             // Timers
             this.ServerRefreshTimer.Tick += this.ServerRefreshTimer_Tick;
@@ -142,10 +173,9 @@ namespace ValheimServerGUI.Forms
             this.TabServerDetails.VisibleChanged += this.BuildEventHandler(this.TabServerDetails_VisibleChanged);
 
             // Buttons
-            this.ButtonAdvancedSettings.Click += this.ButtonAdvancedSettings_Click;
-            this.ButtonStartServer.Click += this.BuildEventHandler(this.StartServer);
-            this.ButtonRestartServer.Click += this.ButtonRestartServer_Click;
-            this.ButtonStopServer.Click += this.ButtonStopServer_Click;
+            this.ButtonStartServer.Click += this.BuildEventHandler(this.ButtonStartServer_Click);
+            this.ButtonRestartServer.Click += this.BuildEventHandler(this.ButtonRestartServer_Click);
+            this.ButtonStopServer.Click += this.BuildEventHandler(this.ButtonStopServer_Click);
             this.ButtonClearLogs.Click += this.ButtonClearLogs_Click;
             this.ButtonSaveLogs.Click += this.ButtonSaveLogs_Click;
             this.ButtonPlayerDetails.Click += this.ButtonPlayerDetails_Click;
@@ -168,6 +198,51 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
+            this.LogViewSelectField.DataSource = new[] { LogViewServer, LogViewApplication };
+            this.LogViewSelectField.Value = LogViewServer;
+
+            this.RefreshFormFields();
+        }
+
+        private void InitializeStartupPrefs()
+        {
+            // If StartProfile was set by SplashForm before this window was shown, then
+            // load that server profile up now, and start the server is settings indicate that.
+            if (this.StartProfile != null)
+            {
+                var serverPrefs = this.SetFormStateFromPrefs(this.StartProfile);
+                if (serverPrefs != null && this.StartServerAutomatically)
+                {
+                    this.StartServer(false);
+                }
+                else
+                {
+                    this.OnServerStatusChanged(ServerStatus.Stopped);
+                }
+            }
+            else
+            {
+                // No server to start, mock a "stopped" event to initialize the form
+                this.OnServerStatusChanged(ServerStatus.Stopped);
+            }
+        }
+
+        private void InitializeIpAddresses()
+        {
+            var internalIp = this.IpAddressProvider.InternalIpAddress;
+            var externalIp = this.IpAddressProvider.ExternalIpAddress;
+
+            this.LabelInternalIpAddress.Value = internalIp ?? IpLoadingText;
+            this.LabelExternalIpAddress.Value = externalIp ?? IpLoadingText;
+
+            if (internalIp == null) this.IpAddressProvider.LoadInternalIpAddressAsync();
+            if (externalIp == null) this.IpAddressProvider.LoadExternalIpAddressAsync();
+
+            this.RefreshIpPorts();
+        }
+
+        private void InitializePlayerData()
+        {
             this.PlayersTable.AddRowBinding<PlayerInfo>(row =>
             {
                 row.AddCellBinding(this.ColumnPlayerName.Index, p => p.PlayerName ?? $"(...{p.SteamId[^4..]})");
@@ -175,27 +250,33 @@ namespace ValheimServerGUI.Forms
                 row.AddCellBinding(this.ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
             });
 
-            this.LogViewSelectField.DataSource = new[] { LogViewServer, LogViewApplication };
-            this.LogViewSelectField.Value = LogViewServer;
-
-            this.RefreshFormFields();
-            this.LoadFormValuesFromUserPrefs(this.UserPrefsProvider.LoadPreferences());
-            this.OnServerStatusChanged(ServerStatus.Stopped);
+            foreach (var playerInfo in this.PlayerDataProvider.Data)
+            {
+                this.SetPlayerStatus(playerInfo);
+            }
         }
 
         #endregion
 
         #region MainWindow Events
 
-        private void MainWindow_Load()
-        {
-            this.Logger.LogInformation($"Valheim Server GUI v{AssemblyHelper.GetApplicationVersion()} - Loaded OK");
-        }
-
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-            this.RunStartupStuff();
+
+            this.InitializeIpAddresses();
+            this.InitializePlayerData();
+            this.InitializeStartupPrefs();
+            this.CheckFilePaths();
+            this.NotifyIcon.Visible = true;
+
+            this.Logger.LogInformation("Valheim Server GUI v{version} - Loaded OK", AssemblyHelper.GetApplicationVersion());
+        }
+
+        private void OnProfileChanged(string _)
+        {
+            this.TrayContextMenuServerName.Text = this.CurrentProfile;
+            this.RefreshApplicationTitle();
         }
 
         protected override void OnResize(EventArgs e)
@@ -221,10 +302,9 @@ namespace ValheimServerGUI.Forms
                 if (this.Server.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running))
                 {
                     // Server is still running, prompt the user to confirm they want to stop it
-
                     var result = MessageBox.Show(
                         "The Valheim server is still running. Do you want to stop the server " +
-                        "and close this application?",
+                        "and close this window?",
                         "Warning",
                         MessageBoxButtons.YesNo,
                         MessageBoxIcon.Warning);
@@ -232,7 +312,7 @@ namespace ValheimServerGUI.Forms
                     if (result == DialogResult.Yes)
                     {
                         this.Server.Stop();
-                        this.CloseApplicationOnServerStopped();
+                        this.CloseWindowOnServerStopped();
                     }
 
                     // Cancel the form close regardless of the user's choice
@@ -263,7 +343,7 @@ namespace ValheimServerGUI.Forms
             {
                 // Try to stop the server, and keep the app running until we're sure it's stopped
                 this.Server.Stop();
-                this.CloseApplicationOnServerStopped();
+                this.CloseWindowOnServerStopped();
                 e.Cancel = true;
             }
             else
@@ -277,29 +357,92 @@ namespace ValheimServerGUI.Forms
 
         #region Menu Items
 
+        private void MenuItemFileNewWindow_Click(object sender, EventArgs e)
+        {
+            this.LaunchNewWindow();
+        }
+
+        private void MenuItemFileNewProfile_Click(object sender, EventArgs e)
+        {
+            var profileName = this.PromptForProfileName();
+            if (profileName == null) return;
+
+            var prefs = new ServerPreferences { ProfileName = profileName, Name = profileName };
+            this.ServerPrefsProvider.SavePreferences(prefs);
+
+            this.SetFormStateFromPrefs(prefs);
+        }
+
+        private void MenuItemFileSaveProfile_Click(object sender, EventArgs e)
+        {
+            var prefs = this.GetPrefsFromFormState();
+            this.ServerPrefsProvider.SavePreferences(prefs);
+        }
+
+        private void MenuItemFileSaveProfileAs_Click(object sender, EventArgs e)
+        {
+            var profileName = this.PromptForProfileName($"Copy of {this.CurrentProfile}");
+            if (profileName == null) return;
+
+            var prefs = this.GetPrefsFromFormState();
+            prefs.ProfileName = profileName;
+            this.ServerPrefsProvider.SavePreferences(prefs);
+            this.CurrentProfile = profileName;
+        }
+
+        private void MenuItemFileLoadProfileItem_Click(object sender, EventArgs e)
+        {
+            if (sender is not ToolStripItem item) return;
+
+            this.SetFormStateFromPrefs(item.Text);
+        }
+
+        private void MenuItemFileRemoveProfileItem_Click(object sender, EventArgs e)
+        {
+            if (sender is not ToolStripItem item) return;
+
+            var profileName = item.Text;
+            var result = MessageBox.Show(
+                $"Remove server profile '{profileName}'?",
+                "Remove Profile",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+
+            if (result == DialogResult.Yes)
+            {
+                this.ServerPrefsProvider.RemovePreferences(profileName);
+            }
+        }
+
         private void MenuItemFilePreferences_Click(object sender, EventArgs e)
         {
             this.ShowPreferencesForm();
         }
 
-        private void MenuItemFileDirectories_Clicked(object sender, EventArgs e)
+        private void MenuItemFileDirectories_Click(object sender, EventArgs e)
         {
             this.ShowDirectoriesForm();
         }
 
-        private void MenuItemFileClose_Clicked(object sender, EventArgs e)
+        private void MenuItemFileOpenSettings_Click(object sender, EventArgs e)
+        {
+            var prefsDir = Path.GetDirectoryName(Resources.UserPrefsFilePathV2);
+            OpenHelper.OpenDirectory(prefsDir);
+        }
+
+        private void MenuItemFileClose_Click(object sender, EventArgs e)
         {
             this.Close();
         }
 
         private void MenuItemHelpManual_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.UrlHelp);
+            OpenHelper.OpenWebAddress(Resources.UrlHelp);
         }
 
-        private void MenuItemHelpPortForwarding_Clicked(object sender, EventArgs e)
+        private void MenuItemHelpPortForwarding_Click(object sender, EventArgs e)
         {
-            WebHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
+            OpenHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
         }
 
         private void MenuItemHelpBugReport_Click(object sender, EventArgs e)
@@ -308,12 +451,12 @@ namespace ValheimServerGUI.Forms
             bugReportForm.ShowDialog();
         }
 
-        private void MenuItemHelpUpdates_Clicked()
+        private void MenuItemHelpUpdates_Click(object sender, EventArgs e)
         {
             this.CheckForUpdates(true);
         }
 
-        private void MenuItemHelpAbout_Clicked(object sender, EventArgs e)
+        private void MenuItemHelpAbout_Click(object sender, EventArgs e)
         {
             var aboutForm = FormProvider.GetForm<AboutForm>();
             aboutForm.ShowDialog();
@@ -323,22 +466,25 @@ namespace ValheimServerGUI.Forms
 
         #region Form Field Events
 
-        private void ButtonAdvancedSettings_Click(object sender, EventArgs e)
+        private void ButtonStartServer_Click()
         {
-            this.ShowAdvancedSettingsForm();
+#if DEBUG
+            if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
+#endif
+            this.StartServer(true);
         }
 
-        private void ButtonStopServer_Click(object sender, EventArgs e)
+        private void ButtonStopServer_Click()
         {
 #if DEBUG
             if (SimulateStopServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
 #endif
-            Server.Stop();
+            this.Server.Stop();
         }
 
-        private void ButtonRestartServer_Click(object sender, EventArgs e)
+        private void ButtonRestartServer_Click()
         {
-            Server.Restart();
+            this.Server.Restart();
         }
 
         private void ButtonClearLogs_Click(object sender, EventArgs e)
@@ -414,6 +560,8 @@ namespace ValheimServerGUI.Forms
                 {
                     this.WindowState = FormWindowState.Normal;
                 }
+
+                this.Activate();
             }
         }
 
@@ -534,17 +682,9 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void OnPlayerDataReady()
-        {
-            foreach (var player in this.PlayerDataProvider.Data)
-            {
-                this.UpdatePlayerStatus(player);
-            }
-        }
-
         private void OnPlayerUpdated(PlayerInfo player)
         {
-            this.UpdatePlayerStatus(player);
+            this.SetPlayerStatus(player);
         }
 
         private void OnWorldSaved(decimal duration)
@@ -563,13 +703,13 @@ namespace ValheimServerGUI.Forms
             this.SetInviteCode(inviteCode);
         }
 
-        private void IpAddressProvider_ExternalIpReceived(string ip)
+        private void IpAddressProvider_ExternalIpChanged(string ip)
         {
             this.LabelExternalIpAddress.Value = ip;
             this.RefreshIpPorts();
         }
 
-        private void IpAddressProvider_InternalIpReceived(string ip)
+        private void IpAddressProvider_InternalIpChanged(string ip)
         {
             this.LabelInternalIpAddress.Value = ip;
             this.RefreshIpPorts();
@@ -634,205 +774,19 @@ namespace ValheimServerGUI.Forms
 
                 if (result == DialogResult.Yes)
                 {
-                    WebHelper.OpenWebAddress(Resources.UrlUpdates);
+                    OpenHelper.OpenWebAddress(Resources.UrlUpdates);
                 }
             }
+        }
+
+        private void OnPreferencesSaved(List<ServerPreferences> prefs)
+        {
+            this.RefreshProfileList();
         }
 
         #endregion
 
-        #region Common Methods
-
-        private void RunStartupStuff()
-        {
-            this.CheckFilePaths();
-            this.CheckServerAlreadyRunning();
-
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-
-            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
-
-            if (prefs.StartServerAutomatically)
-            {
-                this.StartServer();
-            }
-
-            if (prefs.StartMinimized)
-            {
-                this.WindowState = FormWindowState.Minimized;
-            }
-        }
-
-        private void StartServer()
-        {
-#if DEBUG
-            if (SimulateStartServerException) throw new InvalidOperationException("Intentional exception thrown for testing");
-#endif
-            var portFieldValue = this.ServerPortField.Value;
-            if (!this.IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue + 1))
-            {
-                MessageBox.Show(
-                    $"Port {portFieldValue} or {portFieldValue + 1} is already in use.{NL}" +
-                    $"Valheim requires two adjacent ports to run a dedicated server.{NL}" +
-                    "Please shut down any UDP applications using these ports, or choose a different port for your server.",
-                    "Port in use",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            string worldName;
-            bool newWorld = this.WorldSelectRadioNew.Value;
-
-            if (newWorld)
-            {
-                // Creating a new world, ensure that the name is available
-                worldName = this.WorldSelectNewNameField.Value;
-                if (!this.FileProvider.IsWorldNameAvailable(worldName))
-                {
-                    MessageBox.Show(
-                        $"A world named '{worldName}' already exists.",
-                        "Server Configuration Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    this.WorldSelectRadioExisting.Value = true;
-                    return;
-                }
-            }
-            else
-            {
-                // Using an existing world, ensure that the file exists
-                worldName = this.WorldSelectExistingNameField.Value;
-                if (this.FileProvider.IsWorldNameAvailable(worldName))
-                {
-                    // Don't think this is possible to hit because the name comes from a dropdown
-                    MessageBox.Show(
-                        $"No world exists with name '{worldName}'.",
-                        "Server Configuration Error",
-                        MessageBoxButtons.OK,
-                        MessageBoxIcon.Error);
-                    return;
-                }
-            }
-
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-
-            var options = new ValheimServerOptions
-            {
-                Name = this.ServerNameField.Value,
-                Password = this.ServerPasswordField.Value,
-                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
-                NewWorld = newWorld,
-                Public = this.CommunityServerField.Value,
-                Port = this.ServerPortField.Value,
-                Crossplay = this.ServerCrossplayField.Value,
-                SaveInterval = prefs.ServerSaveInterval,
-                Backups = prefs.ServerBackupCount,
-                BackupShort = prefs.ServerBackupIntervalShort,
-                BackupLong = prefs.ServerBackupIntervalLong,
-            };
-
-            try
-            {
-                options.Validate();
-                Server.Start(options);
-            }
-            catch (Exception exception)
-            {
-                MessageBox.Show(
-                    exception.Message,
-                    "Server Configuration Error",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error);
-                return;
-            }
-
-            // User preferences are saved each time the server is started
-            prefs.ServerName = this.ServerNameField.Value;
-            prefs.ServerPort = this.ServerPortField.Value;
-            prefs.ServerPassword = this.ServerPasswordField.Value;
-            prefs.ServerWorldName = worldName;
-            prefs.ServerPublic = this.CommunityServerField.Value;
-            prefs.ServerCrossplay = this.ServerCrossplayField.Value;
-
-            this.UserPrefsProvider.SavePreferences(prefs);
-        }
-
-        private void CheckFilePaths()
-        {
-            try
-            {
-                var _ = this.FileProvider.ServerExe;
-            }
-            catch (Exception e)
-            {
-                var result = MessageBox.Show(
-                    $"{e.Message}{NL}{NL}" +
-                    $"This may occur if you do not have Valheim Dedicated Server installed, or if you have " +
-                    $"installed it in a different directory. See Help for more info.{NL}{NL}" +
-                    "Would you like to change your directories now?",
-                    "File Not Found",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-
-                if (result == DialogResult.Yes)
-                {
-                    this.ShowDirectoriesForm();
-                }
-            }
-        }
-
-        private void CheckServerAlreadyRunning()
-        {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
-            if (!prefs.CheckServerRunning) return;
-
-            string serverAppName;
-
-            try
-            {
-                serverAppName = Path.GetFileNameWithoutExtension(this.FileProvider.ServerExe.FullName);
-            }
-            catch
-            {
-                // Server can't possibly be running if we can't locate the server .exe, right?
-                return;
-            }
-
-            var valheimProcesses = this.ProcessProvider.FindExistingProcessesByName(serverAppName);
-
-            if (valheimProcesses.Any())
-            {
-                string message;
-
-                if (valheimProcesses.Count == 1)
-                {
-                    message = "There is already an instance of Valheim Dedicated Server running on your computer. " +
-                        "Would you like to shut down this server so that ValheimServerGUI can manage it?";
-                }
-                else
-                {
-                    message = $"There are already {valheimProcesses.Count} instances of Valheim Dedicated Server running on your computer. " +
-                        "Would you like to shut them all down so that ValheimServerGUI can manage them?";
-                }
-
-                message += $"{NL}{NL}You can disable this message in File > Preferences...";
-
-                var result = MessageBox.Show(
-                    message,
-                    "Server Already Running",
-                    MessageBoxButtons.YesNo,
-                    MessageBoxIcon.Warning);
-
-                if (result == DialogResult.Yes)
-                {
-                    foreach (var process in valheimProcesses)
-                    {
-                        this.ProcessProvider.SafelyKillProcess(process);
-                    }
-                }
-            }
-        }
+        #region Form Links
 
         private void ShowPreferencesForm()
         {
@@ -846,11 +800,9 @@ namespace ValheimServerGUI.Forms
             this.RefreshFormFields();
         }
 
-        private void ShowAdvancedSettingsForm()
-        {
-            this.FormProvider.GetForm<AdvancedServerControlsForm>().ShowDialog();
-            this.RefreshFormFields();
-        }
+        #endregion
+
+        #region View Setters
 
         private void AddLog(string message, string viewName)
         {
@@ -860,69 +812,6 @@ namespace ValheimServerGUI.Forms
         private void ClearCurrentLogView()
         {
             this.LogViewer.ClearLogView(this.LogViewer.LogView);
-        }
-
-        private void SetStatusTextLeft(string message, Image icon)
-        {
-            this.StatusStripLabelLeft.Text = message;
-            this.StatusStripLabelLeft.Image = icon;
-        }
-
-        private void SetStatusTextRight(string message, Image icon, bool isLink)
-        {
-            this.StatusStripLabelRight.Text = message;
-            this.StatusStripLabelRight.Image = icon;
-            this.StatusStripLabelRight.IsLink = isLink;
-        }
-
-        private int GetImageIndex(string key)
-        {
-            return this.ImageList.Images.IndexOfKey(key);
-        }
-
-        private void RefreshPlayersTable()
-        {
-            foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
-            {
-                row.RefreshValues();
-            }
-        }
-
-        private void RefreshServerDetails()
-        {
-            if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
-            {
-                var elapsed = this.ServerUptimeTimer.Elapsed;
-                var days = elapsed.Days;
-                var timestr = elapsed.ToString(@"hh\:mm\:ss");
-
-                if (days == 1) timestr = $"1 day + {timestr}";
-                else if (days > 1) timestr = $"{days} days + {timestr}";
-
-                this.LabelSessionDuration.Value = timestr;
-            }
-        }
-
-        private void RefreshIpPorts()
-        {
-            const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
-
-            var fields = new[] { this.LabelExternalIpAddress, this.LabelInternalIpAddress, this.LabelLocalIpAddress };
-            var destPort = this.ServerPortField.Value;
-            var isDefaultPort = destPort.ToString() == Resources.DefaultServerPort;
-
-            foreach (var field in fields)
-            {
-                if (field.Value == null || field.Value == IpLoadingText) continue; // Don't try to modify loading text
-
-                var ipMatch = Regex.Match(field.Value, ipExpr);
-                var captures = (ipMatch.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
-
-                if (captures.Length == 0) continue; // Quit if we can't extract the IP address
-
-                var ip = captures[0];
-                field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
-            }
         }
 
         private void SetInviteCode(string inviteCode, bool copyable = true)
@@ -938,7 +827,7 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonInviteCode.Visible = copyable;
         }
 
-        private void UpdatePlayerStatus(PlayerInfo player)
+        private void SetPlayerStatus(PlayerInfo player)
         {
             var playerRows = this.PlayersTable
                 .GetRowsWithType<PlayerInfo>()
@@ -972,8 +861,26 @@ namespace ValheimServerGUI.Forms
             playerRow.ForeColor = color;
         }
 
+        private void SetStatusTextLeft(string message, Image icon)
+        {
+            this.StatusStripLabelLeft.Text = message;
+            this.StatusStripLabelLeft.Image = icon;
+        }
+
+        private void SetStatusTextRight(string message, Image icon, bool isLink)
+        {
+            this.StatusStripLabelRight.Text = message;
+            this.StatusStripLabelRight.Image = icon;
+            this.StatusStripLabelRight.IsLink = isLink;
+        }
+
+        #endregion
+
+        #region View Refreshers
+
         private void RefreshFormFields()
         {
+            this.RefreshProfileList();
             this.RefreshWorldSelect();
             this.RefreshFormStateForServer();
         }
@@ -989,7 +896,15 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.Enabled = allowServerChanges;
             this.CommunityServerField.Enabled = allowServerChanges;
             this.ServerCrossplayField.Enabled = allowServerChanges;
-            this.ButtonAdvancedSettings.Enabled = allowServerChanges;
+            this.ServerSaveIntervalField.Enabled = allowServerChanges;
+            this.ServerBackupsField.Enabled = allowServerChanges;
+            this.ServerShortBackupIntervalField.Enabled = allowServerChanges;
+            this.ServerLongBackupIntervalField.Enabled = allowServerChanges;
+            this.ServerAutoStartField.Enabled = allowServerChanges;
+            this.ServerAdditionalArgsField.Enabled = allowServerChanges;
+
+            this.MenuItemFileNewProfile.Enabled = allowServerChanges;
+            this.MenuItemFileLoadProfile.Enabled = allowServerChanges;
 
             this.ButtonStartServer.Enabled = this.Server.CanStart;
             this.ButtonRestartServer.Enabled = this.Server.CanRestart;
@@ -1000,8 +915,80 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuRestart.Enabled = this.ButtonRestartServer.Enabled;
             this.TrayContextMenuStop.Enabled = this.ButtonStopServer.Enabled;
 
-            this.TrayContextMenuServerName.Text = this.ServerNameField.Value;
             this.TrayContextMenuServerName.Image = this.ServerStatusIconMap[this.Server.Status];
+        }
+
+        private void RefreshIpPorts()
+        {
+            const string ipExpr = @"^([\d]{1,3}\.[\d]{1,3}\.[\d]{1,3}\.[\d]{1,3})";
+
+            var fields = new[] { this.LabelExternalIpAddress, this.LabelInternalIpAddress, this.LabelLocalIpAddress };
+            var destPort = this.ServerPortField.Value;
+            var isDefaultPort = destPort.ToString() == Resources.DefaultServerPort;
+
+            foreach (var field in fields)
+            {
+                if (field.Value == null || field.Value == IpLoadingText) continue; // Don't try to modify loading text
+
+                var ipMatch = Regex.Match(field.Value, ipExpr);
+                var captures = (ipMatch.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
+
+                if (captures.Length == 0) continue; // Quit if we can't extract the IP address
+
+                var ip = captures[0];
+                field.Value = isDefaultPort ? ip : $"{ip}:{destPort}"; // Only append the port if it's not the default
+            }
+        }
+
+        private void RefreshProfileList()
+        {
+            this.MenuItemFileLoadProfile.Enabled = false;
+            this.MenuItemFileLoadProfile.DropDownItems.Clear();
+
+            this.MenuItemFileRemoveProfile.Enabled = false;
+            this.MenuItemFileRemoveProfile.DropDownItems.Clear();
+
+            var prefs = this.ServerPrefsProvider.LoadPreferences()
+                .OrderByDescending(p => p.LastSaved);
+            if (prefs == null || !prefs.Any()) return;
+
+            this.MenuItemFileLoadProfile.Enabled = true;
+            this.MenuItemFileRemoveProfile.Enabled = true;
+
+            foreach (var pref in prefs)
+            {
+                this.MenuItemFileLoadProfile.DropDownItems.Add(
+                    pref.ProfileName,
+                    null,
+                    this.MenuItemFileLoadProfileItem_Click);
+                this.MenuItemFileRemoveProfile.DropDownItems.Add(
+                    pref.ProfileName,
+                    null,
+                    this.MenuItemFileRemoveProfileItem_Click);
+            }
+        }
+
+        private void RefreshPlayersTable()
+        {
+            foreach (var row in this.PlayersTable.GetRowsWithType<PlayerInfo>())
+            {
+                row.RefreshValues();
+            }
+        }
+
+        private void RefreshServerDetails()
+        {
+            if (this.Server.Status == ServerStatus.Running && this.ServerUptimeTimer != null)
+            {
+                var elapsed = this.ServerUptimeTimer.Elapsed;
+                var days = elapsed.Days;
+                var timestr = elapsed.ToString(@"hh\:mm\:ss");
+
+                if (days == 1) timestr = $"1 day + {timestr}";
+                else if (days > 1) timestr = $"{days} days + {timestr}";
+
+                this.LabelSessionDuration.Value = timestr;
+            }
         }
 
         private void RefreshWorldSelect()
@@ -1021,17 +1008,244 @@ namespace ValheimServerGUI.Forms
             }
         }
 
-        private void LoadFormValuesFromUserPrefs(UserPreferences prefs)
+        private void RefreshApplicationTitle()
         {
-            this.ServerNameField.Value = prefs.ServerName;
-            this.ServerPortField.Value = prefs.ServerPort;
-            this.ServerPasswordField.Value = prefs.ServerPassword;
-            this.CommunityServerField.Value = prefs.ServerPublic;
-            this.ServerCrossplayField.Value = prefs.ServerCrossplay;
-            this.ShowPasswordField.Value = false;
+            var title = Resources.ApplicationTitle;
 
-            this.WorldSelectExistingNameField.Value = prefs.ServerWorldName;
-            this.WorldSelectRadioExisting.Value = true;
+            if (this.CurrentProfile != null)
+            {
+                title += $" - {this.CurrentProfile}";
+            }
+
+            this.Text = title;
+        }
+
+        #endregion
+
+        #region Save & Load
+
+        private ServerPreferences GetPrefsFromFormState()
+        {
+            var profileName = this.CurrentProfile;
+
+            // Update existing prefs if they exist with this server name
+            // Otherwise, create new prefs with this profile name
+            var prefs = this.ServerPrefsProvider.LoadPreferences(profileName)
+                ?? new ServerPreferences { ProfileName = profileName };
+
+            prefs.Name = this.ServerNameField.Value;
+            prefs.Port = this.ServerPortField.Value;
+            prefs.Password = this.ServerPasswordField.Value;
+            prefs.WorldName = this.WorldSelectRadioNew.Value
+                ? this.WorldSelectNewNameField.Value
+                : this.WorldSelectExistingNameField.Value;
+            prefs.Public = this.CommunityServerField.Value;
+            prefs.Crossplay = this.ServerCrossplayField.Value;
+            prefs.SaveInterval = this.ServerSaveIntervalField.Value;
+            prefs.BackupCount = this.ServerBackupsField.Value;
+            prefs.BackupIntervalShort = this.ServerShortBackupIntervalField.Value;
+            prefs.BackupIntervalLong = this.ServerLongBackupIntervalField.Value;
+            prefs.AutoStart = this.ServerAutoStartField.Value;
+            prefs.AdditionalArgs = this.ServerAdditionalArgsField.Value;
+
+            return prefs;
+        }
+
+        private ServerPreferences SetFormStateFromPrefs(string profileName)
+        {
+            var prefs = this.ServerPrefsProvider.LoadPreferences(profileName);
+            if (prefs == null)
+            {
+                this.Logger.LogWarning("Unable to set form state: no server profile exists with name '{name}'", profileName);
+                return prefs;
+            }
+
+            this.SetFormStateFromPrefs(prefs);
+            return prefs;
+        }
+
+        private void SetFormStateFromPrefs(ServerPreferences prefs)
+        {
+            if (prefs == null)
+            {
+                this.Logger.LogWarning($"Unable to set form state: {nameof(prefs)} cannot be null");
+                return;
+            }
+
+            this.CurrentProfile = prefs.ProfileName;
+
+            this.ServerNameField.Value = prefs.Name;
+            this.ServerPortField.Value = prefs.Port;
+            this.ServerPasswordField.Value = prefs.Password;
+            this.ShowPasswordField.Value = false;
+            this.CommunityServerField.Value = prefs.Public;
+            this.ServerCrossplayField.Value = prefs.Crossplay;
+            this.ServerSaveIntervalField.Value = prefs.SaveInterval;
+            this.ServerBackupsField.Value = prefs.BackupCount;
+            this.ServerShortBackupIntervalField.Value = prefs.BackupIntervalShort;
+            this.ServerLongBackupIntervalField.Value = prefs.BackupIntervalLong;
+            this.ServerAutoStartField.Value = prefs.AutoStart;
+            this.ServerAdditionalArgsField.Value = prefs.AdditionalArgs;
+
+            var worldName = prefs.WorldName;
+
+            if (this.WorldSelectExistingNameField.DataSource != null &&
+                this.WorldSelectExistingNameField.DataSource.Contains(worldName))
+            {
+                this.WorldSelectExistingNameField.Value = worldName;
+                this.WorldSelectRadioExisting.Value = true;
+            }
+            else
+            {
+                this.WorldSelectNewNameField.Value = worldName;
+                this.WorldSelectRadioNew.Value = true;
+            }
+        }
+
+        #endregion
+
+        #region Feature Capabilities
+
+        private void StartServer(bool isManualStart)
+        {
+            var onError = (string message) =>
+            {
+                if (isManualStart)
+                {
+                    MessageBox.Show(message, "Error starting server", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                }
+                else
+                {
+                    this.Logger.LogError("Error starting server: {message}", message);
+                }
+            };
+
+            var portFieldValue = this.ServerPortField.Value;
+            if (!this.IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue + 1))
+            {
+                onError($"Port {portFieldValue} or {portFieldValue + 1} is already in use.{NL}" +
+                    $"Valheim requires two adjacent ports to run a dedicated server.{NL}" +
+                    "Please shut down any UDP applications using these ports, or choose a different port for your server.");
+                return;
+            }
+
+            string worldName;
+            bool newWorld = this.WorldSelectRadioNew.Value;
+
+            if (newWorld)
+            {
+                // Creating a new world, ensure that the name is available
+                worldName = this.WorldSelectNewNameField.Value;
+                if (string.IsNullOrWhiteSpace(worldName))
+                {
+                    onError("You must enter a world name, or choose an existing world.");
+                    return;
+                }
+
+                if (!this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    onError($"A world named '{worldName}' already exists.");
+                    this.WorldSelectRadioExisting.Value = true;
+                    this.WorldSelectExistingNameField.Value = worldName;
+                    return;
+                }
+            }
+            else
+            {
+                // Using an existing world, ensure that the file exists
+                worldName = this.WorldSelectExistingNameField.Value;
+                if (this.FileProvider.IsWorldNameAvailable(worldName))
+                {
+                    // Don't think this is possible to hit because the name comes from a dropdown
+                    onError($"No world exists with name '{worldName}'.");
+                    return;
+                }
+            }
+
+            var userPrefs = this.UserPrefsProvider.LoadPreferences();
+            var serverPrefs = this.GetPrefsFromFormState();
+
+            var options = new ValheimServerOptions
+            {
+                Name = serverPrefs.Name,
+                Password = serverPrefs.Password,
+                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
+                NewWorld = newWorld,
+                Public = serverPrefs.Public,
+                Port = serverPrefs.Port,
+                Crossplay = serverPrefs.Crossplay,
+                SaveInterval = serverPrefs.SaveInterval,
+                Backups = serverPrefs.BackupCount,
+                BackupShort = serverPrefs.BackupIntervalShort,
+                BackupLong = serverPrefs.BackupIntervalLong,
+                AdditionalArgs = serverPrefs.AdditionalArgs,
+            };
+
+            try
+            {
+                options.Validate();
+                Server.Start(options);
+            }
+            catch (Exception exception)
+            {
+                onError(exception.Message);
+                return;
+            }
+
+            if (userPrefs.SaveProfileOnStart)
+            {
+                this.ServerPrefsProvider.SavePreferences(serverPrefs);
+            }
+        }
+
+        private void CheckFilePaths()
+        {
+            try
+            {
+                var _ = this.FileProvider.ServerExe;
+            }
+            catch (Exception e)
+            {
+                var result = MessageBox.Show(
+                    $"{e.Message}{NL}{NL}" +
+                    $"This may occur if you do not have Valheim Dedicated Server installed, or if you have " +
+                    $"installed it in a different directory. See Help for more info.{NL}{NL}" +
+                    "Would you like to change your directories now?",
+                    "File Not Found",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    this.ShowDirectoriesForm();
+                }
+            }
+        }
+
+        private string PromptForProfileName(string startingText = null)
+        {
+            var dialog = new TextPromptPopout("Server Profile Name", "Enter a server profile name:", startingText);
+            dialog.SetValidation(
+                "Profile name must be 1-30 characters, and must not match an existing profile name.",
+                (input) =>
+                {
+                    if (string.IsNullOrWhiteSpace(input) || input.Length > 30) return false;
+
+                    var prefs = this.ServerPrefsProvider.LoadPreferences(input);
+                    return prefs == null;
+                });
+
+            var result = dialog.ShowDialog();
+            if (result != DialogResult.OK) return null;
+
+            return dialog.Value;
+        }
+
+        private void LaunchNewWindow()
+        {
+            var splashForm = this.FormProvider.GetForm<SplashForm>();
+            var mainWindow = splashForm.CreateNewMainWindow(this.CurrentProfile, false);
+            mainWindow.Show();
         }
 
         private void CheckForUpdates(bool isManualCheck)
@@ -1039,21 +1253,30 @@ namespace ValheimServerGUI.Forms
             Task.Run(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(isManualCheck));
         }
 
-        private void CloseApplicationOnServerStopped()
+        private void CloseWindowOnServerStopped()
         {
             if (this.Server.IsAnyStatus(ServerStatus.Stopped))
             {
-                Application.Exit();
+                this.Close();
                 return;
             }
 
-            this.Server.StatusChanged += (_, status) =>
+            this.Server.StatusChanged += this.BuildEventHandler<ServerStatus>((status) =>
             {
                 if (status == ServerStatus.Stopped)
                 {
-                    Application.Exit();
+                    this.Close();
                 }
-            };
+            });
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        private int GetImageIndex(string key)
+        {
+            return this.ImageList.Images.IndexOfKey(key);
         }
 
         #endregion

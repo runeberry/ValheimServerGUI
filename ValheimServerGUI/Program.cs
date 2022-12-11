@@ -20,14 +20,14 @@ namespace ValheimServerGUI
         /// The main entry point for the application.
         /// </summary>
         [STAThread]
-        public static void Main()
+        public static void Main(string[] args)
         {
             Application.SetHighDpiMode(HighDpiMode.SystemAware);
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
             var services = new ServiceCollection();
-            ConfigureServices(services);
+            ConfigureServices(services, args);
             using var serviceProvider = services.BuildServiceProvider();
             ExceptionHandler = serviceProvider.GetRequiredService<IExceptionHandler>();
 
@@ -41,11 +41,12 @@ namespace ValheimServerGUI
             }
         }
 
-        public static void ConfigureServices(IServiceCollection services)
+        public static void ConfigureServices(IServiceCollection services, string[] args)
         {
-            // Tools
             var applicationLogger = new ApplicationLogger();
+            var startupArgsProvider = new StartupArgsProvider(args);
 
+            // Tools
             services
                 .AddSingleton<IDataFileRepositoryContext, DataFileRepositoryContext>()
                 .AddSingleton<IFileProvider, JsonFileProvider>()
@@ -66,14 +67,15 @@ namespace ValheimServerGUI
                 .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
                 .AddSingleton<IPlayerDataRepository, PlayerDataRepository>()
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
-                .AddSingleton<ValheimServerLogger>()
-                .AddSingleton<ValheimServer>();
+                .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
+                .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
+                .AddTransient<ValheimServerLogger>()
+                .AddTransient<ValheimServer>();
 
             // Forms
             services
                 .AddSingleton<SplashForm>()
-                .AddSingleton<MainWindow>()
-                .AddSingleton<AdvancedServerControlsForm>()
+                .AddTransient<MainWindow>()
                 .AddSingleton<DirectoriesForm>()
                 .AddSingleton<PreferencesForm>()
                 .AddSingleton<BugReportForm>()

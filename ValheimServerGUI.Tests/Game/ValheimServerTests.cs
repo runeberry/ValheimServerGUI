@@ -14,13 +14,11 @@ namespace ValheimServerGUI.Tests.Game
         private const string MessageOffline = "Closing socket {0}";
 
         private readonly ValheimServer Server;
-        private readonly ValheimServerLogger ServerLogger;
         private readonly IPlayerDataRepository PlayerDataRepository;
 
         public ValheimServerTests()
         {
             this.Server = this.GetService<ValheimServer>();
-            ServerLogger = this.GetService<ValheimServerLogger>();
             PlayerDataRepository = this.GetService<IPlayerDataRepository>();
         }
 
@@ -224,11 +222,11 @@ namespace ValheimServerGUI.Tests.Game
 
         private void Log(string message, params object[] args)
         {
-            ServerLogger.LogInformation(string.Format(message, args));
+            this.Server.Logger.LogInformation(string.Format(message, args));
         }
 
         private static PlayerInfo CreatePlayer(
-            string steamId, 
+            string steamId,
             string name = null,
             PlayerStatus? status = null,
             string zdoid = null,
@@ -257,7 +255,7 @@ namespace ValheimServerGUI.Tests.Game
         private static void AssertMatch(PlayerInfo expected, PlayerInfo actual)
         {
             Assert.NotNull(actual);
-            
+
             Assert.Equal(expected.SteamId, actual.SteamId);
             Assert.Equal(expected.PlayerStatus, actual.PlayerStatus);
 

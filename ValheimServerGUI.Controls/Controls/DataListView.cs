@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -37,13 +38,13 @@ namespace ValheimServerGUI.Controls
         private readonly List<DataListViewRow> _rows = new();
         public IReadOnlyList<DataListViewRow> Rows => _rows;
 
-        private readonly Dictionary<Type, DataListViewRowBinding> RowBindings = new();
+        private readonly ConcurrentDictionary<Type, DataListViewRowBinding> RowBindings = new();
 
         public bool IsRowSelected => this.ListView.SelectedItems.Count > 0;
 
         public event EventHandler SelectionChanged;
 
-        public int? SortColumn { get; protected set;  }
+        public int? SortColumn { get; protected set; }
 
         public bool SortDescending { get; protected set; }
 
@@ -72,14 +73,11 @@ namespace ValheimServerGUI.Controls
 
         public DataListView AddRowBinding<TEntity>(Action<IDataListViewRowBinding<TEntity>> builder)
         {
-            if (this.RowBindings.ContainsKey(typeof(TEntity)))
-            {
-                throw new ArgumentException($"{nameof(DataListView)} already has a binding for type {typeof(TEntity)}");
-            }
-
             var binding = new DataListViewRowBinding<TEntity>();
-            builder?.Invoke(binding);
-            this.RowBindings.Add(typeof(TEntity), binding);
+            if (this.RowBindings.TryAdd(typeof(TEntity), binding))
+            {
+                builder?.Invoke(binding);
+            };
 
             return this;
         }
@@ -341,7 +339,7 @@ namespace ValheimServerGUI.Controls
             private DataListViewRowBinding<TEntity> Binding { get; }
 
             internal DataListViewRow(DataListView parent, TEntity entity, DataListViewRowBinding<TEntity> binding)
-                : base(parent) 
+                : base(parent)
             {
                 this.Entity = entity;
                 this.Binding = binding;

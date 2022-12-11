@@ -13,13 +13,17 @@ namespace ValheimServerGUI.Tools
 {
     public interface IIpAddressProvider
     {
-        event EventHandler<string> ExternalIpReceived;
+        public string ExternalIpAddress { get; }
 
-        event EventHandler<string> InternalIpReceived;
+        public string InternalIpAddress { get; }
 
-        Task GetExternalIpAddressAsync();
+        event EventHandler<string> ExternalIpChanged;
 
-        Task GetInternalIpAddressAsync();
+        event EventHandler<string> InternalIpChanged;
+
+        Task LoadExternalIpAddressAsync();
+
+        Task LoadInternalIpAddressAsync();
 
         bool IsLocalUdpPortAvailable(params int[] ports);
     }
@@ -30,11 +34,37 @@ namespace ValheimServerGUI.Tools
         {
         }
 
-        public event EventHandler<string> ExternalIpReceived;
+        #region IIpAddressProvider implementation
 
-        public event EventHandler<string> InternalIpReceived;
+        private string _externalIpAddress;
+        public string ExternalIpAddress
+        {
+            get => this._externalIpAddress;
+            private set
+            {
+                if (this._externalIpAddress == value) return;
+                this._externalIpAddress = value;
+                this.ExternalIpChanged?.Invoke(this, value);
+            }
+        }
 
-        public Task GetExternalIpAddressAsync()
+        private string _internalIpAddress;
+        public string InternalIpAddress
+        {
+            get => this._internalIpAddress;
+            private set
+            {
+                if (this._internalIpAddress == value) return;
+                this._internalIpAddress = value;
+                this.InternalIpChanged?.Invoke(this, value);
+            }
+        }
+
+        public event EventHandler<string> ExternalIpChanged;
+
+        public event EventHandler<string> InternalIpChanged;
+
+        public Task LoadExternalIpAddressAsync()
         {
             return this.Get(Resources.UrlExternalIpLookup)
                 .WithCallback<ExternalIpResponse>(this.OnExternalIpResponse)
@@ -42,7 +72,7 @@ namespace ValheimServerGUI.Tools
         }
 
         // Adapted from: https://stackoverflow.com/a/40528818/7071436
-        public Task GetInternalIpAddressAsync()
+        public Task LoadInternalIpAddressAsync()
         {
             // Extract the IPv4 addresses from all network interfaces that are currently "up"
             var addresses = NetworkInterface.GetAllNetworkInterfaces()
@@ -71,13 +101,7 @@ namespace ValheimServerGUI.Tools
                 .Where(str => !string.IsNullOrWhiteSpace(str))
                 .OrderBy(str => str);
 
-            var result = results.FirstOrDefault();
-
-            if (result != null)
-            {
-                this.InternalIpReceived?.Invoke(this, result);
-            }
-
+            this.InternalIpAddress = results.FirstOrDefault();
             return Task.CompletedTask;
         }
 
@@ -89,10 +113,14 @@ namespace ValheimServerGUI.Tools
                 .Any(p => ports.Contains(p.Port));
         }
 
+        #endregion
+
+        #region Non-public methods
+
         private void OnExternalIpResponse(object sender, ExternalIpResponse response)
         {
             if (string.IsNullOrWhiteSpace(response?.Ip)) return;
-            this.ExternalIpReceived?.Invoke(this, response.Ip);
+            this.ExternalIpAddress = response.Ip;
         }
 
         private class ExternalIpResponse
@@ -100,5 +128,7 @@ namespace ValheimServerGUI.Tools
             [JsonProperty("ip")]
             public string Ip { get; set; }
         }
+
+        #endregion
     }
 }

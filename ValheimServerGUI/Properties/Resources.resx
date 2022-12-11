@@ -118,8 +118,14 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
+  <data name="AddImmediateWindow_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\AddImmediateWindow_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="ApplicationIcon" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\ApplicationIcon.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="ApplicationTitle" xml:space="preserve">
+    <value>(Unofficial) Valheim Dedicated Server GUI</value>
   </data>
   <data name="Cancel_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Cancel_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -152,6 +158,9 @@
   <data name="DefaultServerPort" xml:space="preserve">
     <value>2456</value>
   </data>
+  <data name="DefaultServerProfileName" xml:space="preserve">
+    <value>Default</value>
+  </data>
   <data name="DefaultValheimSaveFolder" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim</value>
   </data>
@@ -173,6 +182,15 @@
   <data name="NewBug_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\NewBug_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="NewFile_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\NewFile_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OpenFile_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\OpenFile_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="OpenFolder_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\OpenFolder_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="OpenWeb_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\OpenWeb_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -187,6 +205,9 @@
   </data>
   <data name="Run_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Run_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="Save_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Save_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="Settings_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Settings_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -217,9 +238,6 @@
   </data>
   <data name="Stop_16x" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\Stop_16x.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
-  </data>
-  <data name="TwitterLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\TwitterLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="UnsyncedCommits_16x_Horiz" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\UnsyncedCommits_16x_Horiz.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
@@ -253,9 +271,6 @@
   </data>
   <data name="UrlRuneberryApi" xml:space="preserve">
     <value>https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod</value>
-  </data>
-  <data name="UrlTwitter" xml:space="preserve">
-    <value>https://twitter.com/Runeberries</value>
   </data>
   <data name="UrlUpdates" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/releases</value>

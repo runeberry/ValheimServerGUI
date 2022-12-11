@@ -18,6 +18,8 @@ namespace ValheimServerGUI.Tools
         {
             return (sender, args) =>
             {
+                if (control.IsDisposed) return;
+
                 if (control.InvokeRequired)
                 {
                     control.Invoke(new Action<TArgs>(action), new object[] { args });
@@ -32,6 +34,8 @@ namespace ValheimServerGUI.Tools
         {
             return (sender, args) =>
             {
+                if (control.IsDisposed) return;
+
                 // This technique allows cross-thread access to UI controls
                 // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
                 if (control.InvokeRequired)
@@ -52,6 +56,8 @@ namespace ValheimServerGUI.Tools
 
                 await Task.Run(() =>
                 {
+                    if (control.IsDisposed) return;
+
                     if (control.InvokeRequired)
                     {
                         control.Invoke(new Func<TArgs, Task>(taskFunc), new object[] { args });
@@ -71,6 +77,8 @@ namespace ValheimServerGUI.Tools
 
                 await Task.Run(() =>
                 {
+                    if (control.IsDisposed) return;
+
                     if (control.InvokeRequired)
                     {
                         control.Invoke(new Func<Task>(taskFunc));
@@ -120,7 +128,7 @@ namespace ValheimServerGUI.Tools
                 .Cast<DictionaryEntry>()
                 .Where(de => de.Key != null && de.Value != null && typeof(Image).IsAssignableFrom(de.Value.GetType()))
                 .ToDictionary(de => de.Key.ToString(), de => de.Value as Image);
-            
+
             foreach (var (key, image) in resourceImages)
             {
                 // For now, only add images that match the list size exactly

@@ -19,6 +19,11 @@ namespace ValheimServerGUI.Game
         /// </summary>        
         public IValheimServerOptions Options { get; private set; } = new ValheimServerOptions();
 
+        /// <summary>
+        /// Exposed for testing.
+        /// </summary>
+        public ValheimServerLogger Logger => this.ServerLogger;
+
         public ServerStatus Status
         {
             get => this._status;
@@ -30,17 +35,18 @@ namespace ValheimServerGUI.Game
             }
         }
         private ServerStatus _status = ServerStatus.Stopped;
-        public event EventHandler<ServerStatus> StatusChanged;
-
-        public event EventHandler<decimal> WorldSaved;
-        public event EventHandler<string> InviteCodeReady;
-
-        public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped);
-        public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running);
-        public bool CanRestart => this.IsAnyStatus(ServerStatus.Running);
-
+        private string ProcessKey;
         private bool IsRestarting;
         private readonly Dictionary<string, LogEventHandler> LogBasedActions = new();
+
+        public event EventHandler<ServerStatus> StatusChanged;
+        public event EventHandler<decimal> WorldSaved;
+        public event EventHandler<string> InviteCodeReady;
+        public event EventHandler<EventLogContext> LogReceived;
+
+        public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped) && this.ProcessKey == null;
+        public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && this.ProcessKey != null;
+        public bool CanRestart => this.IsAnyStatus(ServerStatus.Running) && this.ProcessKey != null;
 
         private readonly IProcessProvider ProcessProvider;
         private readonly IValheimFileProvider FileProvider;
@@ -71,16 +77,24 @@ namespace ValheimServerGUI.Game
 
         private void InitializeLogBasedActions()
         {
+
             LogBasedActions.Add(@"Game server connected", this.OnServerConnected);
-
-            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
-            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
-            LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
-            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // Technically "disconnecting" but it's the best terminator I can find
-
             LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", this.OnWorldSaved);
-
             LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", this.OnCrossplayJoinCodeAvailable);
+
+            // Connecting
+            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
+            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID Steam_(\d+?)$", this.OnPlayerConnecting); // Crossplay
+
+            // Connected - NOTE: ZDOID can be a negative number, account for that w/ regex!
+            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
+
+            // Disconnecting
+            LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
+
+            // Disconnected
+            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // This is technically "disconnecting" but it's the best terminator I can find
+            LogBasedActions.Add(@"Destroying abandoned non persistent zdo ([\d-]+?):.*$", this.OnPlayerDisconnected); // Crossplay
         }
 
         private void InitializeStatusBasedActions()
@@ -123,32 +137,23 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStart) return;
 
-            this.ApplicationLogger.LogInformation("Starting server...");
+            this.ApplicationLogger.LogInformation("Starting server: {name}", options.Name);
 
             var exePath = this.FileProvider.ServerExe.FullName;
-            var saveDataFolder = this.FileProvider.SaveDataFolder.FullName;
-            var publicFlag = options.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}"" -saveinterval {options.SaveInterval} -backups {options.Backups} -backupshort {options.BackupShort} -backuplong {options.BackupLong}";
+            var processArgs = this.GenerateArgs(options);
+            this.ApplicationLogger.LogInformation(@"Server run command: ""{exePath}"" {processArgs}", exePath, processArgs);
 
-            if (options.Crossplay)
-            {
-                processArgs += " -crossplay";
-            }
-
-            // TODO: can't actually enable this right now, because it stops the process from writing out logs,
-            // which are essential for the app to function. Need to implement my own file logging, or find a way
-            // to read logs from file as they come in.
-            //if (!string.IsNullOrWhiteSpace(options.LogFile))
-            //{
-            //    processArgs += @$" -logFile ""{options.LogFile}""";
-            //}
-
-            var process = this.ProcessProvider.AddBackgroundProcess(ProcessKeys.ValheimServer, exePath, processArgs);
+            this.ProcessKey = Guid.NewGuid().ToString();
+            var process = this.ProcessProvider.AddBackgroundProcess(this.ProcessKey, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
             process.OutputDataReceived += this.Process_OnDataReceived;
             process.ErrorDataReceived += this.Process_OnErrorReceived;
-            process.Exited += (obj, e) => this.Status = ServerStatus.Stopped;
+            process.Exited += (obj, e) =>
+            {
+                this.ProcessKey = null;
+                this.Status = ServerStatus.Stopped;
+            };
 
             process.StartIO();
 
@@ -164,9 +169,9 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanStop) return;
 
-            this.ApplicationLogger.LogInformation("Stopping server...");
+            this.ApplicationLogger.LogInformation("Stopping server: {name}", this.Options.Name);
 
-            this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
+            this.ProcessProvider.SafelyKillProcess(this.ProcessKey);
 
             this.IsRestarting = false;
             this.Status = ServerStatus.Stopping;
@@ -180,9 +185,9 @@ namespace ValheimServerGUI.Game
         {
             if (!this.CanRestart) return;
 
-            this.ApplicationLogger.LogInformation("Restarting server...");
+            this.ApplicationLogger.LogInformation("Restarting server: {name}", this.Options.Name);
 
-            this.ProcessProvider.SafelyKillProcess(ProcessKeys.ValheimServer);
+            this.ProcessProvider.SafelyKillProcess(this.ProcessKey);
 
             this.Options = options ?? this.Options;
             this.IsRestarting = true;
@@ -223,9 +228,11 @@ namespace ValheimServerGUI.Game
                 }
                 catch (Exception e)
                 {
-                    this.ApplicationLogger.LogError(e, "Error parsing server log: {0}", context.Message);
+                    this.ApplicationLogger.LogError(e, "Error parsing server log: {message}", context.Message);
                 }
             }
+
+            this.LogReceived?.Invoke(obj, context);
         }
 
         #endregion
@@ -234,6 +241,11 @@ namespace ValheimServerGUI.Game
 
         private void OnServerConnected(object sender, EventLogContext context, params string[] captures)
         {
+            // The server can reach a running state if you attempt to stop it late in the 
+            // startup process, so avoid changing status from "Stopping" -> "Running".
+            // It will still stop after it fully starts up.
+            if (this.Status == ServerStatus.Stopping) return;
+
             this.Status = ServerStatus.Running;
         }
 
@@ -258,18 +270,18 @@ namespace ValheimServerGUI.Game
 
         private void OnPlayerDisconnecting(object sender, EventLogContext context, params string[] captures)
         {
-            var steamId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamId)) return;
+            var steamOrZdoId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
 
-            this.PlayerDataRepository.SetPlayerLeaving(steamId);
+            this.PlayerDataRepository.SetPlayerLeaving(steamOrZdoId);
         }
 
         private void OnPlayerDisconnected(object sender, EventLogContext context, params string[] captures)
         {
-            var steamId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamId)) return;
+            var steamOrZdoId = captures[0];
+            if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
 
-            this.PlayerDataRepository.SetPlayerOffline(steamId);
+            this.PlayerDataRepository.SetPlayerOffline(steamOrZdoId);
         }
 
         private void OnWorldSaved(object sender, EventLogContext context, params string[] captures)
@@ -299,6 +311,37 @@ namespace ValheimServerGUI.Game
             this.Stop();
 
             GC.SuppressFinalize(this);
+        }
+
+        #endregion
+
+        #region Helper methods
+
+        private string GenerateArgs(IValheimServerOptions options)
+        {
+            var saveDataFolder = this.FileProvider.SaveDataFolder.FullName;
+            var publicFlag = options.Public ? 1 : 0;
+            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}"" -saveinterval {options.SaveInterval} -backups {options.Backups} -backupshort {options.BackupShort} -backuplong {options.BackupLong}";
+
+            if (options.Crossplay)
+            {
+                processArgs += " -crossplay";
+            }
+
+            if (!string.IsNullOrWhiteSpace(options.AdditionalArgs))
+            {
+                processArgs += options.AdditionalArgs;
+            }
+
+            // TODO: can't actually enable this right now, because it stops the process from writing out logs,
+            // which are essential for the app to function. Need to implement my own file logging, or find a way
+            // to read logs from file as they come in.
+            //if (!string.IsNullOrWhiteSpace(options.LogFile))
+            //{
+            //    processArgs += @$" -logFile ""{options.LogFile}""";
+            //}
+
+            return processArgs;
         }
 
         #endregion

@@ -215,12 +215,6 @@ namespace ValheimServerGUI.Forms
                 // No server to start, mock a "stopped" event to initialize the form
                 this.OnServerStatusChanged(ServerStatus.Stopped);
             }
-
-            var userPrefs = this.UserPrefsProvider.LoadPreferences();
-            if (userPrefs.StartMinimized)
-            {
-                this.WindowState = FormWindowState.Minimized;
-            }
         }
 
         private void InitializeIpAddresses()

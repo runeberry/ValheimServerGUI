@@ -347,9 +347,15 @@ namespace ValheimServerGUI.Forms
 
         private void FinishStartup()
         {
+            var userPrefs = this.UserPrefsProvider.LoadPreferences();
+
             foreach (var mainWindow in this.MainWindows)
             {
                 mainWindow.Show();
+                if (userPrefs.StartMinimized)
+                {
+                    mainWindow.WindowState = FormWindowState.Minimized;
+                }
             }
 
 #if DEBUG

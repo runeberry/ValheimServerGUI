@@ -16,6 +16,10 @@ namespace ValheimServerGUI.Game
 
         public bool CheckForUpdates { get; set; } = true;
 
+        public bool StartWithWindows { get; set; }
+
+        public bool StartMinimized { get; set; }
+
         public bool SaveProfileOnStart { get; set; } = true;
 
         public List<ServerPreferences> Servers { get; set; } = new();
@@ -30,11 +34,14 @@ namespace ValheimServerGUI.Game
             prefs.ValheimServerPath = file.ValheimServerPath ?? prefs.ValheimServerPath;
             prefs.ValheimSaveDataFolder = file.ValheimSaveDataFolder ?? prefs.ValheimSaveDataFolder;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
+            prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
+            prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
             prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
 
             if (file.Servers != null)
             {
                 prefs.Servers = file.Servers
+                    .Where(f => f != null)
                     .Select(f => ServerPreferences.FromFile(f))
                     .DistinctBy(f => f.ProfileName)
                     .ToList();
@@ -51,6 +58,8 @@ namespace ValheimServerGUI.Game
                 ValheimServerPath = this.ValheimServerPath,
                 ValheimSaveDataFolder = this.ValheimSaveDataFolder,
                 CheckForUpdates = this.CheckForUpdates,
+                StartWithWindows = this.StartWithWindows,
+                StartMinimized = this.StartMinimized,
                 SaveProfileOnStart = this.SaveProfileOnStart,
                 Servers = new(),
             };

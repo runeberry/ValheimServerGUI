@@ -19,13 +19,13 @@ namespace ValheimServerGUI.Game
         [JsonProperty("valheimSaveDataFolder")]
         public string ValheimSaveDataFolder { get; set; }
 
-        [JsonProperty("startWithWindows"), Obsolete("Moved to server preferences", true)]
+        [JsonProperty("startWithWindows")]
         public bool? StartWithWindows { get; set; }
 
         [JsonProperty("startServerAutomatically"), Obsolete("Moved to server preferences", true)]
         public bool? StartServerAutomatically { get; set; }
 
-        [JsonProperty("startMinimized"), Obsolete("Moved to server preferences", true)]
+        [JsonProperty("startMinimized")]
         public bool? StartMinimized { get; set; }
 
         [JsonProperty("checkServerRunning"), Obsolete("Removed with multi-server support", true)]

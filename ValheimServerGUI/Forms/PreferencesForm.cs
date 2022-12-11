@@ -53,6 +53,8 @@ namespace ValheimServerGUI.Forms
             prefs.StartWithWindows = this.StartWithWindowsField.Value;
             prefs.StartMinimized = this.StartMinimizedField.Value;
 
+            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
+
             this.UserPrefsProvider.SavePreferences(prefs);
             this.Close();
         }

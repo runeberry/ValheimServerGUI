@@ -241,6 +241,11 @@ namespace ValheimServerGUI.Game
 
         private void OnServerConnected(object sender, EventLogContext context, params string[] captures)
         {
+            // The server can reach a running state if you attempt to stop it late in the 
+            // startup process, so avoid changing status from "Stopping" -> "Running".
+            // It will still stop after it fully starts up.
+            if (this.Status == ServerStatus.Stopping) return;
+
             this.Status = ServerStatus.Running;
         }
 

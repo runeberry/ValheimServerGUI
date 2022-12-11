@@ -271,8 +271,6 @@ namespace ValheimServerGUI.Forms
         {
             this.TaskFinished += this.BuildEventHandler<Task>(this.OnTaskFinished);
 
-            this.AddStartupTask(this.IpAddressProvider.GetExternalIpAddressAsync, "Get external IP address");
-            this.AddStartupTask(this.IpAddressProvider.GetInternalIpAddressAsync, "Get internal IP address");
             this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false), "Check for updates");
             this.AddStartupTask(this.PlayerDataRepository.LoadAsync, "Load player data");
 

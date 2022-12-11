@@ -117,8 +117,8 @@ namespace ValheimServerGUI.Forms
 
             this.PlayerDataProvider.EntityUpdated += this.BuildEventHandler<PlayerInfo>(this.OnPlayerUpdated);
 
-            this.IpAddressProvider.ExternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_ExternalIpReceived);
-            this.IpAddressProvider.InternalIpReceived += this.BuildEventHandler<string>(this.IpAddressProvider_InternalIpReceived);
+            this.IpAddressProvider.ExternalIpChanged += this.BuildEventHandler<string>(this.IpAddressProvider_ExternalIpChanged);
+            this.IpAddressProvider.InternalIpChanged += this.BuildEventHandler<string>(this.IpAddressProvider_InternalIpChanged);
 
             this.SoftwareUpdateProvider.UpdateCheckStarted += this.BuildEventHandler(this.SoftwareUpdateProvider_UpdateCheckStarted);
             this.SoftwareUpdateProvider.UpdateCheckFinished += this.BuildEventHandler<SoftwareUpdateEventArgs>(this.SoftwareUpdateProvider_UpdateCheckFinished);
@@ -223,6 +223,20 @@ namespace ValheimServerGUI.Forms
             }
         }
 
+        private void InitializeIpAddresses()
+        {
+            var internalIp = this.IpAddressProvider.InternalIpAddress;
+            var externalIp = this.IpAddressProvider.ExternalIpAddress;
+
+            this.LabelInternalIpAddress.Value = internalIp ?? IpLoadingText;
+            this.LabelExternalIpAddress.Value = externalIp ?? IpLoadingText;
+
+            if (internalIp == null) this.IpAddressProvider.LoadInternalIpAddressAsync();
+            if (externalIp == null) this.IpAddressProvider.LoadExternalIpAddressAsync();
+
+            this.RefreshIpPorts();
+        }
+
         private void InitializePlayerData()
         {
             this.PlayersTable.AddRowBinding<PlayerInfo>(row =>
@@ -246,6 +260,7 @@ namespace ValheimServerGUI.Forms
         {
             base.OnShown(e);
 
+            this.InitializeIpAddresses();
             this.InitializePlayerData();
             this.InitializeStartupPrefs();
             this.CheckFilePaths();
@@ -684,13 +699,13 @@ namespace ValheimServerGUI.Forms
             this.SetInviteCode(inviteCode);
         }
 
-        private void IpAddressProvider_ExternalIpReceived(string ip)
+        private void IpAddressProvider_ExternalIpChanged(string ip)
         {
             this.LabelExternalIpAddress.Value = ip;
             this.RefreshIpPorts();
         }
 
-        private void IpAddressProvider_InternalIpReceived(string ip)
+        private void IpAddressProvider_InternalIpChanged(string ip)
         {
             this.LabelInternalIpAddress.Value = ip;
             this.RefreshIpPorts();

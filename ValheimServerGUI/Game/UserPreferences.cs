@@ -67,9 +67,9 @@ namespace ValheimServerGUI.Game
             if (this.Servers != null)
             {
                 var servers = this.Servers
-                    .Where(p => !string.IsNullOrWhiteSpace(p.Name)) // Remove servers with no name
-                    .DistinctBy(p => p.Name) // Remove duplicate entries by server name
-                    .Select(p => p.ToFile());
+                    .Select(p => p.ToFile())
+                    .Where(p => !string.IsNullOrWhiteSpace(p.ProfileName)) // Remove profiles with no name
+                    .DistinctBy(p => p.ProfileName); // Remove duplicate entries by profile name
 
                 file.Servers.AddRange(servers);
             }

@@ -230,29 +230,29 @@ namespace ValheimServerGUI.Forms
         private void PrepareMainWindows()
         {
             var allPrefs = this.ServerPrefsProvider.LoadPreferences();
-
             var autoStartServers = allPrefs.Where(p => p != null && p.AutoStart);
             if (autoStartServers.Any())
             {
                 this.Logger.LogInformation("Loading server profiles with auto-start enabled");
-                foreach (var prefs in autoStartServers)
+                foreach (var autoStartServer in autoStartServers)
                 {
-                    this.CreateNewMainWindow(prefs.ProfileName, true);
+                    this.CreateNewMainWindow(autoStartServer.ProfileName, true);
                 }
+                return;
             }
-            else
-            {
-                var prefs = allPrefs
-                    .OrderByDescending(p => p.LastSaved)
-                    .FirstOrDefault();
 
-                if (prefs != null)
-                {
-                    this.Logger.LogInformation("Loading most recently saved profile: {name}", prefs.ProfileName);
-                    this.CreateNewMainWindow(prefs.ProfileName, false);
-                    return;
-                }
+            var lastSavedServer = allPrefs.OrderByDescending(p => p.LastSaved).FirstOrDefault();
+            if (lastSavedServer != null)
+            {
+                this.Logger.LogInformation("Loading most recently saved profile: {name}", lastSavedServer.ProfileName);
+                this.CreateNewMainWindow(lastSavedServer.ProfileName, false);
+                return;
             }
+
+            var newPrefs = new ServerPreferences { ProfileName = Resources.DefaultServerProfileName };
+            this.ServerPrefsProvider.SavePreferences(newPrefs);
+            this.Logger.LogInformation("User preferences not found, creating new file");
+            this.CreateNewMainWindow(newPrefs.ProfileName, false);
         }
 
         private void AddStartupTask(Func<Task> taskFunc, string taskName)

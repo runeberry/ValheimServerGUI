@@ -56,7 +56,7 @@ namespace ValheimServerGUI.Forms
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(253, 79);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Valheim Dedicated Server GUI\r\n\r\n(c) 2021 Runeberry Software, LLC\r\nLicensed under " +
+            this.label1.Text = "Valheim Dedicated Server GUI\r\n\r\n(c) 2022 Runeberry Software, LLC\r\nLicensed under " +
     "GNU GPLv3";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 

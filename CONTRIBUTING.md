@@ -37,11 +37,22 @@ This project uses a **Publish Profile** (.pubxml) file to store configuration fo
 
 1. Right-click the **ValheimServerGUI** project in the Solution Explorer in Visual Studio.
 2. Click **Publish...**
-3. Choose the **small-x64.pubxml** profile.
+3. Choose the **small-x64-debug.pubxml** profile.
 4. Click the **Publish** button in the top-right.
-5. The .exe file will appear in the **/publish** folder in the root of this repo.
+5. The .exe file will appear in the **/publish/small-x64/** folder in the root of this repo.
 
-If you are publishing a Release configuration of this project, you will need a copy of the **ValheimServerGUI.snk** file in your SolutionResources folder. However, you can get around this by simply changing the Configuration to "Debug" for testing.
+### Publishing a signed version of the app
+
+_For projects maintainers only._
+
+In order to publish a code-signed release of the app, you must take the following additional steps:
+
+* You must add the **ValheimServerGUI.snk** file to the SolutionResources folder.
+* You must have the Runeberry Software code signing certificate (.pfx) installed on your machine.
+* You must have **SignTool.exe** in your system's PATH.
+  * With the Visual Studio Installer, this is installed along with the Windows 10/11 SDKs. The install path looks like: `C:\Program Files (x86)\Windows Kits\10\bin\{version}\x86`
+
+With all this in place, you should be able to run the **small-x64-release.pubxml** publish profile.
 
 ### Creating a new release
 

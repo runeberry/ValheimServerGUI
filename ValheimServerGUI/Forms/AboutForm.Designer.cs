@@ -54,10 +54,10 @@ namespace ValheimServerGUI.Forms
             // 
             this.label1.Location = new System.Drawing.Point(118, 12);
             this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(253, 79);
+            this.label1.Size = new System.Drawing.Size(253, 65);
             this.label1.TabIndex = 1;
-            this.label1.Text = "Valheim Dedicated Server GUI\r\n\r\n(c) 2022 Runeberry Software, LLC\r\nLicensed under " +
-    "GNU GPLv3";
+            this.label1.Text = "Valheim Dedicated Server GUI\r\n\r\n© 2023 Runeberry Software, LLC\r\nLicensed under GN" +
+    "U GPLv3";
             this.label1.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // label2
@@ -74,11 +74,11 @@ namespace ValheimServerGUI.Forms
             // 
             // VersionLabel
             // 
-            this.VersionLabel.Location = new System.Drawing.Point(118, 91);
+            this.VersionLabel.Location = new System.Drawing.Point(119, 77);
             this.VersionLabel.Name = "VersionLabel";
-            this.VersionLabel.Size = new System.Drawing.Size(253, 23);
+            this.VersionLabel.Size = new System.Drawing.Size(253, 35);
             this.VersionLabel.TabIndex = 2;
-            this.VersionLabel.Text = "Version: ?";
+            this.VersionLabel.Text = "Version: 0.0.0-rc.1\r\nBuild Date: 2000-01-01T00:00:00.000Z";
             this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // ButtonGitHub

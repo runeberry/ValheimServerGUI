@@ -29,7 +29,6 @@ namespace ValheimServerGUI.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(AboutForm));
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -43,7 +42,7 @@ namespace ValheimServerGUI.Forms
             // 
             // pictureBox1
             // 
-            this.pictureBox1.Image = ((System.Drawing.Image)(resources.GetObject("pictureBox1.Image")));
+            this.pictureBox1.Image = global::ValheimServerGUI.Properties.Resources.RuneberryLogo;
             this.pictureBox1.Location = new System.Drawing.Point(12, 12);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(100, 100);
@@ -86,7 +85,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ButtonGitHub.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonGitHub.Image = ((System.Drawing.Image)(resources.GetObject("ButtonGitHub.Image")));
+            this.ButtonGitHub.Image = global::ValheimServerGUI.Properties.Resources.GitHubLogo;
             this.ButtonGitHub.Location = new System.Drawing.Point(12, 216);
             this.ButtonGitHub.Name = "ButtonGitHub";
             this.ButtonGitHub.Size = new System.Drawing.Size(116, 23);
@@ -101,7 +100,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ButtonDonate.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonDonate.Image = ((System.Drawing.Image)(resources.GetObject("ButtonDonate.Image")));
+            this.ButtonDonate.Image = global::ValheimServerGUI.Properties.Resources.DonateLogo;
             this.ButtonDonate.Location = new System.Drawing.Point(256, 216);
             this.ButtonDonate.Name = "ButtonDonate";
             this.ButtonDonate.Size = new System.Drawing.Size(116, 23);
@@ -116,7 +115,7 @@ namespace ValheimServerGUI.Forms
             // 
             this.ButtonValheimSite.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonValheimSite.Image = ((System.Drawing.Image)(resources.GetObject("ButtonValheimSite.Image")));
+            this.ButtonValheimSite.Image = global::ValheimServerGUI.Properties.Resources.vsg_logo_16;
             this.ButtonValheimSite.Location = new System.Drawing.Point(12, 187);
             this.ButtonValheimSite.Name = "ButtonValheimSite";
             this.ButtonValheimSite.Size = new System.Drawing.Size(360, 23);

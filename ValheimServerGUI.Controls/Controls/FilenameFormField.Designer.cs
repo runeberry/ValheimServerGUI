@@ -41,7 +41,7 @@ namespace ValheimServerGUI.Controls
             this.Label.Location = new System.Drawing.Point(9, 0);
             this.Label.Name = "Label";
             this.Label.Size = new System.Drawing.Size(35, 15);
-            this.Label.TabIndex = 3;
+            this.Label.TabIndex = 0;
             this.Label.Text = "Label";
             // 
             // TextBox
@@ -51,7 +51,7 @@ namespace ValheimServerGUI.Controls
             this.TextBox.Location = new System.Drawing.Point(9, 18);
             this.TextBox.Name = "TextBox";
             this.TextBox.Size = new System.Drawing.Size(106, 23);
-            this.TextBox.TabIndex = 2;
+            this.TextBox.TabIndex = 0;
             // 
             // FileBrowserButton
             // 
@@ -59,7 +59,7 @@ namespace ValheimServerGUI.Controls
             this.FileBrowserButton.Location = new System.Drawing.Point(116, 18);
             this.FileBrowserButton.Name = "FileBrowserButton";
             this.FileBrowserButton.Size = new System.Drawing.Size(26, 23);
-            this.FileBrowserButton.TabIndex = 4;
+            this.FileBrowserButton.TabIndex = 1;
             this.FileBrowserButton.Text = "...";
             this.FileBrowserButton.UseVisualStyleBackColor = true;
             this.FileBrowserButton.Click += new System.EventHandler(this.FileBrowserButton_Click);
@@ -72,7 +72,8 @@ namespace ValheimServerGUI.Controls
             this.HelpLabel.Location = new System.Drawing.Point(130, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 8;
+            this.HelpLabel.TabIndex = 0;
+            this.HelpLabel.TabStop = false;
             // 
             // FilenameFormField
             // 

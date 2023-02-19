@@ -51,7 +51,7 @@ namespace ValheimServerGUI.Controls
             this.Label.Location = new System.Drawing.Point(9, 0);
             this.Label.Name = "Label";
             this.Label.Size = new System.Drawing.Size(35, 15);
-            this.Label.TabIndex = 1;
+            this.Label.TabIndex = 0;
             this.Label.Text = "Label";
             // 
             // HelpLabel
@@ -62,7 +62,8 @@ namespace ValheimServerGUI.Controls
             this.HelpLabel.Location = new System.Drawing.Point(129, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 8;
+            this.HelpLabel.TabIndex = 0;
+            this.HelpLabel.TabStop = false;
             // 
             // DropdownFormField
             // 

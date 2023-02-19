@@ -46,6 +46,7 @@ namespace ValheimServerGUI.Controls
             this.TextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.TextBox.Size = new System.Drawing.Size(300, 150);
             this.TextBox.TabIndex = 0;
+            this.TextBox.TabStop = false;
             // 
             // LogViewer
             // 

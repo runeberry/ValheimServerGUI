@@ -41,7 +41,7 @@ namespace ValheimServerGUI.Forms
             this.AppNameLabel.Location = new System.Drawing.Point(12, 9);
             this.AppNameLabel.Name = "AppNameLabel";
             this.AppNameLabel.Size = new System.Drawing.Size(174, 23);
-            this.AppNameLabel.TabIndex = 1;
+            this.AppNameLabel.TabIndex = 0;
             this.AppNameLabel.Text = "ValheimServerGUI";
             this.AppNameLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
@@ -53,7 +53,7 @@ namespace ValheimServerGUI.Forms
             this.ProgressBar.Name = "ProgressBar";
             this.ProgressBar.Size = new System.Drawing.Size(174, 16);
             this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Continuous;
-            this.ProgressBar.TabIndex = 2;
+            this.ProgressBar.TabIndex = 1;
             // 
             // SplashForm
             // 

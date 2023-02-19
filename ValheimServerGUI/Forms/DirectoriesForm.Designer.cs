@@ -44,7 +44,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonCancel.Location = new System.Drawing.Point(272, 182);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 3;
+            this.ButtonCancel.TabIndex = 5;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
@@ -66,7 +66,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults.Location = new System.Drawing.Point(12, 182);
             this.ButtonDefaults.Name = "ButtonDefaults";
             this.ButtonDefaults.Size = new System.Drawing.Size(111, 23);
-            this.ButtonDefaults.TabIndex = 5;
+            this.ButtonDefaults.TabIndex = 3;
             this.ButtonDefaults.Text = "Restore Defaults";
             this.ButtonDefaults.UseVisualStyleBackColor = true;
             this.ButtonDefaults.Click += new System.EventHandler(this.ButtonDefaults_Click);
@@ -82,7 +82,7 @@ namespace ValheimServerGUI.Forms
             this.GamePathField.Name = "GamePathField";
             this.GamePathField.ReadOnly = false;
             this.GamePathField.Size = new System.Drawing.Size(335, 41);
-            this.GamePathField.TabIndex = 6;
+            this.GamePathField.TabIndex = 0;
             this.GamePathField.Value = "";
             // 
             // ServerPathField
@@ -96,10 +96,10 @@ namespace ValheimServerGUI.Forms
             this.ServerPathField.Name = "ServerPathField";
             this.ServerPathField.ReadOnly = false;
             this.ServerPathField.Size = new System.Drawing.Size(335, 41);
-            this.ServerPathField.TabIndex = 7;
+            this.ServerPathField.TabIndex = 1;
             this.ServerPathField.Value = "";
             // 
-            // WorldsFolderField
+            // SaveDataFolderField
             // 
             this.SaveDataFolderField.FileSelectMode = ValheimServerGUI.Controls.FileSelectMode.Directory;
             this.SaveDataFolderField.HelpText = "The location of the save data for your Valheim server,\r\nincluding the \"worlds\" fo" +
@@ -108,10 +108,10 @@ namespace ValheimServerGUI.Forms
             this.SaveDataFolderField.LabelText = "Valheim Save Data Folder";
             this.SaveDataFolderField.Location = new System.Drawing.Point(12, 106);
             this.SaveDataFolderField.MultiFileSeparator = "; ";
-            this.SaveDataFolderField.Name = "WorldsFolderField";
+            this.SaveDataFolderField.Name = "SaveDataFolderField";
             this.SaveDataFolderField.ReadOnly = false;
             this.SaveDataFolderField.Size = new System.Drawing.Size(335, 41);
-            this.SaveDataFolderField.TabIndex = 8;
+            this.SaveDataFolderField.TabIndex = 2;
             this.SaveDataFolderField.Value = "";
             // 
             // DirectoriesForm

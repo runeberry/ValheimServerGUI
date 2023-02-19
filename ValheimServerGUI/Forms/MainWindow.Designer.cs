@@ -52,6 +52,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpBugReport = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.MenuItemHelpUpdates = new System.Windows.Forms.ToolStripMenuItem();
+            this.MenuItemHelpDiscord = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuItemHelpAbout = new System.Windows.Forms.ToolStripMenuItem();
             this.StatusStrip = new System.Windows.Forms.StatusStrip();
             this.StatusStripLabelLeft = new System.Windows.Forms.ToolStripStatusLabel();
@@ -123,7 +124,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.MenuItemHelpDiscord = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -303,6 +303,13 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpUpdates.Size = new System.Drawing.Size(192, 22);
             this.MenuItemHelpUpdates.Text = "Check for &Updates";
             // 
+            // MenuItemHelpDiscord
+            // 
+            this.MenuItemHelpDiscord.Image = global::ValheimServerGUI.Properties.Resources.DiscordLogo;
+            this.MenuItemHelpDiscord.Name = "MenuItemHelpDiscord";
+            this.MenuItemHelpDiscord.Size = new System.Drawing.Size(192, 22);
+            this.MenuItemHelpDiscord.Text = "Get support in &Discord";
+            // 
             // MenuItemHelpAbout
             // 
             this.MenuItemHelpAbout.Name = "MenuItemHelpAbout";
@@ -318,7 +325,7 @@ namespace ValheimServerGUI.Forms
             this.StatusStrip.Location = new System.Drawing.Point(0, 310);
             this.StatusStrip.Name = "StatusStrip";
             this.StatusStrip.Size = new System.Drawing.Size(484, 22);
-            this.StatusStrip.TabIndex = 1;
+            this.StatusStrip.TabIndex = 2;
             // 
             // StatusStripLabelLeft
             // 
@@ -350,7 +357,7 @@ namespace ValheimServerGUI.Forms
             this.Tabs.Name = "Tabs";
             this.Tabs.SelectedIndex = 0;
             this.Tabs.Size = new System.Drawing.Size(460, 280);
-            this.Tabs.TabIndex = 2;
+            this.Tabs.TabIndex = 1;
             // 
             // TabServerControls
             // 
@@ -378,7 +385,8 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonServerPassword.Location = new System.Drawing.Point(236, 69);
             this.CopyButtonServerPassword.Name = "CopyButtonServerPassword";
             this.CopyButtonServerPassword.Size = new System.Drawing.Size(16, 16);
-            this.CopyButtonServerPassword.TabIndex = 21;
+            this.CopyButtonServerPassword.TabIndex = 3;
+            this.CopyButtonServerPassword.TabStop = false;
             // 
             // JoinOptionsGroupBox
             // 
@@ -387,7 +395,7 @@ namespace ValheimServerGUI.Forms
             this.JoinOptionsGroupBox.Location = new System.Drawing.Point(249, 94);
             this.JoinOptionsGroupBox.Name = "JoinOptionsGroupBox";
             this.JoinOptionsGroupBox.Size = new System.Drawing.Size(197, 96);
-            this.JoinOptionsGroupBox.TabIndex = 19;
+            this.JoinOptionsGroupBox.TabIndex = 6;
             this.JoinOptionsGroupBox.TabStop = false;
             this.JoinOptionsGroupBox.Text = "Join Options";
             // 
@@ -398,7 +406,7 @@ namespace ValheimServerGUI.Forms
             this.CommunityServerField.Location = new System.Drawing.Point(6, 22);
             this.CommunityServerField.Name = "CommunityServerField";
             this.CommunityServerField.Size = new System.Drawing.Size(185, 17);
-            this.CommunityServerField.TabIndex = 13;
+            this.CommunityServerField.TabIndex = 0;
             this.CommunityServerField.Value = false;
             // 
             // ServerCrossplayField
@@ -410,7 +418,7 @@ namespace ValheimServerGUI.Forms
             this.ServerCrossplayField.Location = new System.Drawing.Point(6, 45);
             this.ServerCrossplayField.Name = "ServerCrossplayField";
             this.ServerCrossplayField.Size = new System.Drawing.Size(133, 17);
-            this.ServerCrossplayField.TabIndex = 18;
+            this.ServerCrossplayField.TabIndex = 1;
             this.ServerCrossplayField.Value = false;
             // 
             // WorldSelectGroupBox
@@ -422,7 +430,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.Location = new System.Drawing.Point(3, 94);
             this.WorldSelectGroupBox.Name = "WorldSelectGroupBox";
             this.WorldSelectGroupBox.Size = new System.Drawing.Size(240, 96);
-            this.WorldSelectGroupBox.TabIndex = 17;
+            this.WorldSelectGroupBox.TabIndex = 5;
             this.WorldSelectGroupBox.TabStop = false;
             this.WorldSelectGroupBox.Text = "World";
             // 
@@ -431,12 +439,12 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectNewNameField.HelpText = "";
             this.WorldSelectNewNameField.HideValue = false;
             this.WorldSelectNewNameField.LabelText = "New World Name";
-            this.WorldSelectNewNameField.Location = new System.Drawing.Point(6, 45);
+            this.WorldSelectNewNameField.Location = new System.Drawing.Point(3, 45);
             this.WorldSelectNewNameField.MaxLength = 20;
             this.WorldSelectNewNameField.Multiline = false;
             this.WorldSelectNewNameField.Name = "WorldSelectNewNameField";
             this.WorldSelectNewNameField.Size = new System.Drawing.Size(234, 41);
-            this.WorldSelectNewNameField.TabIndex = 18;
+            this.WorldSelectNewNameField.TabIndex = 3;
             this.WorldSelectNewNameField.Value = "";
             this.WorldSelectNewNameField.Visible = false;
             // 
@@ -448,7 +456,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectRadioNew.Location = new System.Drawing.Point(117, 22);
             this.WorldSelectRadioNew.Name = "WorldSelectRadioNew";
             this.WorldSelectRadioNew.Size = new System.Drawing.Size(111, 17);
-            this.WorldSelectRadioNew.TabIndex = 14;
+            this.WorldSelectRadioNew.TabIndex = 1;
             this.WorldSelectRadioNew.Value = false;
             // 
             // WorldSelectRadioExisting
@@ -459,7 +467,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectRadioExisting.Location = new System.Drawing.Point(6, 22);
             this.WorldSelectRadioExisting.Name = "WorldSelectRadioExisting";
             this.WorldSelectRadioExisting.Size = new System.Drawing.Size(105, 17);
-            this.WorldSelectRadioExisting.TabIndex = 13;
+            this.WorldSelectRadioExisting.TabIndex = 0;
             this.WorldSelectRadioExisting.Value = false;
             // 
             // WorldSelectExistingNameField
@@ -472,7 +480,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectExistingNameField.Location = new System.Drawing.Point(6, 45);
             this.WorldSelectExistingNameField.Name = "WorldSelectExistingNameField";
             this.WorldSelectExistingNameField.Size = new System.Drawing.Size(234, 41);
-            this.WorldSelectExistingNameField.TabIndex = 12;
+            this.WorldSelectExistingNameField.TabIndex = 2;
             this.WorldSelectExistingNameField.Value = null;
             this.WorldSelectExistingNameField.Visible = false;
             // 
@@ -480,13 +488,12 @@ namespace ValheimServerGUI.Forms
             // 
             this.ServerPortField.HelpText = "";
             this.ServerPortField.LabelText = "Port";
-            this.ServerPortField.Location = new System.Drawing.Point(234, 0);
+            this.ServerPortField.Location = new System.Drawing.Point(249, 0);
             this.ServerPortField.Maximum = 65535;
             this.ServerPortField.Minimum = 1;
             this.ServerPortField.Name = "ServerPortField";
             this.ServerPortField.Size = new System.Drawing.Size(75, 41);
-            this.ServerPortField.TabIndex = 16;
-            this.ServerPortField.TabStop = false;
+            this.ServerPortField.TabIndex = 1;
             this.ServerPortField.Value = 1;
             // 
             // ButtonRestartServer
@@ -496,7 +503,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonRestartServer.Location = new System.Drawing.Point(115, 226);
             this.ButtonRestartServer.Name = "ButtonRestartServer";
             this.ButtonRestartServer.Size = new System.Drawing.Size(106, 23);
-            this.ButtonRestartServer.TabIndex = 15;
+            this.ButtonRestartServer.TabIndex = 8;
             this.ButtonRestartServer.Text = "Restart Server";
             this.ButtonRestartServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ButtonRestartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -509,7 +516,7 @@ namespace ValheimServerGUI.Forms
             this.ShowPasswordField.Location = new System.Drawing.Point(255, 68);
             this.ShowPasswordField.Name = "ShowPasswordField";
             this.ShowPasswordField.Size = new System.Drawing.Size(150, 17);
-            this.ShowPasswordField.TabIndex = 14;
+            this.ShowPasswordField.TabIndex = 4;
             this.ShowPasswordField.Value = false;
             // 
             // ServerPasswordField
@@ -524,7 +531,7 @@ namespace ValheimServerGUI.Forms
             this.ServerPasswordField.Multiline = false;
             this.ServerPasswordField.Name = "ServerPasswordField";
             this.ServerPasswordField.Size = new System.Drawing.Size(243, 41);
-            this.ServerPasswordField.TabIndex = 11;
+            this.ServerPasswordField.TabIndex = 2;
             this.ServerPasswordField.Value = "";
             // 
             // ServerNameField
@@ -537,7 +544,7 @@ namespace ValheimServerGUI.Forms
             this.ServerNameField.Multiline = false;
             this.ServerNameField.Name = "ServerNameField";
             this.ServerNameField.Size = new System.Drawing.Size(243, 41);
-            this.ServerNameField.TabIndex = 10;
+            this.ServerNameField.TabIndex = 0;
             this.ServerNameField.Value = "";
             // 
             // ButtonStopServer
@@ -547,7 +554,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer.Location = new System.Drawing.Point(227, 226);
             this.ButtonStopServer.Name = "ButtonStopServer";
             this.ButtonStopServer.Size = new System.Drawing.Size(106, 23);
-            this.ButtonStopServer.TabIndex = 1;
+            this.ButtonStopServer.TabIndex = 9;
             this.ButtonStopServer.Text = "Stop Server";
             this.ButtonStopServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ButtonStopServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -560,7 +567,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonStartServer.Location = new System.Drawing.Point(3, 226);
             this.ButtonStartServer.Name = "ButtonStartServer";
             this.ButtonStartServer.Size = new System.Drawing.Size(106, 23);
-            this.ButtonStartServer.TabIndex = 0;
+            this.ButtonStartServer.TabIndex = 7;
             this.ButtonStartServer.Text = "Start Server";
             this.ButtonStartServer.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.ButtonStartServer.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
@@ -585,7 +592,7 @@ namespace ValheimServerGUI.Forms
             this.StartupGroupBox.Location = new System.Drawing.Point(6, 141);
             this.StartupGroupBox.Name = "StartupGroupBox";
             this.StartupGroupBox.Size = new System.Drawing.Size(307, 105);
-            this.StartupGroupBox.TabIndex = 2;
+            this.StartupGroupBox.TabIndex = 1;
             this.StartupGroupBox.TabStop = false;
             this.StartupGroupBox.Text = "Startup";
             // 
@@ -596,7 +603,7 @@ namespace ValheimServerGUI.Forms
             this.ServerAutoStartField.Location = new System.Drawing.Point(6, 22);
             this.ServerAutoStartField.Name = "ServerAutoStartField";
             this.ServerAutoStartField.Size = new System.Drawing.Size(286, 17);
-            this.ServerAutoStartField.TabIndex = 2;
+            this.ServerAutoStartField.TabIndex = 0;
             this.ServerAutoStartField.Value = false;
             // 
             // ServerAdditionalArgsField
@@ -636,7 +643,7 @@ namespace ValheimServerGUI.Forms
             this.ServerLongBackupIntervalField.Minimum = 300;
             this.ServerLongBackupIntervalField.Name = "ServerLongBackupIntervalField";
             this.ServerLongBackupIntervalField.Size = new System.Drawing.Size(173, 41);
-            this.ServerLongBackupIntervalField.TabIndex = 1;
+            this.ServerLongBackupIntervalField.TabIndex = 3;
             this.ServerLongBackupIntervalField.Value = 300;
             // 
             // ServerShortBackupIntervalField
@@ -648,7 +655,7 @@ namespace ValheimServerGUI.Forms
             this.ServerShortBackupIntervalField.Minimum = 300;
             this.ServerShortBackupIntervalField.Name = "ServerShortBackupIntervalField";
             this.ServerShortBackupIntervalField.Size = new System.Drawing.Size(173, 41);
-            this.ServerShortBackupIntervalField.TabIndex = 2;
+            this.ServerShortBackupIntervalField.TabIndex = 1;
             this.ServerShortBackupIntervalField.Value = 300;
             // 
             // ServerBackupsField
@@ -662,7 +669,7 @@ namespace ValheimServerGUI.Forms
             this.ServerBackupsField.Minimum = 1;
             this.ServerBackupsField.Name = "ServerBackupsField";
             this.ServerBackupsField.Size = new System.Drawing.Size(116, 41);
-            this.ServerBackupsField.TabIndex = 1;
+            this.ServerBackupsField.TabIndex = 2;
             this.ServerBackupsField.Value = 1;
             // 
             // ServerSaveIntervalField
@@ -696,7 +703,7 @@ namespace ValheimServerGUI.Forms
             this.groupBox2.Location = new System.Drawing.Point(3, 143);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Size = new System.Drawing.Size(307, 100);
-            this.groupBox2.TabIndex = 4;
+            this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Statistics";
             // 
@@ -709,7 +716,7 @@ namespace ValheimServerGUI.Forms
             this.LabelSessionDuration.Location = new System.Drawing.Point(7, 23);
             this.LabelSessionDuration.Name = "LabelSessionDuration";
             this.LabelSessionDuration.Size = new System.Drawing.Size(241, 15);
-            this.LabelSessionDuration.TabIndex = 2;
+            this.LabelSessionDuration.TabIndex = 0;
             this.LabelSessionDuration.Value = "";
             this.LabelSessionDuration.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -723,7 +730,7 @@ namespace ValheimServerGUI.Forms
             this.LabelAverageWorldSave.Location = new System.Drawing.Point(6, 65);
             this.LabelAverageWorldSave.Name = "LabelAverageWorldSave";
             this.LabelAverageWorldSave.Size = new System.Drawing.Size(264, 15);
-            this.LabelAverageWorldSave.TabIndex = 1;
+            this.LabelAverageWorldSave.TabIndex = 2;
             this.LabelAverageWorldSave.Value = "";
             this.LabelAverageWorldSave.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -736,7 +743,7 @@ namespace ValheimServerGUI.Forms
             this.LabelLastWorldSave.Location = new System.Drawing.Point(6, 44);
             this.LabelLastWorldSave.Name = "LabelLastWorldSave";
             this.LabelLastWorldSave.Size = new System.Drawing.Size(295, 15);
-            this.LabelLastWorldSave.TabIndex = 0;
+            this.LabelLastWorldSave.TabIndex = 1;
             this.LabelLastWorldSave.Value = "";
             this.LabelLastWorldSave.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -754,7 +761,7 @@ namespace ValheimServerGUI.Forms
             this.groupBox1.Location = new System.Drawing.Point(3, 3);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Size = new System.Drawing.Size(307, 134);
-            this.groupBox1.TabIndex = 3;
+            this.groupBox1.TabIndex = 0;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Connection Details";
             // 
@@ -764,7 +771,8 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonInviteCode.Location = new System.Drawing.Point(276, 85);
             this.CopyButtonInviteCode.Name = "CopyButtonInviteCode";
             this.CopyButtonInviteCode.Size = new System.Drawing.Size(16, 16);
-            this.CopyButtonInviteCode.TabIndex = 8;
+            this.CopyButtonInviteCode.TabIndex = 7;
+            this.CopyButtonInviteCode.TabStop = false;
             // 
             // LabelInviteCode
             // 
@@ -775,7 +783,7 @@ namespace ValheimServerGUI.Forms
             this.LabelInviteCode.Location = new System.Drawing.Point(6, 85);
             this.LabelInviteCode.Name = "LabelInviteCode";
             this.LabelInviteCode.Size = new System.Drawing.Size(264, 15);
-            this.LabelInviteCode.TabIndex = 7;
+            this.LabelInviteCode.TabIndex = 6;
             this.LabelInviteCode.Value = "N/A";
             this.LabelInviteCode.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -786,6 +794,7 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonLocalIpAddress.Name = "CopyButtonLocalIpAddress";
             this.CopyButtonLocalIpAddress.Size = new System.Drawing.Size(16, 16);
             this.CopyButtonLocalIpAddress.TabIndex = 5;
+            this.CopyButtonLocalIpAddress.TabStop = false;
             // 
             // CopyButtonExternalIpAddress
             // 
@@ -793,7 +802,8 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonExternalIpAddress.Location = new System.Drawing.Point(276, 22);
             this.CopyButtonExternalIpAddress.Name = "CopyButtonExternalIpAddress";
             this.CopyButtonExternalIpAddress.Size = new System.Drawing.Size(16, 16);
-            this.CopyButtonExternalIpAddress.TabIndex = 4;
+            this.CopyButtonExternalIpAddress.TabIndex = 1;
+            this.CopyButtonExternalIpAddress.TabStop = false;
             // 
             // CopyButtonInternalIpAddress
             // 
@@ -801,7 +811,8 @@ namespace ValheimServerGUI.Forms
             this.CopyButtonInternalIpAddress.Location = new System.Drawing.Point(276, 43);
             this.CopyButtonInternalIpAddress.Name = "CopyButtonInternalIpAddress";
             this.CopyButtonInternalIpAddress.Size = new System.Drawing.Size(16, 16);
-            this.CopyButtonInternalIpAddress.TabIndex = 6;
+            this.CopyButtonInternalIpAddress.TabIndex = 3;
+            this.CopyButtonInternalIpAddress.TabStop = false;
             // 
             // label1
             // 
@@ -810,7 +821,7 @@ namespace ValheimServerGUI.Forms
             this.label1.Location = new System.Drawing.Point(6, 110);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(261, 15);
-            this.label1.TabIndex = 3;
+            this.label1.TabIndex = 8;
             this.label1.Text = "Trouble connecting? See Help > Port Forwarding.\r\n";
             // 
             // LabelExternalIpAddress
@@ -837,7 +848,7 @@ namespace ValheimServerGUI.Forms
             this.LabelLocalIpAddress.Location = new System.Drawing.Point(6, 64);
             this.LabelLocalIpAddress.Name = "LabelLocalIpAddress";
             this.LabelLocalIpAddress.Size = new System.Drawing.Size(264, 15);
-            this.LabelLocalIpAddress.TabIndex = 2;
+            this.LabelLocalIpAddress.TabIndex = 4;
             this.LabelLocalIpAddress.Value = "127.0.0.1";
             this.LabelLocalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -850,7 +861,7 @@ namespace ValheimServerGUI.Forms
             this.LabelInternalIpAddress.Location = new System.Drawing.Point(6, 43);
             this.LabelInternalIpAddress.Name = "LabelInternalIpAddress";
             this.LabelInternalIpAddress.Size = new System.Drawing.Size(264, 15);
-            this.LabelInternalIpAddress.TabIndex = 1;
+            this.LabelInternalIpAddress.TabIndex = 2;
             this.LabelInternalIpAddress.Value = "Loading...";
             this.LabelInternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -873,7 +884,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonRemovePlayer.Location = new System.Drawing.Point(426, 3);
             this.ButtonRemovePlayer.Name = "ButtonRemovePlayer";
             this.ButtonRemovePlayer.Size = new System.Drawing.Size(23, 23);
-            this.ButtonRemovePlayer.TabIndex = 2;
+            this.ButtonRemovePlayer.TabIndex = 1;
             this.ButtonRemovePlayer.UseVisualStyleBackColor = true;
             // 
             // ButtonPlayerDetails
@@ -882,7 +893,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonPlayerDetails.Location = new System.Drawing.Point(3, 3);
             this.ButtonPlayerDetails.Name = "ButtonPlayerDetails";
             this.ButtonPlayerDetails.Size = new System.Drawing.Size(92, 23);
-            this.ButtonPlayerDetails.TabIndex = 1;
+            this.ButtonPlayerDetails.TabIndex = 0;
             this.ButtonPlayerDetails.Text = "Player Info...";
             this.ButtonPlayerDetails.UseVisualStyleBackColor = true;
             // 
@@ -899,7 +910,7 @@ namespace ValheimServerGUI.Forms
             this.PlayersTable.Location = new System.Drawing.Point(3, 32);
             this.PlayersTable.Name = "PlayersTable";
             this.PlayersTable.Size = new System.Drawing.Size(446, 217);
-            this.PlayersTable.TabIndex = 0;
+            this.PlayersTable.TabIndex = 2;
             // 
             // ColumnPlayerStatus
             // 
@@ -943,7 +954,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
             this.ButtonSaveLogs.Name = "ButtonSaveLogs";
             this.ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
-            this.ButtonSaveLogs.TabIndex = 4;
+            this.ButtonSaveLogs.TabIndex = 1;
             this.ButtonSaveLogs.Text = "Save Logs...";
             this.ButtonSaveLogs.UseVisualStyleBackColor = true;
             // 
@@ -957,7 +968,7 @@ namespace ValheimServerGUI.Forms
             this.LogViewSelectField.Location = new System.Drawing.Point(-4, 4);
             this.LogViewSelectField.Name = "LogViewSelectField";
             this.LogViewSelectField.Size = new System.Drawing.Size(150, 41);
-            this.LogViewSelectField.TabIndex = 3;
+            this.LogViewSelectField.TabIndex = 0;
             this.LogViewSelectField.Value = null;
             // 
             // LogViewer
@@ -969,7 +980,8 @@ namespace ValheimServerGUI.Forms
             this.LogViewer.LogView = "DefaultLogView";
             this.LogViewer.Name = "LogViewer";
             this.LogViewer.Size = new System.Drawing.Size(446, 198);
-            this.LogViewer.TabIndex = 2;
+            this.LogViewer.TabIndex = 3;
+            this.LogViewer.TabStop = false;
             this.LogViewer.TimestampFormat = "HH:mm:ss.fff";
             // 
             // ButtonClearLogs
@@ -978,7 +990,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonClearLogs.Location = new System.Drawing.Point(374, 22);
             this.ButtonClearLogs.Name = "ButtonClearLogs";
             this.ButtonClearLogs.Size = new System.Drawing.Size(75, 23);
-            this.ButtonClearLogs.TabIndex = 1;
+            this.ButtonClearLogs.TabIndex = 2;
             this.ButtonClearLogs.Text = "Clear Logs";
             this.ButtonClearLogs.UseVisualStyleBackColor = true;
             // 
@@ -1057,13 +1069,6 @@ namespace ValheimServerGUI.Forms
             // 
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
-            // 
-            // MenuItemHelpDiscord
-            // 
-            this.MenuItemHelpDiscord.Image = global::ValheimServerGUI.Properties.Resources.DiscordLogo;
-            this.MenuItemHelpDiscord.Name = "MenuItemHelpDiscord";
-            this.MenuItemHelpDiscord.Size = new System.Drawing.Size(192, 22);
-            this.MenuItemHelpDiscord.Text = "Get support in &Discord";
             // 
             // MainWindow
             // 

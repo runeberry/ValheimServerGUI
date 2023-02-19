@@ -53,7 +53,7 @@ namespace ValheimServerGUI.Forms
             this.CloseButton.Location = new System.Drawing.Point(197, 76);
             this.CloseButton.Name = "CloseButton";
             this.CloseButton.Size = new System.Drawing.Size(75, 23);
-            this.CloseButton.TabIndex = 1;
+            this.CloseButton.TabIndex = 2;
             this.CloseButton.Text = "Cancel";
             this.CloseButton.UseVisualStyleBackColor = true;
             // 
@@ -65,7 +65,7 @@ namespace ValheimServerGUI.Forms
             this.ProgressBar.Size = new System.Drawing.Size(178, 23);
             this.ProgressBar.Step = 2;
             this.ProgressBar.Style = System.Windows.Forms.ProgressBarStyle.Marquee;
-            this.ProgressBar.TabIndex = 2;
+            this.ProgressBar.TabIndex = 1;
             // 
             // Timer
             // 

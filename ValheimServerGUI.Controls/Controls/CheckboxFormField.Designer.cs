@@ -59,7 +59,8 @@ namespace ValheimServerGUI.Controls
             this.HelpLabel.Location = new System.Drawing.Point(138, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 8;
+            this.HelpLabel.TabIndex = 0;
+            this.HelpLabel.TabStop = false;
             // 
             // CheckboxFormField
             // 

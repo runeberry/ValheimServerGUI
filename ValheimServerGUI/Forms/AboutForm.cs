@@ -29,5 +29,10 @@ namespace ValheimServerGUI.Forms
         {
             OpenHelper.OpenWebAddress(Resources.ValheimGameSiteUrl);
         }
+
+        private void ButtonDiscord_Click(object sender, EventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.UrlDiscord);
+        }
     }
 }

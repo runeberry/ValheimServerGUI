@@ -164,6 +164,9 @@
   <data name="DefaultValheimSaveFolder" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim</value>
   </data>
+  <data name="DiscordLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\resources\discordlogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
   <data name="DonateLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DonateLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
@@ -244,6 +247,9 @@
   </data>
   <data name="UpdateCheckInterval" xml:space="preserve">
     <value>1.00:00:00</value>
+  </data>
+  <data name="UrlDiscord" xml:space="preserve">
+    <value>https://discord.gg/HBsNJTY</value>
   </data>
   <data name="UrlDonate" xml:space="preserve">
     <value>https://www.buymeacoffee.com/runeberry</value>

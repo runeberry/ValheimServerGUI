@@ -35,25 +35,25 @@ namespace ValheimServerGUI.Game
 
         public ValheimFileProvider(IUserPreferencesProvider userPrefsProvider)
         {
-            this.UserPrefsProvider = userPrefsProvider;
+            UserPrefsProvider = userPrefsProvider;
         }
 
-        public FileInfo GameExe => GetFileInfo("ValheimGamePath", this.Current().ValheimGamePath, ".exe");
+        public FileInfo GameExe => GetFileInfo("ValheimGamePath", Current().ValheimGamePath, ".exe");
 
-        public FileInfo ServerExe => GetFileInfo("ValheimServerPath", this.Current().ValheimServerPath, ".exe");
+        public FileInfo ServerExe => GetFileInfo("ValheimServerPath", Current().ValheimServerPath, ".exe");
 
-        public DirectoryInfo SaveDataFolder => GetDirectoryInfo("ValheimSaveDataFolder", this.Current().ValheimSaveDataFolder);
+        public DirectoryInfo SaveDataFolder => GetDirectoryInfo("ValheimSaveDataFolder", Current().ValheimSaveDataFolder);
 
         public DirectoryInfo[] WorldsFolders => new[] {
-            GetDirectoryInfo("ValheimWorldsFolder", Path.Join(this.Current().ValheimSaveDataFolder, "worlds"), false),
-            GetDirectoryInfo("ValheimWorldsFolder", Path.Join(this.Current().ValheimSaveDataFolder, "worlds_local"), false),
+            GetDirectoryInfo("ValheimWorldsFolder", Path.Join(Current().ValheimSaveDataFolder, "worlds"), false),
+            GetDirectoryInfo("ValheimWorldsFolder", Path.Join(Current().ValheimSaveDataFolder, "worlds_local"), false),
         };
 
         #region Non-public methods
 
         private UserPreferences Current()
         {
-            return this.UserPrefsProvider.LoadPreferences();
+            return UserPrefsProvider.LoadPreferences();
         }
 
         private static FileInfo GetFileInfo(string prefKey, string path, string extension = null)

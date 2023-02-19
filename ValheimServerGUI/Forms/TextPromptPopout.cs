@@ -16,40 +16,40 @@ namespace ValheimServerGUI.Forms
         {
             InitializeComponent();
 
-            this.Text = title;
-            this.TextInputField.LabelText = message;
+            Text = title;
+            TextInputField.LabelText = message;
 
             if (!string.IsNullOrWhiteSpace(startingText))
             {
-                this.TextInputField.Value = startingText;
-                this.TextInputField.SelectAll();
+                TextInputField.Value = startingText;
+                TextInputField.SelectAll();
             }
 
-            this.ButtonOK.Click += this.ButtonOK_Click;
-            this.ButtonCancel.Click += this.ButtonCancel_Click;
+            ButtonOK.Click += ButtonOK_Click;
+            ButtonCancel.Click += ButtonCancel_Click;
         }
 
         public void SetValidation(string helpText, Func<string, bool> onValidate)
         {
-            this.TextInputField.HelpText = helpText;
-            this.OnValidate = onValidate;
+            TextInputField.HelpText = helpText;
+            OnValidate = onValidate;
         }
 
         #region Form events
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            if (!this.ValidateInput()) return;
+            if (!ValidateInput()) return;
 
-            this.Value = this.TextInputField.Value;
-            this.DialogResult = DialogResult.OK;
-            this.Close();
+            Value = TextInputField.Value;
+            DialogResult = DialogResult.OK;
+            Close();
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
-            this.DialogResult = DialogResult.Cancel;
-            this.Close();
+            DialogResult = DialogResult.Cancel;
+            Close();
         }
 
         #endregion
@@ -58,14 +58,14 @@ namespace ValheimServerGUI.Forms
 
         private bool ValidateInput()
         {
-            var userInput = this.TextInputField.Value;
+            var userInput = TextInputField.Value;
 
             string errMessage = null;
             try
             {
-                if (!this.OnValidate(userInput))
+                if (!OnValidate(userInput))
                 {
-                    errMessage = this.TextInputField.HelpText ?? "The provided string is invalid.";
+                    errMessage = TextInputField.HelpText ?? "The provided string is invalid.";
                 }
             }
             catch (Exception ex)

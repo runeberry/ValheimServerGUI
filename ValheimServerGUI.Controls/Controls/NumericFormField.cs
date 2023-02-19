@@ -10,27 +10,27 @@ namespace ValheimServerGUI.Controls
 
         public string LabelText
         {
-            get => this.Label.Text;
-            set => this.Label.Text = value;
+            get => Label.Text;
+            set => Label.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public int Value
         {
-            get => this.GetValidatedValue((int)this.NumericUpDown.Value);
+            get => GetValidatedValue((int)NumericUpDown.Value);
             set
             {
-                var validValue = this.GetValidatedValue(value);
-                if (validValue != this.NumericUpDown.Value)
+                var validValue = GetValidatedValue(value);
+                if (validValue != NumericUpDown.Value)
                 {
-                    this.NumericUpDown.Value = validValue;
-                    this.ValueChanged?.Invoke(this, Value);
+                    NumericUpDown.Value = validValue;
+                    ValueChanged?.Invoke(this, Value);
                 }
             }
         }
@@ -41,37 +41,37 @@ namespace ValheimServerGUI.Controls
 
         public int Minimum
         {
-            get => (int)this.NumericUpDown.Minimum;
-            set => this.NumericUpDown.Minimum = value;
+            get => (int)NumericUpDown.Minimum;
+            set => NumericUpDown.Minimum = value;
         }
 
         public int Maximum
         {
-            get => (int)this.NumericUpDown.Maximum;
-            set => this.NumericUpDown.Maximum = value;
+            get => (int)NumericUpDown.Maximum;
+            set => NumericUpDown.Maximum = value;
         }
 
         public NumericFormField()
         {
             InitializeComponent();
 
-            this.NumericUpDown.ValueChanged += this.OnValueChanged;
+            NumericUpDown.ValueChanged += OnValueChanged;
         }
 
         private void OnValueChanged(object sender, EventArgs args)
         {
-            this.ValueChanged?.Invoke(this, this.Value);
+            ValueChanged?.Invoke(this, Value);
         }
 
         private int GetValidatedValue(int val)
         {
-            if (val < this.NumericUpDown.Minimum)
+            if (val < NumericUpDown.Minimum)
             {
-                val = (int)this.NumericUpDown.Minimum;
+                val = (int)NumericUpDown.Minimum;
             }
-            else if (val > this.NumericUpDown.Maximum)
+            else if (val > NumericUpDown.Maximum)
             {
-                val = (int)this.NumericUpDown.Maximum;
+                val = (int)NumericUpDown.Maximum;
             }
 
             return val;

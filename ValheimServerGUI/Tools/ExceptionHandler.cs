@@ -59,7 +59,7 @@ namespace ValheimServerGUI.Tools
                 asyncPopout.ShowDialog();
             }
 
-            this.ExceptionHandled?.Invoke(this, EventArgs.Empty);
+            ExceptionHandled?.Invoke(this, EventArgs.Empty);
         }
 
         private CrashReport BuildCrashReport(Exception e, string contextMessage)
@@ -78,7 +78,7 @@ namespace ValheimServerGUI.Tools
 
             crashReport.Source = "CrashReport";
             crashReport.AdditionalInfo = additionalInfo;
-            crashReport.Logs = this.Logger.LogBuffer.Reverse().Take(100).ToList();
+            crashReport.Logs = Logger.LogBuffer.Reverse().Take(100).ToList();
 
             return crashReport;
         }

@@ -6,9 +6,9 @@ namespace ValheimServerGUI.Tools.Logging
     {
         public ApplicationLogger()
         {
-            this.CategoryName = "Application";
+            CategoryName = "Application";
 
-            this.LogReceived += this.OnLogReceived;
+            LogReceived += OnLogReceived;
         }
 
         private void OnLogReceived(object sender, EventLogContext context)

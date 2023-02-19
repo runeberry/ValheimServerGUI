@@ -22,7 +22,7 @@ namespace ValheimServerGUI.Tools.Logging
 
         #region IEventLogger implementation
 
-        public IEnumerable<string> LogBuffer => this.ConcurrentBuffer;
+        public IEnumerable<string> LogBuffer => ConcurrentBuffer;
 
         public event EventHandler<EventLogContext> LogReceived;
 
@@ -46,7 +46,7 @@ namespace ValheimServerGUI.Tools.Logging
             {
                 Message = formatter(state, exception),
                 Timestamp = DateTime.Now,
-                Category = this.CategoryName ?? typeof(TState).Name,
+                Category = CategoryName ?? typeof(TState).Name,
                 LogLevel = logLevel,
                 EventId = eventId,
                 Exception = exception,
@@ -54,7 +54,7 @@ namespace ValheimServerGUI.Tools.Logging
 
             try
             {
-                if (!this.FilterLog(context)) return;
+                if (!FilterLog(context)) return;
             }
             catch
             {
@@ -64,7 +64,7 @@ namespace ValheimServerGUI.Tools.Logging
 
             try
             {
-                context.Message = this.FormatLog(context);
+                context.Message = FormatLog(context);
             }
             catch
             {
@@ -73,7 +73,7 @@ namespace ValheimServerGUI.Tools.Logging
             }
 
             var formattedMessage = $"[{context.Timestamp:G}] {context.Message}";
-            this.ConcurrentBuffer.Enqueue(formattedMessage);
+            ConcurrentBuffer.Enqueue(formattedMessage);
 
             LogReceived?.Invoke(this, context);
         }
@@ -85,7 +85,7 @@ namespace ValheimServerGUI.Tools.Logging
     {
         public EventLogger()
         {
-            this.CategoryName = typeof(TCategoryName).Name;
+            CategoryName = typeof(TCategoryName).Name;
         }
     }
 }

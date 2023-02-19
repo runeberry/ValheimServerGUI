@@ -12,7 +12,7 @@ namespace ValheimServerGUI.Forms
             InitializeComponent();
             this.AddApplicationIcon();
 
-            this.VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
+            VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
         }
 
         private void ButtonDonate_Click(object sender, EventArgs e)

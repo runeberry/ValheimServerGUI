@@ -19,8 +19,8 @@ namespace ValheimServerGUI.Forms
 
         public DirectoriesForm(IUserPreferencesProvider userPrefsProvider, IValheimFileProvider fileProvider) : this()
         {
-            this.UserPrefsProvider = userPrefsProvider;
-            this.FileProvider = fileProvider;
+            UserPrefsProvider = userPrefsProvider;
+            FileProvider = fileProvider;
         }
 
         protected override void OnShown(EventArgs e)
@@ -32,44 +32,44 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var prefs = UserPrefsProvider.LoadPreferences();
 
-            this.GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
-            this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
-            this.SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
+            GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
+            ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
+            SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
 
-            this.GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
-            this.ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
+            GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
+            ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            if (this.SavePreferences())
+            if (SavePreferences())
             {
-                this.Close();
+                Close();
             }
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void ButtonDefaults_Click(object sender, EventArgs e)
         {
-            this.RestoreDefaults();
+            RestoreDefaults();
         }
 
         private bool SavePreferences()
         {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var prefs = UserPrefsProvider.LoadPreferences();
 
             var (pGamePath, pServerPath, pSaveDataFolder) = (prefs.ValheimGamePath, prefs.ValheimServerPath, prefs.ValheimSaveDataFolder);
 
-            prefs.ValheimGamePath = this.GamePathField.Value;
-            prefs.ValheimServerPath = this.ServerPathField.Value;
-            prefs.ValheimSaveDataFolder = this.SaveDataFolderField.Value;
-                        
+            prefs.ValheimGamePath = GamePathField.Value;
+            prefs.ValheimServerPath = ServerPathField.Value;
+            prefs.ValheimSaveDataFolder = SaveDataFolderField.Value;
+
             try
             {
                 // Validate folders by ensuring that these properties can be called
@@ -95,8 +95,8 @@ namespace ValheimServerGUI.Forms
                     return false;
                 }
             }
-            
-            this.UserPrefsProvider.SavePreferences(prefs);
+
+            UserPrefsProvider.SavePreferences(prefs);
             return true;
         }
 
@@ -104,9 +104,9 @@ namespace ValheimServerGUI.Forms
         {
             var prefs = UserPreferences.GetDefault();
 
-            this.GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
-            this.ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
-            this.SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
+            GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
+            ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
+            SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
         }
     }
 }

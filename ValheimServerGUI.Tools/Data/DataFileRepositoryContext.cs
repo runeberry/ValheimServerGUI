@@ -17,8 +17,8 @@ namespace ValheimServerGUI.Tools.Data
 
         public DataFileRepositoryContext(IFileProvider dataFileProvider, ILogger logger)
         {
-            this.DataFileProvider = dataFileProvider;
-            this.Logger = logger;
+            DataFileProvider = dataFileProvider;
+            Logger = logger;
         }
     }
 }

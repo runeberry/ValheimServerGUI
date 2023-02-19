@@ -10,7 +10,7 @@
         public StartupArgsProvider(string[] args)
         {
             if (args == null || args.Length == 0) return;
-            this.ServerProfileName = args[0];
+            ServerProfileName = args[0];
         }
 
         #region IStartupArgsProvider implementation

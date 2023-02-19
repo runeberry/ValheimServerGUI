@@ -10,18 +10,18 @@ namespace ValheimServerGUI.Tests.Tools
     public class MockHttpClientProvider : IHttpClientProvider
     {
         private Action<HttpResponseMessage> BuildDefaultResponse = res => res.StatusCode = HttpStatusCode.NotImplemented;
-        
+
         private readonly List<(Func<HttpRequestMessage, bool>, Action<HttpResponseMessage>)> Setups = new();
 
         public MockHttpClientProvider SetResponse(Func<HttpRequestMessage, bool> condition, Action<HttpResponseMessage> responseBuilder)
         {
-            this.Setups.Add((condition, responseBuilder));
+            Setups.Add((condition, responseBuilder));
             return this;
         }
 
         public MockHttpClientProvider SetDefaultResponse(Action<HttpResponseMessage> responseBuilder)
         {
-            this.BuildDefaultResponse = responseBuilder;
+            BuildDefaultResponse = responseBuilder;
             return this;
         }
 
@@ -31,9 +31,9 @@ namespace ValheimServerGUI.Tests.Tools
 
             mockClient
                 .Setup(c => c.SendAsync(It.IsAny<HttpRequestMessage>()))
-                .ReturnsAsync(() => GetResponseMessage(this.BuildDefaultResponse));
+                .ReturnsAsync(() => GetResponseMessage(BuildDefaultResponse));
 
-            foreach (var (condition, responseBuilder) in this.Setups)
+            foreach (var (condition, responseBuilder) in Setups)
             {
                 mockClient
                     .Setup(c => c.SendAsync(It.Is<HttpRequestMessage>(r => condition(r))))

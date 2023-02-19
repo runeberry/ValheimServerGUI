@@ -13,26 +13,26 @@ namespace ValheimServerGUI.Controls
 
         public string LabelText
         {
-            get => this.RadioButton.Text;
-            set => this.RadioButton.Text = value;
+            get => RadioButton.Text;
+            set => RadioButton.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public bool Value
         {
-            get => this.RadioButton.Checked;
+            get => RadioButton.Checked;
             set
             {
-                if (value == this.Value) return;
+                if (value == Value) return;
 
-                this.RadioButton.Checked = value;
-                this.ValueChanged?.Invoke(this, value);
+                RadioButton.Checked = value;
+                ValueChanged?.Invoke(this, value);
             }
         }
 
@@ -47,15 +47,15 @@ namespace ValheimServerGUI.Controls
         public RadioFormField()
         {
             InitializeComponent();
-            
-            this.RadioButton.CheckedChanged += RadioButton_Changed;
+
+            RadioButton.CheckedChanged += RadioButton_Changed;
         }
 
         public void RefreshRadioGroup()
         {
-            this.RadioGroup = this.FindForm()
+            RadioGroup = FindForm()
                 .FindAllControls<RadioFormField>()
-                .Where(r => r.GroupName == this.GroupName)
+                .Where(r => r.GroupName == GroupName)
                 .ToList();
         }
 
@@ -63,19 +63,19 @@ namespace ValheimServerGUI.Controls
         {
             base.OnVisibleChanged(e);
 
-            if (this.Visible && this.RadioGroup == null)
+            if (Visible && RadioGroup == null)
             {
-                this.RefreshRadioGroup();
+                RefreshRadioGroup();
             }
         }
 
         private void RadioButton_Changed(object sender, EventArgs e)
         {
-            this.ValueChanged?.Invoke(this, this.Value);
+            ValueChanged?.Invoke(this, Value);
 
-            if (this.Value && this.RadioGroup != null)
+            if (Value && RadioGroup != null)
             {
-                foreach (var other in this.RadioGroup.Where(r => r != this))
+                foreach (var other in RadioGroup.Where(r => r != this))
                 {
                     other.Value = false;
                 }

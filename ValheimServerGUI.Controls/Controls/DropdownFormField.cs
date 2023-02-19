@@ -12,22 +12,22 @@ namespace ValheimServerGUI.Controls
 
         public string LabelText
         {
-            get => this.Label.Text;
-            set => this.Label.Text = value;
+            get => Label.Text;
+            set => Label.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public string Value
         {
             get
             {
-                var selectedItem = this.ComboBox.SelectedItem?.ToString();
+                var selectedItem = ComboBox.SelectedItem?.ToString();
 
                 if (selectedItem == EmptyText)
                 {
@@ -38,13 +38,13 @@ namespace ValheimServerGUI.Controls
             }
             set
             {
-                if (this.ComboBox.SelectedItem?.ToString() == value) return;
+                if (ComboBox.SelectedItem?.ToString() == value) return;
 
-                if (value == null || this.DataSource.Contains(value))
+                if (value == null || DataSource.Contains(value))
                 {
                     // Only allow null or values within DataSource to be set, ignore all others
-                    this.ComboBox.SelectedItem = value;
-                    this.ValueChanged?.Invoke(this, value);
+                    ComboBox.SelectedItem = value;
+                    ValueChanged?.Invoke(this, value);
                 }
             }
         }
@@ -59,12 +59,12 @@ namespace ValheimServerGUI.Controls
         {
             get
             {
-                var dataSource = this.ComboBox.DataSource as IEnumerable<string>;
+                var dataSource = ComboBox.DataSource as IEnumerable<string>;
 
                 if (dataSource == null)
                 {
                     dataSource = new List<string>();
-                    this.ComboBox.DataSource = dataSource;
+                    ComboBox.DataSource = dataSource;
                 }
 
                 if (dataSource.Count() == 1 && dataSource.Single() == EmptyText)
@@ -81,26 +81,26 @@ namespace ValheimServerGUI.Controls
                     value = new List<string> { EmptyText };
                 }
 
-                this.ComboBox.DataSource = value;
+                ComboBox.DataSource = value;
             }
         }
 
         public bool DropdownEnabled
         {
-            get => this.ComboBox.Enabled;
-            set => this.ComboBox.Enabled = value;
+            get => ComboBox.Enabled;
+            set => ComboBox.Enabled = value;
         }
 
         public DropdownFormField()
         {
             InitializeComponent();
 
-            this.ComboBox.SelectedIndexChanged += this.OnSelectedIndexChanged;
+            ComboBox.SelectedIndexChanged += OnSelectedIndexChanged;
         }
 
         private void OnSelectedIndexChanged(object sender, EventArgs args)
         {
-            this.ValueChanged?.Invoke(this, this.Value);
+            ValueChanged?.Invoke(this, Value);
         }
     }
 }

@@ -16,19 +16,19 @@ namespace ValheimServerGUI.Tools.Data
 
         public JsonFileProvider(ILogger logger)
         {
-            this.Logger = logger;
+            Logger = logger;
         }
 
         protected virtual void OnDataLoaded<TFile>(TFile data) where TFile : class
         {
             if (data == null) return;
-            this.DataLoaded?.Invoke(this, data);
+            DataLoaded?.Invoke(this, data);
         }
 
         protected virtual void OnDataSaved<TFile>(TFile data) where TFile : class
         {
             if (data == null) return;
-            this.DataSaved?.Invoke(this, data);
+            DataSaved?.Invoke(this, data);
         }
 
         #region ILocalDataProvider implementation
@@ -42,7 +42,7 @@ namespace ValheimServerGUI.Tools.Data
             filePath = Environment.ExpandEnvironmentVariables(filePath);
             TFile dataFile = default;
 
-            this.RWLock.EnterReadLock();
+            RWLock.EnterReadLock();
 
             try
             {
@@ -51,19 +51,19 @@ namespace ValheimServerGUI.Tools.Data
                     using var streamReader = File.OpenText(filePath);
                     using var jsonReader = new JsonTextReader(streamReader);
 
-                    dataFile = this.Serializer.Deserialize<TFile>(jsonReader);
+                    dataFile = Serializer.Deserialize<TFile>(jsonReader);
                 }
             }
             catch (Exception e)
             {
-                this.Logger.LogException(e, $"Error loading JSON data from file: {filePath}");
+                Logger.LogException(e, $"Error loading JSON data from file: {filePath}");
             }
             finally
             {
-                this.RWLock.ExitReadLock();
+                RWLock.ExitReadLock();
             }
 
-            this.OnDataLoaded(dataFile);
+            OnDataLoaded(dataFile);
 
             return Task.FromResult(dataFile);
         }
@@ -72,7 +72,7 @@ namespace ValheimServerGUI.Tools.Data
         {
             filePath = Environment.ExpandEnvironmentVariables(filePath);
 
-            this.RWLock.EnterWriteLock();
+            RWLock.EnterWriteLock();
 
             try
             {
@@ -85,18 +85,18 @@ namespace ValheimServerGUI.Tools.Data
                 using var streamWriter = File.CreateText(filePath);
                 using var jsonWriter = new JsonTextWriter(streamWriter);
 
-                this.Serializer.Serialize(jsonWriter, data);
+                Serializer.Serialize(jsonWriter, data);
             }
             catch (Exception e)
             {
-                this.Logger.LogException(e, $"Error saving JSON data to file: {filePath}");
+                Logger.LogException(e, $"Error saving JSON data to file: {filePath}");
             }
             finally
             {
-                this.RWLock.ExitWriteLock();
+                RWLock.ExitWriteLock();
             }
 
-            this.OnDataSaved(data);
+            OnDataSaved(data);
 
             return Task.CompletedTask;
         }

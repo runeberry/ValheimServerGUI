@@ -11,26 +11,26 @@ namespace ValheimServerGUI.Controls
 
         public string LabelText
         {
-            get => this.FormLabel.Text;
-            set => this.FormLabel.Text = value;
+            get => FormLabel.Text;
+            set => FormLabel.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public string Value
         {
-            get => this.ValueLabel.Text;
+            get => ValueLabel.Text;
             set
             {
-                if (this.ValueLabel.Text == value) return;
+                if (ValueLabel.Text == value) return;
 
-                this.ValueLabel.Text = value;
-                this.ValueChanged?.Invoke(this, value);
+                ValueLabel.Text = value;
+                ValueChanged?.Invoke(this, value);
             }
         }
 
@@ -41,52 +41,52 @@ namespace ValheimServerGUI.Controls
         private double _lsr = 0.5;
         public double LabelSplitRatio
         {
-            get => this._lsr;
+            get => _lsr;
             set
             {
-                this._lsr = value;
-                this.ResizeLabels();
+                _lsr = value;
+                ResizeLabels();
             }
         }
 
         public ContentAlignment LabelTextAlign
         {
-            get => this.FormLabel.TextAlign;
-            set => this.FormLabel.TextAlign = value;
+            get => FormLabel.TextAlign;
+            set => FormLabel.TextAlign = value;
         }
 
         public ContentAlignment ValueTextAlign
         {
-            get => this.ValueLabel.TextAlign;
-            set => this.ValueLabel.TextAlign = value;
+            get => ValueLabel.TextAlign;
+            set => ValueLabel.TextAlign = value;
         }
 
         public LabelField()
         {
             InitializeComponent();
 
-            this.ResizeLabels();
+            ResizeLabels();
         }
 
         protected override void OnResize(EventArgs e)
         {
             base.OnResize(e);
 
-            this.ResizeLabels();
+            ResizeLabels();
         }
 
         private void ResizeLabels()
         {
-            var fillWidth = this.Width - this.FormLabel.Location.X - this.HelpLabel.Width;
-            var split = Math.Min(1.0, Math.Max(0.0, this.LabelSplitRatio));
+            var fillWidth = Width - FormLabel.Location.X - HelpLabel.Width;
+            var split = Math.Min(1.0, Math.Max(0.0, LabelSplitRatio));
 
             // The Label and Value should each fill up 50% of the available space
-            this.FormLabel.Width = (int)(fillWidth * split);
-            this.ValueLabel.Width = (int)(fillWidth * (1-split));
+            FormLabel.Width = (int)(fillWidth * split);
+            ValueLabel.Width = (int)(fillWidth * (1 - split));
 
             // The Value should always be anchored directly to the right of the Label
-            var locX = this.FormLabel.Location.X + this.FormLabel.Width;
-            this.ValueLabel.Location = new Point(locX, this.ValueLabel.Location.Y);
-    }
+            var locX = FormLabel.Location.X + FormLabel.Width;
+            ValueLabel.Location = new Point(locX, ValueLabel.Location.Y);
+        }
     }
 }

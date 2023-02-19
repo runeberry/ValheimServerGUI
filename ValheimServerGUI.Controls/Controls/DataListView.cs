@@ -17,18 +17,18 @@ namespace ValheimServerGUI.Controls
         [Editor("System.Windows.Forms.Design.ColumnHeaderCollectionEditor", "System.Drawing.Design.UITypeEditor")]
         [Localizable(true)]
         [MergableProperty(false)]
-        public ListView.ColumnHeaderCollection Columns => this.ListView.Columns;
+        public ListView.ColumnHeaderCollection Columns => ListView.Columns;
 
         public override Color ForeColor
         {
-            get => this.ListView.ForeColor;
-            set => this.ListView.ForeColor = value;
+            get => ListView.ForeColor;
+            set => ListView.ForeColor = value;
         }
 
         public ImageList Icons
         {
-            get => this.ListView.SmallImageList;
-            set => this.ListView.SmallImageList = value;
+            get => ListView.SmallImageList;
+            set => ListView.SmallImageList = value;
         }
 
         #endregion
@@ -40,7 +40,7 @@ namespace ValheimServerGUI.Controls
 
         private readonly ConcurrentDictionary<Type, DataListViewRowBinding> RowBindings = new();
 
-        public bool IsRowSelected => this.ListView.SelectedItems.Count > 0;
+        public bool IsRowSelected => ListView.SelectedItems.Count > 0;
 
         public event EventHandler SelectionChanged;
 
@@ -54,27 +54,27 @@ namespace ValheimServerGUI.Controls
         {
             InitializeComponent();
 
-            this.ListView.ItemSelectionChanged += ListView_ItemSelectionChanged;
-            this.ListView.ColumnClick += ListView_ColumnClick;
+            ListView.ItemSelectionChanged += ListView_ItemSelectionChanged;
+            ListView.ColumnClick += ListView_ColumnClick;
         }
 
         private void ListView_ItemSelectionChanged(object sender, ListViewItemSelectionChangedEventArgs e)
         {
-            this.SelectionChanged?.Invoke(this, EventArgs.Empty);
+            SelectionChanged?.Invoke(this, EventArgs.Empty);
         }
 
         private void ListView_ColumnClick(object sender, ColumnClickEventArgs e)
         {
             var descending = false;
-            if (this.SortColumn == e.Column) descending = !this.SortDescending;
+            if (SortColumn == e.Column) descending = !SortDescending;
 
-            this.OrderByColumn(e.Column, descending);
+            OrderByColumn(e.Column, descending);
         }
 
         public DataListView AddRowBinding<TEntity>(Action<IDataListViewRowBinding<TEntity>> builder)
         {
             var binding = new DataListViewRowBinding<TEntity>();
-            if (this.RowBindings.TryAdd(typeof(TEntity), binding))
+            if (RowBindings.TryAdd(typeof(TEntity), binding))
             {
                 builder?.Invoke(binding);
             };
@@ -86,34 +86,34 @@ namespace ValheimServerGUI.Controls
 
         public IEnumerable<DataListViewRow<TEntity>> GetRowsWithType<TEntity>()
         {
-            return this.Rows
+            return Rows
                 .Select(row => row as DataListViewRow<TEntity>)
                 .Where(row => row != null);
         }
 
         public DataListViewRow GetSelectedRow()
         {
-            if (!this.IsRowSelected) return null;
+            if (!IsRowSelected) return null;
 
-            return this.ListView.SelectedItems[0] as DataListViewRow;
+            return ListView.SelectedItems[0] as DataListViewRow;
         }
 
         public DataListViewRow<TEntity> GetSelectedRow<TEntity>()
         {
-            if (!this.IsRowSelected) return null;
+            if (!IsRowSelected) return null;
 
-            return this.ListView.SelectedItems[0] as DataListViewRow<TEntity>;
+            return ListView.SelectedItems[0] as DataListViewRow<TEntity>;
         }
 
         public bool TryGetSelectedRow(out DataListViewRow row)
         {
-            row = this.GetSelectedRow();
+            row = GetSelectedRow();
             return row != null;
         }
 
         public bool TryGetSelectedRow<TEntity>(out DataListViewRow<TEntity> row)
         {
-            row = this.GetSelectedRow<TEntity>();
+            row = GetSelectedRow<TEntity>();
             return row != null;
         }
 
@@ -125,18 +125,18 @@ namespace ValheimServerGUI.Controls
         {
             var item = new DataListViewRow(this, values);
 
-            this.ListView.Items.Add(item);
-            this._rows.Add(item);
+            ListView.Items.Add(item);
+            _rows.Add(item);
 
             // Reapply the sort when data is added
-            if (this.SortColumn.HasValue) this.OrderByColumn(this.SortColumn.Value, this.SortDescending);
+            if (SortColumn.HasValue) OrderByColumn(SortColumn.Value, SortDescending);
 
             return item;
         }
 
         public DataListViewRow<TEntity> AddRowFromEntity<TEntity>(TEntity entity)
         {
-            if (!this.RowBindings.TryGetValue(typeof(TEntity), out var binding))
+            if (!RowBindings.TryGetValue(typeof(TEntity), out var binding))
             {
                 throw new ArgumentException($"{nameof(DataListView)} does not have a binding for type {typeof(TEntity)}");
             }
@@ -144,11 +144,11 @@ namespace ValheimServerGUI.Controls
             var typedBinding = binding as DataListViewRowBinding<TEntity>;
             var item = new DataListViewRow<TEntity>(this, entity, typedBinding);
 
-            this.ListView.Items.Add(item);
-            this._rows.Add(item);
+            ListView.Items.Add(item);
+            _rows.Add(item);
 
             // Reapply the sort when data is added
-            if (this.SortColumn.HasValue) this.OrderByColumn(this.SortColumn.Value, this.SortDescending);
+            if (SortColumn.HasValue) OrderByColumn(SortColumn.Value, SortDescending);
 
             return item;
         }
@@ -157,11 +157,11 @@ namespace ValheimServerGUI.Controls
         {
             if (row == null) return false;
 
-            var result = this._rows.Remove(row);
+            var result = _rows.Remove(row);
 
             if (result)
             {
-                this.ListView.Items.Remove(row);
+                ListView.Items.Remove(row);
             }
 
             return result;
@@ -169,7 +169,7 @@ namespace ValheimServerGUI.Controls
 
         public bool RemoveSelectedRow()
         {
-            return this.RemoveRow(this.GetSelectedRow());
+            return RemoveRow(GetSelectedRow());
         }
 
         public bool RemoveRows(IEnumerable<DataListViewRow> rows)
@@ -180,7 +180,7 @@ namespace ValheimServerGUI.Controls
 
             foreach (var row in rows)
             {
-                var result = this.RemoveRow(row);
+                var result = RemoveRow(row);
                 anyRemoved = anyRemoved || result;
             }
 
@@ -189,12 +189,12 @@ namespace ValheimServerGUI.Controls
 
         public bool RemoveRowsWhere(Func<DataListViewRow, bool> condition)
         {
-            return this.RemoveRows(this.Rows.Where(condition).ToList());
+            return RemoveRows(Rows.Where(condition).ToList());
         }
 
         public bool RemoveRowsWhere<TEntity>(Func<DataListViewRow<TEntity>, bool> condition)
         {
-            return this.RemoveRows(this.GetRowsWithType<TEntity>().Where(condition).ToList());
+            return RemoveRows(GetRowsWithType<TEntity>().Where(condition).ToList());
         }
 
         #endregion
@@ -203,20 +203,20 @@ namespace ValheimServerGUI.Controls
 
         public void OrderByColumn(int colIndex, bool descending = false)
         {
-            if (colIndex >= this.Columns.Count) return;
+            if (colIndex >= Columns.Count) return;
 
             var rowsCopy = descending
-                ? this._rows.OrderByDescending(r => r.GetCell(colIndex)?.Value).ToArray()
-                : this._rows.OrderBy(r => r.GetCell(colIndex)?.Value).ToArray();
+                ? _rows.OrderByDescending(r => r.GetCell(colIndex)?.Value).ToArray()
+                : _rows.OrderBy(r => r.GetCell(colIndex)?.Value).ToArray();
 
-            this.SortColumn = colIndex;
-            this.SortDescending = descending;
+            SortColumn = colIndex;
+            SortDescending = descending;
 
-            this.ListView.Items.Clear();
-            this._rows.Clear();
+            ListView.Items.Clear();
+            _rows.Clear();
 
-            this.ListView.Items.AddRange(rowsCopy);
-            this._rows.AddRange(rowsCopy);
+            ListView.Items.AddRange(rowsCopy);
+            _rows.AddRange(rowsCopy);
         }
 
         #endregion
@@ -232,19 +232,19 @@ namespace ValheimServerGUI.Controls
 
             public DataListViewRow(DataListView parent)
             {
-                this.Parent = parent;
+                Parent = parent;
             }
 
             public DataListViewRow(DataListView parent, int numColumns)
                 : this(parent)
             {
-                this.FillCellsToIndex(numColumns - 1);
+                FillCellsToIndex(numColumns - 1);
             }
 
             public DataListViewRow(DataListView parent, params object[] values)
                 : this(parent)
             {
-                this.SetCellValues(values);
+                SetCellValues(values);
             }
 
             public DataListViewRow SetCellValues(params object[] values)
@@ -252,14 +252,14 @@ namespace ValheimServerGUI.Controls
                 if (values == null || values.Length == 0)
                 {
                     // No values have been provided, clear out all existing values
-                    foreach (var cell in this.Cells)
+                    foreach (var cell in Cells)
                     {
                         cell.Value = null;
                     }
                 }
                 else
                 {
-                    var maxIndex = Math.Max(this.Cells.Count, values.Length) - 1;
+                    var maxIndex = Math.Max(Cells.Count, values.Length) - 1;
 
                     for (var i = 0; i <= maxIndex; i++)
                     {
@@ -267,11 +267,11 @@ namespace ValheimServerGUI.Controls
                         {
                             // A cell exists, but no value has been provided for it,
                             // so clear out the existing value
-                            this.SetCellValue(i, null);
+                            SetCellValue(i, null);
                         }
                         else
                         {
-                            this.SetCellValue(i, values[i]);
+                            SetCellValue(i, values[i]);
                         }
                     }
                 }
@@ -281,13 +281,13 @@ namespace ValheimServerGUI.Controls
 
             public DataListViewRow SetCellValue(int cellIndex, object value)
             {
-                var cell = this.GetCell(cellIndex);
+                var cell = GetCell(cellIndex);
                 cell.Value = value;
 
                 // ListView compatibility: Item [0] is actually just the row's Text
                 if (cellIndex == 0)
                 {
-                    this.Text = cell.Text;
+                    Text = cell.Text;
                 }
 
                 return this;
@@ -295,20 +295,20 @@ namespace ValheimServerGUI.Controls
 
             public DataListViewCell GetCell(int cellIndex)
             {
-                this.FillCellsToIndex(cellIndex);
+                FillCellsToIndex(cellIndex);
 
-                return this.Cells[cellIndex];
+                return Cells[cellIndex];
             }
 
             #region Non-public methods
 
             private void FillCellsToIndex(int cellIndex)
             {
-                if (cellIndex >= this.Cells.Count)
+                if (cellIndex >= Cells.Count)
                 {
-                    for (var i = this.Cells.Count; i <= cellIndex; i++)
+                    for (var i = Cells.Count; i <= cellIndex; i++)
                     {
-                        this.AddCell();
+                        AddCell();
                     }
                 }
             }
@@ -319,12 +319,12 @@ namespace ValheimServerGUI.Controls
 
                 // ListView compatibility: Item [0] is simply the row's Text, but subsequent
                 // items must be added as SubItems
-                if (this.Cells.Count > 0)
+                if (Cells.Count > 0)
                 {
-                    this.SubItems.Add(cell);
+                    SubItems.Add(cell);
                 }
 
-                this._cells.Add(cell);
+                _cells.Add(cell);
 
                 return cell;
             }
@@ -341,15 +341,15 @@ namespace ValheimServerGUI.Controls
             internal DataListViewRow(DataListView parent, TEntity entity, DataListViewRowBinding<TEntity> binding)
                 : base(parent)
             {
-                this.Entity = entity;
-                this.Binding = binding;
-                this.RefreshValues();
+                Entity = entity;
+                Binding = binding;
+                RefreshValues();
             }
 
             public DataListViewRow<TEntity> RefreshValues()
             {
-                var cellValues = this.Binding.ExtractValues(this.Entity).ToArray();
-                this.SetCellValues(cellValues);
+                var cellValues = Binding.ExtractValues(Entity).ToArray();
+                SetCellValues(cellValues);
                 return this;
             }
         }
@@ -365,13 +365,13 @@ namespace ValheimServerGUI.Controls
             private object _value;
             public object Value
             {
-                get => this._value;
+                get => _value;
                 set
                 {
-                    if (this._value == value) return;
-                    this._value = value;
-                    this.Text = value?.ToString();
-                    this.ValueChanged?.Invoke(this, value);
+                    if (_value == value) return;
+                    _value = value;
+                    Text = value?.ToString();
+                    ValueChanged?.Invoke(this, value);
                 }
             }
 
@@ -379,13 +379,13 @@ namespace ValheimServerGUI.Controls
 
             public DataListViewCell(DataListViewRow parent)
             {
-                this.Parent = parent;
+                Parent = parent;
             }
 
             public DataListViewCell(DataListViewRow parent, object value)
                 : this(parent)
             {
-                this.Value = value;
+                Value = value;
             }
         }
 
@@ -399,7 +399,7 @@ namespace ValheimServerGUI.Controls
 
             public DataListViewRowBinding(Type entityType)
             {
-                this.EntityType = entityType;
+                EntityType = entityType;
             }
         }
 
@@ -413,20 +413,20 @@ namespace ValheimServerGUI.Controls
             {
                 if (cellIndex < 0)
                 {
-                    throw new ArgumentException($"{this.GetType()}.{nameof(AddCellBinding)} must have a cellIndex >= 0");
+                    throw new ArgumentException($"{GetType()}.{nameof(AddCellBinding)} must have a cellIndex >= 0");
                 }
 
-                if (this.Extractors.ContainsKey(cellIndex))
+                if (Extractors.ContainsKey(cellIndex))
                 {
-                    throw new ArgumentException($"{this.GetType()} already has a cell binding for column {cellIndex}");
+                    throw new ArgumentException($"{GetType()} already has a cell binding for column {cellIndex}");
                 }
 
-                this.Extractors.Add(cellIndex, extractor);
+                Extractors.Add(cellIndex, extractor);
             }
 
             public IEnumerable<object> ExtractValues(TEntity entity)
             {
-                return this.ExtractValues(entity, this.Extractors.Keys.Max());
+                return ExtractValues(entity, Extractors.Keys.Max());
             }
 
             public IEnumerable<object> ExtractValues(TEntity entity, int numValues)
@@ -435,7 +435,7 @@ namespace ValheimServerGUI.Controls
                 {
                     object value = null;
 
-                    if (this.Extractors.TryGetValue(i, out var extractor))
+                    if (Extractors.TryGetValue(i, out var extractor))
                     {
                         try
                         {

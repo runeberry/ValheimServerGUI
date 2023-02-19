@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -8,7 +7,7 @@ namespace ValheimServerGUI.Game
     public class PlayerInfo : IPrimaryKeyEntity
     {
         [JsonIgnore]
-        public string Key => this.PlayerName == null ? this.SteamId : $"{this.SteamId}:{this.PlayerName}";
+        public string Key => PlayerName == null ? SteamId : $"{SteamId}:{PlayerName}";
 
         /// <summary>
         /// The character's name as it appears within Valheim

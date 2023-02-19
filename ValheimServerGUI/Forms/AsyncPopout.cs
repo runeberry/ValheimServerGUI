@@ -14,7 +14,7 @@ namespace ValheimServerGUI.Forms
         private event EventHandler TaskFinished;
 
         private bool AutoCloseOnFinished;
-        
+
         private string FinishedMessage;
 
         private AsyncPopout()
@@ -22,8 +22,8 @@ namespace ValheimServerGUI.Forms
             InitializeComponent();
             this.AddApplicationIcon();
 
-            this.CloseButton.Click += this.BuildEventHandler(this.Close);
-            this.TaskFinished += this.BuildEventHandler(this.OnTaskFinished);
+            CloseButton.Click += this.BuildEventHandler(Close);
+            TaskFinished += this.BuildEventHandler(OnTaskFinished);
         }
 
         public AsyncPopout(Task task, Action<AsyncPopoutOptions> optionsBuilder = null)
@@ -33,65 +33,65 @@ namespace ValheimServerGUI.Forms
 
             var options = new AsyncPopoutOptions();
             optionsBuilder?.Invoke(options);
-            this.Options = options;
+            Options = options;
 
-            this.Task = task;
-            this.Text = options.Title ?? this.Text;
-            this.LoadingLabel.Text = options.Text ?? this.LoadingLabel.Text;
+            Task = task;
+            Text = options.Title ?? Text;
+            LoadingLabel.Text = options.Text ?? LoadingLabel.Text;
         }
 
         protected override void OnLoad(EventArgs e)
         {
             base.OnLoad(e);
 
-            this.Task = this.Task.ContinueWith(this.TaskContinuationHandler);
+            Task = Task.ContinueWith(TaskContinuationHandler);
         }
 
         protected void OnTaskFinished()
         {
-            if (this.AutoCloseOnFinished)
+            if (AutoCloseOnFinished)
             {
-                this.Close();
+                Close();
                 return;
             }
 
-            this.LoadingLabel.Text = this.FinishedMessage ?? "Task Complete!";
-            this.CloseButton.Text = "Close";
-            this.ProgressBar.Visible = false;
+            LoadingLabel.Text = FinishedMessage ?? "Task Complete!";
+            CloseButton.Text = "Close";
+            ProgressBar.Visible = false;
         }
 
         private Task TaskContinuationHandler(Task task)
         {
             if (task.Status == TaskStatus.RanToCompletion)
             {
-                if (this.Options.CloseOnSuccess) return this.CloseAsync();
+                if (Options.CloseOnSuccess) return CloseAsync();
 
-                this.FinishedMessage = this.Options.SuccessMessage;
+                FinishedMessage = Options.SuccessMessage;
             }
             else if (task.Exception != null)
             {
-                if (this.Options.CloseOnFailure) return this.CloseAsync();
+                if (Options.CloseOnFailure) return CloseAsync();
 
-                var errMessage = this.Options.FailureMessage ?? "The task was cancelled due to an error.";
+                var errMessage = Options.FailureMessage ?? "The task was cancelled due to an error.";
                 var ex = task.Exception.GetPrimaryException();
-                this.FinishedMessage = $"{errMessage}\r\n{ex.GetType().Name}\r\n{ex.Message}";
+                FinishedMessage = $"{errMessage}\r\n{ex.GetType().Name}\r\n{ex.Message}";
             }
             else
             {
-                if (this.Options.CloseOnFailure) return this.CloseAsync();
+                if (Options.CloseOnFailure) return CloseAsync();
 
-                this.FinishedMessage = this.Options.FailureMessage ?? "The task was cancelled due to an unknown error.";
+                FinishedMessage = Options.FailureMessage ?? "The task was cancelled due to an unknown error.";
             }
 
-            this.TaskFinished?.Invoke(this, EventArgs.Empty);
+            TaskFinished?.Invoke(this, EventArgs.Empty);
 
             return Task.CompletedTask;
         }
 
         private Task CloseAsync()
         {
-            this.AutoCloseOnFinished = true;
-            this.TaskFinished?.Invoke(this, EventArgs.Empty);
+            AutoCloseOnFinished = true;
+            TaskFinished?.Invoke(this, EventArgs.Empty);
             return Task.CompletedTask;
         }
 

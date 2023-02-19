@@ -18,8 +18,8 @@ namespace ValheimServerGUI.Tests.Game
 
         public ValheimServerTests()
         {
-            this.Server = this.GetService<ValheimServer>();
-            PlayerDataRepository = this.GetService<IPlayerDataRepository>();
+            Server = GetService<ValheimServer>();
+            PlayerDataRepository = GetService<IPlayerDataRepository>();
         }
 
         [Fact]
@@ -52,7 +52,7 @@ namespace ValheimServerGUI.Tests.Game
             var expected = new PlayerInfo { SteamId = steamId, PlayerStatus = PlayerStatus.Joining };
             AssertMatch(expected, eventPlayer);
 
-            var dataPlayer = Assert.Single(this.PlayerDataRepository.Data);
+            var dataPlayer = Assert.Single(PlayerDataRepository.Data);
             AssertMatch(expected, dataPlayer);
         }
 
@@ -69,7 +69,7 @@ namespace ValheimServerGUI.Tests.Game
             var expected = new PlayerInfo { SteamId = steamId, PlayerStatus = PlayerStatus.Leaving };
             AssertMatch(expected, eventPlayer);
 
-            var dataPlayer = Assert.Single(this.PlayerDataRepository.Data);
+            var dataPlayer = Assert.Single(PlayerDataRepository.Data);
             AssertMatch(expected, dataPlayer);
         }
 
@@ -86,7 +86,7 @@ namespace ValheimServerGUI.Tests.Game
             var expected = new PlayerInfo { SteamId = steamId, PlayerStatus = PlayerStatus.Offline };
             AssertMatch(expected, eventPlayer);
 
-            var dataPlayer = Assert.Single(this.PlayerDataRepository.Data);
+            var dataPlayer = Assert.Single(PlayerDataRepository.Data);
             AssertMatch(expected, dataPlayer);
         }
 
@@ -110,7 +110,7 @@ namespace ValheimServerGUI.Tests.Game
             var expected = CreatePlayer(steamId, name, PlayerStatus.Online, zdoid);
             AssertMatch(expected, eventPlayer);
 
-            var dataPlayer = Assert.Single(this.PlayerDataRepository.Data);
+            var dataPlayer = Assert.Single(PlayerDataRepository.Data);
             AssertMatch(expected, dataPlayer);
         }
 
@@ -133,7 +133,7 @@ namespace ValheimServerGUI.Tests.Game
                 eventPlayer = player;
             };
 
-            Assert.Equal(3, this.PlayerDataRepository.Data.Count());
+            Assert.Equal(3, PlayerDataRepository.Data.Count());
 
             // And a player by name goes online...
             var (name1, zdoid1) = ("PlayerOne", "-432");
@@ -142,7 +142,7 @@ namespace ValheimServerGUI.Tests.Game
             // ...then that player is not yet brought online
             Assert.Null(eventPlayer);
             Assert.Equal(0, eventCalls);
-            Assert.True(this.PlayerDataRepository.Data.All(p => p.PlayerStatus == PlayerStatus.Joining));
+            Assert.True(PlayerDataRepository.Data.All(p => p.PlayerStatus == PlayerStatus.Joining));
 
             // And another player goes online...
             var (name2, zdoid2) = ("PlayerTwo", "5834");
@@ -151,7 +151,7 @@ namespace ValheimServerGUI.Tests.Game
             // ...then *still* no players are brought online
             Assert.Null(eventPlayer);
             Assert.Equal(0, eventCalls);
-            Assert.True(this.PlayerDataRepository.Data.All(p => p.PlayerStatus == PlayerStatus.Joining));
+            Assert.True(PlayerDataRepository.Data.All(p => p.PlayerStatus == PlayerStatus.Joining));
 
             // And the final player goes online...
             var (name3, zdoid3) = ("PlayerThree", "146131");
@@ -160,7 +160,7 @@ namespace ValheimServerGUI.Tests.Game
             // ...then, finally, all players are brought online
             Assert.NotNull(eventPlayer);
             Assert.Equal(3, eventCalls);
-            Assert.True(this.PlayerDataRepository.Data.All(p => p.PlayerStatus == PlayerStatus.Online));
+            Assert.True(PlayerDataRepository.Data.All(p => p.PlayerStatus == PlayerStatus.Online));
         }
 
         // If the same steamId joins under multiple character names, then we can track separate
@@ -180,7 +180,7 @@ namespace ValheimServerGUI.Tests.Game
             PlayerInfo expected;
             PlayerDataRepository.PlayerStatusChanged += (_, player) => eventPlayer = player;
 
-            dataPlayer = this.PlayerDataRepository.Data.Single();
+            dataPlayer = PlayerDataRepository.Data.Single();
             var origTimestamp = dataPlayer.LastStatusChange; // For later assertion
 
             // And joins again...
@@ -190,7 +190,7 @@ namespace ValheimServerGUI.Tests.Game
             expected = CreatePlayer(steamId, name1, PlayerStatus.Joining);
             AssertMatch(expected, eventPlayer);
 
-            dataPlayer = Assert.Single(this.PlayerDataRepository.Data);
+            dataPlayer = Assert.Single(PlayerDataRepository.Data);
             AssertMatch(expected, dataPlayer);
             var origKey = dataPlayer.Key; // For lookup in later assertion
 
@@ -202,19 +202,19 @@ namespace ValheimServerGUI.Tests.Game
             expected = CreatePlayer(steamId, name2, PlayerStatus.Online, zdoid2);
             AssertMatch(expected, eventPlayer);
 
-            Assert.Equal(2, this.PlayerDataRepository.Data.Count());
-            dataPlayer = this.PlayerDataRepository.FindById(eventPlayer.Key);
+            Assert.Equal(2, PlayerDataRepository.Data.Count());
+            dataPlayer = PlayerDataRepository.FindById(eventPlayer.Key);
             AssertMatch(expected, dataPlayer);
 
             // ...then the offline player should have had their timestamp reverted
-            dataPlayer = this.PlayerDataRepository.FindById(origKey);
+            dataPlayer = PlayerDataRepository.FindById(origKey);
             Assert.Equal(origTimestamp, dataPlayer.LastStatusChange);
 
             // And that player goes offline...
             Log(MessageOffline, steamId);
 
             // ...then the original player's timestamp is unaffected
-            dataPlayer = this.PlayerDataRepository.FindById(origKey);
+            dataPlayer = PlayerDataRepository.FindById(origKey);
             Assert.Equal(origTimestamp, dataPlayer.LastStatusChange);
         }
 
@@ -222,7 +222,7 @@ namespace ValheimServerGUI.Tests.Game
 
         private void Log(string message, params object[] args)
         {
-            this.Server.Logger.LogInformation(string.Format(message, args));
+            Server.Logger.LogInformation(string.Format(message, args));
         }
 
         private static PlayerInfo CreatePlayer(

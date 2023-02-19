@@ -11,7 +11,7 @@ namespace ValheimServerGUI.Tools.Data
 
         public JsonDataFile(Dictionary<string, TEntity> data)
         {
-            this.Data = data;
+            Data = data;
         }
 
         [JsonProperty("data")]

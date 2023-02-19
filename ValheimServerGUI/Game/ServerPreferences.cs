@@ -61,20 +61,20 @@ namespace ValheimServerGUI.Game
         {
             var file = new ServerPreferencesFile
             {
-                ProfileName = this.ProfileName,
-                LastSaved = this.LastSaved,
-                Name = this.Name,
-                Password = this.Password,
-                WorldName = this.WorldName,
-                Community = this.Public,
-                Port = this.Port,
-                Crossplay = this.Crossplay,
-                SaveInterval = this.SaveInterval,
-                BackupCount = this.BackupCount,
-                BackupIntervalShort = this.BackupIntervalShort,
-                BackupIntervalLong = this.BackupIntervalLong,
-                AutoStart = this.AutoStart,
-                AdditionalArgs = this.AdditionalArgs,
+                ProfileName = ProfileName,
+                LastSaved = LastSaved,
+                Name = Name,
+                Password = Password,
+                WorldName = WorldName,
+                Community = Public,
+                Port = Port,
+                Crossplay = Crossplay,
+                SaveInterval = SaveInterval,
+                BackupCount = BackupCount,
+                BackupIntervalShort = BackupIntervalShort,
+                BackupIntervalLong = BackupIntervalLong,
+                AutoStart = AutoStart,
+                AdditionalArgs = AdditionalArgs,
             };
 
             return file;

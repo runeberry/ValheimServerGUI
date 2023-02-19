@@ -25,11 +25,11 @@ namespace ValheimServerGUI.Tools
 
             if (obj is TimeAgo timeAgo)
             {
-                return this.CompareTo(timeAgo);
+                return CompareTo(timeAgo);
             }
             else if (obj is DateTimeOffset dateTimeOffset)
             {
-                return this.Timestamp.CompareTo(dateTimeOffset);
+                return Timestamp.CompareTo(dateTimeOffset);
             }
             else
             {
@@ -39,7 +39,7 @@ namespace ValheimServerGUI.Tools
 
         public int CompareTo(TimeAgo other)
         {
-            return this.Timestamp.CompareTo(other.Timestamp);
+            return Timestamp.CompareTo(other.Timestamp);
         }
 
         public bool Equals(TimeAgo other)
@@ -49,7 +49,7 @@ namespace ValheimServerGUI.Tools
 
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            return this.Timestamp.ToString(formatProvider);
+            return Timestamp.ToString(formatProvider);
         }
 
         #endregion
@@ -58,7 +58,7 @@ namespace ValheimServerGUI.Tools
 
         public override string ToString()
         {
-            return this.Timestamp.Humanize();
+            return Timestamp.Humanize();
         }
 
         public override bool Equals(object obj)
@@ -67,11 +67,11 @@ namespace ValheimServerGUI.Tools
 
             if (obj is TimeAgo timeAgo)
             {
-                return this.CompareTo(timeAgo) == 0;
+                return CompareTo(timeAgo) == 0;
             }
             else if (obj is DateTimeOffset dateTimeOffset)
             {
-                return this.Timestamp.CompareTo(dateTimeOffset) == 0;
+                return Timestamp.CompareTo(dateTimeOffset) == 0;
             }
             else
             {

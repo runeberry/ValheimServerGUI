@@ -39,24 +39,24 @@ namespace ValheimServerGUI.Tools
         private string _externalIpAddress;
         public string ExternalIpAddress
         {
-            get => this._externalIpAddress;
+            get => _externalIpAddress;
             private set
             {
-                if (this._externalIpAddress == value) return;
-                this._externalIpAddress = value;
-                this.ExternalIpChanged?.Invoke(this, value);
+                if (_externalIpAddress == value) return;
+                _externalIpAddress = value;
+                ExternalIpChanged?.Invoke(this, value);
             }
         }
 
         private string _internalIpAddress;
         public string InternalIpAddress
         {
-            get => this._internalIpAddress;
+            get => _internalIpAddress;
             private set
             {
-                if (this._internalIpAddress == value) return;
-                this._internalIpAddress = value;
-                this.InternalIpChanged?.Invoke(this, value);
+                if (_internalIpAddress == value) return;
+                _internalIpAddress = value;
+                InternalIpChanged?.Invoke(this, value);
             }
         }
 
@@ -66,8 +66,8 @@ namespace ValheimServerGUI.Tools
 
         public Task LoadExternalIpAddressAsync()
         {
-            return this.Get(Resources.UrlExternalIpLookup)
-                .WithCallback<ExternalIpResponse>(this.OnExternalIpResponse)
+            return Get(Resources.UrlExternalIpLookup)
+                .WithCallback<ExternalIpResponse>(OnExternalIpResponse)
                 .SendAsync();
         }
 
@@ -84,7 +84,7 @@ namespace ValheimServerGUI.Tools
 
             if (!addresses.Any())
             {
-                this.Logger.LogWarning("Failed to find internal IP address: No network interfaces are UP with any IPv4 addresses");
+                Logger.LogWarning("Failed to find internal IP address: No network interfaces are UP with any IPv4 addresses");
                 return Task.CompletedTask;
             }
 
@@ -101,7 +101,7 @@ namespace ValheimServerGUI.Tools
                 .Where(str => !string.IsNullOrWhiteSpace(str))
                 .OrderBy(str => str);
 
-            this.InternalIpAddress = results.FirstOrDefault();
+            InternalIpAddress = results.FirstOrDefault();
             return Task.CompletedTask;
         }
 
@@ -120,7 +120,7 @@ namespace ValheimServerGUI.Tools
         private void OnExternalIpResponse(object sender, ExternalIpResponse response)
         {
             if (string.IsNullOrWhiteSpace(response?.Ip)) return;
-            this.ExternalIpAddress = response.Ip;
+            ExternalIpAddress = response.Ip;
         }
 
         private class ExternalIpResponse

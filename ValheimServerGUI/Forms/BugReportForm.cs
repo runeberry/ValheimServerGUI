@@ -12,56 +12,56 @@ namespace ValheimServerGUI.Forms
         private readonly IRuneberryApiClient RuneberryApiClient;
 
         private readonly IEventLogger Logger;
-        
+
         public BugReportForm(
             IRuneberryApiClient runeberryApiClient,
             IEventLogger logger)
         {
-            this.RuneberryApiClient = runeberryApiClient;
-            this.Logger = logger;
+            RuneberryApiClient = runeberryApiClient;
+            Logger = logger;
 
             InitializeComponent();
             this.AddApplicationIcon();
 
-            this.ButtonSubmit.Click += this.BuildEventHandler(this.ButtonSubmit_Click);
-            this.ButtonCancel.Click += this.BuildEventHandler(this.ButtonCancel_Click);
-            this.BugReportField.ValueChanged += this.BuildEventHandler<string>(this.BugReportField_ValueChanged);
+            ButtonSubmit.Click += this.BuildEventHandler(ButtonSubmit_Click);
+            ButtonCancel.Click += this.BuildEventHandler(ButtonCancel_Click);
+            BugReportField.ValueChanged += this.BuildEventHandler<string>(BugReportField_ValueChanged);
         }
 
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
 
-            this.ClearForm();
+            ClearForm();
         }
 
         protected override void OnClosed(EventArgs e)
         {
             base.OnClosed(e);
 
-            this.ClearForm();
+            ClearForm();
         }
 
         private void ButtonCancel_Click()
         {
-            this.Close();
+            Close();
         }
 
         private void ButtonSubmit_Click()
         {
-            this.SubmitBugReport();
+            SubmitBugReport();
         }
 
         private void BugReportField_ValueChanged(string value)
         {
             // Only enable the Submit button when there is some content in the bug report
-            this.ButtonSubmit.Enabled = !string.IsNullOrWhiteSpace(value);
+            ButtonSubmit.Enabled = !string.IsNullOrWhiteSpace(value);
         }
 
         private void ClearForm()
         {
-            this.BugReportField.Value = string.Empty;
-            this.ContactInfoField.Value = string.Empty;
+            BugReportField.Value = string.Empty;
+            ContactInfoField.Value = string.Empty;
         }
 
         private void SubmitBugReport()
@@ -70,13 +70,13 @@ namespace ValheimServerGUI.Forms
 
             var additionalInfo = new Dictionary<string, string>
             {
-                { "BugReport", this.BugReportField.Value },
-                { "ContactInfo", this.ContactInfoField.Value },
+                { "BugReport", BugReportField.Value },
+                { "ContactInfo", ContactInfoField.Value },
             };
 
             crashReport.Source = "BugReport";
             crashReport.AdditionalInfo = additionalInfo;
-            crashReport.Logs = this.Logger.LogBuffer.Reverse().Take(100).ToList();
+            crashReport.Logs = Logger.LogBuffer.Reverse().Take(100).ToList();
 
             var task = RuneberryApiClient.SendCrashReportAsync(crashReport);
             var asyncPopout = new AsyncPopout(task, o =>
@@ -89,7 +89,7 @@ namespace ValheimServerGUI.Forms
 
             asyncPopout.ShowDialog();
 
-            this.Close();
+            Close();
         }
     }
 }

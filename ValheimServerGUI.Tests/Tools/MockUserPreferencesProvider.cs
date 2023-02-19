@@ -9,12 +9,12 @@ namespace ValheimServerGUI.Tests.Tools
 
         public void SetUserPreferences(UserPreferences prefs)
         {
-            this.UserPrefs = prefs;
+            UserPrefs = prefs;
         }
 
         public void SetUserPreferences(Action<UserPreferences> prefsBuilder)
         {
-            prefsBuilder(this.UserPrefs);
+            prefsBuilder(UserPrefs);
         }
 
         #region IUserPreferencesProvider implementation
@@ -23,12 +23,12 @@ namespace ValheimServerGUI.Tests.Tools
 
         public UserPreferences LoadPreferences()
         {
-            return this.UserPrefs;
+            return UserPrefs;
         }
 
         public void SavePreferences(UserPreferences preferences)
         {
-            this.PreferencesSaved?.Invoke(this, preferences);
+            PreferencesSaved?.Invoke(this, preferences);
         }
 
         #endregion

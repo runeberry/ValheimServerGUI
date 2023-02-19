@@ -54,19 +54,19 @@ namespace ValheimServerGUI.Game
         {
             var file = new UserPreferencesFile
             {
-                ValheimGamePath = this.ValheimGamePath,
-                ValheimServerPath = this.ValheimServerPath,
-                ValheimSaveDataFolder = this.ValheimSaveDataFolder,
-                CheckForUpdates = this.CheckForUpdates,
-                StartWithWindows = this.StartWithWindows,
-                StartMinimized = this.StartMinimized,
-                SaveProfileOnStart = this.SaveProfileOnStart,
+                ValheimGamePath = ValheimGamePath,
+                ValheimServerPath = ValheimServerPath,
+                ValheimSaveDataFolder = ValheimSaveDataFolder,
+                CheckForUpdates = CheckForUpdates,
+                StartWithWindows = StartWithWindows,
+                StartMinimized = StartMinimized,
+                SaveProfileOnStart = SaveProfileOnStart,
                 Servers = new(),
             };
 
-            if (this.Servers != null)
+            if (Servers != null)
             {
-                var servers = this.Servers
+                var servers = Servers
                     .Select(p => p.ToFile())
                     .Where(p => !string.IsNullOrWhiteSpace(p.ProfileName)) // Remove profiles with no name
                     .DistinctBy(p => p.ProfileName); // Remove duplicate entries by profile name

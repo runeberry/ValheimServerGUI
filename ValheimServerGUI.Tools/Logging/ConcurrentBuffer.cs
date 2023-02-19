@@ -11,31 +11,31 @@ namespace ValheimServerGUI.Tools.Logging
         public int BufferSize { get; }
 
         private ConcurrentQueue<T> ConcurrentQueue = new();
-        
+
         public ConcurrentBuffer(int bufferSize)
         {
             if (bufferSize < 0) throw new ArgumentException("Buffer size must be >= 0");
 
-            this.BufferSize = bufferSize;
+            BufferSize = bufferSize;
         }
 
-        public int Count => this.ConcurrentQueue.Count;
+        public int Count => ConcurrentQueue.Count;
 
         public bool IsReadOnly => false;
 
         public void Enqueue(T item)
         {
-            this.ConcurrentQueue.Enqueue(item);
+            ConcurrentQueue.Enqueue(item);
 
-            while (this.ConcurrentQueue.Count > this.BufferSize)
+            while (ConcurrentQueue.Count > BufferSize)
             {
-                this.ConcurrentQueue.TryDequeue(out var _);
+                ConcurrentQueue.TryDequeue(out var _);
             }
         }
 
         public T Dequeue()
         {
-            if (this.ConcurrentQueue.TryDequeue(out var item))
+            if (ConcurrentQueue.TryDequeue(out var item))
             {
                 return item;
             }
@@ -45,27 +45,27 @@ namespace ValheimServerGUI.Tools.Logging
 
         public void Clear()
         {
-            this.ConcurrentQueue.Clear();
+            ConcurrentQueue.Clear();
         }
 
         public bool Contains(T item)
         {
-            return this.ConcurrentQueue.Contains(item);
+            return ConcurrentQueue.Contains(item);
         }
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            this.ConcurrentQueue.CopyTo(array, arrayIndex);
+            ConcurrentQueue.CopyTo(array, arrayIndex);
         }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return this.ConcurrentQueue.GetEnumerator();
+            return ConcurrentQueue.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
         {
-            return this.ConcurrentQueue.GetEnumerator();
+            return ConcurrentQueue.GetEnumerator();
         }
     }
 }

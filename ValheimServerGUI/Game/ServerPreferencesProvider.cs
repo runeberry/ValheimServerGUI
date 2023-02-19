@@ -25,10 +25,10 @@ namespace ValheimServerGUI.Game
 
         public ServerPreferencesProvider(IUserPreferencesProvider userPreferencesProvider, ILogger logger)
         {
-            this.UserPreferencesProvider = userPreferencesProvider;
-            this.Logger = logger;
+            UserPreferencesProvider = userPreferencesProvider;
+            Logger = logger;
 
-            this.UserPreferencesProvider.PreferencesSaved += this.OnPreferencesSaved;
+            UserPreferencesProvider.PreferencesSaved += OnPreferencesSaved;
         }
 
         #region IServerPreferencesProvider implementation
@@ -39,7 +39,7 @@ namespace ValheimServerGUI.Game
         {
             if (string.IsNullOrWhiteSpace(profileName)) throw new ArgumentException($"{nameof(profileName)} must not be null or whitespace");
 
-            var prefs = this.LoadPreferences().Where(p => p.ProfileName == profileName).ToList();
+            var prefs = LoadPreferences().Where(p => p.ProfileName == profileName).ToList();
 
             if (prefs.Count == 0)
             {
@@ -47,7 +47,7 @@ namespace ValheimServerGUI.Game
             }
             else if (prefs.Count > 1)
             {
-                this.Logger.LogWarning($"Multiple configurations found for server '{profileName}'. Returning the most recently updated one.");
+                Logger.LogWarning($"Multiple configurations found for server '{profileName}'. Returning the most recently updated one.");
                 return prefs.OrderByDescending(p => p.LastSaved).First();
             }
 
@@ -56,14 +56,14 @@ namespace ValheimServerGUI.Game
 
         public IEnumerable<ServerPreferences> LoadPreferences()
         {
-            return this.UserPreferencesProvider.LoadPreferences().Servers;
+            return UserPreferencesProvider.LoadPreferences().Servers;
         }
 
         public void SavePreferences(ServerPreferences preferences)
         {
             if (preferences == null) return;
 
-            var userPrefs = this.UserPreferencesProvider.LoadPreferences();
+            var userPrefs = UserPreferencesProvider.LoadPreferences();
 
             // Remove any existing server profiles with this name
             userPrefs.Servers.RemoveAll(p => p.ProfileName == preferences.ProfileName);
@@ -71,23 +71,23 @@ namespace ValheimServerGUI.Game
 
             preferences.LastSaved = DateTime.UtcNow;
 
-            this.UserPreferencesProvider.SavePreferences(userPrefs);
-            this.Logger.LogInformation("Saved preferences for server profile: {profileName}", preferences.ProfileName);
+            UserPreferencesProvider.SavePreferences(userPrefs);
+            Logger.LogInformation("Saved preferences for server profile: {profileName}", preferences.ProfileName);
         }
 
         public void RemovePreferences(string profileName)
         {
             if (string.IsNullOrWhiteSpace(profileName)) return;
 
-            var userPrefs = this.UserPreferencesProvider.LoadPreferences();
+            var userPrefs = UserPreferencesProvider.LoadPreferences();
 
             if (userPrefs.Servers.Any(p => p.ProfileName == profileName))
             {
                 // Remove any existing server profiles with this name
                 userPrefs.Servers.RemoveAll(p => p.ProfileName == profileName);
 
-                this.UserPreferencesProvider.SavePreferences(userPrefs);
-                this.Logger.LogInformation("Removed preferences for server profile: {profileName}", profileName);
+                UserPreferencesProvider.SavePreferences(userPrefs);
+                Logger.LogInformation("Removed preferences for server profile: {profileName}", profileName);
             }
         }
 
@@ -97,7 +97,7 @@ namespace ValheimServerGUI.Game
 
         private void OnPreferencesSaved(object sender, UserPreferences preferences)
         {
-            this.PreferencesSaved?.Invoke(this, preferences.Servers);
+            PreferencesSaved?.Invoke(this, preferences.Servers);
         }
 
         #endregion

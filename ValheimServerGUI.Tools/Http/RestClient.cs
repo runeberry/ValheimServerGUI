@@ -7,11 +7,11 @@ namespace ValheimServerGUI.Tools.Http
     {
         public IRestClientContext Context { get; }
 
-        public ILogger Logger => this.Context.Logger;
+        public ILogger Logger => Context.Logger;
 
         public RestClient(IRestClientContext context)
         {
-            this.Context = context;
+            Context = context;
         }
 
         public RestClientRequest Request(HttpMethod method, string uri, object payload = null)

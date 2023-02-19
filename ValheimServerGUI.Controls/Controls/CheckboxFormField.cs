@@ -10,26 +10,26 @@ namespace ValheimServerGUI.Controls
 
         public string LabelText
         {
-            get => this.CheckBox.Text;
-            set => this.CheckBox.Text = value;
+            get => CheckBox.Text;
+            set => CheckBox.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public bool Value
         {
-            get => this.CheckBox.Checked;
+            get => CheckBox.Checked;
             set
             {
-                if (value == this.Value) return;
+                if (value == Value) return;
 
-                this.CheckBox.Checked = value;
-                this.ValueChanged?.Invoke(this, value);
+                CheckBox.Checked = value;
+                ValueChanged?.Invoke(this, value);
             }
         }
 
@@ -41,12 +41,12 @@ namespace ValheimServerGUI.Controls
         {
             InitializeComponent();
 
-            this.CheckBox.CheckedChanged += this.CheckBox_Changed;
+            CheckBox.CheckedChanged += CheckBox_Changed;
         }
 
         private void CheckBox_Changed(object sender, EventArgs e)
         {
-            this.ValueChanged?.Invoke(this, this.Value);
+            ValueChanged?.Invoke(this, Value);
         }
     }
 }

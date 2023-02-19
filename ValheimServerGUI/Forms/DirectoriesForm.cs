@@ -34,11 +34,9 @@ namespace ValheimServerGUI.Forms
         {
             var prefs = UserPrefsProvider.LoadPreferences();
 
-            GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
             ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
             SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
 
-            GamePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
             ServerPathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
         }
 
@@ -64,16 +62,14 @@ namespace ValheimServerGUI.Forms
         {
             var prefs = UserPrefsProvider.LoadPreferences();
 
-            var (pGamePath, pServerPath, pSaveDataFolder) = (prefs.ValheimGamePath, prefs.ValheimServerPath, prefs.ValheimSaveDataFolder);
+            var (pServerPath, pSaveDataFolder) = (prefs.ValheimServerPath, prefs.ValheimSaveDataFolder);
 
-            prefs.ValheimGamePath = GamePathField.Value;
             prefs.ValheimServerPath = ServerPathField.Value;
             prefs.ValheimSaveDataFolder = SaveDataFolderField.Value;
 
             try
             {
                 // Validate folders by ensuring that these properties can be called
-                _ = FileProvider.GameExe;
                 _ = FileProvider.ServerExe;
                 _ = FileProvider.SaveDataFolder;
             }
@@ -88,7 +84,6 @@ namespace ValheimServerGUI.Forms
                 if (dialogResult == DialogResult.No)
                 {
                     // Revert the preference updates if the user chooses to back out
-                    prefs.ValheimGamePath = pGamePath;
                     prefs.ValheimServerPath = pServerPath;
                     prefs.ValheimSaveDataFolder = pSaveDataFolder;
 
@@ -104,7 +99,6 @@ namespace ValheimServerGUI.Forms
         {
             var prefs = UserPreferences.GetDefault();
 
-            GamePathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimGamePath);
             ServerPathField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimServerPath);
             SaveDataFolderField.Value = Environment.ExpandEnvironmentVariables(prefs.ValheimSaveDataFolder);
         }

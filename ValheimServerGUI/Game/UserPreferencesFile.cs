@@ -10,8 +10,9 @@ namespace ValheimServerGUI.Game
     /// </summary>
     public class UserPreferencesFile
     {
-        [JsonProperty("valheimGamePath")]
-        public string ValheimGamePath { get; set; }
+        // (jb, 2/19/23) This field was recorded, but never used.
+        //[JsonProperty("valheimGamePath")]
+        //public string ValheimGamePath { get; set; }
 
         [JsonProperty("valheimServerPath")]
         public string ValheimServerPath { get; set; }

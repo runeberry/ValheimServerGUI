@@ -8,7 +8,8 @@ namespace ValheimServerGUI.Game
     {
         public static UserPreferences GetDefault() => new();
 
-        public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
+        // (jb, 2/19/23) This field was recorded, but never used.
+        //public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
 
         public string ValheimServerPath { get; set; } = Resources.DefaultServerPath;
 
@@ -30,7 +31,6 @@ namespace ValheimServerGUI.Game
 
             if (file == null) return prefs;
 
-            prefs.ValheimGamePath = file.ValheimGamePath ?? prefs.ValheimGamePath;
             prefs.ValheimServerPath = file.ValheimServerPath ?? prefs.ValheimServerPath;
             prefs.ValheimSaveDataFolder = file.ValheimSaveDataFolder ?? prefs.ValheimSaveDataFolder;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
@@ -54,7 +54,6 @@ namespace ValheimServerGUI.Game
         {
             var file = new UserPreferencesFile
             {
-                ValheimGamePath = ValheimGamePath,
                 ValheimServerPath = ValheimServerPath,
                 ValheimSaveDataFolder = ValheimSaveDataFolder,
                 CheckForUpdates = CheckForUpdates,

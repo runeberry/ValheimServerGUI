@@ -6,11 +6,6 @@ namespace ValheimServerGUI.Game
     public interface IValheimFileProvider
     {
         /// <summary>
-        /// The location of the Valheim game executable.
-        /// </summary>
-        FileInfo GameExe { get; }
-
-        /// <summary>
         /// The location of the Valheim dedicated server executable.
         /// </summary>
         FileInfo ServerExe { get; }
@@ -37,8 +32,6 @@ namespace ValheimServerGUI.Game
         {
             UserPrefsProvider = userPrefsProvider;
         }
-
-        public FileInfo GameExe => GetFileInfo("ValheimGamePath", Current().ValheimGamePath, ".exe");
 
         public FileInfo ServerExe => GetFileInfo("ValheimServerPath", Current().ValheimServerPath, ".exe");
 

@@ -967,7 +967,7 @@ namespace ValheimServerGUI.Forms
             this.LogViewer.Name = "LogViewer";
             this.LogViewer.Size = new System.Drawing.Size(446, 198);
             this.LogViewer.TabIndex = 2;
-            this.LogViewer.TimestampFormat = "T";
+            this.LogViewer.TimestampFormat = "HH:mm:ss.fff";
             // 
             // ButtonClearLogs
             // 

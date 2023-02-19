@@ -87,7 +87,7 @@ namespace ValheimServerGUI.Controls
                 }
             }
 
-            if (TimestampFormat != null)
+            if (!string.IsNullOrWhiteSpace(TimestampFormat))
             {
                 message = $"[{DateTime.Now.ToString(TimestampFormat)}] {message}";
             }

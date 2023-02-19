@@ -123,6 +123,7 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.MenuItemHelpDiscord = new System.Windows.Forms.ToolStripMenuItem();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -263,6 +264,7 @@ namespace ValheimServerGUI.Forms
             this.MenuItemHelpBugReport,
             this.MenuItemHelpSeparator1,
             this.MenuItemHelpUpdates,
+            this.MenuItemHelpDiscord,
             this.MenuItemHelpAbout});
             this.MenuItemHelp.Name = "MenuItemHelp";
             this.MenuItemHelp.Size = new System.Drawing.Size(44, 20);
@@ -947,6 +949,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -1054,6 +1057,13 @@ namespace ValheimServerGUI.Forms
             // 
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
+            // 
+            // MenuItemHelpDiscord
+            // 
+            this.MenuItemHelpDiscord.Image = global::ValheimServerGUI.Properties.Resources.DiscordLogo;
+            this.MenuItemHelpDiscord.Name = "MenuItemHelpDiscord";
+            this.MenuItemHelpDiscord.Size = new System.Drawing.Size(192, 22);
+            this.MenuItemHelpDiscord.Text = "Get support in &Discord";
             // 
             // MainWindow
             // 
@@ -1185,5 +1195,6 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileOpenSettings;
         private System.Windows.Forms.GroupBox StartupGroupBox;
         private ValheimServerGUI.Controls.CheckboxFormField ServerAutoStartField;
+        private System.Windows.Forms.ToolStripMenuItem MenuItemHelpDiscord;
     }
 }

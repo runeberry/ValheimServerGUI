@@ -154,6 +154,7 @@ namespace ValheimServerGUI.Forms
             MenuItemHelpPortForwarding.Click += MenuItemHelpPortForwarding_Click;
             MenuItemHelpBugReport.Click += MenuItemHelpBugReport_Click;
             MenuItemHelpUpdates.Click += MenuItemHelpUpdates_Click;
+            MenuItemHelpDiscord.Click += MenuItemHelpDiscord_Click;
             MenuItemHelpAbout.Click += MenuItemHelpAbout_Click;
 
             // Tray icon
@@ -454,6 +455,11 @@ namespace ValheimServerGUI.Forms
         private void MenuItemHelpUpdates_Click(object sender, EventArgs e)
         {
             CheckForUpdates(true);
+        }
+
+        private void MenuItemHelpDiscord_Click(object sender, EventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.UrlDiscord);
         }
 
         private void MenuItemHelpAbout_Click(object sender, EventArgs e)

@@ -76,6 +76,8 @@ namespace ValheimServerGUI.Forms
             this.ButtonStopServer = new System.Windows.Forms.Button();
             this.ButtonStartServer = new System.Windows.Forms.Button();
             this.TabAdvancedControls = new System.Windows.Forms.TabPage();
+            this.StartupGroupBox = new System.Windows.Forms.GroupBox();
+            this.ServerAutoStartField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerAdditionalArgsField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.SavingGroupBox = new System.Windows.Forms.GroupBox();
             this.ServerLongBackupIntervalField = new ValheimServerGUI.Controls.NumericFormField();
@@ -121,8 +123,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.StartupGroupBox = new System.Windows.Forms.GroupBox();
-            this.ServerAutoStartField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -130,6 +130,7 @@ namespace ValheimServerGUI.Forms
             this.JoinOptionsGroupBox.SuspendLayout();
             this.WorldSelectGroupBox.SuspendLayout();
             this.TabAdvancedControls.SuspendLayout();
+            this.StartupGroupBox.SuspendLayout();
             this.SavingGroupBox.SuspendLayout();
             this.TabServerDetails.SuspendLayout();
             this.groupBox2.SuspendLayout();
@@ -137,7 +138,6 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.SuspendLayout();
             this.TabLogs.SuspendLayout();
             this.TrayContextMenuStrip.SuspendLayout();
-            this.StartupGroupBox.SuspendLayout();
             this.SuspendLayout();
             // 
             // MenuStrip
@@ -392,10 +392,10 @@ namespace ValheimServerGUI.Forms
             // CommunityServerField
             // 
             this.CommunityServerField.HelpText = resources.GetString("CommunityServerField.HelpText");
-            this.CommunityServerField.LabelText = "Community Server";
+            this.CommunityServerField.LabelText = "Community Server (Public)";
             this.CommunityServerField.Location = new System.Drawing.Point(6, 22);
             this.CommunityServerField.Name = "CommunityServerField";
-            this.CommunityServerField.Size = new System.Drawing.Size(142, 17);
+            this.CommunityServerField.Size = new System.Drawing.Size(185, 17);
             this.CommunityServerField.TabIndex = 13;
             this.CommunityServerField.Value = false;
             // 
@@ -575,6 +575,27 @@ namespace ValheimServerGUI.Forms
             this.TabAdvancedControls.TabIndex = 5;
             this.TabAdvancedControls.Text = "Advanced Controls";
             this.TabAdvancedControls.UseVisualStyleBackColor = true;
+            // 
+            // StartupGroupBox
+            // 
+            this.StartupGroupBox.Controls.Add(this.ServerAutoStartField);
+            this.StartupGroupBox.Controls.Add(this.ServerAdditionalArgsField);
+            this.StartupGroupBox.Location = new System.Drawing.Point(6, 141);
+            this.StartupGroupBox.Name = "StartupGroupBox";
+            this.StartupGroupBox.Size = new System.Drawing.Size(307, 105);
+            this.StartupGroupBox.TabIndex = 2;
+            this.StartupGroupBox.TabStop = false;
+            this.StartupGroupBox.Text = "Startup";
+            // 
+            // ServerAutoStartField
+            // 
+            this.ServerAutoStartField.HelpText = resources.GetString("ServerAutoStartField.HelpText");
+            this.ServerAutoStartField.LabelText = "Start this server when ValheimServerGUI starts";
+            this.ServerAutoStartField.Location = new System.Drawing.Point(6, 22);
+            this.ServerAutoStartField.Name = "ServerAutoStartField";
+            this.ServerAutoStartField.Size = new System.Drawing.Size(286, 17);
+            this.ServerAutoStartField.TabIndex = 2;
+            this.ServerAutoStartField.Value = false;
             // 
             // ServerAdditionalArgsField
             // 
@@ -1034,27 +1055,6 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
-            // StartupGroupBox
-            // 
-            this.StartupGroupBox.Controls.Add(this.ServerAutoStartField);
-            this.StartupGroupBox.Controls.Add(this.ServerAdditionalArgsField);
-            this.StartupGroupBox.Location = new System.Drawing.Point(6, 141);
-            this.StartupGroupBox.Name = "StartupGroupBox";
-            this.StartupGroupBox.Size = new System.Drawing.Size(307, 105);
-            this.StartupGroupBox.TabIndex = 2;
-            this.StartupGroupBox.TabStop = false;
-            this.StartupGroupBox.Text = "Startup";
-            // 
-            // ServerAutoStartField
-            // 
-            this.ServerAutoStartField.HelpText = resources.GetString("ServerAutoStartField.HelpText");
-            this.ServerAutoStartField.LabelText = "Start this server when ValheimServerGUI starts";
-            this.ServerAutoStartField.Location = new System.Drawing.Point(6, 22);
-            this.ServerAutoStartField.Name = "ServerAutoStartField";
-            this.ServerAutoStartField.Size = new System.Drawing.Size(286, 17);
-            this.ServerAutoStartField.TabIndex = 2;
-            this.ServerAutoStartField.Value = false;
-            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1077,6 +1077,7 @@ namespace ValheimServerGUI.Forms
             this.JoinOptionsGroupBox.ResumeLayout(false);
             this.WorldSelectGroupBox.ResumeLayout(false);
             this.TabAdvancedControls.ResumeLayout(false);
+            this.StartupGroupBox.ResumeLayout(false);
             this.SavingGroupBox.ResumeLayout(false);
             this.TabServerDetails.ResumeLayout(false);
             this.groupBox2.ResumeLayout(false);
@@ -1085,7 +1086,6 @@ namespace ValheimServerGUI.Forms
             this.TabPlayers.ResumeLayout(false);
             this.TabLogs.ResumeLayout(false);
             this.TrayContextMenuStrip.ResumeLayout(false);
-            this.StartupGroupBox.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 

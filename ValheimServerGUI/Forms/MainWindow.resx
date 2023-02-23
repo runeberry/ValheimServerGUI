@@ -86,6 +86,23 @@ along with the corresponding setting under File &gt;
 Preferences.
 </value>
   </data>
+  <data name="ServerSaveDataFolderPathField.HelpText" xml:space="preserve">
+    <value>The location of the save data for your Valheim server,
+including the "worlds" folder, admin lists, etc.
+
+This field sets the path just for this profile. Leave this field empty
+if you do not want a profile-specific override. To set this path
+for all profiles, see File &gt; Set Directories.
+</value>
+  </data>
+  <data name="ServerExePathField.HelpText" xml:space="preserve">
+    <value>The location of the Valheim Dedicated Server executable,
+usually "valheim_server.exe".
+
+This field sets the path just for this profile. Leave this field empty
+if you do not want a profile-specific override. To set this path
+for all profiles, see File &gt; Set Directories.</value>
+  </data>
   <data name="LabelInviteCode.HelpText" xml:space="preserve">
     <value>Invite codes are only available when Crossplay is enabled and change
 each time the server is restarted. Players on any platform can connect

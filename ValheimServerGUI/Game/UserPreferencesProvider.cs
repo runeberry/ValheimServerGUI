@@ -105,7 +105,7 @@ namespace ValheimServerGUI.Game
         private static readonly Dictionary<string, Action<UserPreferences, string>> MigrationActions = new()
         {
             //{ "ValheimGamePath", (p, v) => p.ValheimGamePath = v },
-            { "ValheimServerPath", (p, v) => p.ValheimServerPath = v },
+            { "ValheimServerPath", (p, v) => p.ServerExePath = v },
             { "ServerName", (p, v) => p.Servers[0].Name = v },
             { "ServerPassword", (p, v) => p.Servers[0].Password = v },
             { "ServerWorldName", (p, v) => p.Servers[0].WorldName = v },

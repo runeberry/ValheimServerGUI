@@ -11,9 +11,9 @@ namespace ValheimServerGUI.Game
         // (jb, 2/19/23) This field was recorded, but never used.
         //public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
 
-        public string ValheimServerPath { get; set; } = Resources.DefaultServerPath;
+        public string ServerExePath { get; set; } = Resources.DefaultServerPath;
 
-        public string ValheimSaveDataFolder { get; set; } = Resources.DefaultValheimSaveFolder;
+        public string SaveDataFolderPath { get; set; } = Resources.DefaultValheimSaveFolder;
 
         public bool CheckForUpdates { get; set; } = true;
 
@@ -31,8 +31,8 @@ namespace ValheimServerGUI.Game
 
             if (file == null) return prefs;
 
-            prefs.ValheimServerPath = file.ValheimServerPath ?? prefs.ValheimServerPath;
-            prefs.ValheimSaveDataFolder = file.ValheimSaveDataFolder ?? prefs.ValheimSaveDataFolder;
+            prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
+            prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
             prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
@@ -54,8 +54,8 @@ namespace ValheimServerGUI.Game
         {
             var file = new UserPreferencesFile
             {
-                ValheimServerPath = ValheimServerPath,
-                ValheimSaveDataFolder = ValheimSaveDataFolder,
+                ServerExePath = ServerExePath,
+                SaveDataFolderPath = SaveDataFolderPath,
                 CheckForUpdates = CheckForUpdates,
                 StartWithWindows = StartWithWindows,
                 StartMinimized = StartMinimized,

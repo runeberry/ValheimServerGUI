@@ -64,7 +64,6 @@ namespace ValheimServerGUI
 
             // Game & server data
             services
-                .AddSingleton<IValheimFileProvider, ValheimFileProvider>()
                 .AddSingleton<IPlayerDataRepository, PlayerDataRepository>()
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()

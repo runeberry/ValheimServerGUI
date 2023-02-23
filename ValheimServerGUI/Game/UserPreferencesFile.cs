@@ -10,15 +10,15 @@ namespace ValheimServerGUI.Game
     /// </summary>
     public class UserPreferencesFile
     {
-        // (jb, 2/19/23) This field was recorded, but never used.
+        // (jb, 2/19/23) This field was previously recorded, but never used.
         //[JsonProperty("valheimGamePath")]
         //public string ValheimGamePath { get; set; }
 
         [JsonProperty("valheimServerPath")]
-        public string ValheimServerPath { get; set; }
+        public string ServerExePath { get; set; }
 
         [JsonProperty("valheimSaveDataFolder")]
-        public string ValheimSaveDataFolder { get; set; }
+        public string SaveDataFolderPath { get; set; }
 
         [JsonProperty("startWithWindows")]
         public bool? StartWithWindows { get; set; }

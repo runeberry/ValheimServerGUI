@@ -2,10 +2,11 @@
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Game
 {
-    public static class ValheimFileProviderExtensions
+    public static class ValheimPathExtensions
     {
         /// <summary>
         /// These are automatic backup files created by Valheim with the transition to
@@ -13,13 +14,23 @@ namespace ValheimServerGUI.Game
         /// </summary>
         private static readonly Regex AutoBackupRegex = new(@"^.*?_backup_\d+?-\d+?");
 
-        public static List<string> GetWorldNames(this IValheimFileProvider files)
+        public static FileInfo GetValidatedServerExe(this IValheimServerOptions options)
+        {
+            return PathExtensions.GetFileInfo(options.ServerExePath, ".exe");
+        }
+
+        public static DirectoryInfo GetValidatedSaveDataFolder(this IValheimServerOptions options)
+        {
+            return PathExtensions.GetDirectoryInfo(options.SaveDataFolderPath, true);
+        }
+
+        public static List<string> GetWorldNames(this DirectoryInfo saveDataFolder)
         {
             try
             {
                 var allNames = new List<string>();
 
-                foreach (var info in files.WorldsFolders)
+                foreach (var info in saveDataFolder.GetWorldsFolders())
                 {
                     if (!Directory.Exists(info.FullName)) continue;
 
@@ -38,14 +49,15 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        public static bool IsWorldNameAvailable(this IValheimFileProvider files, string worldName)
+        public static bool IsWorldNameAvailable(this DirectoryInfo saveDataFolder, string worldName)
         {
             if (string.IsNullOrWhiteSpace(worldName)) return false;
 
             try
             {
-                var paths = files.WorldsFolders.Select(p => Path.Join(p.FullName, $"{worldName}.fwl"));
-                return !paths.Any(p => File.Exists(p));
+                return !saveDataFolder.GetWorldsFolders()
+                    .Select(p => Path.Join(p.FullName, $"{worldName}.fwl"))
+                    .Any(p => File.Exists(p));
             }
             catch
             {
@@ -53,5 +65,15 @@ namespace ValheimServerGUI.Game
                 return true;
             }
         }
+
+        #region Helper methods
+
+        private static IEnumerable<DirectoryInfo> GetWorldsFolders(this DirectoryInfo saveDataFolder)
+        {
+            yield return PathExtensions.GetDirectoryInfo(Path.Join(saveDataFolder.FullName, "worlds"));
+            yield return PathExtensions.GetDirectoryInfo(Path.Join(saveDataFolder.FullName, "worlds_local"));
+        }
+
+        #endregion
     }
 }

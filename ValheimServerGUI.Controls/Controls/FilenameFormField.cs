@@ -114,26 +114,26 @@ namespace ValheimServerGUI.Controls
             }
             else
             {
-                using (var dialog = new OpenFileDialog())
+                using var dialog = new OpenFileDialog();
+                FileDialogBuilder?.Invoke(dialog);
+
+                if (!string.IsNullOrWhiteSpace(InitialPath))
                 {
-                    if (FileDialogBuilder != null)
-                    {
-                        FileDialogBuilder(dialog);
-                    }
-
-                    dialog.InitialDirectory = !string.IsNullOrWhiteSpace(InitialPath)
-                        ? new FileInfo(InitialPath).Directory.FullName
-                        : new FileInfo(Value).Directory.FullName;
-
-                    // Override the Multiselect property based on this control's FileSelectMode
-                    dialog.Multiselect = FileSelectMode == FileSelectMode.MultiFile;
-
-                    if (dialog.ShowDialog() != DialogResult.OK) return;
-
-                    result = FileSelectMode == FileSelectMode.MultiFile
-                        ? string.Join(MultiFileSeparator, dialog.FileNames)
-                        : dialog.FileName;
+                    dialog.InitialDirectory = new FileInfo(InitialPath).Directory.FullName;
                 }
+                else if (!string.IsNullOrWhiteSpace(Value))
+                {
+                    dialog.InitialDirectory = new FileInfo(Value).Directory.FullName;
+                }
+
+                // Override the Multiselect property based on this control's FileSelectMode
+                dialog.Multiselect = FileSelectMode == FileSelectMode.MultiFile;
+
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+
+                result = FileSelectMode == FileSelectMode.MultiFile
+                    ? string.Join(MultiFileSeparator, dialog.FileNames)
+                    : dialog.FileName;
             }
 
             Value = result;

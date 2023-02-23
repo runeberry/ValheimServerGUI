@@ -46,5 +46,11 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("additionalArgs")]
         public string AdditionalArgs { get; set; }
+
+        [JsonProperty("valheimServerPath")]
+        public string ServerExePath { get; set; }
+
+        [JsonProperty("valheimSaveDataFolder")]
+        public string SaveDataFolderPath { get; set; }
     }
 }

@@ -10,8 +10,6 @@ namespace ValheimServerGUI.Game
 
         public string WorldName { get; set; }
 
-        public bool NewWorld { get; set; }
-
         public bool Public { get; set; }
 
         public int Port { get; set; }
@@ -28,18 +26,15 @@ namespace ValheimServerGUI.Game
 
         public string AdditionalArgs { get; set; }
 
+        public string ServerExePath { get; set; }
+
+        public string SaveDataFolderPath { get; set; }
+
         public void Validate()
         {
             // Ensure all required fields exist
             if (string.IsNullOrWhiteSpace(Name)) throw new ArgumentException($"Server name must be defined.");
             if (string.IsNullOrWhiteSpace(WorldName)) throw new ArgumentException($"World name must be defined.");
-
-            // WorldName validation
-            // todo: Validate world name is available? Or do we trust it from the UI control?
-            if (NewWorld)
-            {
-                if (WorldName.Length < 5 || WorldName.Length > 20) throw new ArgumentException($"World name must be 5-20 characters long.");
-            }
 
             // Name validation
             if (Name == WorldName) throw new ArgumentException($"The server name cannot be the same as the world name ({WorldName}).");
@@ -65,6 +60,10 @@ namespace ValheimServerGUI.Game
             if (BackupLong < 1) throw new ArgumentException($"Long backup interval must be greater than 0.");
             if (SaveInterval > BackupShort || SaveInterval > BackupLong) throw new ArgumentException($"Save interval must be less than or equal to the backup intervals.");
             if (BackupShort > BackupLong) throw new ArgumentException($"Short backup interval must be less than or equal to the long backup interval.");
+
+            // Filepaths
+            this.GetValidatedServerExe();
+            this.GetValidatedSaveDataFolder();
         }
     }
 
@@ -91,5 +90,9 @@ namespace ValheimServerGUI.Game
         int BackupLong { get; }
 
         string AdditionalArgs { get; }
+
+        string ServerExePath { get; }
+
+        string SaveDataFolderPath { get; }
     }
 }

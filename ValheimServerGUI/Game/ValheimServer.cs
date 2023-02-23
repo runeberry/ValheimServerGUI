@@ -49,20 +49,17 @@ namespace ValheimServerGUI.Game
         public bool CanRestart => IsAnyStatus(ServerStatus.Running) && ProcessKey != null;
 
         private readonly IProcessProvider ProcessProvider;
-        private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataRepository;
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger ApplicationLogger;
 
         public ValheimServer(
             IProcessProvider processProvider,
-            IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataRepository,
             ValheimServerLogger serverLogger,
             IEventLogger appLogger)
         {
             ProcessProvider = processProvider;
-            FileProvider = fileProvider;
             PlayerDataRepository = playerDataRepository;
             ServerLogger = serverLogger;
             ApplicationLogger = appLogger;
@@ -139,7 +136,7 @@ namespace ValheimServerGUI.Game
 
             ApplicationLogger.LogInformation("Starting server: {name}", options.Name);
 
-            var exePath = FileProvider.ServerExe.FullName;
+            var exePath = options.GetValidatedServerExe().FullName;
             var processArgs = GenerateArgs(options);
             ApplicationLogger.LogInformation(@"Server run command: ""{exePath}"" {processArgs}", exePath, processArgs);
 
@@ -317,9 +314,9 @@ namespace ValheimServerGUI.Game
 
         #region Helper methods
 
-        private string GenerateArgs(IValheimServerOptions options)
+        private static string GenerateArgs(IValheimServerOptions options)
         {
-            var saveDataFolder = FileProvider.SaveDataFolder.FullName;
+            var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;
             var publicFlag = options.Public ? 1 : 0;
             var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -public {publicFlag} -savedir ""{saveDataFolder}"" -saveinterval {options.SaveInterval} -backups {options.Backups} -backupshort {options.BackupShort} -backuplong {options.BackupLong}";
 

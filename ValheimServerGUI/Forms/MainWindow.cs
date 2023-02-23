@@ -65,7 +65,6 @@ namespace ValheimServerGUI.Forms
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
         private readonly IServerPreferencesProvider ServerPrefsProvider;
-        private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
         private readonly IEventLogger Logger;
@@ -78,7 +77,6 @@ namespace ValheimServerGUI.Forms
             IFormProvider formProvider,
             IUserPreferencesProvider userPrefsProvider,
             IServerPreferencesProvider serverPrefsProvider,
-            IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
             IEventLogger appLogger,
@@ -93,7 +91,6 @@ namespace ValheimServerGUI.Forms
             FormProvider = formProvider;
             UserPrefsProvider = userPrefsProvider;
             ServerPrefsProvider = serverPrefsProvider;
-            FileProvider = fileProvider;
             PlayerDataProvider = playerDataProvider;
             Server = server;
             Logger = appLogger;
@@ -202,6 +199,7 @@ namespace ValheimServerGUI.Forms
         {
             LogViewSelectField.DataSource = new[] { LogViewServer, LogViewApplication };
             LogViewSelectField.Value = LogViewServer;
+            ServerExePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
 
             RefreshFormFields();
         }
@@ -1006,7 +1004,8 @@ namespace ValheimServerGUI.Forms
             {
                 // Refresh the existing worlds list, then re-select whatever was originally selected
                 var selectedWorld = WorldSelectExistingNameField.Value;
-                var worlds = FileProvider.GetWorldNames();
+                var options = GetServerOptionsFromFormState();
+                var worlds = options.GetValidatedSaveDataFolder().GetWorldNames();
 
                 WorldSelectExistingNameField.DataSource = worlds;
                 WorldSelectExistingNameField.DropdownEnabled = worlds.Any();
@@ -1064,8 +1063,39 @@ namespace ValheimServerGUI.Forms
             prefs.BackupIntervalLong = ServerLongBackupIntervalField.Value;
             prefs.AutoStart = ServerAutoStartField.Value;
             prefs.AdditionalArgs = ServerAdditionalArgsField.Value;
+            prefs.ServerExePath = ServerExePathField.Value;
+            prefs.SaveDataFolderPath = ServerSaveDataFolderPathField.Value;
 
             return prefs;
+        }
+
+        private ValheimServerOptions GetServerOptionsFromFormState()
+        {
+            var userPrefs = UserPrefsProvider.LoadPreferences();
+            var serverPrefs = GetPrefsFromFormState();
+
+            var options = new ValheimServerOptions
+            {
+                Name = serverPrefs.Name,
+                Password = serverPrefs.Password,
+                WorldName = serverPrefs.WorldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
+                Public = serverPrefs.Public,
+                Port = serverPrefs.Port,
+                Crossplay = serverPrefs.Crossplay,
+                SaveInterval = serverPrefs.SaveInterval,
+                Backups = serverPrefs.BackupCount,
+                BackupShort = serverPrefs.BackupIntervalShort,
+                BackupLong = serverPrefs.BackupIntervalLong,
+                AdditionalArgs = serverPrefs.AdditionalArgs,
+                ServerExePath = !string.IsNullOrWhiteSpace(serverPrefs.ServerExePath)
+                    ? serverPrefs.ServerExePath
+                    : userPrefs.ServerExePath,
+                SaveDataFolderPath = !string.IsNullOrWhiteSpace(serverPrefs.SaveDataFolderPath)
+                    ? serverPrefs.SaveDataFolderPath
+                    : userPrefs.SaveDataFolderPath,
+            };
+
+            return options;
         }
 
         private ServerPreferences SetFormStateFromPrefs(string profileName)
@@ -1103,7 +1133,10 @@ namespace ValheimServerGUI.Forms
             ServerLongBackupIntervalField.Value = prefs.BackupIntervalLong;
             ServerAutoStartField.Value = prefs.AutoStart;
             ServerAdditionalArgsField.Value = prefs.AdditionalArgs;
+            ServerExePathField.Value = prefs.ServerExePath;
+            ServerSaveDataFolderPathField.Value = prefs.SaveDataFolderPath;
 
+            RefreshWorldSelect();
             var worldName = prefs.WorldName;
 
             if (WorldSelectExistingNameField.DataSource != null &&
@@ -1137,29 +1170,49 @@ namespace ValheimServerGUI.Forms
                 }
             };
 
-            var portFieldValue = ServerPortField.Value;
-            if (!IpAddressProvider.IsLocalUdpPortAvailable(portFieldValue, portFieldValue + 1))
+            var options = GetServerOptionsFromFormState();
+
+            // Run standard input validation first
+            try
             {
-                onError($"Port {portFieldValue} or {portFieldValue + 1} is already in use.{NL}" +
+                options.Validate();
+            }
+            catch (Exception exception)
+            {
+                onError(exception.Message);
+                return;
+            }
+
+            // Then, run additional validation that requires more context than just the fields themselves
+            var port = options.Port;
+            if (!IpAddressProvider.IsLocalUdpPortAvailable(port, port + 1))
+            {
+                onError($"Port {port} or {port + 1} is already in use.{NL}" +
                     $"Valheim requires two adjacent ports to run a dedicated server.{NL}" +
                     "Please shut down any UDP applications using these ports, or choose a different port for your server.");
                 return;
             }
 
-            string worldName;
+            var worldName = options.WorldName;
+            var saveFolder = options.GetValidatedSaveDataFolder();
             bool newWorld = WorldSelectRadioNew.Value;
 
             if (newWorld)
             {
                 // Creating a new world, ensure that the name is available
-                worldName = WorldSelectNewNameField.Value;
                 if (string.IsNullOrWhiteSpace(worldName))
                 {
                     onError("You must enter a world name, or choose an existing world.");
                     return;
                 }
 
-                if (!FileProvider.IsWorldNameAvailable(worldName))
+                if (worldName.Length < 5 || worldName.Length > 20)
+                {
+                    onError("World name must be 5-20 characters long.");
+                    return;
+                }
+
+                if (!saveFolder.IsWorldNameAvailable(worldName))
                 {
                     onError($"A world named '{worldName}' already exists.");
                     WorldSelectRadioExisting.Value = true;
@@ -1170,8 +1223,7 @@ namespace ValheimServerGUI.Forms
             else
             {
                 // Using an existing world, ensure that the file exists
-                worldName = WorldSelectExistingNameField.Value;
-                if (FileProvider.IsWorldNameAvailable(worldName))
+                if (saveFolder.IsWorldNameAvailable(worldName))
                 {
                     // Don't think this is possible to hit because the name comes from a dropdown
                     onError($"No world exists with name '{worldName}'.");
@@ -1179,28 +1231,9 @@ namespace ValheimServerGUI.Forms
                 }
             }
 
-            var userPrefs = UserPrefsProvider.LoadPreferences();
-            var serverPrefs = GetPrefsFromFormState();
-
-            var options = new ValheimServerOptions
-            {
-                Name = serverPrefs.Name,
-                Password = serverPrefs.Password,
-                WorldName = worldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
-                NewWorld = newWorld,
-                Public = serverPrefs.Public,
-                Port = serverPrefs.Port,
-                Crossplay = serverPrefs.Crossplay,
-                SaveInterval = serverPrefs.SaveInterval,
-                Backups = serverPrefs.BackupCount,
-                BackupShort = serverPrefs.BackupIntervalShort,
-                BackupLong = serverPrefs.BackupIntervalLong,
-                AdditionalArgs = serverPrefs.AdditionalArgs,
-            };
-
+            // Finally, after all validation has finished, try to start the server
             try
             {
-                options.Validate();
                 Server.Start(options);
             }
             catch (Exception exception)
@@ -1209,8 +1242,10 @@ namespace ValheimServerGUI.Forms
                 return;
             }
 
+            var userPrefs = UserPrefsProvider.LoadPreferences();
             if (userPrefs.SaveProfileOnStart)
             {
+                var serverPrefs = GetPrefsFromFormState();
                 ServerPrefsProvider.SavePreferences(serverPrefs);
             }
         }
@@ -1219,7 +1254,8 @@ namespace ValheimServerGUI.Forms
         {
             try
             {
-                var _ = FileProvider.ServerExe;
+                var options = GetServerOptionsFromFormState();
+                options.GetValidatedServerExe();
             }
             catch (Exception e)
             {

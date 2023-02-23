@@ -33,6 +33,10 @@ namespace ValheimServerGUI.Game
 
         public string AdditionalArgs { get; set; }
 
+        public string ServerExePath { get; set; }
+
+        public string SaveDataFolderPath { get; set; }
+
         public static ServerPreferences FromFile(ServerPreferencesFile file)
         {
             var prefs = new ServerPreferences();
@@ -53,6 +57,8 @@ namespace ValheimServerGUI.Game
             prefs.BackupIntervalLong = file.BackupIntervalLong ?? prefs.BackupIntervalLong;
             prefs.AutoStart = file.AutoStart ?? prefs.AutoStart;
             prefs.AdditionalArgs = file.AdditionalArgs ?? prefs.AdditionalArgs;
+            prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
+            prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
 
             return prefs;
         }
@@ -75,6 +81,8 @@ namespace ValheimServerGUI.Game
                 BackupIntervalLong = BackupIntervalLong,
                 AutoStart = AutoStart,
                 AdditionalArgs = AdditionalArgs,
+                ServerExePath = ServerExePath,
+                SaveDataFolderPath = SaveDataFolderPath,
             };
 
             return file;

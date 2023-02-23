@@ -12,7 +12,7 @@
 		<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
 		<Version>2.1.0-rc.1</Version>
     <!-- Build date adapted from: https://rmauro.dev/add-build-time-to-your-csharp-assembly/ -->
-    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("o"))</SourceRevisionId>
+    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))</SourceRevisionId>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">

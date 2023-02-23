@@ -78,7 +78,7 @@ namespace ValheimServerGUI.Forms
             this.VersionLabel.Name = "VersionLabel";
             this.VersionLabel.Size = new System.Drawing.Size(253, 35);
             this.VersionLabel.TabIndex = 2;
-            this.VersionLabel.Text = "Version: 0.0.0-rc.1\r\nBuild Date: 2000-01-01T00:00:00.000Z";
+            this.VersionLabel.Text = "Version: 0.0.0-rc.1\r\nBuild Date: 2000-01-01T00:00:00Z";
             this.VersionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
             // 
             // ButtonGitHub

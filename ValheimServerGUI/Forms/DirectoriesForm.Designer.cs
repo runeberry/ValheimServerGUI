@@ -46,7 +46,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonCancel.Location = new System.Drawing.Point(272, 182);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 4;
+            this.ButtonCancel.TabIndex = 7;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
@@ -57,7 +57,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonOK.Location = new System.Drawing.Point(191, 182);
             this.ButtonOK.Name = "ButtonOK";
             this.ButtonOK.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOK.TabIndex = 3;
+            this.ButtonOK.TabIndex = 6;
             this.ButtonOK.Text = "OK";
             this.ButtonOK.UseVisualStyleBackColor = true;
             this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
@@ -68,7 +68,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults.Location = new System.Drawing.Point(12, 182);
             this.ButtonDefaults.Name = "ButtonDefaults";
             this.ButtonDefaults.Size = new System.Drawing.Size(111, 23);
-            this.ButtonDefaults.TabIndex = 2;
+            this.ButtonDefaults.TabIndex = 5;
             this.ButtonDefaults.Text = "Restore Defaults";
             this.ButtonDefaults.UseVisualStyleBackColor = true;
             this.ButtonDefaults.Click += new System.EventHandler(this.ButtonDefaults_Click);
@@ -86,7 +86,7 @@ namespace ValheimServerGUI.Forms
             this.ServerExePathField.Name = "ServerExePathField";
             this.ServerExePathField.ReadOnly = false;
             this.ServerExePathField.Size = new System.Drawing.Size(326, 45);
-            this.ServerExePathField.TabIndex = 0;
+            this.ServerExePathField.TabIndex = 1;
             this.ServerExePathField.Value = "";
             // 
             // SaveDataFolderPathField
@@ -103,7 +103,7 @@ namespace ValheimServerGUI.Forms
             this.SaveDataFolderPathField.Name = "SaveDataFolderPathField";
             this.SaveDataFolderPathField.ReadOnly = false;
             this.SaveDataFolderPathField.Size = new System.Drawing.Size(326, 41);
-            this.SaveDataFolderPathField.TabIndex = 1;
+            this.SaveDataFolderPathField.TabIndex = 3;
             this.SaveDataFolderPathField.Value = "";
             // 
             // label1
@@ -124,7 +124,8 @@ namespace ValheimServerGUI.Forms
             this.ServerExePathOpenButton.Name = "ServerExePathOpenButton";
             this.ServerExePathOpenButton.PathFunction = null;
             this.ServerExePathOpenButton.Size = new System.Drawing.Size(16, 16);
-            this.ServerExePathOpenButton.TabIndex = 5;
+            this.ServerExePathOpenButton.TabIndex = 2;
+            this.ServerExePathOpenButton.TabStop = false;
             // 
             // SaveDataFolderPathOpenButton
             // 
@@ -133,7 +134,8 @@ namespace ValheimServerGUI.Forms
             this.SaveDataFolderPathOpenButton.Name = "SaveDataFolderPathOpenButton";
             this.SaveDataFolderPathOpenButton.PathFunction = null;
             this.SaveDataFolderPathOpenButton.Size = new System.Drawing.Size(16, 16);
-            this.SaveDataFolderPathOpenButton.TabIndex = 6;
+            this.SaveDataFolderPathOpenButton.TabIndex = 4;
+            this.SaveDataFolderPathOpenButton.TabStop = false;
             // 
             // DirectoriesForm
             // 

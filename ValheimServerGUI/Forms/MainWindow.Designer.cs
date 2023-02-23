@@ -800,6 +800,7 @@ namespace ValheimServerGUI.Forms
             this.LabelSessionDuration.Name = "LabelSessionDuration";
             this.LabelSessionDuration.Size = new System.Drawing.Size(241, 15);
             this.LabelSessionDuration.TabIndex = 0;
+            this.LabelSessionDuration.TabStop = false;
             this.LabelSessionDuration.Value = "";
             this.LabelSessionDuration.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -814,6 +815,7 @@ namespace ValheimServerGUI.Forms
             this.LabelAverageWorldSave.Name = "LabelAverageWorldSave";
             this.LabelAverageWorldSave.Size = new System.Drawing.Size(264, 15);
             this.LabelAverageWorldSave.TabIndex = 2;
+            this.LabelAverageWorldSave.TabStop = false;
             this.LabelAverageWorldSave.Value = "";
             this.LabelAverageWorldSave.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -827,6 +829,7 @@ namespace ValheimServerGUI.Forms
             this.LabelLastWorldSave.Name = "LabelLastWorldSave";
             this.LabelLastWorldSave.Size = new System.Drawing.Size(295, 15);
             this.LabelLastWorldSave.TabIndex = 1;
+            this.LabelLastWorldSave.TabStop = false;
             this.LabelLastWorldSave.Value = "";
             this.LabelLastWorldSave.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -867,6 +870,7 @@ namespace ValheimServerGUI.Forms
             this.LabelInviteCode.Name = "LabelInviteCode";
             this.LabelInviteCode.Size = new System.Drawing.Size(264, 15);
             this.LabelInviteCode.TabIndex = 6;
+            this.LabelInviteCode.TabStop = false;
             this.LabelInviteCode.Value = "N/A";
             this.LabelInviteCode.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -919,6 +923,7 @@ namespace ValheimServerGUI.Forms
             this.LabelExternalIpAddress.Name = "LabelExternalIpAddress";
             this.LabelExternalIpAddress.Size = new System.Drawing.Size(264, 15);
             this.LabelExternalIpAddress.TabIndex = 0;
+            this.LabelExternalIpAddress.TabStop = false;
             this.LabelExternalIpAddress.Value = "Loading...";
             this.LabelExternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -932,6 +937,7 @@ namespace ValheimServerGUI.Forms
             this.LabelLocalIpAddress.Name = "LabelLocalIpAddress";
             this.LabelLocalIpAddress.Size = new System.Drawing.Size(264, 15);
             this.LabelLocalIpAddress.TabIndex = 4;
+            this.LabelLocalIpAddress.TabStop = false;
             this.LabelLocalIpAddress.Value = "127.0.0.1";
             this.LabelLocalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -945,6 +951,7 @@ namespace ValheimServerGUI.Forms
             this.LabelInternalIpAddress.Name = "LabelInternalIpAddress";
             this.LabelInternalIpAddress.Size = new System.Drawing.Size(264, 15);
             this.LabelInternalIpAddress.TabIndex = 2;
+            this.LabelInternalIpAddress.TabStop = false;
             this.LabelInternalIpAddress.Value = "Loading...";
             this.LabelInternalIpAddress.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -1044,7 +1051,6 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
-            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";

@@ -127,6 +127,8 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
+            this.ServerExePathOpenButton = new ValheimServerGUI.Forms.OpenButton();
+            this.ServerSaveDataPathOpenButton = new ValheimServerGUI.Forms.OpenButton();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -702,6 +704,8 @@ namespace ValheimServerGUI.Forms
             // 
             // DirectoriesGroupBox
             // 
+            this.DirectoriesGroupBox.Controls.Add(this.ServerSaveDataPathOpenButton);
+            this.DirectoriesGroupBox.Controls.Add(this.ServerExePathOpenButton);
             this.DirectoriesGroupBox.Controls.Add(this.ServerSaveDataFolderPathField);
             this.DirectoriesGroupBox.Controls.Add(this.ServerExePathField);
             this.DirectoriesGroupBox.Location = new System.Drawing.Point(6, 6);
@@ -723,8 +727,8 @@ namespace ValheimServerGUI.Forms
             this.ServerSaveDataFolderPathField.MultiFileSeparator = "; ";
             this.ServerSaveDataFolderPathField.Name = "ServerSaveDataFolderPathField";
             this.ServerSaveDataFolderPathField.ReadOnly = false;
-            this.ServerSaveDataFolderPathField.Size = new System.Drawing.Size(295, 41);
-            this.ServerSaveDataFolderPathField.TabIndex = 1;
+            this.ServerSaveDataFolderPathField.Size = new System.Drawing.Size(286, 41);
+            this.ServerSaveDataFolderPathField.TabIndex = 2;
             this.ServerSaveDataFolderPathField.Value = "";
             // 
             // ServerExePathField
@@ -739,7 +743,7 @@ namespace ValheimServerGUI.Forms
             this.ServerExePathField.MultiFileSeparator = "; ";
             this.ServerExePathField.Name = "ServerExePathField";
             this.ServerExePathField.ReadOnly = false;
-            this.ServerExePathField.Size = new System.Drawing.Size(295, 41);
+            this.ServerExePathField.Size = new System.Drawing.Size(286, 41);
             this.ServerExePathField.TabIndex = 0;
             this.ServerExePathField.Value = "";
             // 
@@ -1128,6 +1132,26 @@ namespace ValheimServerGUI.Forms
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
             // 
+            // ServerExePathOpenButton
+            // 
+            this.ServerExePathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerExePathOpenButton.Location = new System.Drawing.Point(285, 43);
+            this.ServerExePathOpenButton.Name = "ServerExePathOpenButton";
+            this.ServerExePathOpenButton.PathFunction = null;
+            this.ServerExePathOpenButton.Size = new System.Drawing.Size(16, 16);
+            this.ServerExePathOpenButton.TabIndex = 1;
+            this.ServerExePathOpenButton.TabStop = false;
+            // 
+            // ServerSaveDataPathOpenButton
+            // 
+            this.ServerSaveDataPathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerSaveDataPathOpenButton.Location = new System.Drawing.Point(285, 90);
+            this.ServerSaveDataPathOpenButton.Name = "ServerSaveDataPathOpenButton";
+            this.ServerSaveDataPathOpenButton.PathFunction = null;
+            this.ServerSaveDataPathOpenButton.Size = new System.Drawing.Size(16, 16);
+            this.ServerSaveDataPathOpenButton.TabIndex = 3;
+            this.ServerSaveDataPathOpenButton.TabStop = false;
+            // 
             // MainWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
@@ -1263,5 +1287,7 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.FilenameFormField ServerSaveDataFolderPathField;
         private ValheimServerGUI.Controls.FilenameFormField ServerExePathField;
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileDirectories;
+        private OpenButton ServerSaveDataPathOpenButton;
+        private OpenButton ServerExePathOpenButton;
     }
 }

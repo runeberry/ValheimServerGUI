@@ -34,6 +34,9 @@ namespace ValheimServerGUI.Forms
             ServerExePathField.Value = prefs.ServerExePath;
             SaveDataFolderPathField.Value = prefs.SaveDataFolderPath;
 
+            ServerExePathOpenButton.PathFunction = () => ServerExePathField.Value;
+            SaveDataFolderPathOpenButton.PathFunction = () => SaveDataFolderPathField.Value;
+
             ServerExePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
         }
 

@@ -183,6 +183,8 @@ namespace ValheimServerGUI.Forms
             CopyButtonInternalIpAddress.CopyFunction = () => LabelInternalIpAddress.Value;
             CopyButtonLocalIpAddress.CopyFunction = () => LabelLocalIpAddress.Value;
             CopyButtonInviteCode.CopyFunction = () => LabelInviteCode.Value;
+            ServerExePathOpenButton.PathFunction = () => ServerExePathField.Value;
+            ServerSaveDataPathOpenButton.PathFunction = () => ServerSaveDataFolderPathField.Value;
             StatusStripLabelRight.Click += this.BuildEventHandler(StatusStripLabelRight_Click);
 
             // Form fields

@@ -86,6 +86,8 @@ namespace ValheimServerGUI.Forms
             this.ServerAutoStartField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerAdditionalArgsField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.DirectoriesGroupBox = new System.Windows.Forms.GroupBox();
+            this.ServerSaveDataPathOpenButton = new ValheimServerGUI.Forms.OpenButton();
+            this.ServerExePathOpenButton = new ValheimServerGUI.Forms.OpenButton();
             this.ServerSaveDataFolderPathField = new ValheimServerGUI.Controls.FilenameFormField();
             this.ServerExePathField = new ValheimServerGUI.Controls.FilenameFormField();
             this.TabServerDetails = new System.Windows.Forms.TabPage();
@@ -127,8 +129,6 @@ namespace ValheimServerGUI.Forms
             this.TrayContextMenuClose = new System.Windows.Forms.ToolStripMenuItem();
             this.ServerRefreshTimer = new System.Windows.Forms.Timer(this.components);
             this.UpdateCheckTimer = new System.Windows.Forms.Timer(this.components);
-            this.ServerExePathOpenButton = new ValheimServerGUI.Forms.OpenButton();
-            this.ServerSaveDataPathOpenButton = new ValheimServerGUI.Forms.OpenButton();
             this.MenuStrip.SuspendLayout();
             this.StatusStrip.SuspendLayout();
             this.Tabs.SuspendLayout();
@@ -715,6 +715,26 @@ namespace ValheimServerGUI.Forms
             this.DirectoriesGroupBox.TabStop = false;
             this.DirectoriesGroupBox.Text = "Directory Overrides (for just this Profile)";
             // 
+            // ServerSaveDataPathOpenButton
+            // 
+            this.ServerSaveDataPathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerSaveDataPathOpenButton.Location = new System.Drawing.Point(285, 90);
+            this.ServerSaveDataPathOpenButton.Name = "ServerSaveDataPathOpenButton";
+            this.ServerSaveDataPathOpenButton.PathFunction = null;
+            this.ServerSaveDataPathOpenButton.Size = new System.Drawing.Size(16, 16);
+            this.ServerSaveDataPathOpenButton.TabIndex = 3;
+            this.ServerSaveDataPathOpenButton.TabStop = false;
+            // 
+            // ServerExePathOpenButton
+            // 
+            this.ServerExePathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerExePathOpenButton.Location = new System.Drawing.Point(285, 43);
+            this.ServerExePathOpenButton.Name = "ServerExePathOpenButton";
+            this.ServerExePathOpenButton.PathFunction = null;
+            this.ServerExePathOpenButton.Size = new System.Drawing.Size(16, 16);
+            this.ServerExePathOpenButton.TabIndex = 1;
+            this.ServerExePathOpenButton.TabStop = false;
+            // 
             // ServerSaveDataFolderPathField
             // 
             this.ServerSaveDataFolderPathField.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
@@ -942,6 +962,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ButtonRemovePlayer
             // 
+            this.ButtonRemovePlayer.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.ButtonRemovePlayer.Enabled = false;
             this.ButtonRemovePlayer.Image = global::ValheimServerGUI.Properties.Resources.Cancel_16x;
             this.ButtonRemovePlayer.Location = new System.Drawing.Point(426, 3);
@@ -1023,6 +1044,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            this.LogViewSelectField.DataSource = ((System.Collections.Generic.IEnumerable<string>)(resources.GetObject("LogViewSelectField.DataSource")));
             this.LogViewSelectField.DropdownEnabled = true;
             this.LogViewSelectField.EmptyText = "";
             this.LogViewSelectField.HelpText = "";
@@ -1131,26 +1153,6 @@ namespace ValheimServerGUI.Forms
             // 
             this.UpdateCheckTimer.Enabled = true;
             this.UpdateCheckTimer.Interval = 60000;
-            // 
-            // ServerExePathOpenButton
-            // 
-            this.ServerExePathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ServerExePathOpenButton.Location = new System.Drawing.Point(285, 43);
-            this.ServerExePathOpenButton.Name = "ServerExePathOpenButton";
-            this.ServerExePathOpenButton.PathFunction = null;
-            this.ServerExePathOpenButton.Size = new System.Drawing.Size(16, 16);
-            this.ServerExePathOpenButton.TabIndex = 1;
-            this.ServerExePathOpenButton.TabStop = false;
-            // 
-            // ServerSaveDataPathOpenButton
-            // 
-            this.ServerSaveDataPathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.ServerSaveDataPathOpenButton.Location = new System.Drawing.Point(285, 90);
-            this.ServerSaveDataPathOpenButton.Name = "ServerSaveDataPathOpenButton";
-            this.ServerSaveDataPathOpenButton.PathFunction = null;
-            this.ServerSaveDataPathOpenButton.Size = new System.Drawing.Size(16, 16);
-            this.ServerSaveDataPathOpenButton.TabIndex = 3;
-            this.ServerSaveDataPathOpenButton.TabStop = false;
             // 
             // MainWindow
             // 

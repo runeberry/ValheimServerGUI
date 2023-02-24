@@ -665,7 +665,9 @@ namespace ValheimServerGUI.Forms
                 // Once a "new world" starts running, switch back to the Existing Worlds screen
                 // and select the newly created world
                 RefreshWorldSelect();
+                var worldName = WorldSelectNewNameField.Value;
                 WorldSelectRadioExisting.Value = true;
+                WorldSelectExistingNameField.Value = worldName;
             }
 
             if (status == ServerStatus.Running)
@@ -999,9 +1001,6 @@ namespace ValheimServerGUI.Forms
 
         private void RefreshWorldSelect()
         {
-            // Don't change the dropdown unless it's in a state where it can be modified
-            if (!WorldSelectExistingNameField.Enabled) return;
-
             try
             {
                 // Refresh the existing worlds list, then re-select whatever was originally selected

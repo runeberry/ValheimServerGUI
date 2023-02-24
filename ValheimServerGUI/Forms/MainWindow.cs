@@ -910,6 +910,8 @@ namespace ValheimServerGUI.Forms
             ServerLongBackupIntervalField.Enabled = allowServerChanges;
             ServerAutoStartField.Enabled = allowServerChanges;
             ServerAdditionalArgsField.Enabled = allowServerChanges;
+            ServerExePathField.Enabled = allowServerChanges;
+            ServerSaveDataFolderPathField.Enabled = allowServerChanges;
 
             MenuItemFileNewProfile.Enabled = allowServerChanges;
             MenuItemFileLoadProfile.Enabled = allowServerChanges;

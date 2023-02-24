@@ -387,6 +387,7 @@ namespace ValheimServerGUI.Forms
             // CopyButtonServerPassword
             // 
             this.CopyButtonServerPassword.CopyFunction = null;
+            this.CopyButtonServerPassword.HelpText = "Copy password to clipboard";
             this.CopyButtonServerPassword.Location = new System.Drawing.Point(236, 69);
             this.CopyButtonServerPassword.Name = "CopyButtonServerPassword";
             this.CopyButtonServerPassword.Size = new System.Drawing.Size(16, 16);
@@ -854,6 +855,7 @@ namespace ValheimServerGUI.Forms
             // CopyButtonInviteCode
             // 
             this.CopyButtonInviteCode.CopyFunction = null;
+            this.CopyButtonInviteCode.HelpText = "Copy invite code to clipboard";
             this.CopyButtonInviteCode.Location = new System.Drawing.Point(276, 85);
             this.CopyButtonInviteCode.Name = "CopyButtonInviteCode";
             this.CopyButtonInviteCode.Size = new System.Drawing.Size(16, 16);
@@ -877,6 +879,7 @@ namespace ValheimServerGUI.Forms
             // CopyButtonLocalIpAddress
             // 
             this.CopyButtonLocalIpAddress.CopyFunction = null;
+            this.CopyButtonLocalIpAddress.HelpText = "Copy local IP address to clipboard";
             this.CopyButtonLocalIpAddress.Location = new System.Drawing.Point(276, 63);
             this.CopyButtonLocalIpAddress.Name = "CopyButtonLocalIpAddress";
             this.CopyButtonLocalIpAddress.Size = new System.Drawing.Size(16, 16);
@@ -886,6 +889,7 @@ namespace ValheimServerGUI.Forms
             // CopyButtonExternalIpAddress
             // 
             this.CopyButtonExternalIpAddress.CopyFunction = null;
+            this.CopyButtonExternalIpAddress.HelpText = "Copy external IP address to clipboard";
             this.CopyButtonExternalIpAddress.Location = new System.Drawing.Point(276, 22);
             this.CopyButtonExternalIpAddress.Name = "CopyButtonExternalIpAddress";
             this.CopyButtonExternalIpAddress.Size = new System.Drawing.Size(16, 16);
@@ -895,6 +899,7 @@ namespace ValheimServerGUI.Forms
             // CopyButtonInternalIpAddress
             // 
             this.CopyButtonInternalIpAddress.CopyFunction = null;
+            this.CopyButtonInternalIpAddress.HelpText = "Copy internal IP address to clipboard";
             this.CopyButtonInternalIpAddress.Location = new System.Drawing.Point(276, 43);
             this.CopyButtonInternalIpAddress.Name = "CopyButtonInternalIpAddress";
             this.CopyButtonInternalIpAddress.Size = new System.Drawing.Size(16, 16);

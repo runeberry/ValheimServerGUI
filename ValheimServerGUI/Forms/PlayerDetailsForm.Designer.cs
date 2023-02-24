@@ -146,6 +146,7 @@ namespace ValheimServerGUI.Forms
             this.SteamIdCopyButton.Size = new System.Drawing.Size(16, 16);
             this.SteamIdCopyButton.TabIndex = 2;
             this.SteamIdCopyButton.TabStop = false;
+            this.SteamIdCopyButton.HelpText = "Copy Steam ID to clipboard";
             // 
             // PlayerDetailsForm
             // 

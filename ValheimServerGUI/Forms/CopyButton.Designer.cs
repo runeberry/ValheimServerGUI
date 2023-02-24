@@ -1,5 +1,4 @@
-﻿
-namespace ValheimServerGUI.Forms
+﻿namespace ValheimServerGUI.Forms
 {
     partial class CopyButton
     {
@@ -29,42 +28,32 @@ namespace ValheimServerGUI.Forms
         /// </summary>
         private void InitializeComponent()
         {
-            this.components = new System.ComponentModel.Container();
-            this.PictureBox = new System.Windows.Forms.PictureBox();
-            this.Timer = new System.Windows.Forms.Timer(this.components);
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).BeginInit();
+            this.IconButton = new ValheimServerGUI.Controls.IconButton();
             this.SuspendLayout();
             // 
-            // PictureBox
+            // iconButton1
             // 
-            this.PictureBox.Cursor = System.Windows.Forms.Cursors.Hand;
-            this.PictureBox.Image = global::ValheimServerGUI.Properties.Resources.Copy_16x;
-            this.PictureBox.InitialImage = null;
-            this.PictureBox.Location = new System.Drawing.Point(0, 0);
-            this.PictureBox.Name = "PictureBox";
-            this.PictureBox.Size = new System.Drawing.Size(16, 16);
-            this.PictureBox.TabIndex = 0;
-            this.PictureBox.TabStop = false;
-            // 
-            // Timer
-            // 
-            this.Timer.Interval = 2000;
+            this.IconButton.ConfirmImage = global::ValheimServerGUI.Properties.Resources.StatusOK_16x;
+            this.IconButton.HelpText = "";
+            this.IconButton.Image = global::ValheimServerGUI.Properties.Resources.Copy_16x;
+            this.IconButton.Location = new System.Drawing.Point(0, 0);
+            this.IconButton.Name = "iconButton1";
+            this.IconButton.Size = new System.Drawing.Size(16, 16);
+            this.IconButton.TabIndex = 0;
             // 
             // CopyButton
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.Controls.Add(this.PictureBox);
+            this.Controls.Add(this.IconButton);
             this.Name = "CopyButton";
             this.Size = new System.Drawing.Size(16, 16);
-            ((System.ComponentModel.ISupportInitialize)(this.PictureBox)).EndInit();
             this.ResumeLayout(false);
 
         }
 
         #endregion
 
-        private System.Windows.Forms.PictureBox PictureBox;
-        private System.Windows.Forms.Timer Timer;
+        private ValheimServerGUI.Controls.IconButton IconButton;
     }
 }

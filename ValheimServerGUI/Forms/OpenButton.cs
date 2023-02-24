@@ -12,22 +12,16 @@ namespace ValheimServerGUI.Forms
         {
             InitializeComponent();
 
-            PictureBox.Click += this.BuildEventHandler(PictureBox_Click);
+            IconButton.IconClicked = OnIconClicked;
         }
 
-        private void PictureBox_Click()
+        private bool OnIconClicked()
         {
-            try
-            {
-                var path = PathFunction?.Invoke();
-                if (string.IsNullOrWhiteSpace(path)) return;
+            var path = PathFunction?.Invoke();
+            if (string.IsNullOrWhiteSpace(path)) return false;
 
-                OpenHelper.OpenDirectory(path);
-            }
-            catch
-            {
-                // Suppress all errors
-            }
+            OpenHelper.OpenDirectory(path);
+            return true;
         }
     }
 }

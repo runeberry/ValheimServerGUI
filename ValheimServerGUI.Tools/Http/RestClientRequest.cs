@@ -12,7 +12,7 @@ namespace ValheimServerGUI.Tools.Http
     {
         protected RestClient Client { get; }
 
-        protected IRestClientContext Context => this.Client.Context;
+        protected IRestClientContext Context => Client.Context;
 
         public HttpMethod Method { get; set; }
 
@@ -32,38 +32,38 @@ namespace ValheimServerGUI.Tools.Http
 
         public RestClientRequest(RestClient client)
         {
-            this.Client = client;
+            Client = client;
         }
 
         public async Task<TResponse> SendAsync<TResponse>()
             where TResponse : class
         {
             await this.WithResponseType<TResponse>().SendAsync();
-            return this.ResponseContent as TResponse;
+            return ResponseContent as TResponse;
         }
 
         public async Task<HttpResponseMessage> SendAsync()
         {
-            var logAddress = $"{this.Method} {this.Uri}";
+            var logAddress = $"{Method} {Uri}";
 
             try
             {
-                var client = this.Context.HttpClientProvider.CreateClient();
+                var client = Context.HttpClientProvider.CreateClient();
 
-                foreach (var clientBuilder in this.ClientBuilders)
+                foreach (var clientBuilder in ClientBuilders)
                 {
                     clientBuilder(client);
                 }
 
-                var requestMessage = new HttpRequestMessage(this.Method, this.Uri);
+                var requestMessage = new HttpRequestMessage(Method, Uri);
 
-                if (this.RequestContent != null)
+                if (RequestContent != null)
                 {
-                    var strPayload = JsonConvert.SerializeObject(this.RequestContent);
+                    var strPayload = JsonConvert.SerializeObject(RequestContent);
                     requestMessage.Content = new StringContent(strPayload, Encoding.UTF8, "application/json");
                 }
 
-                foreach (var requestBuilder in this.RequestBuilders)
+                foreach (var requestBuilder in RequestBuilders)
                 {
                     requestBuilder(requestMessage);
                 }
@@ -73,19 +73,19 @@ namespace ValheimServerGUI.Tools.Http
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    this.Context.Logger.LogError("HTTP request was not successful ({0}): {1}", statusCode, logAddress);
+                    Context.Logger.LogError("HTTP request was not successful ({0}): {1}", statusCode, logAddress);
                     return responseMessage;
                 }
 
-                if (this.ResponseContentType != null)
+                if (ResponseContentType != null)
                 {
                     var responseContentStr = await responseMessage.Content.ReadAsStringAsync();
-                    this.ResponseContent = JsonConvert.DeserializeObject(responseContentStr, this.ResponseContentType);
+                    ResponseContent = JsonConvert.DeserializeObject(responseContentStr, ResponseContentType);
                 }
 
-                this.Context.Logger.LogTrace("HTTP request was successful ({0}): {1}", statusCode, logAddress);
+                Context.Logger.LogTrace("HTTP request was successful ({0}): {1}", statusCode, logAddress);
 
-                foreach (var callback in this.Callbacks)
+                foreach (var callback in Callbacks)
                 {
                     try
                     {
@@ -94,9 +94,9 @@ namespace ValheimServerGUI.Tools.Http
                     catch (Exception callbackException)
                     {
                         // Log the error, but keep iterating over callbacks
-                        this.Context.Logger.LogError(callbackException, "HTTP request callback encountered an unexpected error: {0}", logAddress);
-                        this.Context.Logger.LogError(callbackException.Message);
-                        this.Context.Logger.LogError(callbackException.StackTrace);
+                        Context.Logger.LogError(callbackException, "HTTP request callback encountered an unexpected error: {0}", logAddress);
+                        Context.Logger.LogError(callbackException.Message);
+                        Context.Logger.LogError(callbackException.StackTrace);
                     }
                 }
 
@@ -104,9 +104,9 @@ namespace ValheimServerGUI.Tools.Http
             }
             catch (Exception e)
             {
-                this.Context.Logger.LogError(e, "HTTP request encountered an unexpected error: {0}", logAddress);
-                this.Context.Logger.LogError(e.Message);
-                this.Context.Logger.LogError(e.StackTrace);
+                Context.Logger.LogError(e, "HTTP request encountered an unexpected error: {0}", logAddress);
+                Context.Logger.LogError(e.Message);
+                Context.Logger.LogError(e.StackTrace);
                 return null;
             }
         }

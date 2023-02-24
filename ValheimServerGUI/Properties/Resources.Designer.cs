@@ -193,6 +193,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap DiscordLogo {
+            get {
+                object obj = ResourceManager.GetObject("DiscordLogo", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap DonateLogo {
             get {
                 object obj = ResourceManager.GetObject("DonateLogo", resourceCulture);
@@ -455,6 +465,15 @@ namespace ValheimServerGUI.Properties {
         internal static string UpdateCheckInterval {
             get {
                 return ResourceManager.GetString("UpdateCheckInterval", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://discord.gg/HBsNJTY.
+        /// </summary>
+        internal static string UrlDiscord {
+            get {
+                return ResourceManager.GetString("UrlDiscord", resourceCulture);
             }
         }
         

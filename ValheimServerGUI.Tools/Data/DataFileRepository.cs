@@ -17,40 +17,40 @@ namespace ValheimServerGUI.Tools.Data
 
         public DataFileRepository(IDataFileRepositoryContext context, string filePath)
         {
-            this.Context = context;
-            this.FilePath = filePath;
+            Context = context;
+            FilePath = filePath;
 
-            this.DataFileProvider.DataLoaded += this.OnDataLoaded;
+            DataFileProvider.DataLoaded += OnDataLoaded;
         }
 
         private Dictionary<string, TEntity> Entities = new();
 
         public virtual void Load()
         {
-            this.DataFileProvider.Load<JsonDataFile<TEntity>>(this.FilePath);
+            DataFileProvider.Load<JsonDataFile<TEntity>>(FilePath);
         }
 
         public virtual Task LoadAsync()
         {
-            return this.DataFileProvider.LoadAsync<JsonDataFile<TEntity>>(this.FilePath);
+            return DataFileProvider.LoadAsync<JsonDataFile<TEntity>>(FilePath);
         }
 
         public virtual void Save()
         {
-            this.DataFileProvider.Save(this.FilePath, new JsonDataFile<TEntity>(this.Entities));
+            DataFileProvider.Save(FilePath, new JsonDataFile<TEntity>(Entities));
         }
 
         public virtual Task SaveAsync()
         {
-            return this.DataFileProvider.SaveAsync(this.FilePath, new JsonDataFile<TEntity>(this.Entities));
+            return DataFileProvider.SaveAsync(FilePath, new JsonDataFile<TEntity>(Entities));
         }
 
         protected virtual void OnDataLoaded(object sender, object dataFile)
         {
             if (dataFile is JsonDataFile<TEntity> typed)
             {
-                this.Entities = typed.Data;
-                this.DataReady?.Invoke(this, EventArgs.Empty);
+                Entities = typed.Data;
+                DataReady?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -66,11 +66,11 @@ namespace ValheimServerGUI.Tools.Data
 
         public event EventHandler<TEntity> EntityRemoved;
 
-        public IEnumerable<TEntity> Data => this.Entities.Values;
+        public IEnumerable<TEntity> Data => Entities.Values;
 
         public virtual TEntity FindById(string id)
         {
-            if (this.Entities.TryGetValue(id, out var entity))
+            if (Entities.TryGetValue(id, out var entity))
             {
                 return entity;
             }
@@ -80,44 +80,44 @@ namespace ValheimServerGUI.Tools.Data
 
         public virtual void Upsert(TEntity entity)
         {
-            this.Entities[entity.Key] = entity;
-            this.EntityUpdated?.Invoke(this, entity);
+            Entities[entity.Key] = entity;
+            EntityUpdated?.Invoke(this, entity);
 
-            this.DataUpdated?.Invoke(this, EventArgs.Empty);
-            this.Save();
+            DataUpdated?.Invoke(this, EventArgs.Empty);
+            Save();
         }
 
         public virtual void UpsertBulk(IEnumerable<TEntity> entities)
         {
             foreach (var entity in entities)
             {
-                this.Entities[entity.Key] = entity;
-                this.EntityUpdated?.Invoke(this, entity);
+                Entities[entity.Key] = entity;
+                EntityUpdated?.Invoke(this, entity);
             }
 
-            this.DataUpdated?.Invoke(this, EventArgs.Empty);
-            this.Save();
+            DataUpdated?.Invoke(this, EventArgs.Empty);
+            Save();
         }
 
         public virtual void Remove(string key)
         {
-            if (this.Entities.TryGetValue(key, out var entity) && this.Entities.Remove(key))
+            if (Entities.TryGetValue(key, out var entity) && Entities.Remove(key))
             {
-                this.EntityRemoved?.Invoke(this, entity);
+                EntityRemoved?.Invoke(this, entity);
 
-                this.DataUpdated?.Invoke(this, EventArgs.Empty);
-                this.Save();
+                DataUpdated?.Invoke(this, EventArgs.Empty);
+                Save();
             }
         }
 
         public virtual void Remove(TEntity entity)
         {
-            if (this.Entities.Remove(entity.Key))
+            if (Entities.Remove(entity.Key))
             {
-                this.EntityRemoved?.Invoke(this, entity);
+                EntityRemoved?.Invoke(this, entity);
 
-                this.DataUpdated?.Invoke(this, EventArgs.Empty);
-                this.Save();
+                DataUpdated?.Invoke(this, EventArgs.Empty);
+                Save();
             }
         }
 
@@ -127,17 +127,17 @@ namespace ValheimServerGUI.Tools.Data
 
             foreach (var key in keys)
             {
-                if (this.Entities.TryGetValue(key, out var entity) && this.Entities.Remove(key))
+                if (Entities.TryGetValue(key, out var entity) && Entities.Remove(key))
                 {
-                    this.EntityRemoved?.Invoke(this, entity);
+                    EntityRemoved?.Invoke(this, entity);
                     anyRemoved = true;
                 }
             }
 
             if (anyRemoved)
             {
-                this.DataUpdated?.Invoke(this, EventArgs.Empty);
-                this.Save();
+                DataUpdated?.Invoke(this, EventArgs.Empty);
+                Save();
             }
         }
 
@@ -147,29 +147,29 @@ namespace ValheimServerGUI.Tools.Data
 
             foreach (var entity in entities)
             {
-                if (this.Entities.Remove(entity.Key))
+                if (Entities.Remove(entity.Key))
                 {
-                    this.EntityRemoved?.Invoke(this, entity);
+                    EntityRemoved?.Invoke(this, entity);
                     anyRemoved = true;
                 }
             }
 
             if (anyRemoved)
             {
-                this.DataUpdated?.Invoke(this, EventArgs.Empty);
-                this.Save();
+                DataUpdated?.Invoke(this, EventArgs.Empty);
+                Save();
             }
         }
 
         public virtual void RemoveAll()
         {
-            if (this.Entities.Any())
+            if (Entities.Any())
             {
-                this.Entities.Clear();
+                Entities.Clear();
 
-                this.DataCleared?.Invoke(this, EventArgs.Empty);
+                DataCleared?.Invoke(this, EventArgs.Empty);
 
-                this.Save();
+                Save();
             }
         }
 

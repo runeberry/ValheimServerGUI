@@ -10,12 +10,12 @@ namespace ValheimServerGUI.Tools
 
         public FormProvider(IServiceProvider serviceProvider)
         {
-            this.ServiceProvider = serviceProvider;
+            ServiceProvider = serviceProvider;
         }
 
         public T GetForm<T>() where T : Form
         {
-            return this.ServiceProvider.GetRequiredService<T>();
+            return ServiceProvider.GetRequiredService<T>();
         }
     }
 

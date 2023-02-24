@@ -1,13 +1,14 @@
 ﻿using System;
 using System.ComponentModel;
 using System.Windows.Forms;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Forms
 {
-    public partial class CopyButton : UserControl
+    public partial class OpenButton : UserControl
     {
         [Browsable(false)]
-        public Func<string> CopyFunction { get; set; }
+        public Func<string> PathFunction { get; set; }
 
         public string HelpText
         {
@@ -15,7 +16,7 @@ namespace ValheimServerGUI.Forms
             set => IconButton.HelpText = value;
         }
 
-        public CopyButton()
+        public OpenButton()
         {
             InitializeComponent();
 
@@ -24,10 +25,10 @@ namespace ValheimServerGUI.Forms
 
         private bool OnIconClicked()
         {
-            var str = CopyFunction?.Invoke();
-            if (string.IsNullOrEmpty(str)) return false;
+            var path = PathFunction?.Invoke();
+            if (string.IsNullOrWhiteSpace(path)) return false;
 
-            Clipboard.SetText(str);
+            OpenHelper.OpenDirectory(path);
             return true;
         }
     }

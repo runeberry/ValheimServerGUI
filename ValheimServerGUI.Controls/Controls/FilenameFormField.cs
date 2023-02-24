@@ -14,26 +14,26 @@ namespace ValheimServerGUI.Controls
 
         public string LabelText
         {
-            get => this.Label.Text;
-            set => this.Label.Text = value;
+            get => Label.Text;
+            set => Label.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public string Value
         {
-            get => this.TextBox.Text;
+            get => TextBox.Text;
             set
             {
-                if (this.TextBox.Text == value) return;
+                if (TextBox.Text == value) return;
 
-                this.TextBox.Text = value;
-                this.ValueChanged?.Invoke(this, value);
+                TextBox.Text = value;
+                ValueChanged?.Invoke(this, value);
             }
         }
 
@@ -43,11 +43,11 @@ namespace ValheimServerGUI.Controls
 
         public bool ReadOnly
         {
-            get => this.TextBox.ReadOnly;
+            get => TextBox.ReadOnly;
             set
             {
-                this.TextBox.ReadOnly = value;
-                this.FileBrowserButton.Enabled = !value;
+                TextBox.ReadOnly = value;
+                FileBrowserButton.Enabled = !value;
             }
         }
 
@@ -65,7 +65,7 @@ namespace ValheimServerGUI.Controls
         {
             InitializeComponent();
 
-            this.TextBox.TextChanged += this.OnTextChanged;
+            TextBox.TextChanged += OnTextChanged;
         }
 
         public void ConfigureFileDialog(Action<OpenFileDialog> builder)
@@ -80,31 +80,31 @@ namespace ValheimServerGUI.Controls
 
         private void OnTextChanged(object sender, EventArgs args)
         {
-            this.ValueChanged?.Invoke(this, this.Value);
+            ValueChanged?.Invoke(this, Value);
         }
 
         private void FileBrowserButton_Click(object sender, EventArgs e)
         {
             string result;
 
-            if (this.FileSelectMode == FileSelectMode.Directory)
+            if (FileSelectMode == FileSelectMode.Directory)
             {
                 using (var dialog = new FolderBrowserDialog())
                 {
-                    if (this.FolderDialogBuilder != null)
+                    if (FolderDialogBuilder != null)
                     {
-                        this.FolderDialogBuilder(dialog);
+                        FolderDialogBuilder(dialog);
                     }
 
                     dialog.RootFolder = Environment.SpecialFolder.ProgramFilesX86;
 
-                    if (!string.IsNullOrWhiteSpace(this.InitialPath))
+                    if (!string.IsNullOrWhiteSpace(InitialPath))
                     {
-                        dialog.SelectedPath = new DirectoryInfo(this.InitialPath).FullName;
+                        dialog.SelectedPath = new DirectoryInfo(InitialPath).FullName;
                     }
-                    else if (!string.IsNullOrWhiteSpace(this.Value))
+                    else if (!string.IsNullOrWhiteSpace(Value))
                     {
-                        dialog.SelectedPath = new DirectoryInfo(this.Value).FullName;
+                        dialog.SelectedPath = new DirectoryInfo(Value).FullName;
                     }
 
                     if (dialog.ShowDialog() != DialogResult.OK) return;
@@ -114,29 +114,29 @@ namespace ValheimServerGUI.Controls
             }
             else
             {
-                using (var dialog = new OpenFileDialog())
+                using var dialog = new OpenFileDialog();
+                FileDialogBuilder?.Invoke(dialog);
+
+                if (!string.IsNullOrWhiteSpace(InitialPath))
                 {
-                    if (this.FileDialogBuilder != null)
-                    {
-                        this.FileDialogBuilder(dialog);
-                    }
-
-                    dialog.InitialDirectory = !string.IsNullOrWhiteSpace(this.InitialPath)
-                        ? new FileInfo(this.InitialPath).Directory.FullName
-                        : new FileInfo(this.Value).Directory.FullName;
-
-                    // Override the Multiselect property based on this control's FileSelectMode
-                    dialog.Multiselect = this.FileSelectMode == FileSelectMode.MultiFile;
-
-                    if (dialog.ShowDialog() != DialogResult.OK) return;
-
-                    result = this.FileSelectMode == FileSelectMode.MultiFile
-                        ? string.Join(this.MultiFileSeparator, dialog.FileNames)
-                        : dialog.FileName;
+                    dialog.InitialDirectory = new FileInfo(InitialPath).Directory.FullName;
                 }
+                else if (!string.IsNullOrWhiteSpace(Value))
+                {
+                    dialog.InitialDirectory = new FileInfo(Value).Directory.FullName;
+                }
+
+                // Override the Multiselect property based on this control's FileSelectMode
+                dialog.Multiselect = FileSelectMode == FileSelectMode.MultiFile;
+
+                if (dialog.ShowDialog() != DialogResult.OK) return;
+
+                result = FileSelectMode == FileSelectMode.MultiFile
+                    ? string.Join(MultiFileSeparator, dialog.FileNames)
+                    : dialog.FileName;
             }
 
-            this.Value = result;
+            Value = result;
         }
     }
 

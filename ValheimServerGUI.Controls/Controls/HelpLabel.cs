@@ -11,11 +11,11 @@ namespace ValheimServerGUI.Controls
         [DesignerSerializationVisibility(DesignerSerializationVisibility.Visible)]
         public override string Text
         {
-            get => this.ToolTip.GetToolTip(this.Label);
+            get => ToolTip.GetToolTip(Label);
             set
             {
-                this.ToolTip.SetToolTip(this.Label, value);
-                this.Label.Visible = !string.IsNullOrWhiteSpace(value);
+                ToolTip.SetToolTip(Label, value);
+                Label.Visible = !string.IsNullOrWhiteSpace(value);
             }
         }
 

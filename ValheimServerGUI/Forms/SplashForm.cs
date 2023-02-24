@@ -45,14 +45,14 @@ namespace ValheimServerGUI.Forms
             IPlayerDataRepository playerDataRepository,
             ILogger logger)
         {
-            this.FormProvider = formProvider;
-            this.IpAddressProvider = ipAddressProvider;
-            this.SoftwareUpdateProvider = softwareUpdateProvider;
-            this.ExceptionHandler = exceptionHandler;
-            this.UserPrefsProvider = userPrefsProvider;
-            this.ServerPrefsProvider = serverPrefsProvider;
-            this.PlayerDataRepository = playerDataRepository;
-            this.Logger = logger;
+            FormProvider = formProvider;
+            IpAddressProvider = ipAddressProvider;
+            SoftwareUpdateProvider = softwareUpdateProvider;
+            ExceptionHandler = exceptionHandler;
+            UserPrefsProvider = userPrefsProvider;
+            ServerPrefsProvider = serverPrefsProvider;
+            PlayerDataRepository = playerDataRepository;
+            Logger = logger;
 
             Application.ThreadException += Application_ThreadException;
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
@@ -66,7 +66,7 @@ namespace ValheimServerGUI.Forms
             }
             catch (Exception e)
             {
-                this.HandleException(e, "Startup Init Exception", true);
+                HandleException(e, "Startup Init Exception", true);
             }
         }
 
@@ -74,13 +74,13 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeAppName()
         {
-            this.AppNameLabel.Text = $"ValheimServerGUI v{AssemblyHelper.GetApplicationVersion()}";
+            AppNameLabel.Text = $"ValheimServerGUI v{AssemblyHelper.GetApplicationVersion()}";
         }
 
         private void InitializeFormEvents()
         {
-            this.Shown += this.BuildEventHandler(this.SplashForm_OnShown);
-            this.ExceptionHandler.ExceptionHandled += this.BuildEventHandler(this.OnExceptionHandled);
+            Shown += this.BuildEventHandler(SplashForm_OnShown);
+            ExceptionHandler.ExceptionHandled += this.BuildEventHandler(OnExceptionHandled);
         }
 
         #endregion
@@ -89,17 +89,17 @@ namespace ValheimServerGUI.Forms
 
         public MainWindow CreateNewMainWindow(string startProfile, bool startServer)
         {
-            var mainWindow = this.FormProvider.GetForm<MainWindow>();
+            var mainWindow = FormProvider.GetForm<MainWindow>();
 
             // Since the splash screen is the application's main form, it must continue running in the background
             // So listen for whenever the MainWindow closes, and close the splash screen as well, in order to close the application
-            mainWindow.FormClosed += this.OnMainWindowClosed;
+            mainWindow.FormClosed += OnMainWindowClosed;
             mainWindow.StartProfile = startProfile;
             mainWindow.StartServerAutomatically = startServer;
-            mainWindow.SplashIndex = this.MainWindows.Count;
+            mainWindow.SplashIndex = MainWindows.Count;
 
-            this.MainWindows.Add(mainWindow);
-            this.Logger.LogDebug("Created {name} [{index}] for profile {name}", nameof(MainWindow), mainWindow.SplashIndex, startProfile);
+            MainWindows.Add(mainWindow);
+            Logger.LogDebug("Created {name} [{index}] for profile {name}", nameof(MainWindow), mainWindow.SplashIndex, startProfile);
 
             return mainWindow;
         }
@@ -110,15 +110,15 @@ namespace ValheimServerGUI.Forms
 
         protected void SplashForm_OnShown()
         {
-            if (this.IsFirstShown)
+            if (IsFirstShown)
             {
-                this.IsFirstShown = false;
+                IsFirstShown = false;
 
                 // For some reason the form is not actually fully rendered at this point
                 // (labels appear as white boxes) so I'm forcing a redraw here
-                this.Refresh();
+                Refresh();
 
-                this.OnFirstShown();
+                OnFirstShown();
             }
         }
 
@@ -126,19 +126,19 @@ namespace ValheimServerGUI.Forms
         {
             try
             {
-                if (!this.VersionCheck())
+                if (!VersionCheck())
                 {
-                    this.Close();
+                    Close();
                     return;
                 }
 
-                this.PrepareMainWindows();
-                this.PrepareStartupTasks();
-                this.RunStartupTasks();
+                PrepareMainWindows();
+                PrepareStartupTasks();
+                RunStartupTasks();
             }
             catch (Exception ex)
             {
-                this.HandleException(ex, "Startup Run Exception", true);
+                HandleException(ex, "Startup Run Exception", true);
             }
         }
 
@@ -148,79 +148,79 @@ namespace ValheimServerGUI.Forms
 
         private void OnTaskFinished(Task task)
         {
-            if (!this.StartupTasks.Any())
+            if (!StartupTasks.Any())
             {
                 // Close the splash screen if there are no startup tasks
-                this.FinishStartup();
+                FinishStartup();
                 return;
             }
 
             if (task != null)
             {
-                this.FinishedTasks.Add(task);
+                FinishedTasks.Add(task);
 
                 if (!task.IsCompletedSuccessfully)
                 {
-                    this.Logger.LogWarning("Error encountered during startup task");
-                    this.HandleException(task.Exception, "Startup Task Exception", true);
+                    Logger.LogWarning("Error encountered during startup task");
+                    HandleException(task.Exception, "Startup Task Exception", true);
                     return;
                 }
             }
 
-            var numTasks = this.StartupTasks.Count;
-            var numTasksFinished = this.FinishedTasks.Count;
+            var numTasks = StartupTasks.Count;
+            var numTasksFinished = FinishedTasks.Count;
             var pctTasksFinished = numTasksFinished * 100 / numTasks;
 
-            this.ProgressBar.Value = pctTasksFinished;
+            ProgressBar.Value = pctTasksFinished;
 
             if (numTasksFinished >= numTasks)
             {
                 // Close the splash screen once all startup tasks have finished
-                this.FinishStartup();
+                FinishStartup();
                 return;
             }
         }
 
         private void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            var isMainWindowVisible = this.MainWindows.Any((m) => m?.Visible == true);
-            this.HandleException(e.ExceptionObject as Exception, "Unhandled Exception", !isMainWindowVisible);
+            var isMainWindowVisible = MainWindows.Any((m) => m?.Visible == true);
+            HandleException(e.ExceptionObject as Exception, "Unhandled Exception", !isMainWindowVisible);
         }
 
         private void Application_ThreadException(object sender, System.Threading.ThreadExceptionEventArgs e)
         {
-            var isMainWindowVisible = this.MainWindows.Any((m) => m?.Visible == true);
-            this.HandleException(e.Exception, "Thread Exception", !isMainWindowVisible);
+            var isMainWindowVisible = MainWindows.Any((m) => m?.Visible == true);
+            HandleException(e.Exception, "Thread Exception", !isMainWindowVisible);
         }
 
         private void OnExceptionHandled()
         {
-            if (CloseAfterExceptionHandled) this.Close();
+            if (CloseAfterExceptionHandled) Close();
         }
 
         private void OnMainWindowClosed(object sender, FormClosedEventArgs e)
         {
-            if (this.InvokeRequired)
+            if (InvokeRequired)
             {
-                this.Invoke(new Action<object, FormClosedEventArgs>(this.OnMainWindowClosed), new object[] { sender, e });
+                Invoke(new Action<object, FormClosedEventArgs>(OnMainWindowClosed), new object[] { sender, e });
                 return;
             }
 
             if (sender is not MainWindow mainWindow) return;
 
-            this.Logger.LogDebug("Closed {name} [{index}]", nameof(MainWindow), mainWindow.SplashIndex);
+            Logger.LogDebug("Closed {name} [{index}]", nameof(MainWindow), mainWindow.SplashIndex);
 
-            this.MainWindows[mainWindow.SplashIndex] = null;
-            var stillOpen = this.MainWindows.Count(m => m != null);
+            MainWindows[mainWindow.SplashIndex] = null;
+            var stillOpen = MainWindows.Count(m => m != null);
             if (stillOpen > 0)
             {
 
-                this.Logger.LogDebug("{stillOpen} windows are still open", stillOpen);
+                Logger.LogDebug("{stillOpen} windows are still open", stillOpen);
                 return;
             }
 
-            this.Logger.LogDebug($"All windows closed, shutting down application");
-            this.Close();
+            Logger.LogDebug($"All windows closed, shutting down application");
+            Close();
         }
 
         #endregion
@@ -229,14 +229,14 @@ namespace ValheimServerGUI.Forms
 
         private void PrepareMainWindows()
         {
-            var allPrefs = this.ServerPrefsProvider.LoadPreferences();
+            var allPrefs = ServerPrefsProvider.LoadPreferences();
             var autoStartServers = allPrefs.Where(p => p != null && p.AutoStart);
             if (autoStartServers.Any())
             {
-                this.Logger.LogInformation("Loading server profiles with auto-start enabled");
+                Logger.LogInformation("Loading server profiles with auto-start enabled");
                 foreach (var autoStartServer in autoStartServers)
                 {
-                    this.CreateNewMainWindow(autoStartServer.ProfileName, true);
+                    CreateNewMainWindow(autoStartServer.ProfileName, true);
                 }
                 return;
             }
@@ -244,48 +244,48 @@ namespace ValheimServerGUI.Forms
             var lastSavedServer = allPrefs.OrderByDescending(p => p.LastSaved).FirstOrDefault();
             if (lastSavedServer != null)
             {
-                this.Logger.LogInformation("Loading most recently saved profile: {name}", lastSavedServer.ProfileName);
-                this.CreateNewMainWindow(lastSavedServer.ProfileName, false);
+                Logger.LogInformation("Loading most recently saved profile: {name}", lastSavedServer.ProfileName);
+                CreateNewMainWindow(lastSavedServer.ProfileName, false);
                 return;
             }
 
             var newPrefs = new ServerPreferences { ProfileName = Resources.DefaultServerProfileName };
-            this.ServerPrefsProvider.SavePreferences(newPrefs);
-            this.Logger.LogInformation("User preferences not found, creating new file");
-            this.CreateNewMainWindow(newPrefs.ProfileName, false);
+            ServerPrefsProvider.SavePreferences(newPrefs);
+            Logger.LogInformation("User preferences not found, creating new file");
+            CreateNewMainWindow(newPrefs.ProfileName, false);
         }
 
         private void AddStartupTask(Func<Task> taskFunc, string taskName)
         {
-            this.StartupTasks.Add(async () =>
+            StartupTasks.Add(async () =>
             {
-                this.Logger.LogDebug("Starting startup task: {name}", taskName);
+                Logger.LogDebug("Starting startup task: {name}", taskName);
                 var sw = Stopwatch.StartNew();
 
                 await taskFunc();
 
-                this.Logger.LogDebug("Finished startup task: {name} ({dur}ms)", taskName, sw.ElapsedMilliseconds);
+                Logger.LogDebug("Finished startup task: {name} ({dur}ms)", taskName, sw.ElapsedMilliseconds);
             });
         }
 
         private void PrepareStartupTasks()
         {
-            this.TaskFinished += this.BuildEventHandler<Task>(this.OnTaskFinished);
+            TaskFinished += this.BuildEventHandler<Task>(OnTaskFinished);
 
-            this.AddStartupTask(() => this.SoftwareUpdateProvider.CheckForUpdatesAsync(false), "Check for updates");
-            this.AddStartupTask(this.PlayerDataRepository.LoadAsync, "Load player data");
+            AddStartupTask(() => SoftwareUpdateProvider.CheckForUpdatesAsync(false), "Check for updates");
+            AddStartupTask(PlayerDataRepository.LoadAsync, "Load player data");
 
 #if DEBUG
             if (SimulateLongRunningStartup)
             {
-                this.AddStartupTask(() => Task.Delay(2000), "2s delay");
-                this.AddStartupTask(() => Task.Delay(2500), "2.5 delay");
-                this.AddStartupTask(() => Task.Delay(3000), "3s delay");
+                AddStartupTask(() => Task.Delay(2000), "2s delay");
+                AddStartupTask(() => Task.Delay(2500), "2.5 delay");
+                AddStartupTask(() => Task.Delay(3000), "3s delay");
             }
 
             if (SimulateStartupTaskException)
             {
-                this.AddStartupTask(async () =>
+                AddStartupTask(async () =>
                 {
                     await Task.Delay(500);
                     throw new InvalidOperationException("Intentional exception thrown for testing");
@@ -297,13 +297,13 @@ namespace ValheimServerGUI.Forms
         private void RunStartupTasks()
         {
             //var i = 1;
-            foreach (var taskFunc in this.StartupTasks)
+            foreach (var taskFunc in StartupTasks)
             {
                 //this.Logger.LogTrace($"Beginning startup task #{i++}");
 
                 Task.Run(() => taskFunc().ContinueWith(t =>
                 {
-                    this.TaskFinished?.Invoke(this, t);
+                    TaskFinished?.Invoke(this, t);
                     return Task.CompletedTask;
                 }));
             }
@@ -315,7 +315,7 @@ namespace ValheimServerGUI.Forms
 
             if (dotnetVersion.Major < 6)
             {
-                this.Logger.LogWarning($"Incompatible .NET version detected: {dotnetVersion}");
+                Logger.LogWarning($"Incompatible .NET version detected: {dotnetVersion}");
 
                 var nl = Environment.NewLine;
                 var result = MessageBox.Show(
@@ -339,18 +339,18 @@ namespace ValheimServerGUI.Forms
 
         private void HandleException(Exception exception, string contextMessage, bool closeAfterHandle)
         {
-            this.Logger.LogError($"Encountered exception - {exception.GetType().Name}: {exception.Message}");
+            Logger.LogError($"Encountered exception - {exception.GetType().Name}: {exception.Message}");
 
-            this.CloseAfterExceptionHandled = closeAfterHandle;
+            CloseAfterExceptionHandled = closeAfterHandle;
 
-            this.ExceptionHandler.HandleException(exception, contextMessage);
+            ExceptionHandler.HandleException(exception, contextMessage);
         }
 
         private void FinishStartup()
         {
-            var userPrefs = this.UserPrefsProvider.LoadPreferences();
+            var userPrefs = UserPrefsProvider.LoadPreferences();
 
-            foreach (var mainWindow in this.MainWindows)
+            foreach (var mainWindow in MainWindows)
             {
                 mainWindow.Show();
                 if (userPrefs.StartMinimized)
@@ -374,7 +374,7 @@ namespace ValheimServerGUI.Forms
             }
 #endif
             // Hide the splash screen so it's no longer visible once the application is loaded
-            this.Hide();
+            Hide();
         }
 
         #endregion

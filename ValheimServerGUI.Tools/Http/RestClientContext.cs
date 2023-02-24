@@ -17,8 +17,8 @@ namespace ValheimServerGUI.Tools.Http
 
         public RestClientContext(ILogger logger, IHttpClientProvider provider)
         {
-            this.Logger = logger;
-            this.HttpClientProvider = provider;
+            Logger = logger;
+            HttpClientProvider = provider;
         }
     }
 }

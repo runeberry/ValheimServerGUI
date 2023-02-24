@@ -1,54 +1,61 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFrameworks>net6.0-windows</TargetFrameworks>
-    <UseWindowsForms>true</UseWindowsForms>
-    <ApplicationIcon>Resources\ApplicationIcon.ico</ApplicationIcon>
-    <Authors>Runeberry Software, LLC</Authors>
-    <Product>ValheimServerGUI</Product>
-    <Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
-    <Copyright>2022</Copyright>
-    <PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
-    <Version>2.0.0</Version>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFrameworks>net6.0-windows</TargetFrameworks>
+		<UseWindowsForms>true</UseWindowsForms>
+		<ApplicationIcon>Resources\ApplicationIcon.ico</ApplicationIcon>
+		<Authors>Runeberry Software, LLC</Authors>
+		<Product>ValheimServerGUI</Product>
+		<Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
+		<Copyright>2022</Copyright>
+		<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
+		<Version>2.1.0</Version>
+    <!-- Build date adapted from: https://rmauro.dev/add-build-time-to-your-csharp-assembly/ -->
+    <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))</SourceRevisionId>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj" />
-    <ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
-  </ItemGroup>
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<SignAssembly>true</SignAssembly>
+		<AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="DeviceId" Version="6.2.0" />
-    <PackageReference Include="Humanizer" Version="2.14.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
-    <PackageReference Include="Semver" Version="2.2.0" />
-  </ItemGroup>
+	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
+		<Exec Command="post-publish.bat" />
+	</Target>
 
-  <ItemGroup>
-    <Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
-    <Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')" />
-  </ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj" />
+		<ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="Properties\Resources.Designer.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="DeviceId" Version="6.2.0" />
+		<PackageReference Include="Humanizer" Version="2.14.1" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+		<PackageReference Include="Semver" Version="2.2.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
+	<ItemGroup>
+		<Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
+		<Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Update="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
 
 </Project>

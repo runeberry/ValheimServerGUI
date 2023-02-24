@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ValheimServerGUI.Forms;
+﻿using ValheimServerGUI.Forms;
 using Xunit;
 
 namespace ValheimServerGUI.Tests.Forms
@@ -17,7 +12,7 @@ namespace ValheimServerGUI.Tests.Forms
         [Fact]
         public void CanConstructSplashForm()
         {
-            this.GetForm<SplashForm>();
+            GetForm<SplashForm>();
         }
     }
 }

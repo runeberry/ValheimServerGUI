@@ -12,7 +12,12 @@ namespace ValheimServerGUI.Forms
             InitializeComponent();
             this.AddApplicationIcon();
 
-            this.VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
+            try
+            {
+                VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
+                VersionLabel.Text += $"{Environment.NewLine}Build Date: {AssemblyHelper.GetApplicationBuildDate().ToUniversalTime():yyyy-MM-ddTHH:mm:ssZ}";
+            }
+            catch { }
         }
 
         private void ButtonDonate_Click(object sender, EventArgs e)
@@ -28,6 +33,11 @@ namespace ValheimServerGUI.Forms
         private void ButtonValheimSite_Click(object sender, EventArgs e)
         {
             OpenHelper.OpenWebAddress(Resources.ValheimGameSiteUrl);
+        }
+
+        private void ButtonDiscord_Click(object sender, EventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.UrlDiscord);
         }
     }
 }

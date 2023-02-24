@@ -25,8 +25,8 @@ namespace ValheimServerGUI.Game
 
         public UserPreferencesProvider(ILogger logger) : base(logger)
         {
-            this.UserPrefsFilePath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePathV2);
-            this.LegacyPath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePath);
+            UserPrefsFilePath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePathV2);
+            LegacyPath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePath);
         }
 
         #region IUserPreferencesProvider implementation
@@ -35,12 +35,12 @@ namespace ValheimServerGUI.Game
 
         public UserPreferences LoadPreferences()
         {
-            return this.LoadInternal();
+            return LoadInternal();
         }
 
         public void SavePreferences(UserPreferences preferences)
         {
-            this.SaveInternal(preferences);
+            SaveInternal(preferences);
         }
 
         #endregion
@@ -49,10 +49,10 @@ namespace ValheimServerGUI.Game
 
         private void OnFileChanged(object sender, FileSystemEventArgs e)
         {
-            if (e.FullPath != this.UserPrefsFilePath) return;
+            if (e.FullPath != UserPrefsFilePath) return;
 
-            var prefs = this.LoadInternal();
-            this.PreferencesSaved?.Invoke(this, prefs);
+            var prefs = LoadInternal();
+            PreferencesSaved?.Invoke(this, prefs);
         }
 
         #endregion
@@ -64,16 +64,16 @@ namespace ValheimServerGUI.Game
             try
             {
                 var file = preferences.ToFile();
-                this.SaveAsync(this.UserPrefsFilePath, file).GetAwaiter().GetResult();
-                this.Logger.LogInformation("User preferences saved");
+                SaveAsync(UserPrefsFilePath, file).GetAwaiter().GetResult();
+                Logger.LogInformation("User preferences saved");
             }
             catch (Exception e)
             {
-                this.Logger.LogException(e, "Failed to save user preferences");
+                Logger.LogException(e, "Failed to save user preferences");
                 return;
             }
 
-            this.PreferencesSaved?.Invoke(this, preferences);
+            PreferencesSaved?.Invoke(this, preferences);
         }
 
         private UserPreferences LoadInternal()
@@ -82,7 +82,7 @@ namespace ValheimServerGUI.Game
             {
                 if (!File.Exists(UserPrefsFilePath))
                 {
-                    if (this.TryMigrateLegacyPrefs(out var legacyPrefs))
+                    if (TryMigrateLegacyPrefs(out var legacyPrefs))
                     {
                         return legacyPrefs;
                     }
@@ -92,20 +92,20 @@ namespace ValheimServerGUI.Game
                     }
                 }
 
-                var file = this.LoadAsync<UserPreferencesFile>(this.UserPrefsFilePath).GetAwaiter().GetResult();
+                var file = LoadAsync<UserPreferencesFile>(UserPrefsFilePath).GetAwaiter().GetResult();
                 return UserPreferences.FromFile(file);
             }
             catch (Exception e)
             {
-                this.Logger.LogException(e, "Failed to load user preferences");
+                Logger.LogException(e, "Failed to load user preferences");
                 return UserPreferences.GetDefault();
             }
         }
 
         private static readonly Dictionary<string, Action<UserPreferences, string>> MigrationActions = new()
         {
-            { "ValheimGamePath", (p, v) => p.ValheimGamePath = v },
-            { "ValheimServerPath", (p, v) => p.ValheimServerPath = v },
+            //{ "ValheimGamePath", (p, v) => p.ValheimGamePath = v },
+            { "ValheimServerPath", (p, v) => p.ServerExePath = v },
             { "ServerName", (p, v) => p.Servers[0].Name = v },
             { "ServerPassword", (p, v) => p.Servers[0].Password = v },
             { "ServerWorldName", (p, v) => p.Servers[0].WorldName = v },
@@ -123,7 +123,7 @@ namespace ValheimServerGUI.Game
 
             try
             {
-                this.Logger.LogInformation("Migrating userprefs.txt to userprefs.json...");
+                Logger.LogInformation("Migrating userprefs.txt to userprefs.json...");
 
                 prefs = new UserPreferences();
 
@@ -146,16 +146,16 @@ namespace ValheimServerGUI.Game
                     }
                 }
 
-                this.SaveInternal(prefs);
+                SaveInternal(prefs);
                 File.Delete(LegacyPath);
 
-                this.Logger.LogInformation("Migration OK!");
+                Logger.LogInformation("Migration OK!");
 
                 return true;
             }
             catch (Exception e)
             {
-                this.Logger.LogException(e, "Migration failed");
+                Logger.LogException(e, "Migration failed");
                 prefs = null;
                 return false;
             }

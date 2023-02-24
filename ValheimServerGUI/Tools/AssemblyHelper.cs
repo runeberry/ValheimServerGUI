@@ -11,13 +11,25 @@ namespace ValheimServerGUI.Tools
 {
     public static class AssemblyHelper
     {
+        private static string _appVersion;
+        private static string AppVersion => _appVersion ??= GetInformationalVersion();
+        private const string BuildPrefix = "+build";
+        private static string ClientCorrelationId;
+
         public static string GetApplicationVersion()
         {
-            var attribute = Assembly.GetExecutingAssembly()
-                .GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
-                .FirstOrDefault() as AssemblyInformationalVersionAttribute;
+            return AppVersion[..AppVersion.IndexOf(BuildPrefix)];
+        }
 
-            return attribute?.InformationalVersion ?? "0.0.0";
+
+        /// <remarks>
+        /// Adapted from: https://rmauro.dev/add-build-time-to-your-csharp-assembly/
+        /// Set as SourceRevisionId in csproj.
+        /// </remarks>
+        public static DateTime GetApplicationBuildDate()
+        {
+            var index = AppVersion.IndexOf(BuildPrefix) + BuildPrefix.Length;
+            return DateTime.Parse(AppVersion[index..], CultureInfo.InvariantCulture);
         }
 
         /// <summary>
@@ -48,8 +60,6 @@ namespace ValheimServerGUI.Tools
         {
             return Environment.Version;
         }
-
-        private static string ClientCorrelationId;
 
         public static string GetClientCorrelationId()
         {
@@ -82,5 +92,18 @@ namespace ValheimServerGUI.Tools
                 CurrentUICulture = CultureInfo.CurrentUICulture?.ToString(),
             };
         }
+
+        #region Helper methods
+
+        private static string GetInformationalVersion()
+        {
+            var attribute = Assembly.GetExecutingAssembly()
+                .GetCustomAttributes(typeof(AssemblyInformationalVersionAttribute), false)
+                .FirstOrDefault() as AssemblyInformationalVersionAttribute;
+
+            return attribute?.InformationalVersion ?? "0.0.0";
+        }
+
+        #endregion
     }
 }

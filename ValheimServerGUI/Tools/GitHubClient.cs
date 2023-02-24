@@ -20,7 +20,7 @@ namespace ValheimServerGUI.Tools
 
         public async Task<GitHubRelease> GetLatestReleaseAsync()
         {
-            var releases = await this.Get($"{Resources.UrlGithubApi}/releases")
+            var releases = await Get($"{Resources.UrlGithubApi}/releases")
                 .WithHeader("User-Agent", "ValheimServerGUI")
                 .SendAsync<GitHubRelease[]>();
 
@@ -58,7 +58,7 @@ namespace ValheimServerGUI.Tools
 
         [JsonProperty("prerelease")]
         public bool Prerelease { get; set; }
-        
+
         [JsonProperty("published_at")]
         public DateTime PublishedAt { get; set; }
 

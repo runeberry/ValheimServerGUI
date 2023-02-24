@@ -22,16 +22,16 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// Exposed for testing.
         /// </summary>
-        public ValheimServerLogger Logger => this.ServerLogger;
+        public ValheimServerLogger Logger => ServerLogger;
 
         public ServerStatus Status
         {
-            get => this._status;
+            get => _status;
             private set
             {
-                if (this._status == value) return;
-                this._status = value;
-                this.StatusChanged?.Invoke(this, value);
+                if (_status == value) return;
+                _status = value;
+                StatusChanged?.Invoke(this, value);
             }
         }
         private ServerStatus _status = ServerStatus.Stopped;
@@ -44,30 +44,27 @@ namespace ValheimServerGUI.Game
         public event EventHandler<string> InviteCodeReady;
         public event EventHandler<EventLogContext> LogReceived;
 
-        public bool CanStart => this.IsAnyStatus(ServerStatus.Stopped) && this.ProcessKey == null;
-        public bool CanStop => this.IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && this.ProcessKey != null;
-        public bool CanRestart => this.IsAnyStatus(ServerStatus.Running) && this.ProcessKey != null;
+        public bool CanStart => IsAnyStatus(ServerStatus.Stopped) && ProcessKey == null;
+        public bool CanStop => IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && ProcessKey != null;
+        public bool CanRestart => IsAnyStatus(ServerStatus.Running) && ProcessKey != null;
 
         private readonly IProcessProvider ProcessProvider;
-        private readonly IValheimFileProvider FileProvider;
         private readonly IPlayerDataRepository PlayerDataRepository;
         private readonly ValheimServerLogger ServerLogger;
         private readonly IEventLogger ApplicationLogger;
 
         public ValheimServer(
             IProcessProvider processProvider,
-            IValheimFileProvider fileProvider,
             IPlayerDataRepository playerDataRepository,
             ValheimServerLogger serverLogger,
             IEventLogger appLogger)
         {
-            this.ProcessProvider = processProvider;
-            this.FileProvider = fileProvider;
-            this.PlayerDataRepository = playerDataRepository;
-            this.ServerLogger = serverLogger;
-            this.ApplicationLogger = appLogger;
+            ProcessProvider = processProvider;
+            PlayerDataRepository = playerDataRepository;
+            ServerLogger = serverLogger;
+            ApplicationLogger = appLogger;
 
-            this.ServerLogger.LogReceived += this.Logger_OnServerLogReceived;
+            ServerLogger.LogReceived += Logger_OnServerLogReceived;
 
             InitializeLogBasedActions();
             InitializeStatusBasedActions();
@@ -78,30 +75,30 @@ namespace ValheimServerGUI.Game
         private void InitializeLogBasedActions()
         {
 
-            LogBasedActions.Add(@"Game server connected", this.OnServerConnected);
-            LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", this.OnWorldSaved);
-            LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", this.OnCrossplayJoinCodeAvailable);
+            LogBasedActions.Add(@"Game server connected", OnServerConnected);
+            LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", OnWorldSaved);
+            LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", OnCrossplayJoinCodeAvailable);
 
             // Connecting
-            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", this.OnPlayerConnecting);
-            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID Steam_(\d+?)$", this.OnPlayerConnecting); // Crossplay
+            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", OnPlayerConnecting);
+            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID Steam_(\d+?)$", OnPlayerConnecting); // Crossplay
 
             // Connected - NOTE: ZDOID can be a negative number, account for that w/ regex!
-            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", this.OnPlayerConnected);
+            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", OnPlayerConnected);
 
             // Disconnecting
-            LogBasedActions.Add(@"Peer (\d+?) has wrong password", this.OnPlayerDisconnecting);
+            LogBasedActions.Add(@"Peer (\d+?) has wrong password", OnPlayerDisconnecting);
 
             // Disconnected
-            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", this.OnPlayerDisconnected); // This is technically "disconnecting" but it's the best terminator I can find
-            LogBasedActions.Add(@"Destroying abandoned non persistent zdo ([\d-]+?):.*$", this.OnPlayerDisconnected); // Crossplay
+            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", OnPlayerDisconnected); // This is technically "disconnecting" but it's the best terminator I can find
+            LogBasedActions.Add(@"Destroying abandoned non persistent zdo ([\d-]+?):.*$", OnPlayerDisconnected); // Crossplay
         }
 
         private void InitializeStatusBasedActions()
         {
-            this.StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () =>
+            StatusChanged += BuildStatusHandler(ServerStatus.Stopped, () =>
             {
-                if (this.IsRestarting)
+                if (IsRestarting)
                 {
                     // There are no more server events to listen to after it has stopped, so
                     // we're just going to artifically delay here to allow any shutdown actions to finish
@@ -109,10 +106,10 @@ namespace ValheimServerGUI.Game
                     {
                         await Task.Delay(500);
 
-                        if (!this.IsRestarting) return;
+                        if (!IsRestarting) return;
 
-                        this.IsRestarting = false;
-                        this.Start(this.Options);
+                        IsRestarting = false;
+                        Start(Options);
                     });
                 }
             });
@@ -135,31 +132,31 @@ namespace ValheimServerGUI.Game
         /// </summary>
         public void Start(IValheimServerOptions options)
         {
-            if (!this.CanStart) return;
+            if (!CanStart) return;
 
-            this.ApplicationLogger.LogInformation("Starting server: {name}", options.Name);
+            ApplicationLogger.LogInformation("Starting server: {name}", options.Name);
 
-            var exePath = this.FileProvider.ServerExe.FullName;
-            var processArgs = this.GenerateArgs(options);
-            this.ApplicationLogger.LogInformation(@"Server run command: ""{exePath}"" {processArgs}", exePath, processArgs);
+            var exePath = options.GetValidatedServerExe().FullName;
+            var processArgs = GenerateArgs(options);
+            ApplicationLogger.LogInformation(@"Server run command: ""{exePath}"" {processArgs}", exePath, processArgs);
 
-            this.ProcessKey = Guid.NewGuid().ToString();
-            var process = this.ProcessProvider.AddBackgroundProcess(this.ProcessKey, exePath, processArgs);
+            ProcessKey = Guid.NewGuid().ToString();
+            var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
 
             process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
-            process.OutputDataReceived += this.Process_OnDataReceived;
-            process.ErrorDataReceived += this.Process_OnErrorReceived;
+            process.OutputDataReceived += Process_OnDataReceived;
+            process.ErrorDataReceived += Process_OnErrorReceived;
             process.Exited += (obj, e) =>
             {
-                this.ProcessKey = null;
-                this.Status = ServerStatus.Stopped;
+                ProcessKey = null;
+                Status = ServerStatus.Stopped;
             };
 
             process.StartIO();
 
-            this.Options = options;
-            this.IsRestarting = false;
-            this.Status = ServerStatus.Starting;
+            Options = options;
+            IsRestarting = false;
+            Status = ServerStatus.Starting;
         }
 
         /// <summary>
@@ -167,14 +164,14 @@ namespace ValheimServerGUI.Game
         /// </summary>
         public void Stop()
         {
-            if (!this.CanStop) return;
+            if (!CanStop) return;
 
-            this.ApplicationLogger.LogInformation("Stopping server: {name}", this.Options.Name);
+            ApplicationLogger.LogInformation("Stopping server: {name}", Options.Name);
 
-            this.ProcessProvider.SafelyKillProcess(this.ProcessKey);
+            ProcessProvider.SafelyKillProcess(ProcessKey);
 
-            this.IsRestarting = false;
-            this.Status = ServerStatus.Stopping;
+            IsRestarting = false;
+            Status = ServerStatus.Stopping;
         }
 
         /// <summary>
@@ -183,20 +180,20 @@ namespace ValheimServerGUI.Game
         /// </summary>
         public void Restart(IValheimServerOptions options = null)
         {
-            if (!this.CanRestart) return;
+            if (!CanRestart) return;
 
-            this.ApplicationLogger.LogInformation("Restarting server: {name}", this.Options.Name);
+            ApplicationLogger.LogInformation("Restarting server: {name}", Options.Name);
 
-            this.ProcessProvider.SafelyKillProcess(this.ProcessKey);
+            ProcessProvider.SafelyKillProcess(ProcessKey);
 
-            this.Options = options ?? this.Options;
-            this.IsRestarting = true;
-            this.Status = ServerStatus.Stopping;
+            Options = options ?? Options;
+            IsRestarting = true;
+            Status = ServerStatus.Stopping;
         }
 
         public bool IsAnyStatus(params ServerStatus[] statuses)
         {
-            return statuses.Any(s => s == this.Status);
+            return statuses.Any(s => s == Status);
         }
 
         #endregion
@@ -215,7 +212,7 @@ namespace ValheimServerGUI.Game
 
         private void Logger_OnServerLogReceived(object obj, EventLogContext context)
         {
-            foreach (var kvp in this.LogBasedActions)
+            foreach (var kvp in LogBasedActions)
             {
                 var match = Regex.Match(context.Message, kvp.Key, RegexOptions.IgnoreCase);
                 if (!match.Success) continue;
@@ -228,11 +225,11 @@ namespace ValheimServerGUI.Game
                 }
                 catch (Exception e)
                 {
-                    this.ApplicationLogger.LogError(e, "Error parsing server log: {message}", context.Message);
+                    ApplicationLogger.LogError(e, "Error parsing server log: {message}", context.Message);
                 }
             }
 
-            this.LogReceived?.Invoke(obj, context);
+            LogReceived?.Invoke(obj, context);
         }
 
         #endregion
@@ -244,9 +241,9 @@ namespace ValheimServerGUI.Game
             // The server can reach a running state if you attempt to stop it late in the 
             // startup process, so avoid changing status from "Stopping" -> "Running".
             // It will still stop after it fully starts up.
-            if (this.Status == ServerStatus.Stopping) return;
+            if (Status == ServerStatus.Stopping) return;
 
-            this.Status = ServerStatus.Running;
+            Status = ServerStatus.Running;
         }
 
         private void OnPlayerConnecting(object sender, EventLogContext context, params string[] captures)
@@ -254,7 +251,7 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            this.PlayerDataRepository.SetPlayerJoining(steamId);
+            PlayerDataRepository.SetPlayerJoining(steamId);
         }
 
         private void OnPlayerConnected(object sender, EventLogContext context, params string[] captures)
@@ -265,7 +262,7 @@ namespace ValheimServerGUI.Game
 
             if (string.IsNullOrWhiteSpace(playerName)) return;
 
-            this.PlayerDataRepository.SetPlayerOnline(playerName, zdoid);
+            PlayerDataRepository.SetPlayerOnline(playerName, zdoid);
         }
 
         private void OnPlayerDisconnecting(object sender, EventLogContext context, params string[] captures)
@@ -273,7 +270,7 @@ namespace ValheimServerGUI.Game
             var steamOrZdoId = captures[0];
             if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
 
-            this.PlayerDataRepository.SetPlayerLeaving(steamOrZdoId);
+            PlayerDataRepository.SetPlayerLeaving(steamOrZdoId);
         }
 
         private void OnPlayerDisconnected(object sender, EventLogContext context, params string[] captures)
@@ -281,7 +278,7 @@ namespace ValheimServerGUI.Game
             var steamOrZdoId = captures[0];
             if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
 
-            this.PlayerDataRepository.SetPlayerOffline(steamOrZdoId);
+            PlayerDataRepository.SetPlayerOffline(steamOrZdoId);
         }
 
         private void OnWorldSaved(object sender, EventLogContext context, params string[] captures)
@@ -291,7 +288,7 @@ namespace ValheimServerGUI.Game
                 timeMs = 0;
             }
 
-            this.WorldSaved?.Invoke(this, timeMs);
+            WorldSaved?.Invoke(this, timeMs);
         }
 
         private void OnCrossplayJoinCodeAvailable(object sender, EventLogContext context, params string[] captures)
@@ -299,7 +296,7 @@ namespace ValheimServerGUI.Game
             var inviteCode = captures[0];
             if (string.IsNullOrWhiteSpace(inviteCode)) return;
 
-            this.InviteCodeReady?.Invoke(this, inviteCode);
+            InviteCodeReady?.Invoke(this, inviteCode);
         }
 
         #endregion
@@ -308,7 +305,7 @@ namespace ValheimServerGUI.Game
 
         public void Dispose()
         {
-            this.Stop();
+            Stop();
 
             GC.SuppressFinalize(this);
         }
@@ -317,11 +314,16 @@ namespace ValheimServerGUI.Game
 
         #region Helper methods
 
-        private string GenerateArgs(IValheimServerOptions options)
+        private static string GenerateArgs(IValheimServerOptions options)
         {
-            var saveDataFolder = this.FileProvider.SaveDataFolder.FullName;
+            var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;
             var publicFlag = options.Public ? 1 : 0;
-            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -password ""{options.Password}"" -public {publicFlag} -savedir ""{saveDataFolder}"" -saveinterval {options.SaveInterval} -backups {options.Backups} -backupshort {options.BackupShort} -backuplong {options.BackupLong}";
+            var processArgs = @$"-nographics -batchmode -name ""{options.Name}"" -port {options.Port} -world ""{options.WorldName}"" -public {publicFlag} -savedir ""{saveDataFolder}"" -saveinterval {options.SaveInterval} -backups {options.Backups} -backupshort {options.BackupShort} -backuplong {options.BackupLong}";
+
+            if (!string.IsNullOrWhiteSpace(options.Password))
+            {
+                processArgs += @$" -password ""{options.Password}""";
+            }
 
             if (options.Crossplay)
             {

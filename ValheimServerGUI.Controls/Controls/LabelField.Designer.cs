@@ -49,7 +49,7 @@ namespace ValheimServerGUI.Controls
             this.ValueLabel.Location = new System.Drawing.Point(73, 0);
             this.ValueLabel.Name = "ValueLabel";
             this.ValueLabel.Size = new System.Drawing.Size(64, 15);
-            this.ValueLabel.TabIndex = 1;
+            this.ValueLabel.TabIndex = 0;
             // 
             // HelpLabel
             // 
@@ -59,7 +59,8 @@ namespace ValheimServerGUI.Controls
             this.HelpLabel.Location = new System.Drawing.Point(138, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 2;
+            this.HelpLabel.TabIndex = 0;
+            this.HelpLabel.TabStop = false;
             // 
             // LabelField
             // 

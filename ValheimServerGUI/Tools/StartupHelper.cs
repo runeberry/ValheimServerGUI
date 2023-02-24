@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.Win32;
+using System;
 using System.Security;
 using System.Windows.Forms;
-using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
 
 namespace ValheimServerGUI.Tools
 {

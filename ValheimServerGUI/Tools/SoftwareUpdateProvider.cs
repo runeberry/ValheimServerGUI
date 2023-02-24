@@ -28,18 +28,18 @@ namespace ValheimServerGUI.Tools
             string latestVersion,
             bool isManualCheck)
         {
-            this.LatestVersion = latestVersion;
-            this.IsManualCheck = isManualCheck;
-            this.IsSuccessful = true;
+            LatestVersion = latestVersion;
+            IsManualCheck = isManualCheck;
+            IsSuccessful = true;
         }
 
         public SoftwareUpdateEventArgs(
             Exception e,
             bool isManualCheck)
         {
-            this.Exception = e;
-            this.IsManualCheck = isManualCheck;
-            this.IsSuccessful = false;
+            Exception = e;
+            IsManualCheck = isManualCheck;
+            IsSuccessful = false;
         }
     }
 
@@ -53,8 +53,8 @@ namespace ValheimServerGUI.Tools
 
         public SoftwareUpdateProvider(IGitHubClient gitHubClient, IUserPreferencesProvider userPrefsProvider)
         {
-            this.GitHubClient = gitHubClient;
-            this.UserPrefsProvider = userPrefsProvider;
+            GitHubClient = gitHubClient;
+            UserPrefsProvider = userPrefsProvider;
         }
 
         public event EventHandler UpdateCheckStarted;
@@ -67,22 +67,22 @@ namespace ValheimServerGUI.Tools
             {
                 // Only fulfill automated checks if enough time has passed since the last check
                 var now = DateTime.UtcNow;
-                if (now < this.NextAutomaticUpdateCheck) return;
-                this.NextAutomaticUpdateCheck = now + this.UpdateCheckInterval;
+                if (now < NextAutomaticUpdateCheck) return;
+                NextAutomaticUpdateCheck = now + UpdateCheckInterval;
 
                 // Only fulfill automated checks if the user has update checks enabled
-                var prefs = this.UserPrefsProvider.LoadPreferences();
+                var prefs = UserPrefsProvider.LoadPreferences();
                 if (!prefs.CheckForUpdates) return;
             }
 
-            this.UpdateCheckStarted?.Invoke(this, EventArgs.Empty);
+            UpdateCheckStarted?.Invoke(this, EventArgs.Empty);
 
             SoftwareUpdateEventArgs eventArgs;
 
             try
             {
                 var currentVersion = AssemblyHelper.GetApplicationVersion();
-                var release = await this.GitHubClient.GetLatestReleaseAsync();
+                var release = await GitHubClient.GetLatestReleaseAsync();
 
                 // In case there was no response from GitHub, consider the current running version as the "latest version"
                 var latestVersion = release?.TagName ?? AssemblyHelper.GetApplicationVersion();
@@ -94,7 +94,7 @@ namespace ValheimServerGUI.Tools
                 eventArgs = new SoftwareUpdateEventArgs(e, isManualCheck);
             }
 
-            this.UpdateCheckFinished?.Invoke(this, eventArgs);
+            UpdateCheckFinished?.Invoke(this, eventArgs);
         }
     }
 }

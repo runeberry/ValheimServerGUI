@@ -20,8 +20,8 @@ namespace ValheimServerGUI.Forms
 
         public PreferencesForm(IUserPreferencesProvider userPrefsProvider, ILogger logger) : this()
         {
-            this.UserPrefsProvider = userPrefsProvider;
-            this.Logger = logger;
+            UserPrefsProvider = userPrefsProvider;
+            Logger = logger;
         }
 
         protected override void OnShown(EventArgs e)
@@ -33,45 +33,45 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var prefs = UserPrefsProvider.LoadPreferences();
 
-            this.SaveProfileOnStartField.Value = prefs.SaveProfileOnStart;
-            this.CheckForUpdatesField.Value = prefs.CheckForUpdates;
-            this.StartWithWindowsField.Value = prefs.StartWithWindows;
-            this.StartMinimizedField.Value = prefs.StartMinimized;
+            SaveProfileOnStartField.Value = prefs.SaveProfileOnStart;
+            CheckForUpdatesField.Value = prefs.CheckForUpdates;
+            StartWithWindowsField.Value = prefs.StartWithWindows;
+            StartMinimizedField.Value = prefs.StartMinimized;
 
             var startupInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
-            this.CheckForUpdatesField.HelpText = this.CheckForUpdatesField.HelpText?.Replace("{startupInterval}", $"{startupInterval.TotalHours} hours");
+            CheckForUpdatesField.HelpText = CheckForUpdatesField.HelpText?.Replace("{startupInterval}", $"{startupInterval.TotalHours} hours");
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            var prefs = this.UserPrefsProvider.LoadPreferences();
+            var prefs = UserPrefsProvider.LoadPreferences();
 
-            prefs.SaveProfileOnStart = this.SaveProfileOnStartField.Value;
-            prefs.CheckForUpdates = this.CheckForUpdatesField.Value;
-            prefs.StartWithWindows = this.StartWithWindowsField.Value;
-            prefs.StartMinimized = this.StartMinimizedField.Value;
+            prefs.SaveProfileOnStart = SaveProfileOnStartField.Value;
+            prefs.CheckForUpdates = CheckForUpdatesField.Value;
+            prefs.StartWithWindows = StartWithWindowsField.Value;
+            prefs.StartMinimized = StartMinimizedField.Value;
 
-            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, this.Logger);
+            StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, Logger);
 
-            this.UserPrefsProvider.SavePreferences(prefs);
-            this.Close();
+            UserPrefsProvider.SavePreferences(prefs);
+            Close();
         }
 
         private void ButtonCancel_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         private void ButtonDefaults_Click(object sender, EventArgs e)
         {
             var prefs = UserPreferences.GetDefault();
 
-            this.SaveProfileOnStartField.Value = prefs.SaveProfileOnStart;
-            this.CheckForUpdatesField.Value = prefs.CheckForUpdates;
-            this.StartWithWindowsField.Value = prefs.StartWithWindows;
-            this.StartMinimizedField.Value = prefs.StartMinimized;
+            SaveProfileOnStartField.Value = prefs.SaveProfileOnStart;
+            CheckForUpdatesField.Value = prefs.CheckForUpdates;
+            StartWithWindowsField.Value = prefs.StartWithWindows;
+            StartMinimizedField.Value = prefs.StartMinimized;
         }
     }
 }

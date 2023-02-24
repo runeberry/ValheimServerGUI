@@ -4,10 +4,10 @@ using System.Windows.Forms;
 
 namespace ValheimServerGUI.Forms
 {
-    public partial class CopyButton : UserControl
+    public partial class RefreshButton : UserControl
     {
         [Browsable(false)]
-        public Func<string> CopyFunction { get; set; }
+        public Action RefreshFunction { get; set; }
 
         public string HelpText
         {
@@ -15,7 +15,7 @@ namespace ValheimServerGUI.Forms
             set => IconButton.HelpText = value;
         }
 
-        public CopyButton()
+        public RefreshButton()
         {
             InitializeComponent();
 
@@ -24,10 +24,9 @@ namespace ValheimServerGUI.Forms
 
         private bool OnIconClicked()
         {
-            var str = CopyFunction?.Invoke();
-            if (string.IsNullOrEmpty(str)) return false;
+            if (RefreshFunction == null) return false;
 
-            Clipboard.SetText(str);
+            RefreshFunction.Invoke();
             return true;
         }
     }

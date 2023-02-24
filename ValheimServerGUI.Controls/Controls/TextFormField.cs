@@ -13,26 +13,26 @@ namespace ValheimServerGUI.Forms.Controls
 
         public string LabelText
         {
-            get => this.Label.Text;
-            set => this.Label.Text = value;
+            get => Label.Text;
+            set => Label.Text = value;
         }
 
         [Editor("System.ComponentModel.Design.MultilineStringEditor", "System.Drawing.Design.UITypeEditor")]
         public string HelpText
         {
-            get => this.HelpLabel.Text;
-            set => this.HelpLabel.Text = value;
+            get => HelpLabel.Text;
+            set => HelpLabel.Text = value;
         }
 
         public string Value
         {
-            get => this.TextBox.Text;
+            get => TextBox.Text;
             set
             {
-                if (this.TextBox.Text == value) return;
+                if (TextBox.Text == value) return;
 
-                this.TextBox.Text = value;
-                this.ValueChanged?.Invoke(this, value);
+                TextBox.Text = value;
+                ValueChanged?.Invoke(this, value);
             }
         }
 
@@ -42,37 +42,37 @@ namespace ValheimServerGUI.Forms.Controls
 
         public bool HideValue
         {
-            get => this.TextBox.PasswordChar != PasswordCharDisabled;
-            set => this.TextBox.PasswordChar = value ? PasswordChar : PasswordCharDisabled;
+            get => TextBox.PasswordChar != PasswordCharDisabled;
+            set => TextBox.PasswordChar = value ? PasswordChar : PasswordCharDisabled;
         }
 
         public int MaxLength
         {
-            get => this.TextBox.MaxLength;
-            set => this.TextBox.MaxLength = value;
+            get => TextBox.MaxLength;
+            set => TextBox.MaxLength = value;
         }
 
         public bool Multiline
         {
-            get => this.TextBox.Multiline;
-            set => this.TextBox.Multiline = value;
+            get => TextBox.Multiline;
+            set => TextBox.Multiline = value;
         }
 
         public TextFormField()
         {
             InitializeComponent();
 
-            this.TextBox.TextChanged += this.OnTextChanged;
+            TextBox.TextChanged += OnTextChanged;
         }
 
         public void SelectAll()
         {
-            this.TextBox.SelectAll();
+            TextBox.SelectAll();
         }
 
         private void OnTextChanged(object sender, EventArgs args)
         {
-            this.ValueChanged?.Invoke(this, this.Value);
+            ValueChanged?.Invoke(this, Value);
         }
     }
 }

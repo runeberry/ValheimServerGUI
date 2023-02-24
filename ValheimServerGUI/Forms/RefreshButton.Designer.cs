@@ -1,6 +1,6 @@
 ﻿namespace ValheimServerGUI.Forms
 {
-    partial class CopyButton
+    partial class RefreshButton
     {
         /// <summary> 
         /// Required designer variable.
@@ -31,22 +31,23 @@
             this.IconButton = new ValheimServerGUI.Controls.IconButton();
             this.SuspendLayout();
             // 
-            // iconButton1
+            // IconButton
             // 
             this.IconButton.ConfirmImage = global::ValheimServerGUI.Properties.Resources.StatusOK_16x;
-            this.IconButton.HelpText = "";
-            this.IconButton.Image = global::ValheimServerGUI.Properties.Resources.Copy_16x;
+            this.IconButton.HelpText = "Refresh";
+            this.IconButton.IconClicked = null;
+            this.IconButton.Image = global::ValheimServerGUI.Properties.Resources.Restart_16x;
             this.IconButton.Location = new System.Drawing.Point(0, 0);
-            this.IconButton.Name = "iconButton1";
+            this.IconButton.Name = "IconButton";
             this.IconButton.Size = new System.Drawing.Size(16, 16);
             this.IconButton.TabIndex = 0;
             // 
-            // CopyButton
+            // RefreshButton
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.Controls.Add(this.IconButton);
-            this.Name = "CopyButton";
+            this.Name = "RefreshButton";
             this.Size = new System.Drawing.Size(16, 16);
             this.ResumeLayout(false);
 

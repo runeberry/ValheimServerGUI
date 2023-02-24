@@ -13,44 +13,44 @@ namespace ValheimServerGUI.Forms
 
         public PlayerDetailsForm(IPlayerDataRepository playerDataProvider)
         {
-            this.PlayerDataProvider = playerDataProvider;
+            PlayerDataProvider = playerDataProvider;
 
             InitializeComponent();
             this.AddApplicationIcon();
 
-            this.ButtonRefresh.Click += ButtonRefresh_Click;
-            this.ButtonOK.Click += ButtonOK_Click;
-            this.SteamIdCopyButton.CopyFunction = () => this.Player?.SteamId;
+            ButtonRefresh.Click += ButtonRefresh_Click;
+            ButtonOK.Click += ButtonOK_Click;
+            SteamIdCopyButton.CopyFunction = () => Player?.SteamId;
         }
 
         private void ButtonRefresh_Click(object sender, EventArgs e)
         {
-            this.RefreshPlayerData();
+            RefreshPlayerData();
         }
 
         private void ButtonOK_Click(object sender, EventArgs e)
         {
-            this.Close();
+            Close();
         }
 
         public void SetPlayerData(PlayerInfo player)
         {
             // Pull fresh data from provider
-            Player = this.PlayerDataProvider.FindById(player.Key);
-            this.RefreshPlayerData();
+            Player = PlayerDataProvider.FindById(player.Key);
+            RefreshPlayerData();
         }
 
         public void RefreshPlayerData()
         {
-            if (this.Player == null) return;
-            
-            this.PlayerNameField.Value = this.Player.PlayerName ?? "(unknown)";
-            this.SteamIdField.Value = this.Player.SteamId;
-            this.ZdoIdField.Value = this.Player.ZdoId ?? "N/A";
-            this.OnlineStatusField.Value = this.Player.PlayerStatus.ToString();
-            this.StatusChangedField.Value = new TimeAgo(this.Player.LastStatusChange).ToString();
+            if (Player == null) return;
 
-            this.SteamIdWarningIcon.Visible = !this.Player.MatchConfident;
+            PlayerNameField.Value = Player.PlayerName ?? "(unknown)";
+            SteamIdField.Value = Player.SteamId;
+            ZdoIdField.Value = Player.ZdoId ?? "N/A";
+            OnlineStatusField.Value = Player.PlayerStatus.ToString();
+            StatusChangedField.Value = new TimeAgo(Player.LastStatusChange).ToString();
+
+            SteamIdWarningIcon.Visible = !Player.MatchConfident;
         }
     }
 }

@@ -14,13 +14,13 @@ namespace ValheimServerGUI.Controls
         private string _logView = DefaultLogView;
         public string LogView
         {
-            get => this._logView;
+            get => _logView;
             set
             {
                 value ??= DefaultLogView;
-                if (value == this._logView) return;
-                this._logView = value;
-                this.LogViewChanged?.Invoke(this, EventArgs.Empty);
+                if (value == _logView) return;
+                _logView = value;
+                LogViewChanged?.Invoke(this, EventArgs.Empty);
             }
         }
 
@@ -32,64 +32,64 @@ namespace ValheimServerGUI.Controls
         {
             InitializeComponent();
 
-            this.LogViewChanged += this.OnLogViewChanged;
+            LogViewChanged += OnLogViewChanged;
         }
 
         public void AddLog(string message)
         {
-            this.AddLogToView(message, DefaultLogView);
+            AddLogToView(message, DefaultLogView);
         }
 
         public void AddLogToView(string message, string viewName)
         {
-            message = this.StoreLog(message, viewName);
+            message = StoreLog(message, viewName);
 
-            if (viewName == this.LogView)
+            if (viewName == LogView)
             {
-                this.AppendLine(message);
+                AppendLine(message);
             }
         }
 
         public void ClearLogs()
         {
-            this.LogsByView.Clear();            
-            
-            this.ClearLines();
+            LogsByView.Clear();
+
+            ClearLines();
         }
 
         public void ClearLogView(string viewName)
         {
-            if (viewName == null || !this.LogsByView.TryGetValue(viewName, out var logs)) return;
+            if (viewName == null || !LogsByView.TryGetValue(viewName, out var logs)) return;
 
             logs.Clear();
 
-            if (viewName == this.LogView)
+            if (viewName == LogView)
             {
-                this.ClearLines();
+                ClearLines();
             }
         }
 
         public string GetCurrentViewText()
         {
-            return this.TextBox.Text;
+            return TextBox.Text;
         }
 
         #region Non-public methods
 
         private string StoreLog(string message, string viewName)
         {
-            if (!this.LogsByView.TryGetValue(viewName, out var list))
+            if (!LogsByView.TryGetValue(viewName, out var list))
             {
                 list = new List<string>();
-                if (!this.LogsByView.TryAdd(viewName, list))
+                if (!LogsByView.TryAdd(viewName, list))
                 {
-                    list = this.LogsByView[viewName];
+                    list = LogsByView[viewName];
                 }
             }
 
-            if (this.TimestampFormat != null)
+            if (!string.IsNullOrWhiteSpace(TimestampFormat))
             {
-                message = $"[{DateTime.Now.ToString(this.TimestampFormat)}] {message}";
+                message = $"[{DateTime.Now.ToString(TimestampFormat)}] {message}";
             }
 
             list.Add(message);
@@ -101,30 +101,30 @@ namespace ValheimServerGUI.Controls
         {
             if (line == null) return;
 
-            if (this.TextBox.Text == null || this.TextBox.Text.Length == 0)
+            if (TextBox.Text == null || TextBox.Text.Length == 0)
             {
-                this.TextBox.Text = line;
+                TextBox.Text = line;
             }
             else
             {
-                this.TextBox.AppendText(Environment.NewLine + line);
+                TextBox.AppendText(Environment.NewLine + line);
             }
         }
 
         private void ClearLines()
         {
-            this.TextBox.Text = string.Empty;
+            TextBox.Text = string.Empty;
         }
 
         private void OnLogViewChanged(object sender, EventArgs args)
         {
-            this.ClearLines();
+            ClearLines();
 
-            if (this.LogsByView.TryGetValue(this.LogView, out var logs))
+            if (LogsByView.TryGetValue(LogView, out var logs))
             {
                 var logString = string.Join(Environment.NewLine, logs);
 
-                this.AppendLine(logString);
+                AppendLine(logString);
             }
         }
 

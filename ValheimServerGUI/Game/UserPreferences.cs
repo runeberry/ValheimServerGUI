@@ -8,11 +8,12 @@ namespace ValheimServerGUI.Game
     {
         public static UserPreferences GetDefault() => new();
 
-        public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
+        // (jb, 2/19/23) This field was recorded, but never used.
+        //public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
 
-        public string ValheimServerPath { get; set; } = Resources.DefaultServerPath;
+        public string ServerExePath { get; set; } = Resources.DefaultServerPath;
 
-        public string ValheimSaveDataFolder { get; set; } = Resources.DefaultValheimSaveFolder;
+        public string SaveDataFolderPath { get; set; } = Resources.DefaultValheimSaveFolder;
 
         public bool CheckForUpdates { get; set; } = true;
 
@@ -30,9 +31,8 @@ namespace ValheimServerGUI.Game
 
             if (file == null) return prefs;
 
-            prefs.ValheimGamePath = file.ValheimGamePath ?? prefs.ValheimGamePath;
-            prefs.ValheimServerPath = file.ValheimServerPath ?? prefs.ValheimServerPath;
-            prefs.ValheimSaveDataFolder = file.ValheimSaveDataFolder ?? prefs.ValheimSaveDataFolder;
+            prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
+            prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
             prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
@@ -54,19 +54,18 @@ namespace ValheimServerGUI.Game
         {
             var file = new UserPreferencesFile
             {
-                ValheimGamePath = this.ValheimGamePath,
-                ValheimServerPath = this.ValheimServerPath,
-                ValheimSaveDataFolder = this.ValheimSaveDataFolder,
-                CheckForUpdates = this.CheckForUpdates,
-                StartWithWindows = this.StartWithWindows,
-                StartMinimized = this.StartMinimized,
-                SaveProfileOnStart = this.SaveProfileOnStart,
+                ServerExePath = ServerExePath,
+                SaveDataFolderPath = SaveDataFolderPath,
+                CheckForUpdates = CheckForUpdates,
+                StartWithWindows = StartWithWindows,
+                StartMinimized = StartMinimized,
+                SaveProfileOnStart = SaveProfileOnStart,
                 Servers = new(),
             };
 
-            if (this.Servers != null)
+            if (Servers != null)
             {
-                var servers = this.Servers
+                var servers = Servers
                     .Select(p => p.ToFile())
                     .Where(p => !string.IsNullOrWhiteSpace(p.ProfileName)) // Remove profiles with no name
                     .DistinctBy(p => p.ProfileName); // Remove duplicate entries by profile name

@@ -45,7 +45,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonCancel.Location = new System.Drawing.Point(272, 182);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 3;
+            this.ButtonCancel.TabIndex = 6;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             this.ButtonCancel.Click += new System.EventHandler(this.ButtonCancel_Click);
@@ -56,7 +56,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonOK.Location = new System.Drawing.Point(191, 182);
             this.ButtonOK.Name = "ButtonOK";
             this.ButtonOK.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOK.TabIndex = 4;
+            this.ButtonOK.TabIndex = 5;
             this.ButtonOK.Text = "OK";
             this.ButtonOK.UseVisualStyleBackColor = true;
             this.ButtonOK.Click += new System.EventHandler(this.ButtonOK_Click);
@@ -67,7 +67,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonDefaults.Location = new System.Drawing.Point(12, 182);
             this.ButtonDefaults.Name = "ButtonDefaults";
             this.ButtonDefaults.Size = new System.Drawing.Size(111, 23);
-            this.ButtonDefaults.TabIndex = 5;
+            this.ButtonDefaults.TabIndex = 4;
             this.ButtonDefaults.Text = "Restore Defaults";
             this.ButtonDefaults.UseVisualStyleBackColor = true;
             this.ButtonDefaults.Click += new System.EventHandler(this.ButtonDefaults_Click);
@@ -79,7 +79,7 @@ namespace ValheimServerGUI.Forms
             this.CheckForUpdatesField.Location = new System.Drawing.Point(12, 35);
             this.CheckForUpdatesField.Name = "CheckForUpdatesField";
             this.CheckForUpdatesField.Size = new System.Drawing.Size(334, 17);
-            this.CheckForUpdatesField.TabIndex = 9;
+            this.CheckForUpdatesField.TabIndex = 1;
             this.CheckForUpdatesField.Value = false;
             // 
             // SaveProfileOnStartField
@@ -90,7 +90,7 @@ namespace ValheimServerGUI.Forms
             this.SaveProfileOnStartField.Location = new System.Drawing.Point(12, 12);
             this.SaveProfileOnStartField.Name = "SaveProfileOnStartField";
             this.SaveProfileOnStartField.Size = new System.Drawing.Size(334, 17);
-            this.SaveProfileOnStartField.TabIndex = 10;
+            this.SaveProfileOnStartField.TabIndex = 0;
             this.SaveProfileOnStartField.Value = false;
             // 
             // StartWithWindowsField
@@ -102,7 +102,7 @@ namespace ValheimServerGUI.Forms
             this.StartWithWindowsField.Location = new System.Drawing.Point(12, 58);
             this.StartWithWindowsField.Name = "StartWithWindowsField";
             this.StartWithWindowsField.Size = new System.Drawing.Size(334, 17);
-            this.StartWithWindowsField.TabIndex = 11;
+            this.StartWithWindowsField.TabIndex = 2;
             this.StartWithWindowsField.Value = false;
             // 
             // StartMinimizedField
@@ -112,7 +112,7 @@ namespace ValheimServerGUI.Forms
             this.StartMinimizedField.Location = new System.Drawing.Point(12, 81);
             this.StartMinimizedField.Name = "StartMinimizedField";
             this.StartMinimizedField.Size = new System.Drawing.Size(334, 17);
-            this.StartMinimizedField.TabIndex = 12;
+            this.StartMinimizedField.TabIndex = 3;
             this.StartMinimizedField.Value = false;
             // 
             // PreferencesForm

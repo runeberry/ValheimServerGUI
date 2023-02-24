@@ -41,7 +41,7 @@ namespace ValheimServerGUI.Controls
             this.Label.Location = new System.Drawing.Point(9, 0);
             this.Label.Name = "Label";
             this.Label.Size = new System.Drawing.Size(35, 15);
-            this.Label.TabIndex = 2;
+            this.Label.TabIndex = 0;
             this.Label.Text = "Label";
             // 
             // NumericUpDown
@@ -51,7 +51,7 @@ namespace ValheimServerGUI.Controls
             this.NumericUpDown.Location = new System.Drawing.Point(9, 18);
             this.NumericUpDown.Name = "NumericUpDown";
             this.NumericUpDown.Size = new System.Drawing.Size(57, 23);
-            this.NumericUpDown.TabIndex = 3;
+            this.NumericUpDown.TabIndex = 0;
             // 
             // HelpLabel
             // 
@@ -61,7 +61,8 @@ namespace ValheimServerGUI.Controls
             this.HelpLabel.Location = new System.Drawing.Point(54, 0);
             this.HelpLabel.Name = "HelpLabel";
             this.HelpLabel.Size = new System.Drawing.Size(12, 15);
-            this.HelpLabel.TabIndex = 7;
+            this.HelpLabel.TabIndex = 0;
+            this.HelpLabel.TabStop = false;
             // 
             // NumericFormField
             // 

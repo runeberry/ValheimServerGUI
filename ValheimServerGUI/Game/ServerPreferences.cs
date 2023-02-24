@@ -33,6 +33,10 @@ namespace ValheimServerGUI.Game
 
         public string AdditionalArgs { get; set; }
 
+        public string ServerExePath { get; set; }
+
+        public string SaveDataFolderPath { get; set; }
+
         public static ServerPreferences FromFile(ServerPreferencesFile file)
         {
             var prefs = new ServerPreferences();
@@ -53,6 +57,8 @@ namespace ValheimServerGUI.Game
             prefs.BackupIntervalLong = file.BackupIntervalLong ?? prefs.BackupIntervalLong;
             prefs.AutoStart = file.AutoStart ?? prefs.AutoStart;
             prefs.AdditionalArgs = file.AdditionalArgs ?? prefs.AdditionalArgs;
+            prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
+            prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
 
             return prefs;
         }
@@ -61,20 +67,22 @@ namespace ValheimServerGUI.Game
         {
             var file = new ServerPreferencesFile
             {
-                ProfileName = this.ProfileName,
-                LastSaved = this.LastSaved,
-                Name = this.Name,
-                Password = this.Password,
-                WorldName = this.WorldName,
-                Community = this.Public,
-                Port = this.Port,
-                Crossplay = this.Crossplay,
-                SaveInterval = this.SaveInterval,
-                BackupCount = this.BackupCount,
-                BackupIntervalShort = this.BackupIntervalShort,
-                BackupIntervalLong = this.BackupIntervalLong,
-                AutoStart = this.AutoStart,
-                AdditionalArgs = this.AdditionalArgs,
+                ProfileName = ProfileName,
+                LastSaved = LastSaved,
+                Name = Name,
+                Password = Password,
+                WorldName = WorldName,
+                Community = Public,
+                Port = Port,
+                Crossplay = Crossplay,
+                SaveInterval = SaveInterval,
+                BackupCount = BackupCount,
+                BackupIntervalShort = BackupIntervalShort,
+                BackupIntervalLong = BackupIntervalLong,
+                AutoStart = AutoStart,
+                AdditionalArgs = AdditionalArgs,
+                ServerExePath = ServerExePath,
+                SaveDataFolderPath = SaveDataFolderPath,
             };
 
             return file;

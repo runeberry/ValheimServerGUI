@@ -61,7 +61,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonOK.Location = new System.Drawing.Point(202, 120);
             this.ButtonOK.Name = "ButtonOK";
             this.ButtonOK.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOK.TabIndex = 1;
+            this.ButtonOK.TabIndex = 7;
             this.ButtonOK.Text = "OK";
             this.ButtonOK.UseVisualStyleBackColor = true;
             // 
@@ -72,7 +72,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonRefresh.Location = new System.Drawing.Point(173, 120);
             this.ButtonRefresh.Name = "ButtonRefresh";
             this.ButtonRefresh.Size = new System.Drawing.Size(23, 23);
-            this.ButtonRefresh.TabIndex = 2;
+            this.ButtonRefresh.TabIndex = 6;
             this.ButtonRefresh.UseVisualStyleBackColor = true;
             // 
             // SteamIdField
@@ -85,7 +85,7 @@ namespace ValheimServerGUI.Forms
             this.SteamIdField.Location = new System.Drawing.Point(12, 33);
             this.SteamIdField.Name = "SteamIdField";
             this.SteamIdField.Size = new System.Drawing.Size(240, 15);
-            this.SteamIdField.TabIndex = 3;
+            this.SteamIdField.TabIndex = 1;
             this.SteamIdField.Value = "";
             this.SteamIdField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -98,7 +98,7 @@ namespace ValheimServerGUI.Forms
             this.ZdoIdField.Location = new System.Drawing.Point(12, 54);
             this.ZdoIdField.Name = "ZdoIdField";
             this.ZdoIdField.Size = new System.Drawing.Size(240, 15);
-            this.ZdoIdField.TabIndex = 4;
+            this.ZdoIdField.TabIndex = 3;
             this.ZdoIdField.Value = "";
             this.ZdoIdField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -111,7 +111,7 @@ namespace ValheimServerGUI.Forms
             this.OnlineStatusField.Location = new System.Drawing.Point(12, 75);
             this.OnlineStatusField.Name = "OnlineStatusField";
             this.OnlineStatusField.Size = new System.Drawing.Size(240, 15);
-            this.OnlineStatusField.TabIndex = 5;
+            this.OnlineStatusField.TabIndex = 4;
             this.OnlineStatusField.Value = "";
             this.OnlineStatusField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -124,7 +124,7 @@ namespace ValheimServerGUI.Forms
             this.StatusChangedField.Location = new System.Drawing.Point(12, 96);
             this.StatusChangedField.Name = "StatusChangedField";
             this.StatusChangedField.Size = new System.Drawing.Size(240, 15);
-            this.StatusChangedField.TabIndex = 6;
+            this.StatusChangedField.TabIndex = 5;
             this.StatusChangedField.Value = "";
             this.StatusChangedField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
@@ -144,7 +144,9 @@ namespace ValheimServerGUI.Forms
             this.SteamIdCopyButton.Location = new System.Drawing.Point(258, 34);
             this.SteamIdCopyButton.Name = "SteamIdCopyButton";
             this.SteamIdCopyButton.Size = new System.Drawing.Size(16, 16);
-            this.SteamIdCopyButton.TabIndex = 9;
+            this.SteamIdCopyButton.TabIndex = 2;
+            this.SteamIdCopyButton.TabStop = false;
+            this.SteamIdCopyButton.HelpText = "Copy Steam ID to clipboard";
             // 
             // PlayerDetailsForm
             // 

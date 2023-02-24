@@ -19,7 +19,7 @@ namespace ValheimServerGUI.Tools
 
         public async Task SendCrashReportAsync(CrashReport report)
         {
-            var response = await this.Post($"{Resources.UrlRuneberryApi}/crash-report", report)
+            var response = await Post($"{Resources.UrlRuneberryApi}/crash-report", report)
                 .WithHeader(Secrets.RuneberryApiKeyHeader, Secrets.RuneberryClientApiKey)
                 .SendAsync();
 

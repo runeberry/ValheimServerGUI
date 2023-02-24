@@ -42,7 +42,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonCancel.Location = new System.Drawing.Point(272, 182);
             this.ButtonCancel.Name = "ButtonCancel";
             this.ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            this.ButtonCancel.TabIndex = 0;
+            this.ButtonCancel.TabIndex = 3;
             this.ButtonCancel.Text = "Cancel";
             this.ButtonCancel.UseVisualStyleBackColor = true;
             // 
@@ -53,7 +53,7 @@ namespace ValheimServerGUI.Forms
             this.ButtonSubmit.Location = new System.Drawing.Point(191, 182);
             this.ButtonSubmit.Name = "ButtonSubmit";
             this.ButtonSubmit.Size = new System.Drawing.Size(75, 23);
-            this.ButtonSubmit.TabIndex = 1;
+            this.ButtonSubmit.TabIndex = 2;
             this.ButtonSubmit.Text = "Submit";
             this.ButtonSubmit.UseVisualStyleBackColor = true;
             // 
@@ -69,7 +69,7 @@ namespace ValheimServerGUI.Forms
             this.ContactInfoField.Multiline = false;
             this.ContactInfoField.Name = "ContactInfoField";
             this.ContactInfoField.Size = new System.Drawing.Size(334, 41);
-            this.ContactInfoField.TabIndex = 2;
+            this.ContactInfoField.TabIndex = 1;
             this.ContactInfoField.Value = "";
             // 
             // BugReportField
@@ -85,7 +85,7 @@ namespace ValheimServerGUI.Forms
             this.BugReportField.Multiline = true;
             this.BugReportField.Name = "BugReportField";
             this.BugReportField.Size = new System.Drawing.Size(334, 117);
-            this.BugReportField.TabIndex = 4;
+            this.BugReportField.TabIndex = 0;
             this.BugReportField.Value = "";
             // 
             // BugReportForm

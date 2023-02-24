@@ -27,30 +27,30 @@ namespace ValheimServerGUI.Tests
 
         public BaseTest()
         {
-            this.ServiceCollection = new ServiceCollection();
-            Program.ConfigureServices(this.ServiceCollection, Array.Empty<string>());
+            ServiceCollection = new ServiceCollection();
+            Program.ConfigureServices(ServiceCollection, Array.Empty<string>());
 
-            this.MockDataFileProvider = new();
-            this.MockProcessProvider = new();
-            this.MockHttpClientProvider = new();
-            this.MockUserPreferencesProvider = new();
+            MockDataFileProvider = new();
+            MockProcessProvider = new();
+            MockHttpClientProvider = new();
+            MockUserPreferencesProvider = new();
 
-            this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IFileProvider>(this.MockDataFileProvider));
-            this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IProcessProvider>(this.MockProcessProvider));
-            this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IHttpClientProvider>(this.MockHttpClientProvider));
-            this.ServiceCollection.Replace(ServiceDescriptor.Singleton<IUserPreferencesProvider>(this.MockUserPreferencesProvider));
+            ServiceCollection.Replace(ServiceDescriptor.Singleton<IFileProvider>(MockDataFileProvider));
+            ServiceCollection.Replace(ServiceDescriptor.Singleton<IProcessProvider>(MockProcessProvider));
+            ServiceCollection.Replace(ServiceDescriptor.Singleton<IHttpClientProvider>(MockHttpClientProvider));
+            ServiceCollection.Replace(ServiceDescriptor.Singleton<IUserPreferencesProvider>(MockUserPreferencesProvider));
 
-            this.ServiceProvider = this.ServiceCollection.BuildServiceProvider();
+            ServiceProvider = ServiceCollection.BuildServiceProvider();
         }
 
         protected TService GetService<TService>()
         {
-            return this.ServiceProvider.GetRequiredService<TService>();
+            return ServiceProvider.GetRequiredService<TService>();
         }
 
         protected TForm GetForm<TForm>() where TForm : Form
         {
-            var formProvider = this.ServiceProvider.GetRequiredService<IFormProvider>();
+            var formProvider = ServiceProvider.GetRequiredService<IFormProvider>();
             return formProvider.GetForm<TForm>();
         }
     }

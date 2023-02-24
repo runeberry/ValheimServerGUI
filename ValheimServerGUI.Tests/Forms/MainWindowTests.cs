@@ -8,7 +8,7 @@ namespace ValheimServerGUI.Tests.Forms
         [Fact]
         public void CanConstructMainWindow()
         {
-            this.GetForm<MainWindow>();
+            GetForm<MainWindow>();
         }
     }
 }

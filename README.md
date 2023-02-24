@@ -4,7 +4,7 @@ A simple user interface for running a [Valheim](https://www.valheimgame.com/) De
 
 Download the [latest release here](https://github.com/runeberry/ValheimServerGUI/releases). It's just a single, small .exe file!
 
-Need help? You can find support articles in the [Online Manual here](https://github.com/runeberry/ValheimServerGUI/wiki).
+Need help? Join our [Discord server](https://discord.gg/HBsNJTY) to ask questions or give feedback, or check out [Online Manual](https://github.com/runeberry/ValheimServerGUI/wiki) for answers to some common questions.
 
 **Disclaimer:** _This is a fan-made project. Runeberry Software is not affiliated with Valheim or Iron Gate Studio in any official capacity. Use at your own risk!_
 
@@ -23,7 +23,7 @@ Need help? You can find support articles in the [Online Manual here](https://git
 
 In order to run ValheimServerGUI, you will need the following:
 
-* **Windows 10 x64-based PC** - Other Windows configurations may or may not work. 🤷‍♀
+* **Windows 10 or 11 x64-based PC** - Other Windows configurations may or may not work. 🤷‍♀
 * **.NET 6 Desktop Runtime** - If you don't have it, you should be prompted to install it when you first run this app. Otherwise, you can install the latest release [here](https://dotnet.microsoft.com/download/dotnet/6.0) (under ".NET Desktop Runtime 6.X.X").
 * **Valheim Dedicated Server** - Comes free with your purchase of Valheim. See the installation guide [here](https://github.com/runeberry/ValheimServerGUI/wiki/Installing-Valheim-Dedicated-Server).
 
@@ -63,6 +63,7 @@ Interesting in contributing code to ValheimServerGUI? Check out the guidelines a
 
 Got suggestions, feedback, or want to report a bug? Here's how you can reach me:
 
+* Post in the **#vsg-support** channel on our [Discord](https://discord.gg/HBsNJTY) server.
 * Create a [GitHub issue](https://github.com/runeberry/ValheimServerGUI/issues/new) - Include as many details as you can for bug reports!
 * Submit a bug report in the app itself (Help > Submit a Bug Report). This will include logs & machine info to help troubleshoot the problem.
 * Send me an email - feedback@runeberry.com

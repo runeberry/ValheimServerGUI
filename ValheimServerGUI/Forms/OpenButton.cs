@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Windows.Forms;
 using ValheimServerGUI.Tools;
 
@@ -6,7 +7,14 @@ namespace ValheimServerGUI.Forms
 {
     public partial class OpenButton : UserControl
     {
+        [Browsable(false)]
         public Func<string> PathFunction { get; set; }
+
+        public string HelpText
+        {
+            get => IconButton.HelpText;
+            set => IconButton.HelpText = value;
+        }
 
         public OpenButton()
         {

@@ -11,7 +11,6 @@ namespace ValheimServerGUI.Controls
 
         public Image ConfirmImage { get; set; }
 
-        [EditorBrowsable(EditorBrowsableState.Never)]
         [Browsable(false)]
         public Func<bool> IconClicked { get; set; }
 

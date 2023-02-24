@@ -65,6 +65,8 @@ namespace ValheimServerGUI.Forms
             this.CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.ServerCrossplayField = new ValheimServerGUI.Controls.CheckboxFormField();
             this.WorldSelectGroupBox = new System.Windows.Forms.GroupBox();
+            this.WorldsListRefreshButton = new ValheimServerGUI.Forms.RefreshButton();
+            this.WorldsFolderOpenButton = new ValheimServerGUI.Forms.OpenButton();
             this.WorldSelectNewNameField = new ValheimServerGUI.Forms.Controls.TextFormField();
             this.WorldSelectRadioNew = new ValheimServerGUI.Controls.RadioFormField();
             this.WorldSelectRadioExisting = new ValheimServerGUI.Controls.RadioFormField();
@@ -429,6 +431,8 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldSelectGroupBox
             // 
+            this.WorldSelectGroupBox.Controls.Add(this.WorldsListRefreshButton);
+            this.WorldSelectGroupBox.Controls.Add(this.WorldsFolderOpenButton);
             this.WorldSelectGroupBox.Controls.Add(this.WorldSelectNewNameField);
             this.WorldSelectGroupBox.Controls.Add(this.WorldSelectRadioNew);
             this.WorldSelectGroupBox.Controls.Add(this.WorldSelectRadioExisting);
@@ -440,6 +444,26 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectGroupBox.TabStop = false;
             this.WorldSelectGroupBox.Text = "World";
             // 
+            // WorldsListRefreshButton
+            // 
+            this.WorldsListRefreshButton.HelpText = "Refresh the worlds list";
+            this.WorldsListRefreshButton.Location = new System.Drawing.Point(188, 23);
+            this.WorldsListRefreshButton.Name = "WorldsListRefreshButton";
+            this.WorldsListRefreshButton.RefreshFunction = null;
+            this.WorldsListRefreshButton.Size = new System.Drawing.Size(16, 16);
+            this.WorldsListRefreshButton.TabIndex = 2;
+            this.WorldsListRefreshButton.TabStop = false;
+            // 
+            // WorldsFolderOpenButton
+            // 
+            this.WorldsFolderOpenButton.HelpText = "Open the save data folder in Explorer";
+            this.WorldsFolderOpenButton.Location = new System.Drawing.Point(210, 23);
+            this.WorldsFolderOpenButton.Name = "WorldsFolderOpenButton";
+            this.WorldsFolderOpenButton.PathFunction = null;
+            this.WorldsFolderOpenButton.Size = new System.Drawing.Size(16, 16);
+            this.WorldsFolderOpenButton.TabIndex = 3;
+            this.WorldsFolderOpenButton.TabStop = false;
+            // 
             // WorldSelectNewNameField
             // 
             this.WorldSelectNewNameField.HelpText = "";
@@ -450,7 +474,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectNewNameField.Multiline = false;
             this.WorldSelectNewNameField.Name = "WorldSelectNewNameField";
             this.WorldSelectNewNameField.Size = new System.Drawing.Size(234, 41);
-            this.WorldSelectNewNameField.TabIndex = 3;
+            this.WorldSelectNewNameField.TabIndex = 5;
             this.WorldSelectNewNameField.Value = "";
             this.WorldSelectNewNameField.Visible = false;
             // 
@@ -458,10 +482,10 @@ namespace ValheimServerGUI.Forms
             // 
             this.WorldSelectRadioNew.GroupName = "WorldSelect";
             this.WorldSelectRadioNew.HelpText = "";
-            this.WorldSelectRadioNew.LabelText = "Create New";
-            this.WorldSelectRadioNew.Location = new System.Drawing.Point(117, 22);
+            this.WorldSelectRadioNew.LabelText = "New";
+            this.WorldSelectRadioNew.Location = new System.Drawing.Point(82, 23);
             this.WorldSelectRadioNew.Name = "WorldSelectRadioNew";
-            this.WorldSelectRadioNew.Size = new System.Drawing.Size(111, 17);
+            this.WorldSelectRadioNew.Size = new System.Drawing.Size(65, 17);
             this.WorldSelectRadioNew.TabIndex = 1;
             this.WorldSelectRadioNew.Value = false;
             // 
@@ -469,10 +493,10 @@ namespace ValheimServerGUI.Forms
             // 
             this.WorldSelectRadioExisting.GroupName = "WorldSelect";
             this.WorldSelectRadioExisting.HelpText = "";
-            this.WorldSelectRadioExisting.LabelText = "Use Existing";
+            this.WorldSelectRadioExisting.LabelText = "Existing";
             this.WorldSelectRadioExisting.Location = new System.Drawing.Point(6, 22);
             this.WorldSelectRadioExisting.Name = "WorldSelectRadioExisting";
-            this.WorldSelectRadioExisting.Size = new System.Drawing.Size(105, 17);
+            this.WorldSelectRadioExisting.Size = new System.Drawing.Size(83, 17);
             this.WorldSelectRadioExisting.TabIndex = 0;
             this.WorldSelectRadioExisting.Value = false;
             // 
@@ -486,7 +510,7 @@ namespace ValheimServerGUI.Forms
             this.WorldSelectExistingNameField.Location = new System.Drawing.Point(6, 45);
             this.WorldSelectExistingNameField.Name = "WorldSelectExistingNameField";
             this.WorldSelectExistingNameField.Size = new System.Drawing.Size(234, 41);
-            this.WorldSelectExistingNameField.TabIndex = 2;
+            this.WorldSelectExistingNameField.TabIndex = 4;
             this.WorldSelectExistingNameField.Value = null;
             this.WorldSelectExistingNameField.Visible = false;
             // 
@@ -719,6 +743,7 @@ namespace ValheimServerGUI.Forms
             // ServerSaveDataPathOpenButton
             // 
             this.ServerSaveDataPathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerSaveDataPathOpenButton.HelpText = "Open this folder in Explorer";
             this.ServerSaveDataPathOpenButton.Location = new System.Drawing.Point(285, 90);
             this.ServerSaveDataPathOpenButton.Name = "ServerSaveDataPathOpenButton";
             this.ServerSaveDataPathOpenButton.PathFunction = null;
@@ -729,6 +754,7 @@ namespace ValheimServerGUI.Forms
             // ServerExePathOpenButton
             // 
             this.ServerExePathOpenButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.ServerExePathOpenButton.HelpText = "Open this folder in Explorer";
             this.ServerExePathOpenButton.Location = new System.Drawing.Point(285, 43);
             this.ServerExePathOpenButton.Name = "ServerExePathOpenButton";
             this.ServerExePathOpenButton.PathFunction = null;
@@ -1302,5 +1328,7 @@ namespace ValheimServerGUI.Forms
         private System.Windows.Forms.ToolStripMenuItem MenuItemFileDirectories;
         private OpenButton ServerSaveDataPathOpenButton;
         private OpenButton ServerExePathOpenButton;
+        private OpenButton WorldsFolderOpenButton;
+        private RefreshButton WorldsListRefreshButton;
     }
 }

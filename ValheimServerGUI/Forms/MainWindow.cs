@@ -179,6 +179,8 @@ namespace ValheimServerGUI.Forms
             ButtonPlayerDetails.Click += ButtonPlayerDetails_Click;
             ButtonRemovePlayer.Click += ButtonRemovePlayer_Click;
             CopyButtonServerPassword.CopyFunction = () => ServerPasswordField.Value;
+            WorldsListRefreshButton.RefreshFunction = WorldsListRefreshButton_Click;
+            WorldsFolderOpenButton.PathFunction = () => GetServerOptionsFromFormState().SaveDataFolderPath;
             CopyButtonExternalIpAddress.CopyFunction = () => LabelExternalIpAddress.Value;
             CopyButtonInternalIpAddress.CopyFunction = () => LabelInternalIpAddress.Value;
             CopyButtonLocalIpAddress.CopyFunction = () => LabelLocalIpAddress.Value;
@@ -640,6 +642,17 @@ namespace ValheimServerGUI.Forms
             RefocusWindow();
         }
 
+        private void WorldsListRefreshButton_Click()
+        {
+            RefreshWorldSelect();
+
+            if (!WorldSelectRadioExisting.Value)
+            {
+                // Switch to the world list after refreshing it
+                WorldSelectRadioExisting.Value = true;
+            }
+        }
+
         #endregion
 
         #region Service Events
@@ -901,7 +914,10 @@ namespace ValheimServerGUI.Forms
             ServerNameField.Enabled = allowServerChanges;
             ServerPortField.Enabled = allowServerChanges;
             ServerPasswordField.Enabled = allowServerChanges;
-            WorldSelectGroupBox.Enabled = allowServerChanges;
+            WorldSelectRadioNew.Enabled = allowServerChanges;
+            WorldSelectRadioExisting.Enabled = allowServerChanges;
+            WorldSelectExistingNameField.Enabled = allowServerChanges;
+            WorldSelectNewNameField.Enabled = allowServerChanges;
             CommunityServerField.Enabled = allowServerChanges;
             ServerCrossplayField.Enabled = allowServerChanges;
             ServerSaveIntervalField.Enabled = allowServerChanges;

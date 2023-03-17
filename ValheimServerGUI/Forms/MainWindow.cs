@@ -510,7 +510,7 @@ namespace ValheimServerGUI.Forms
 
             var dialog = new SaveFileDialog
             {
-                FileName = $"{LogViewer.LogView}Logs-{DateTime.Now:u}.txt",
+                FileName = $"{LogViewer.LogView}Logs-{DateTime.Now:yyyy-MM-dd_HH-mm-ssZ}.txt",
                 Filter = "Text Files (*.txt)|*.txt",
                 CheckPathExists = true,
                 RestoreDirectory = true,

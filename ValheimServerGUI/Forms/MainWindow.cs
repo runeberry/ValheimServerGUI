@@ -106,7 +106,6 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeServices()
         {
-            Logger.LogReceived += this.BuildActionHandler<string>(OnApplicationLogReceived);
             Server.StatusChanged += this.BuildEventHandler<ServerStatus>(OnServerStatusChanged);
             Server.WorldSaved += this.BuildEventHandler<decimal>(OnWorldSaved);
             Server.InviteCodeReady += this.BuildEventHandler<string>(OnInviteCodeReady);
@@ -190,6 +189,14 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
+            // Write message backlog to application log view...
+            foreach (var message in Logger.LogBuffer)
+            {
+                LogViewer.AddLogToView(message, LogViews.Application);
+            }
+            // ...then write all new messages to that log view.
+            Logger.LogReceived += this.BuildActionHandler<string>(OnApplicationLogReceived);
+
             LogViewSelectField.DataSource = new[] { LogViews.Server, LogViews.Application };
             LogViewSelectField.Value = LogViews.Server;
             ServerExePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");

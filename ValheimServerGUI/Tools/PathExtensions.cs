@@ -45,5 +45,31 @@ namespace ValheimServerGUI.Tools
 
             return new DirectoryInfo(path);
         }
+
+        public static string GetValidFileName(string filename, bool addTimestamp = false)
+        {
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                return "file";
+            }
+
+            if (filename.Length > 150)
+            {
+                // Max filename length is likely closer to 255, but I'm just gonna play it safe
+                filename = filename[..150];
+            }
+
+            if (addTimestamp)
+            {
+                filename = $"{filename}_{DateTime.Now.ToFilenameISOFormat()}";
+            }
+
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                filename = filename.Replace(c, '-');
+            }
+
+            return filename;
+        }
     }
 }

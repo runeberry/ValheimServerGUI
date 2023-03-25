@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -54,11 +53,11 @@ namespace ValheimServerGUI.Game
                 // If we have no offline record of this player, create a new record
                 player = new PlayerInfo { SteamId = steamId };
 
-                Logger.LogInformation("1 player joining for SteamID {id} (new player)", steamId);
+                Logger.Information("1 player joining for SteamID {id} (new player)", steamId);
             }
             else
             {
-                Logger.LogInformation("1 player joining for SteamID {id} (existing player)", steamId);
+                Logger.Information("1 player joining for SteamID {id} (existing player)", steamId);
             }
 
             player.PlayerStatus = PlayerStatus.Joining;
@@ -87,7 +86,7 @@ namespace ValheimServerGUI.Game
             {
                 // One player record with this name has been seen in the past with this name, so use it
                 player = playersWithSameName.Single();
-                Logger.LogInformation("(PlayerOnline) Player {name} belongs to SteamID {id} (Single match by name)", name, player.SteamId);
+                Logger.Information("(PlayerOnline) Player {name} belongs to SteamID {id} (Single match by name)", name, player.SteamId);
 
                 if (player.PlayerStatus == PlayerStatus.Offline)
                 {
@@ -105,7 +104,7 @@ namespace ValheimServerGUI.Game
                         }
                         playersToSave.Add(wrongJoiningPlayer);
 
-                        Logger.LogInformation("Player {name} was not logging in after all, reverting to offline status", wrongJoiningPlayer.PlayerName);
+                        Logger.Information("Player {name} was not logging in after all, reverting to offline status", wrongJoiningPlayer.PlayerName);
                     }
                 }
             }
@@ -119,19 +118,19 @@ namespace ValheimServerGUI.Game
                 {
                     // If one of those is joining, assume that's the right player
                     player = joiningPlayersWithSameName.Single();
-                    Logger.LogInformation("(PlayerOnline) Player {name} belongs to SteamID {id} (Single joining by name)", name, player.SteamId);
+                    Logger.Information("(PlayerOnline) Player {name} belongs to SteamID {id} (Single joining by name)", name, player.SteamId);
                 }
                 else
                 {
                     // Otherwise, we cannot reliably pick which of the players by this name we should update
-                    Logger.LogInformation("Cannot resolve SteamID for Player {name} (Multiple joining w/ same name)", name);
+                    Logger.Information("Cannot resolve SteamID for Player {name} (Multiple joining w/ same name)", name);
                 }
             }
             else if (joiningPlayers.Count() == 1)
             {
                 // No players were found joining or offline w/ this name, but there is only one joining player, so we can confirm this match
                 player = joiningPlayers.Single();
-                Logger.LogInformation("(PlayerOnline) Player {name} belongs to SteamID {id} (Single player joining)", name, player.SteamId);
+                Logger.Information("(PlayerOnline) Player {name} belongs to SteamID {id} (Single player joining)", name, player.SteamId);
 
                 if (player.PlayerName == null)
                 {
@@ -148,7 +147,7 @@ namespace ValheimServerGUI.Game
                     }
                     playersToSave.Add(player);
 
-                    Logger.LogInformation("Player {name} was not logging in after all, reverting to offline status", player.PlayerName);
+                    Logger.Information("Player {name} was not logging in after all, reverting to offline status", player.PlayerName);
 
                     var steamId = player.SteamId;
                     player = new PlayerInfo { SteamId = steamId, PlayerName = name };
@@ -156,7 +155,7 @@ namespace ValheimServerGUI.Game
             }
             else
             {
-                Logger.LogInformation("Cannot resolve SteamID for Player {name} (Multiple players joining, no match by name)", name);
+                Logger.Information("Cannot resolve SteamID for Player {name} (Multiple players joining, no match by name)", name);
             }
 
             if (player != null)
@@ -182,20 +181,20 @@ namespace ValheimServerGUI.Game
                         playersToSave.Add(jp);
                     }
 
-                    Logger.LogInformation("(PlayerOnline) {count} anonymous player(s) entering Online status", remainingPlayers.Count());
+                    Logger.Information("(PlayerOnline) {count} anonymous player(s) entering Online status", remainingPlayers.Count());
                 }
             }
 
             if (playersToRemove.Any())
             {
                 RemoveBulk(playersToRemove);
-                Logger.LogInformation("{count} player(s) removed", playersToSave.Count);
+                Logger.Information("{count} player(s) removed", playersToSave.Count);
             }
 
             if (playersToSave.Any())
             {
                 UpsertBulk(playersToSave);
-                Logger.LogInformation("{count} player(s) saved", playersToSave.Count);
+                Logger.Information("{count} player(s) saved", playersToSave.Count);
             }
 
             return player;
@@ -219,7 +218,7 @@ namespace ValheimServerGUI.Game
 
                 UpsertBulk(players);
 
-                Logger.LogInformation("{count} player(s) Leaving for SteamID {id}", players.Count, steamOrZdoId);
+                Logger.Information("{count} player(s) Leaving for SteamID {id}", players.Count, steamOrZdoId);
             }
         }
 
@@ -241,7 +240,7 @@ namespace ValheimServerGUI.Game
 
                 UpsertBulk(players);
 
-                Logger.LogInformation("{count} player(s) Offline for SteamID {id}", players.Count, steamOrZdoId);
+                Logger.Information("{count} player(s) Offline for SteamID {id}", players.Count, steamOrZdoId);
             }
         }
 

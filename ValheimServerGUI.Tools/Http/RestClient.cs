@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Serilog;
 using System.Net.Http;
 
 namespace ValheimServerGUI.Tools.Http

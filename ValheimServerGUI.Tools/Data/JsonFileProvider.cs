@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Serilog;
 using System;
 using System.IO;
 using System.Threading;
@@ -56,7 +56,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                Logger.LogException(e, $"Error loading JSON data from file: {filePath}");
+                Logger.Error(e, "Error loading JSON data from file: {filePath}", filePath);
             }
             finally
             {
@@ -89,7 +89,7 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                Logger.LogException(e, $"Error saving JSON data to file: {filePath}");
+                Logger.Error(e, "Error saving JSON data to file: {filePath}", filePath);
             }
             finally
             {

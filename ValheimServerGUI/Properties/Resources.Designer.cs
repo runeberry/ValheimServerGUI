@@ -251,6 +251,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\logs.
+        /// </summary>
+        internal static string LogsFolderPath {
+            get {
+                return ResourceManager.GetString("LogsFolderPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap NewBug_16x {

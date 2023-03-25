@@ -26,8 +26,6 @@ namespace ValheimServerGUI.Controls
 
         public event EventHandler LogViewChanged;
 
-        public string TimestampFormat { get; set; }
-
         public LogViewer()
         {
             InitializeComponent();
@@ -85,11 +83,6 @@ namespace ValheimServerGUI.Controls
                 {
                     list = LogsByView[viewName];
                 }
-            }
-
-            if (!string.IsNullOrWhiteSpace(TimestampFormat))
-            {
-                message = $"[{DateTime.Now.ToString(TimestampFormat)}] {message}";
             }
 
             list.Add(message);

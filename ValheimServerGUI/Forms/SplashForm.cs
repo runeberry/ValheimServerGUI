@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -99,7 +99,7 @@ namespace ValheimServerGUI.Forms
             mainWindow.SplashIndex = MainWindows.Count;
 
             MainWindows.Add(mainWindow);
-            Logger.LogDebug("Created {name} [{index}] for profile {name}", nameof(MainWindow), mainWindow.SplashIndex, startProfile);
+            Logger.Debug("Created {name} [{index}] for profile {name}", nameof(MainWindow), mainWindow.SplashIndex, startProfile);
 
             return mainWindow;
         }
@@ -161,7 +161,7 @@ namespace ValheimServerGUI.Forms
 
                 if (!task.IsCompletedSuccessfully)
                 {
-                    Logger.LogWarning("Error encountered during startup task");
+                    Logger.Warning("Error encountered during startup task");
                     HandleException(task.Exception, "Startup Task Exception", true);
                     return;
                 }
@@ -208,18 +208,18 @@ namespace ValheimServerGUI.Forms
 
             if (sender is not MainWindow mainWindow) return;
 
-            Logger.LogDebug("Closed {name} [{index}]", nameof(MainWindow), mainWindow.SplashIndex);
+            Logger.Debug("Closed {name} [{index}]", nameof(MainWindow), mainWindow.SplashIndex);
 
             MainWindows[mainWindow.SplashIndex] = null;
             var stillOpen = MainWindows.Count(m => m != null);
             if (stillOpen > 0)
             {
 
-                Logger.LogDebug("{stillOpen} windows are still open", stillOpen);
+                Logger.Debug("{stillOpen} windows are still open", stillOpen);
                 return;
             }
 
-            Logger.LogDebug($"All windows closed, shutting down application");
+            Logger.Debug($"All windows closed, shutting down application");
             Close();
         }
 
@@ -233,7 +233,7 @@ namespace ValheimServerGUI.Forms
             var autoStartServers = allPrefs.Where(p => p != null && p.AutoStart);
             if (autoStartServers.Any())
             {
-                Logger.LogInformation("Loading server profiles with auto-start enabled");
+                Logger.Information("Loading server profiles with auto-start enabled");
                 foreach (var autoStartServer in autoStartServers)
                 {
                     CreateNewMainWindow(autoStartServer.ProfileName, true);
@@ -244,14 +244,14 @@ namespace ValheimServerGUI.Forms
             var lastSavedServer = allPrefs.OrderByDescending(p => p.LastSaved).FirstOrDefault();
             if (lastSavedServer != null)
             {
-                Logger.LogInformation("Loading most recently saved profile: {name}", lastSavedServer.ProfileName);
+                Logger.Information("Loading most recently saved profile: {name}", lastSavedServer.ProfileName);
                 CreateNewMainWindow(lastSavedServer.ProfileName, false);
                 return;
             }
 
             var newPrefs = new ServerPreferences { ProfileName = Resources.DefaultServerProfileName };
             ServerPrefsProvider.SavePreferences(newPrefs);
-            Logger.LogInformation("User preferences not found, creating new file");
+            Logger.Information("User preferences not found, creating new file");
             CreateNewMainWindow(newPrefs.ProfileName, false);
         }
 
@@ -259,12 +259,12 @@ namespace ValheimServerGUI.Forms
         {
             StartupTasks.Add(async () =>
             {
-                Logger.LogDebug("Starting startup task: {name}", taskName);
+                Logger.Debug("Starting startup task: {name}", taskName);
                 var sw = Stopwatch.StartNew();
 
                 await taskFunc();
 
-                Logger.LogDebug("Finished startup task: {name} ({dur}ms)", taskName, sw.ElapsedMilliseconds);
+                Logger.Debug("Finished startup task: {name} ({dur}ms)", taskName, sw.ElapsedMilliseconds);
             });
         }
 
@@ -315,7 +315,7 @@ namespace ValheimServerGUI.Forms
 
             if (dotnetVersion.Major < 6)
             {
-                Logger.LogWarning($"Incompatible .NET version detected: {dotnetVersion}");
+                Logger.Warning("Incompatible .NET version detected: {dotnetVersion}", dotnetVersion);
 
                 var nl = Environment.NewLine;
                 var result = MessageBox.Show(
@@ -339,7 +339,7 @@ namespace ValheimServerGUI.Forms
 
         private void HandleException(Exception exception, string contextMessage, bool closeAfterHandle)
         {
-            Logger.LogError($"Encountered exception - {exception.GetType().Name}: {exception.Message}");
+            Logger.Error("Encountered exception - {typeName}: {message}", exception.GetType().Name, exception.Message);
 
             CloseAfterExceptionHandled = closeAfterHandle;
 

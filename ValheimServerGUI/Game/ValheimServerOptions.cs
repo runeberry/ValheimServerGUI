@@ -30,6 +30,8 @@ namespace ValheimServerGUI.Game
 
         public string SaveDataFolderPath { get; set; }
 
+        public Action<string> LogMessageHandler { get; set; }
+
         public void Validate()
         {
             // Ensure all required fields exist
@@ -94,5 +96,7 @@ namespace ValheimServerGUI.Game
         string ServerExePath { get; }
 
         string SaveDataFolderPath { get; }
+
+        Action<string> LogMessageHandler { get; }
     }
 }

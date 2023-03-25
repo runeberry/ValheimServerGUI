@@ -15,7 +15,7 @@ namespace ValheimServerGUI.Forms
             try
             {
                 VersionLabel.Text = $"Version: {AssemblyHelper.GetApplicationVersion()}";
-                VersionLabel.Text += $"{Environment.NewLine}Build Date: {AssemblyHelper.GetApplicationBuildDate().ToUniversalTime():yyyy-MM-ddTHH:mm:ssZ}";
+                VersionLabel.Text += $"{Environment.NewLine}Build Date: {AssemblyHelper.GetApplicationBuildDate().ToUniversalTime().ToDisplayISOFormat()}";
             }
             catch { }
         }

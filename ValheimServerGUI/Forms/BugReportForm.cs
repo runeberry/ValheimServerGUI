@@ -11,11 +11,11 @@ namespace ValheimServerGUI.Forms
     {
         private readonly IRuneberryApiClient RuneberryApiClient;
 
-        private readonly IEventLogger Logger;
+        private readonly IApplicationLogger Logger;
 
         public BugReportForm(
             IRuneberryApiClient runeberryApiClient,
-            IEventLogger logger)
+            IApplicationLogger logger)
         {
             RuneberryApiClient = runeberryApiClient;
             Logger = logger;

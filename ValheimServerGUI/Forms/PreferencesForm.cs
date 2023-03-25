@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Serilog;
 using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;

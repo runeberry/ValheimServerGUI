@@ -18,9 +18,9 @@ namespace ValheimServerGUI.Tools
     {
         private readonly IRuneberryApiClient RuneberryApiClient;
 
-        private readonly IEventLogger Logger;
+        private readonly IApplicationLogger Logger;
 
-        public ExceptionHandler(IRuneberryApiClient runeberryApiClient, IEventLogger logger)
+        public ExceptionHandler(IRuneberryApiClient runeberryApiClient, IApplicationLogger logger)
         {
             RuneberryApiClient = runeberryApiClient;
             Logger = logger;

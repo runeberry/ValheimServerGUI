@@ -71,9 +71,10 @@ namespace ValheimServerGUI.Serverless.Controllers
                 statusCode = 500;
             }
 
-            Logger.LogException(exception, $"{exception.GetType().Name} occurred during S3 upload");
-            Logger.LogError(exception.Message);
-            Logger.LogError(exception.StackTrace);
+            Logger.LogError(exception, "An exception of type '{typeName}' occurred during S3 upload\n{message}\n{stackTrace}",
+                exception.GetType().Name,
+                exception.Message,
+                exception.StackTrace);
 
             return StatusCode(statusCode, new { message = exception.Message });
         }

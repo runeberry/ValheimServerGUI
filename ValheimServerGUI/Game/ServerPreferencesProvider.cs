@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -47,7 +47,7 @@ namespace ValheimServerGUI.Game
             }
             else if (prefs.Count > 1)
             {
-                Logger.LogWarning($"Multiple configurations found for server '{profileName}'. Returning the most recently updated one.");
+                Logger.Warning("Multiple configurations found for server '{profileName}'. Returning the most recently updated one.", profileName);
                 return prefs.OrderByDescending(p => p.LastSaved).First();
             }
 
@@ -72,7 +72,7 @@ namespace ValheimServerGUI.Game
             preferences.LastSaved = DateTime.UtcNow;
 
             UserPreferencesProvider.SavePreferences(userPrefs);
-            Logger.LogInformation("Saved preferences for server profile: {profileName}", preferences.ProfileName);
+            Logger.Information("Saved preferences for server profile: {profileName}", preferences.ProfileName);
         }
 
         public void RemovePreferences(string profileName)
@@ -87,7 +87,7 @@ namespace ValheimServerGUI.Game
                 userPrefs.Servers.RemoveAll(p => p.ProfileName == profileName);
 
                 UserPreferencesProvider.SavePreferences(userPrefs);
-                Logger.LogInformation("Removed preferences for server profile: {profileName}", profileName);
+                Logger.Information("Removed preferences for server profile: {profileName}", profileName);
             }
         }
 

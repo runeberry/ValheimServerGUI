@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Linq;
 using ValheimServerGUI.Game;
 using Xunit;
@@ -19,6 +18,7 @@ namespace ValheimServerGUI.Tests.Game
         public ValheimServerTests()
         {
             Server = GetService<ValheimServer>();
+            Server.Logger.SetFileLoggingEnabled(false); // todo: get from user preferences in server
             PlayerDataRepository = GetService<IPlayerDataRepository>();
         }
 
@@ -222,7 +222,7 @@ namespace ValheimServerGUI.Tests.Game
 
         private void Log(string message, params object[] args)
         {
-            Server.Logger.LogInformation(string.Format(message, args));
+            Server.Logger.Information(message, args);
         }
 
         private static PlayerInfo CreatePlayer(

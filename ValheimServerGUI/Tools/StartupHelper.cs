@@ -1,5 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
+using Serilog;
 using System;
 using System.Security;
 using System.Windows.Forms;
@@ -33,7 +33,7 @@ namespace ValheimServerGUI.Tools
                 }
                 else if (!startupPath.Equals(Application.ExecutablePath, StringComparison.OrdinalIgnoreCase))
                 {
-                    logger.LogInformation("ValheimServerGUI executable path has changed, removing old registry entry...");
+                    logger.Information("ValheimServerGUI executable path has changed, removing old registry entry...");
                     if (RemoveFromStartup(Application.ProductName, logger))
                     {
                         runOnStartup = true;
@@ -42,7 +42,7 @@ namespace ValheimServerGUI.Tools
 
                 if (runOnStartup && RunOnStartup(Application.ProductName, Application.ExecutablePath, logger))
                 {
-                    logger.LogInformation("ValheimServerGUI will now run on Windows startup");
+                    logger.Information("ValheimServerGUI will now run on Windows startup");
                     return true;
                 }
             }
@@ -50,7 +50,7 @@ namespace ValheimServerGUI.Tools
             {
                 if (RemoveFromStartup(Application.ProductName, logger))
                 {
-                    logger.LogInformation("ValheimServerGUI will no longer run on Windows startup");
+                    logger.Information("ValheimServerGUI will no longer run on Windows startup");
                     return true;
                 }
             }
@@ -74,11 +74,11 @@ namespace ValheimServerGUI.Tools
             }
             catch (SecurityException)
             {
-                logger.LogWarning($"{nameof(RunOnStartup)}: No LocalMachine access (not Administrator), trying CurrentUser...");
+                logger.Warning($"{nameof(RunOnStartup)}: No LocalMachine access (not Administrator), trying CurrentUser...");
             }
             catch (Exception e)
             {
-                logger.LogException(e, $"{nameof(RunOnStartup)}: Failed to set LocalMachine registry key, trying CurrentUser...");
+                logger.Error(e, $"{nameof(RunOnStartup)}: Failed to set LocalMachine registry key, trying CurrentUser...");
             }
 
             try
@@ -88,7 +88,7 @@ namespace ValheimServerGUI.Tools
             }
             catch (Exception e)
             {
-                logger.LogException(e, $"{nameof(RunOnStartup)}: Failed to set CurrentUser registry key");
+                logger.Error(e, $"{nameof(RunOnStartup)}: Failed to set CurrentUser registry key");
                 return false;
             }
             return true;
@@ -110,11 +110,11 @@ namespace ValheimServerGUI.Tools
             }
             catch (SecurityException)
             {
-                logger.LogWarning($"{nameof(RemoveFromStartup)}: No LocalMachine access (not Administrator), trying CurrentUser...");
+                logger.Warning($"{nameof(RemoveFromStartup)}: No LocalMachine access (not Administrator), trying CurrentUser...");
             }
             catch (Exception e)
             {
-                logger.LogException(e, $"{nameof(RemoveFromStartup)}: Failed to set LocalMachine registry key, trying CurrentUser...");
+                logger.Error(e, $"{nameof(RemoveFromStartup)}: Failed to set LocalMachine registry key, trying CurrentUser...");
             }
 
             try
@@ -125,7 +125,7 @@ namespace ValheimServerGUI.Tools
             }
             catch (Exception e)
             {
-                logger.LogException(e, $"{nameof(RemoveFromStartup)}: Failed to set CurrentUser registry key");
+                logger.Error(e, $"{nameof(RemoveFromStartup)}: Failed to set CurrentUser registry key");
             }
 
             return false;
@@ -147,11 +147,11 @@ namespace ValheimServerGUI.Tools
             }
             catch (SecurityException)
             {
-                logger.LogWarning($"{nameof(GetStartupPath)}: No LocalMachine access (not Administrator), trying CurrentUser...");
+                logger.Warning($"{nameof(GetStartupPath)}: No LocalMachine access (not Administrator), trying CurrentUser...");
             }
             catch (Exception e)
             {
-                logger.LogException(e, $"{nameof(GetStartupPath)}: Failed to read LocalMachine registry key, trying CurrentUser...");
+                logger.Error(e, $"{nameof(GetStartupPath)}: Failed to read LocalMachine registry key, trying CurrentUser...");
             }
 
             try
@@ -161,7 +161,7 @@ namespace ValheimServerGUI.Tools
             }
             catch (Exception e)
             {
-                logger.LogException(e, $"{nameof(GetStartupPath)}: Failed to read CurrentUser registry key");
+                logger.Error(e, $"{nameof(GetStartupPath)}: Failed to read CurrentUser registry key");
             }
 
             return null;

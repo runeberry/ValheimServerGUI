@@ -65,6 +65,10 @@ namespace ValheimServerGUI.Game
             if (SaveInterval > BackupShort || SaveInterval > BackupLong) throw new ArgumentException($"Save interval must be less than or equal to the backup intervals.");
             if (BackupShort > BackupLong) throw new ArgumentException($"Short backup interval must be less than or equal to the long backup interval.");
 
+            // Additional args
+            // Using the native -logFile command will prevent logs from being piped to VSG, so don't allow it.
+            if (AdditionalArgs.ToLower().Contains("-logfile")) throw new ArgumentException($"ValheimServerGUI does not support the '-logFile' server argument. Instead, enable writing server logs to file under Advanced Controls.");
+
             // Filepaths
             this.GetValidatedServerExe();
             this.GetValidatedSaveDataFolder();

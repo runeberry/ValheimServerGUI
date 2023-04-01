@@ -343,14 +343,6 @@ namespace ValheimServerGUI.Game
                 processArgs += options.AdditionalArgs;
             }
 
-            // TODO: can't actually enable this right now, because it stops the process from writing out logs,
-            // which are essential for the app to function. Need to implement my own file logging, or find a way
-            // to read logs from file as they come in.
-            //if (!string.IsNullOrWhiteSpace(options.LogFile))
-            //{
-            //    processArgs += @$" -logFile ""{options.LogFile}""";
-            //}
-
             return processArgs;
         }
 

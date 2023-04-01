@@ -52,8 +52,8 @@ namespace ValheimServerGUI
                 .AddSingleton<IFormProvider, FormProvider>()
                 .AddSingleton<IProcessProvider, ProcessProvider>()
                 .AddSingleton<ApplicationLogger>()
-                .AddSingleton<ILogger>(sc => sc.GetRequiredService<ApplicationLogger>())
-                .AddSingleton<IApplicationLogger>(sc => sc.GetRequiredService<ApplicationLogger>())
+                .AddSingleton<ILogger>(sp => sp.GetRequiredService<ApplicationLogger>())
+                .AddSingleton<IApplicationLogger>(sp => sp.GetRequiredService<ApplicationLogger>())
                 .AddSingleton<IHttpClientProvider, HttpClientProvider>()
                 .AddSingleton<IRestClientContext, RestClientContext>()
                 .AddSingleton<IIpAddressProvider, IpAddressProvider>()
@@ -68,7 +68,6 @@ namespace ValheimServerGUI
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
                 .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
-                .AddTransient<ValheimServerLogger>()
                 .AddTransient<ValheimServer>();
 
             // Forms

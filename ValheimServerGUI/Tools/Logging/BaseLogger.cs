@@ -12,40 +12,24 @@ namespace ValheimServerGUI.Tools.Logging
         event Action<string> LogReceived;
 
         IEnumerable<string> LogBuffer { get; }
-
-        void SetFileLoggingEnabled(bool enabled);
     }
 
     /// <summary>
     /// Preconfigured Logger for use throughout the application.
     /// </summary>
-    public abstract class BaseLogger
+    public abstract class BaseLogger : IBaseLogger
     {
         public delegate string LogEventModifier(LogEvent logEvent, string renderedMessage);
 
         private readonly LogBufferSink LogBufferSink = new(1000);
         private readonly List<LogEventModifier> Modifiers = new();
-        private bool FileLoggingEnabled;
         private ILogger Logger;
-
-        public BaseLogger()
-        {
-            RebuildLogger();
-        }
 
         #region IBaseLogger implementation
 
         public event Action<string> LogReceived;
 
         public IEnumerable<string> LogBuffer => LogBufferSink.Logs;
-
-        public void SetFileLoggingEnabled(bool enabled)
-        {
-            if (enabled == FileLoggingEnabled) return;
-
-            FileLoggingEnabled = enabled;
-            RebuildLogger();
-        }
 
         #endregion
 
@@ -74,6 +58,14 @@ namespace ValheimServerGUI.Tools.Logging
             Logger = CreateLogger();
         }
 
+        protected void AddFileLogging(LoggerConfiguration config, string fileName)
+        {
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                config.WriteToRollingFile(Resources.LogsFolderPath, fileName);
+            }
+        }
+
         #endregion
 
         #region Private methods
@@ -82,15 +74,6 @@ namespace ValheimServerGUI.Tools.Logging
         {
             var config = new LoggerConfiguration()
                 .WriteTo.Sink(LogBufferSink);
-
-            if (FileLoggingEnabled)
-            {
-                var fileName = LogFileName;
-                if (!string.IsNullOrWhiteSpace(fileName))
-                {
-                    config.WriteToRollingFile(Resources.LogsFolderPath, fileName);
-                }
-            }
 
             ConfigureLogger(config);
 
@@ -111,6 +94,12 @@ namespace ValheimServerGUI.Tools.Logging
             }
 
             message = $"{logEvent.Timestamp.ToLogPrefixFormat()} {message}";
+
+            if (Logger == null)
+            {
+                // Wait until first log is written to create logger, so all dependencies are resolved
+                Logger = CreateLogger();
+            }
 
             Logger.Write(logEvent.Level, message);
 

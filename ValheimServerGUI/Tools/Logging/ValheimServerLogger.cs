@@ -11,24 +11,22 @@ namespace ValheimServerGUI.Tools.Logging
 
     public class ValheimServerLogger : BaseLogger, IValheimServerLogger
     {
-        private readonly string ServerName;
+        private readonly IValheimServerOptions Options;
 
         public ValheimServerLogger(IValheimServerOptions options)
         {
-            ServerName = options.Name;
+            Options = options;
 
             // Remove default timestamp on some logs
             AddModifier((_, message) => Regex.Replace(message, @"^\d+\/\d+\/\d+ \d+:\d+:\d+:\s+", ""));
-
-            SetFileLoggingEnabled(options.LogToFile);
         }
 
         #region DynamicLogger overrides
 
-        protected override string LogFileName => $"ServerLogs-{ServerName}";
-
         protected override void ConfigureLogger(LoggerConfiguration config)
         {
+            if (Options.LogToFile) AddFileLogging(config, $"ServerLogs-{Options.Name}");
+
             // Ignore Unity debug logs
             config.AddRegexExclusion(@"^\(Filename:");
         }

@@ -1,4 +1,6 @@
-﻿using Serilog;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using System;
 using ValheimServerGUI.Game;
 
 namespace ValheimServerGUI.Tools.Logging
@@ -9,30 +11,32 @@ namespace ValheimServerGUI.Tools.Logging
 
     public class ApplicationLogger : BaseLogger, IApplicationLogger
     {
-        private readonly IUserPreferencesProvider UserPrefsProvider;
+        private readonly IServiceProvider ServiceProvider;
+        private IUserPreferencesProvider UserPrefsProvider;
 
-        public ApplicationLogger(IUserPreferencesProvider userPrefsProvider)
+        public ApplicationLogger(IServiceProvider services)
         {
-            UserPrefsProvider = userPrefsProvider;
-
-            var prefs = UserPrefsProvider.LoadPreferences();
-            SetFileLoggingEnabled(prefs.WriteApplicationLogsToFile);
-
-            UserPrefsProvider.PreferencesSaved += OnUserPreferencesSaved;
+            // Dependencies are injected late to avoid creating a circular dependency
+            ServiceProvider = services;
         }
 
         private void OnUserPreferencesSaved(object sender, UserPreferences prefs)
         {
-            SetFileLoggingEnabled(prefs.WriteApplicationLogsToFile);
+            RebuildLogger();
         }
 
         #region BaseLogger overrides
 
-        protected override string LogFileName => "ApplicationLogs";
-
         protected override void ConfigureLogger(LoggerConfiguration config)
         {
-            // no-op
+            if (UserPrefsProvider == null)
+            {
+                UserPrefsProvider = ServiceProvider.GetRequiredService<IUserPreferencesProvider>();
+                UserPrefsProvider.PreferencesSaved += OnUserPreferencesSaved;
+            }
+
+            var prefs = UserPrefsProvider.LoadPreferences();
+            if (prefs.WriteApplicationLogsToFile) AddFileLogging(config, "ApplicationLogs");
         }
 
         #endregion

@@ -154,8 +154,7 @@ namespace ValheimServerGUI.Game
                 Status = ServerStatus.Stopped;
             };
 
-            ServerLogger = new ValheimServerLogger(options.Name);
-            ServerLogger.SetFileLoggingEnabled(true); // todo: use prefs
+            ServerLogger = new ValheimServerLogger(options);
             ServerLogger.LogReceived += Logger_OnServerLogReceived;
             if (options.LogMessageHandler != null)
             {

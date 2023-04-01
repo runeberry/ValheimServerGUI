@@ -1,5 +1,6 @@
 ﻿using Serilog;
 using System.Text.RegularExpressions;
+using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Logging.Components;
 
 namespace ValheimServerGUI.Tools.Logging
@@ -12,12 +13,14 @@ namespace ValheimServerGUI.Tools.Logging
     {
         private readonly string ServerName;
 
-        public ValheimServerLogger(string serverName)
+        public ValheimServerLogger(IValheimServerOptions options)
         {
-            ServerName = serverName;
+            ServerName = options.Name;
 
             // Remove default timestamp on some logs
             AddModifier((_, message) => Regex.Replace(message, @"^\d+\/\d+\/\d+ \d+:\d+:\d+:\s+", ""));
+
+            SetFileLoggingEnabled(options.LogToFile);
         }
 
         #region DynamicLogger overrides

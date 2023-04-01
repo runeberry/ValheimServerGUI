@@ -30,6 +30,8 @@ namespace ValheimServerGUI.Game
 
         public string SaveDataFolderPath { get; set; }
 
+        public bool LogToFile { get; set; }
+
         public Action<string> LogMessageHandler { get; set; }
 
         public void Validate()
@@ -96,6 +98,8 @@ namespace ValheimServerGUI.Game
         string ServerExePath { get; }
 
         string SaveDataFolderPath { get; }
+
+        bool LogToFile { get; }
 
         Action<string> LogMessageHandler { get; }
     }

@@ -1,4 +1,5 @@
 ﻿using Serilog;
+using ValheimServerGUI.Game;
 
 namespace ValheimServerGUI.Tools.Logging
 {
@@ -8,9 +9,21 @@ namespace ValheimServerGUI.Tools.Logging
 
     public class ApplicationLogger : BaseLogger, IApplicationLogger
     {
-        public ApplicationLogger()
+        private readonly IUserPreferencesProvider UserPrefsProvider;
+
+        public ApplicationLogger(IUserPreferencesProvider userPrefsProvider)
         {
-            SetFileLoggingEnabled(true); // todo: use prefs
+            UserPrefsProvider = userPrefsProvider;
+
+            var prefs = UserPrefsProvider.LoadPreferences();
+            SetFileLoggingEnabled(prefs.WriteApplicationLogsToFile);
+
+            UserPrefsProvider.PreferencesSaved += OnUserPreferencesSaved;
+        }
+
+        private void OnUserPreferencesSaved(object sender, UserPreferences prefs)
+        {
+            SetFileLoggingEnabled(prefs.WriteApplicationLogsToFile);
         }
 
         #region BaseLogger overrides

@@ -919,6 +919,7 @@ namespace ValheimServerGUI.Forms
             ServerAdditionalArgsField.Enabled = allowServerChanges;
             ServerExePathField.Enabled = allowServerChanges;
             ServerSaveDataFolderPathField.Enabled = allowServerChanges;
+            ServerLogFileField.Enabled = allowServerChanges;
 
             MenuItemFileNewProfile.Enabled = allowServerChanges;
             MenuItemFileLoadProfile.Enabled = allowServerChanges;
@@ -1075,6 +1076,7 @@ namespace ValheimServerGUI.Forms
             prefs.AdditionalArgs = ServerAdditionalArgsField.Value;
             prefs.ServerExePath = ServerExePathField.Value;
             prefs.SaveDataFolderPath = ServerSaveDataFolderPathField.Value;
+            prefs.WriteServerLogsToFile = ServerLogFileField.Value;
 
             return prefs;
         }
@@ -1103,6 +1105,7 @@ namespace ValheimServerGUI.Forms
                 SaveDataFolderPath = !string.IsNullOrWhiteSpace(serverPrefs.SaveDataFolderPath)
                     ? serverPrefs.SaveDataFolderPath
                     : userPrefs.SaveDataFolderPath,
+                LogToFile = serverPrefs.WriteServerLogsToFile,
                 LogMessageHandler = this.BuildActionHandler<string>(OnServerLogReceived),
             };
 
@@ -1146,6 +1149,7 @@ namespace ValheimServerGUI.Forms
             ServerAdditionalArgsField.Value = prefs.AdditionalArgs;
             ServerExePathField.Value = prefs.ServerExePath;
             ServerSaveDataFolderPathField.Value = prefs.SaveDataFolderPath;
+            ServerLogFileField.Value = prefs.WriteServerLogsToFile;
 
             RefreshWorldSelect();
             var worldName = prefs.WorldName;

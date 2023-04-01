@@ -24,6 +24,7 @@ namespace ValheimServerGUI.Tools.Logging.Components
 
             return config.WriteTo.File(filepath,
                 rollingInterval: RollingInterval.Day,
+                retainedFileTimeLimit: TimeSpan.FromDays(30),
                 outputTemplate: DefaultOutputTemplate);
         }
     }

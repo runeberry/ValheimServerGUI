@@ -18,7 +18,7 @@ namespace ValheimServerGUI.Tests.Game
         public ValheimServerTests()
         {
             Server = GetService<ValheimServer>();
-            Server.Logger.SetFileLoggingEnabled(false); // todo: get from user preferences in server
+            //Server.Logger.SetFileLoggingEnabled(false); // todo: fix tests for new logging changes
             PlayerDataRepository = GetService<IPlayerDataRepository>();
         }
 

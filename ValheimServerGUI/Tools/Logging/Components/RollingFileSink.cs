@@ -25,7 +25,8 @@ namespace ValheimServerGUI.Tools.Logging.Components
             return config.WriteTo.File(filepath,
                 rollingInterval: RollingInterval.Day,
                 retainedFileTimeLimit: TimeSpan.FromDays(30),
-                outputTemplate: DefaultOutputTemplate);
+                outputTemplate: DefaultOutputTemplate,
+                shared: true); // Allows multiple processes to write to same file
         }
     }
 }

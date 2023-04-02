@@ -63,6 +63,21 @@
   <metadata name="StatusStrip.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>125, 17</value>
   </metadata>
+  <data name="CommunityServerField.HelpText" xml:space="preserve">
+    <value>If this box is checked, your server will show up in the Community Servers list within Valheim. 
+If not, other players will need to "Join by IP" to connect to your game.
+
+NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game, but it can
+take up to 15 minutes, and rarely not show up at all. You can always "Join by IP" as a fallback.</value>
+  </data>
+  <data name="WorldSelectExistingNameField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
+    <value>
+        AAEAAAD/////AQAAAAAAAAAEAQAAAH9TeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW1N5
+        c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVi
+        bGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dAwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24GAAAI
+        CAkCAAAAAQAAAAEAAAARAgAAAAQAAAAGAwAAAAANAws=
+</value>
+  </data>
   <data name="ServerAutoStartField.HelpText" xml:space="preserve">
     <value>Automatically start up this server when you open
 ValheimServerGUI. If you want to restart your server
@@ -88,21 +103,6 @@ This field sets the path just for this profile. Leave this field empty
 if you do not want a profile-specific override. To set this path
 for all profiles, see File &gt; Set Directories.</value>
   </data>
-  <data name="CommunityServerField.HelpText" xml:space="preserve">
-    <value>If this box is checked, your server will show up in the Community Servers list within Valheim. 
-If not, other players will need to "Join by IP" to connect to your game.
-
-NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game, but it can
-take up to 15 minutes, and rarely not show up at all. You can always "Join by IP" as a fallback.</value>
-  </data>
-  <data name="WorldSelectExistingNameField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
-    <value>
-        AAEAAAD/////AQAAAAAAAAAEAQAAAH9TeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW1N5
-        c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVi
-        bGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dAwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24GAAAI
-        CAkCAAAAAQAAAAEAAAARAgAAAAQAAAAGAwAAAAANAws=
-</value>
-  </data>
   <data name="LabelInviteCode.HelpText" xml:space="preserve">
     <value>Invite codes are only available when Crossplay is enabled and change
 each time the server is restarted. Players on any platform can connect
@@ -124,6 +124,14 @@ it yourself if you're hosting your server on another machine on your home networ
   <metadata name="ImageList.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>235, 17</value>
   </metadata>
+  <data name="LogViewSelectField.DataSource" mimetype="application/x-microsoft.net.object.binary.base64">
+    <value>
+        AAEAAAD/////AQAAAAAAAAAEAQAAAH9TeXN0ZW0uQ29sbGVjdGlvbnMuR2VuZXJpYy5MaXN0YDFbW1N5
+        c3RlbS5TdHJpbmcsIG1zY29ybGliLCBWZXJzaW9uPTQuMC4wLjAsIEN1bHR1cmU9bmV1dHJhbCwgUHVi
+        bGljS2V5VG9rZW49Yjc3YTVjNTYxOTM0ZTA4OV1dAwAAAAZfaXRlbXMFX3NpemUIX3ZlcnNpb24GAAAI
+        CAkCAAAAAAAAAAAAAAARAgAAAAAAAAAL
+</value>
+  </data>
   <metadata name="NotifyIcon.TrayLocation" type="System.Drawing.Point, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
     <value>339, 17</value>
   </metadata>

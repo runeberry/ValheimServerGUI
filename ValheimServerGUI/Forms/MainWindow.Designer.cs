@@ -85,10 +85,10 @@ namespace ValheimServerGUI.Forms
             ServerShortBackupIntervalField = new ValheimServerGUI.Controls.NumericFormField();
             ServerBackupsField = new ValheimServerGUI.Controls.NumericFormField();
             OtherSettingsGroupBox = new System.Windows.Forms.GroupBox();
+            ServerLogFileField = new ValheimServerGUI.Controls.CheckboxFormField();
             ServerAutoStartField = new ValheimServerGUI.Controls.CheckboxFormField();
             ServerAdditionalArgsField = new Controls.TextFormField();
             DirectoriesGroupBox = new System.Windows.Forms.GroupBox();
-            ServerLogFileField = new ValheimServerGUI.Controls.CheckboxFormField();
             ServerSaveDataPathOpenButton = new OpenButton();
             ServerExePathOpenButton = new OpenButton();
             ServerSaveDataFolderPathField = new ValheimServerGUI.Controls.FilenameFormField();
@@ -117,6 +117,7 @@ namespace ValheimServerGUI.Forms
             ColumnPlayerUpdated = new System.Windows.Forms.ColumnHeader();
             ImageList = new System.Windows.Forms.ImageList(components);
             TabLogs = new System.Windows.Forms.TabPage();
+            LogsFolderOpenButton = new OpenButton();
             ButtonSaveLogs = new System.Windows.Forms.Button();
             LogViewSelectField = new ValheimServerGUI.Controls.DropdownFormField();
             LogViewer = new ValheimServerGUI.Controls.LogViewer();
@@ -663,6 +664,17 @@ namespace ValheimServerGUI.Forms
             OtherSettingsGroupBox.TabStop = false;
             OtherSettingsGroupBox.Text = "Other Settings";
             // 
+            // ServerLogFileField
+            // 
+            ServerLogFileField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ServerLogFileField.HelpText = "If enabled, this server's logs will be written to a daily rolling\r\nlog file on disk. Logs older than 30 days will be deleted\r\nautomatically.\r\n";
+            ServerLogFileField.LabelText = "Write server logs to file";
+            ServerLogFileField.Location = new System.Drawing.Point(6, 45);
+            ServerLogFileField.Name = "ServerLogFileField";
+            ServerLogFileField.Size = new System.Drawing.Size(286, 17);
+            ServerLogFileField.TabIndex = 1;
+            ServerLogFileField.Value = false;
+            // 
             // ServerAutoStartField
             // 
             ServerAutoStartField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
@@ -700,17 +712,6 @@ namespace ValheimServerGUI.Forms
             DirectoriesGroupBox.TabIndex = 0;
             DirectoriesGroupBox.TabStop = false;
             DirectoriesGroupBox.Text = "Directory Overrides (for just this Profile)";
-            // 
-            // ServerLogFileField
-            // 
-            ServerLogFileField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ServerLogFileField.HelpText = "If enabled, this server's logs will be written to a daily rolling\r\nlog file on disk. Logs older than 30 days will be deleted\r\nautomatically.\r\n";
-            ServerLogFileField.LabelText = "Write server logs to file";
-            ServerLogFileField.Location = new System.Drawing.Point(6, 45);
-            ServerLogFileField.Name = "ServerLogFileField";
-            ServerLogFileField.Size = new System.Drawing.Size(286, 17);
-            ServerLogFileField.TabIndex = 1;
-            ServerLogFileField.Value = false;
             // 
             // ServerSaveDataPathOpenButton
             // 
@@ -1021,6 +1022,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabLogs
             // 
+            TabLogs.Controls.Add(LogsFolderOpenButton);
             TabLogs.Controls.Add(ButtonSaveLogs);
             TabLogs.Controls.Add(LogViewSelectField);
             TabLogs.Controls.Add(LogViewer);
@@ -1031,6 +1033,15 @@ namespace ValheimServerGUI.Forms
             TabLogs.TabIndex = 2;
             TabLogs.Text = "Logs";
             TabLogs.UseVisualStyleBackColor = true;
+            // 
+            // LogsFolderOpenButton
+            // 
+            LogsFolderOpenButton.HelpText = "Open the logs folder in Explorer";
+            LogsFolderOpenButton.Location = new System.Drawing.Point(258, 25);
+            LogsFolderOpenButton.Name = "LogsFolderOpenButton";
+            LogsFolderOpenButton.PathFunction = null;
+            LogsFolderOpenButton.Size = new System.Drawing.Size(16, 16);
+            LogsFolderOpenButton.TabIndex = 4;
             // 
             // ButtonSaveLogs
             // 
@@ -1044,6 +1055,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            LogViewSelectField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("LogViewSelectField.DataSource");
             LogViewSelectField.DropdownEnabled = true;
             LogViewSelectField.EmptyText = "";
             LogViewSelectField.HelpText = "";
@@ -1282,5 +1294,6 @@ namespace ValheimServerGUI.Forms
         private OpenButton WorldsFolderOpenButton;
         private RefreshButton WorldsListRefreshButton;
         private ValheimServerGUI.Controls.CheckboxFormField ServerLogFileField;
+        private OpenButton LogsFolderOpenButton;
     }
 }

@@ -164,6 +164,7 @@ namespace ValheimServerGUI.Forms
             ButtonStopServer.Click += this.BuildEventHandler(ButtonStopServer_Click);
             ButtonClearLogs.Click += ButtonClearLogs_Click;
             ButtonSaveLogs.Click += ButtonSaveLogs_Click;
+            LogsFolderOpenButton.PathFunction = () => Resources.LogsFolderPath;
             ButtonPlayerDetails.Click += ButtonPlayerDetails_Click;
             ButtonRemovePlayer.Click += ButtonRemovePlayer_Click;
             CopyButtonServerPassword.CopyFunction = () => ServerPasswordField.Value;
@@ -504,12 +505,23 @@ namespace ValheimServerGUI.Forms
                 return;
             }
 
+            string initialDirectory;
+            try
+            {
+                initialDirectory = PathExtensions.GetDirectoryInfo(Resources.LogsFolderPath).FullName;
+            }
+            catch
+            {
+                initialDirectory = null;
+            }
+
             var dialog = new SaveFileDialog
             {
                 FileName = $"{PathExtensions.GetValidFileName(LogViewer.LogView, true)}.txt",
                 Filter = "Text Files (*.txt)|*.txt",
                 CheckPathExists = true,
                 RestoreDirectory = true,
+                InitialDirectory = initialDirectory,
             };
 
             var result = dialog.ShowDialog();

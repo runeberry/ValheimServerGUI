@@ -1041,7 +1041,7 @@ namespace ValheimServerGUI.Forms
             LogsFolderOpenButton.Name = "LogsFolderOpenButton";
             LogsFolderOpenButton.PathFunction = null;
             LogsFolderOpenButton.Size = new System.Drawing.Size(16, 16);
-            LogsFolderOpenButton.TabIndex = 4;
+            LogsFolderOpenButton.TabIndex = 1;
             // 
             // ButtonSaveLogs
             // 
@@ -1049,13 +1049,12 @@ namespace ValheimServerGUI.Forms
             ButtonSaveLogs.Location = new System.Drawing.Point(280, 22);
             ButtonSaveLogs.Name = "ButtonSaveLogs";
             ButtonSaveLogs.Size = new System.Drawing.Size(88, 23);
-            ButtonSaveLogs.TabIndex = 1;
+            ButtonSaveLogs.TabIndex = 2;
             ButtonSaveLogs.Text = "Save Logs...";
             ButtonSaveLogs.UseVisualStyleBackColor = true;
             // 
             // LogViewSelectField
             // 
-            LogViewSelectField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("LogViewSelectField.DataSource");
             LogViewSelectField.DropdownEnabled = true;
             LogViewSelectField.EmptyText = "";
             LogViewSelectField.HelpText = "";
@@ -1073,7 +1072,7 @@ namespace ValheimServerGUI.Forms
             LogViewer.LogView = "DefaultLogView";
             LogViewer.Name = "LogViewer";
             LogViewer.Size = new System.Drawing.Size(446, 198);
-            LogViewer.TabIndex = 3;
+            LogViewer.TabIndex = 4;
             LogViewer.TabStop = false;
             // 
             // ButtonClearLogs
@@ -1082,7 +1081,7 @@ namespace ValheimServerGUI.Forms
             ButtonClearLogs.Location = new System.Drawing.Point(374, 22);
             ButtonClearLogs.Name = "ButtonClearLogs";
             ButtonClearLogs.Size = new System.Drawing.Size(75, 23);
-            ButtonClearLogs.TabIndex = 2;
+            ButtonClearLogs.TabIndex = 3;
             ButtonClearLogs.Text = "Clear Logs";
             ButtonClearLogs.UseVisualStyleBackColor = true;
             // 

@@ -73,6 +73,11 @@ namespace ValheimServerGUI.Tools.Logging
         private ILogger CreateLogger()
         {
             var config = new LoggerConfiguration()
+#if DEBUG
+                .MinimumLevel.Verbose()
+#else
+                .MinimumLevel.Debug()
+#endif
                 .WriteTo.Sink(LogBufferSink);
 
             ConfigureLogger(config);

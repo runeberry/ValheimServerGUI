@@ -8,7 +8,8 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
-using ValheimServerGUI.Tools;
+using ValheimServerGUI.Serverless.Services;
+using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.Serverless.Controllers
 {
@@ -17,13 +18,21 @@ namespace ValheimServerGUI.Serverless.Controllers
     {
         private readonly ILogger Logger;
         private readonly IConfiguration Configuration;
+        private readonly ISteamApiClient SteamApiClient;
+        private readonly IXboxApiClient XboxApiClient;
 
         private ILambdaContext LambdaContext => HttpContext.Items["LambdaContext"] as ILambdaContext;
 
-        public VsgController(ILogger<VsgController> logger, IConfiguration configuration)
+        public VsgController(
+            ILogger<VsgController> logger,
+            IConfiguration configuration,
+            ISteamApiClient steamApiClient,
+            IXboxApiClient xboxApiClient)
         {
             Logger = logger;
             Configuration = configuration;
+            SteamApiClient = steamApiClient;
+            XboxApiClient = xboxApiClient;
         }
 
         [HttpPost("crash-report")]
@@ -79,12 +88,32 @@ namespace ValheimServerGUI.Serverless.Controllers
             return StatusCode(statusCode, new { message = exception.Message });
         }
 
-        [HttpGet("player-steam-info")]
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
-        public async Task<IActionResult> GetPlayerSteamInfo([FromQuery] string steamId)
-#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
+        [HttpGet("player-info")]
+        public async Task<IActionResult> GetPlayerInfo([FromQuery] string platform, [FromQuery] string playerId)
         {
-            return Ok("Player steam info");
+            if (string.IsNullOrWhiteSpace(platform) || string.IsNullOrWhiteSpace(playerId))
+            {
+                return StatusCode(400, new ErrorResponse("'platform' and 'playerId' are required"));
+            }
+
+            try
+            {
+                switch (platform.ToLowerInvariant())
+                {
+                    case "steam":
+                        var steamPlayer = await SteamApiClient.GetPlayerSummary(playerId);
+                        return Ok(steamPlayer);
+                    case "xbox":
+                        var xboxPlayer = await XboxApiClient.GetPlayerSummary(playerId);
+                        return Ok(xboxPlayer);
+                    default:
+                        return StatusCode(400, new ErrorResponse($"Unsupported value: platform={platform}"));
+                }
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new ErrorResponse(e.Message));
+            }
         }
     }
 }

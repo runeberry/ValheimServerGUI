@@ -76,17 +76,17 @@ Users will be notified that an update is available the next time they open the d
 
 You only need to run the Serverless application locally if you're making changes to the REST API that you want to test. If you're just making changes to the desktop client, you can skip this section.
 
-To run the serverless application locally:
+To run the serverless application locally (Visual Studio 2022):
 
-1. Select the **ValheimServerGUI.Serverless** project (or any file in that project) in the Solution Explorer in Visual Studio.
-2. Press **F5** or click the play button to start debugging the application. This will launch a console window.
+1. Right-click the **ValheimServerGUI.Serverless** project in the Solution Explorer, and select "Set as Startup Project".
+2. Press **F5** or click the play button to start debugging the application in IIS Express. This will launch a new browser window.
 3. Using a REST client of your choice (such as [Postman](https://www.postman.com/downloads/) or just cURL), you can then query any API route using the base address shown in the console. For example:
 
 ```bash
 curl --header "Content-Type: application/json" \
   --request POST \
   --data '{}' \
-  http://localhost:5000/crash-report
+  http://localhost:44385/crash-report
 ```
 
 ### Publishing the Serverless API

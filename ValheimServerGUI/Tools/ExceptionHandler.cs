@@ -4,6 +4,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Forms;
 using ValheimServerGUI.Tools.Logging;
+using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.Tools
 {

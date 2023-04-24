@@ -22,5 +22,15 @@ namespace ValheimServerGUI.Properties
         /// The Runeberry API keys that will be accepted by the server.
         /// </summary>
         public static HashSet<string> RuneberryServerApiKeys { get; } = new();
+
+        /// <summary>
+        /// API key for interacting with the Steamworks Web API.
+        /// </summary>
+        public static string SteamApiKey { get; }
+
+        /// <summary>
+        /// API key for interacting with the OpenXBL API.
+        /// </summary>
+        public static string XboxApiKey { get; }
     }
 }

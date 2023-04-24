@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace ValheimServerGUI.Tools
+namespace ValheimServerGUI.Tools.Models
 {
     public class CrashReport
     {

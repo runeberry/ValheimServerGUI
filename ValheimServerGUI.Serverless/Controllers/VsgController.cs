@@ -98,12 +98,12 @@ namespace ValheimServerGUI.Serverless.Controllers
 
             try
             {
-                switch (platform.ToLowerInvariant())
+                switch (platform)
                 {
-                    case "steam":
+                    case PlayerPlatforms.Steam:
                         var steamPlayer = await SteamApiClient.GetPlayerSummary(playerId);
                         return Ok(steamPlayer);
-                    case "xbox":
+                    case PlayerPlatforms.Xbox:
                         var xboxPlayer = await XboxApiClient.GetPlayerSummary(playerId);
                         return Ok(xboxPlayer);
                     default:

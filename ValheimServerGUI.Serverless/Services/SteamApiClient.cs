@@ -47,7 +47,7 @@ namespace ValheimServerGUI.Serverless.Services
                 throw new Exception($"No players matching steamId on response for: {steamId}");
             }
 
-            return new PlayerInfoResponse("Steam", person.SteamId, person.PersonaName);
+            return new PlayerInfoResponse(PlayerPlatforms.Steam, person.SteamId, person.PersonaName);
         }
 
         #region Nested symbols

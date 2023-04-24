@@ -53,7 +53,7 @@ namespace ValheimServerGUI.Serverless.Services
                 throw new Exception($"No players matching xuid on response for: {xuid}");
             }
 
-            return new PlayerInfoResponse("Xbox", person.Xuid, person.DisplayName);
+            return new PlayerInfoResponse(PlayerPlatforms.Xbox, person.Xuid, person.DisplayName);
         }
 
         #region Nested symbols

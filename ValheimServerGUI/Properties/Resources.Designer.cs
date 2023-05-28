@@ -63,6 +63,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Add_16x {
+            get {
+                object obj = ResourceManager.GetObject("Add_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AddImmediateWindow_16x {
             get {
                 object obj = ResourceManager.GetObject("AddImmediateWindow_16x", resourceCulture);
@@ -213,6 +223,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Edit_16x {
+            get {
+                object obj = ResourceManager.GetObject("Edit_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap FolderInformation_16x {
             get {
                 object obj = ResourceManager.GetObject("FolderInformation_16x", resourceCulture);
@@ -310,11 +330,21 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\players.json.
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\players-cache.json.
         /// </summary>
         internal static string PlayerListFilePath {
             get {
                 return ResourceManager.GetString("PlayerListFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Remove_16x {
+            get {
+                object obj = ResourceManager.GetObject("Remove_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         

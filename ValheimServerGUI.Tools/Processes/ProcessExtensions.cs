@@ -25,7 +25,7 @@ namespace ValheimServerGUI.Tools.Processes
 
             provider.AddProcess(key, process);
 
-            return process;
+            return provider.GetProcess(key);
         }
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace ValheimServerGUI.Tools.Processes
                 var killProcess = provider.AddBackgroundProcess($"{KillCommand}-{process.Id}", KillCommand, $"/pid {process.Id}");
 
                 // todo: Send output to application logs
-                killProcess.StartIO();
+                provider.StartIO(process);
             }
 
             return process;
@@ -61,20 +61,6 @@ namespace ValheimServerGUI.Tools.Processes
             if (process == null) return false;
 
             return !process.HasExited;
-        }
-
-        public static void StartIO(this Process process)
-        {
-            process.Start();
-            process.BeginOutputReadLine();
-            process.BeginErrorReadLine();
-        }
-
-        public static void SafelyWaitForExit(this Process process)
-        {
-            if (process == null || process.HasExited) return;
-
-            process.WaitForExit();
         }
     }
 }

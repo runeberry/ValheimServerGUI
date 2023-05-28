@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Logging;
+using ValheimServerGUI.Tools.Models;
 using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Game
@@ -79,7 +80,7 @@ namespace ValheimServerGUI.Game
 
             // Connecting
             LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", OnPlayerConnecting);
-            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID Steam_(\d+?)$", OnPlayerConnecting); // Crossplay
+            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID (\w+?)_(\d+?)$", OnPlayerConnectingCrossplay); // Crossplay
 
             // Connected - NOTE: ZDOID can be a negative number, account for that w/ regex!
             LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", OnPlayerConnected);
@@ -162,7 +163,7 @@ namespace ValheimServerGUI.Game
                 ServerLogger.LogReceived += options.LogMessageHandler;
             }
 
-            process.StartIO();
+            ProcessProvider.StartIO(process);
 
             Options = options;
             IsRestarting = false;
@@ -259,7 +260,16 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            PlayerDataRepository.SetPlayerJoining(steamId);
+            PlayerDataRepository.SetPlayerJoining(new() { Platform = PlayerPlatforms.Steam, PlayerId = steamId });
+        }
+
+        private void OnPlayerConnectingCrossplay(params string[] captures)
+        {
+            var hasValidPlatform = PlayerPlatforms.TryGetValidPlatform(captures[0], out var platform);
+            var playerId = captures[1];
+            if (!hasValidPlatform || string.IsNullOrWhiteSpace(playerId)) return;
+
+            PlayerDataRepository.SetPlayerJoining(new() { Platform = platform, PlayerId = playerId });
         }
 
         private void OnPlayerConnected(params string[] captures)
@@ -275,18 +285,36 @@ namespace ValheimServerGUI.Game
 
         private void OnPlayerDisconnecting(params string[] captures)
         {
-            var steamOrZdoId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
+            var playerIdOrZdoId = captures[0];
+            if (string.IsNullOrWhiteSpace(playerIdOrZdoId)) return;
 
-            PlayerDataRepository.SetPlayerLeaving(steamOrZdoId);
+            var query = new PlayerDataQuery
+            {
+                PlayerId = playerIdOrZdoId,
+                Or = new()
+                {
+                    ZdoId = playerIdOrZdoId,
+                }
+            };
+
+            PlayerDataRepository.SetPlayerLeaving(query);
         }
 
         private void OnPlayerDisconnected(params string[] captures)
         {
-            var steamOrZdoId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamOrZdoId)) return;
+            var playerIdOrZdoId = captures[0];
+            if (string.IsNullOrWhiteSpace(playerIdOrZdoId)) return;
 
-            PlayerDataRepository.SetPlayerOffline(steamOrZdoId);
+            var query = new PlayerDataQuery
+            {
+                PlayerId = playerIdOrZdoId,
+                Or = new()
+                {
+                    ZdoId = playerIdOrZdoId,
+                }
+            };
+
+            PlayerDataRepository.SetPlayerOffline(query);
         }
 
         private void OnWorldSaved(params string[] captures)

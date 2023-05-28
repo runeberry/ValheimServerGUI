@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 
 namespace ValheimServerGUI.Tools.Processes
 {
     public class ProcessProvider : IProcessProvider
     {
-        private readonly ConcurrentDictionary<string, Process> Processes = new ConcurrentDictionary<string, Process>();
+        private readonly ConcurrentDictionary<string, Process> Processes = new();
 
         public void AddProcess(string key, Process process)
         {
@@ -28,11 +26,11 @@ namespace ValheimServerGUI.Tools.Processes
             return process;
         }
 
-        public List<Process> FindExistingProcessesByName(string name)
+        public void StartIO(Process process)
         {
-            return Process.GetProcesses()
-                .Where(p => p.ProcessName == name)
-                .ToList();
+            process.Start();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
         }
     }
 }

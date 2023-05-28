@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 
 namespace ValheimServerGUI.Tools.Processes
 {
     public interface IProcessProvider
     {
-        public Process GetProcess(string key);
+        void AddProcess(string key, Process process);
 
-        public void AddProcess(string key, Process process);
+        Process GetProcess(string key);
 
-        List<Process> FindExistingProcessesByName(string name);
+        void StartIO(Process process);
     }
 }

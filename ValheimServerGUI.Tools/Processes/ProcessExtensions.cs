@@ -39,7 +39,7 @@ namespace ValheimServerGUI.Tools.Processes
                 var killProcess = provider.AddBackgroundProcess($"{KillCommand}-{process.Id}", KillCommand, $"/pid {process.Id}");
 
                 // todo: Send output to application logs
-                provider.StartIO(process);
+                provider.StartIO(killProcess);
             }
 
             return process;

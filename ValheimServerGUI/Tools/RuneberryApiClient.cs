@@ -28,7 +28,7 @@ namespace ValheimServerGUI.Tools
 
         public async Task RequestPlayerInfoAsync(string platform, string playerId)
         {
-            var response = await Get($"{Resources.UrlRuneberryApi}/player-info")
+            var response = await Get($"{Resources.UrlRuneberryApi}/player-info?platform={platform}&playerId={playerId}")
                 .WithHeader(Secrets.RuneberryApiKeyHeader, Secrets.RuneberryClientApiKey)
                 .SendAsync<PlayerInfoResponse>();
 

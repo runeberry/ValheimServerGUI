@@ -22,7 +22,17 @@ namespace ValheimServerGUI.Tools.Processes
         public Process GetProcess(string key)
         {
             if (!Processes.TryGetValue(key, out var process)) return null;
-            if (process.HasExited) return null;
+
+            try
+            {
+                // Don't return a process if it's already exited
+                if (process.HasExited) return null;
+            }
+            catch
+            {
+                // HasExited will throw if the process hasn't started yet, so ignore that
+            }
+
             return process;
         }
 

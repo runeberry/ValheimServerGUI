@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
 namespace ValheimServerGUI.Serverless
@@ -33,10 +32,6 @@ namespace ValheimServerGUI.Serverless
         protected override void Init(IWebHostBuilder builder)
         {
             builder
-                .ConfigureAppConfiguration(config =>
-                {
-                    config.AddJsonFile("appsettings.secret.json");
-                })
                 .UseStartup<Startup>();
         }
 

@@ -96,8 +96,7 @@ _For project maintainers only._
 The API is published to AWS using the [Serverless Application Model](https://aws.amazon.com/serverless/sam/), which essentially means that the deployment instructions are contained within a CloudFormation template in this repo - namely, [serverless.template](/ValheimServerGUI.Serverless/serverless.template).
 
 Before publishing, ensure that the following Solution Resources are set up locally:
-* appsettings.secret.json
-* Secrets.Values.cs
+* ServerSecrets.Values.cs
 
 The easiest way to publish the API is to install the [AWS Toolkit Extension](https://marketplace.visualstudio.com/items?itemName=AmazonWebServices.AWSToolkitforVisualStudio2017) for Visual Studio. After installing the extension, follow these steps:
 

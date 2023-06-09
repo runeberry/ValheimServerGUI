@@ -58,7 +58,7 @@
             // RemoveButton
             // 
             RemoveButton.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
-            RemoveButton.Image = Properties.Resources.Remove_16x;
+            RemoveButton.Image = Properties.Resources.Remove_Red_16x;
             RemoveButton.Location = new System.Drawing.Point(98, 103);
             RemoveButton.Name = "RemoveButton";
             RemoveButton.Size = new System.Drawing.Size(23, 23);
@@ -75,7 +75,7 @@
             EditButton.TabIndex = 1;
             EditButton.UseVisualStyleBackColor = true;
             // 
-            // AddRemoveSelectList
+            // AddRemoveListField
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -83,7 +83,7 @@
             Controls.Add(RemoveButton);
             Controls.Add(AddButton);
             Controls.Add(SelectListField);
-            Name = "AddRemoveSelectList";
+            Name = "AddRemoveListField";
             Size = new System.Drawing.Size(150, 129);
             ResumeLayout(false);
         }

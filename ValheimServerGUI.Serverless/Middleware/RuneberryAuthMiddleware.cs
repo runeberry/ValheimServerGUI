@@ -14,21 +14,21 @@ namespace ValheimServerGUI.Serverless.Middleware
 
         static RuneberryAuthMiddleware()
         {
-            ApiKeyEnabled = !string.IsNullOrWhiteSpace(Secrets.RuneberryApiKeyHeader) && Secrets.RuneberryApiKeyHeader.Any();
+            ApiKeyEnabled = !string.IsNullOrWhiteSpace(ServerSecrets.RuneberryApiKeyHeader) && ServerSecrets.RuneberryApiKeyHeader.Any();
         }
 
         public static async Task Authorize(HttpContext context, Func<Task> next)
         {
             if (ApiKeyEnabled)
             {
-                if (!context.Request.Headers.TryGetValue(Secrets.RuneberryApiKeyHeader, out var apiKey))
+                if (!context.Request.Headers.TryGetValue(ServerSecrets.RuneberryApiKeyHeader, out var apiKey))
                 {
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsJsonAsync(new { message = "Missing API key" });
                     return;
                 }
 
-                if (!Secrets.RuneberryServerApiKeys.Contains(apiKey))
+                if (!ServerSecrets.RuneberryServerApiKeys.Contains(apiKey))
                 {
                     context.Response.StatusCode = 401;
                     await context.Response.WriteAsJsonAsync(new { message = "Invalid API key" });

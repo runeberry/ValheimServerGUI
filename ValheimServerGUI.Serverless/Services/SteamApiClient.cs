@@ -28,7 +28,7 @@ namespace ValheimServerGUI.Serverless.Services
             }
 
             var response = await Get($"https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?steamids={steamId}")
-                .WithHeader("x-webapi-key", Secrets.SteamApiKey)
+                .WithHeader("x-webapi-key", ServerSecrets.SteamApiKey)
                 .SendAsync<SteamPlayerSummaryResponse>();
 
             if (response == null)

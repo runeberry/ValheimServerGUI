@@ -39,10 +39,10 @@
 		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
-		<Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SolutionResources\ClientSecrets.cs" Link="Properties\ClientSecrets.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\ClientSecrets.cs')" />
+    <Compile Include="..\SolutionResources\ClientSecrets.Values.cs" Link="Properties\ClientSecrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\ClientSecrets.Values.cs')" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">

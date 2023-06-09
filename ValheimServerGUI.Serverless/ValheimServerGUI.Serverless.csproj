@@ -6,18 +6,22 @@
     <!-- This property makes the build directory similar to a publish directory and helps the AWS .NET Lambda Mock Test Tool find project dependencies. -->
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+  
   <ItemGroup>
     <PackageReference Include="Amazon.Lambda.AspNetCoreServer" Version="6.1.0" />
     <PackageReference Include="AWSSDK.S3" Version="3.7.104.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="6.0.16" />
   </ItemGroup>
+  
   <ItemGroup>
     <ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />
   </ItemGroup>
+  
   <ItemGroup>
-    <Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
-    <Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')" />
+    <Compile Include="..\SolutionResources\ServerSecrets.cs" Link="Properties\ServerSecrets.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\ServerSecrets.cs')" />
+    <Compile Include="..\SolutionResources\ServerSecrets.Values.cs" Link="Properties\ServerSecrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\ServerSecrets.Values.cs')" />
   </ItemGroup>
+  
   <ItemGroup>
     <!-- This setup allows us to include a file outside of the project directory -->
     <!-- Courtesy of: https://stackoverflow.com/a/11808911/7071436 -->

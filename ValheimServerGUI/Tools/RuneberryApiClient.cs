@@ -29,7 +29,7 @@ namespace ValheimServerGUI.Tools
         public async Task RequestPlayerInfoAsync(string platform, string playerId)
         {
             var response = await Get($"{Resources.UrlRuneberryApi}/player-info?platform={platform}&playerId={playerId}")
-                .WithHeader(Secrets.RuneberryApiKeyHeader, Secrets.RuneberryClientApiKey)
+                .WithHeader(ClientSecrets.RuneberryApiKeyHeader, ClientSecrets.RuneberryClientApiKey)
                 .SendAsync<PlayerInfoResponse>();
 
             if (response == null)
@@ -44,7 +44,7 @@ namespace ValheimServerGUI.Tools
         public async Task SendCrashReportAsync(CrashReport report)
         {
             var response = await Post($"{Resources.UrlRuneberryApi}/crash-report", report)
-                .WithHeader(Secrets.RuneberryApiKeyHeader, Secrets.RuneberryClientApiKey)
+                .WithHeader(ClientSecrets.RuneberryApiKeyHeader, ClientSecrets.RuneberryClientApiKey)
                 .SendAsync();
 
             if (response == null || !response.IsSuccessStatusCode)

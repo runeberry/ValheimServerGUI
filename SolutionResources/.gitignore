@@ -1,4 +1,4 @@
 ValheimServerGUI.snk
 appsettings.secret.json
 appsettings.local.json
-Secrets.*.cs
+*Secrets.*.cs

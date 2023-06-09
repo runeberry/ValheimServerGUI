@@ -34,7 +34,7 @@ namespace ValheimServerGUI.Serverless.Services
             }
 
             var response = await Get($"https://xbl.io/api/v2/player/summary/{xuid}")
-                .WithHeader("x-authorization", Secrets.XboxApiKey)
+                .WithHeader("x-authorization", ServerSecrets.XboxApiKey)
                 .SendAsync<XboxPlayerSummaryResponse>();
 
             if (response == null)

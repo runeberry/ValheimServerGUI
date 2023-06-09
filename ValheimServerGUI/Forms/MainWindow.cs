@@ -11,6 +11,7 @@ using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
+using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.Forms
 {
@@ -246,7 +247,7 @@ namespace ValheimServerGUI.Forms
         {
             PlayersTable.AddRowBinding<PlayerInfo>(row =>
             {
-                row.AddCellBinding(ColumnPlayerName.Index, p => p.PlayerName ?? $"(...{p.SteamId[^4..]})");
+                row.AddCellBinding(ColumnPlayerName.Index, GetPlayerDisplayName);
                 row.AddCellBinding(ColumnPlayerStatus.Index, p => p.PlayerStatus);
                 row.AddCellBinding(ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
             });
@@ -855,33 +856,33 @@ namespace ValheimServerGUI.Forms
         {
             var playerRows = PlayersTable
                 .GetRowsWithType<PlayerInfo>()
-                .Where(p => p.Entity.SteamId == player.SteamId);
+                .Where(r => r.Entity.Platform == player.Platform && r.Entity.PlayerId == player.PlayerId);
 
             var playerRow = playerRows.FirstOrDefault(p => p.Entity.Key == player.Key) ?? PlayersTable.AddRowFromEntity(player);
             if (playerRow == null) return;
 
-            // Update styles based on player status
-            var imageIndex = -1;
+            // Update styles based on player status and platform
+            var platformImageIndex = -1;
             var color = PlayersTable.ForeColor;
+
+            switch (player.Platform)
+            {
+                case PlayerPlatforms.Steam:
+                    platformImageIndex = GetImageIndex(nameof(Resources.Steam_16x));
+                    break;
+                case PlayerPlatforms.Xbox:
+                    platformImageIndex = GetImageIndex(nameof(Resources.XboxLive_16x));
+                    break;
+            }
 
             switch (player.PlayerStatus)
             {
-                case PlayerStatus.Online:
-                    imageIndex = GetImageIndex(nameof(Resources.StatusOK_16x));
-                    break;
-                case PlayerStatus.Joining:
-                    imageIndex = GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
-                    break;
-                case PlayerStatus.Leaving:
-                    imageIndex = GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
-                    break;
                 case PlayerStatus.Offline:
-                    imageIndex = GetImageIndex(nameof(Resources.StatusNotStarted_16x));
                     color = Color.Gray;
                     break;
             }
 
-            playerRow.ImageIndex = imageIndex;
+            playerRow.ImageIndex = platformImageIndex;
             playerRow.ForeColor = color;
         }
 
@@ -1367,6 +1368,19 @@ namespace ValheimServerGUI.Forms
         private int GetImageIndex(string key)
         {
             return ImageList.Images.IndexOfKey(key);
+        }
+
+        private string GetPlayerDisplayName(PlayerInfo player)
+        {
+            // Show the last 4 digits of the player's platform ID if their name is not yet known
+            var name = player.PlayerName ?? $"[...{player.PlayerId[^4..]}]";
+
+            if (!string.IsNullOrWhiteSpace(player.LastStatusCharacter))
+            {
+                name += $" ({player.LastStatusCharacter})";
+            }
+
+            return name;
         }
 
         #endregion

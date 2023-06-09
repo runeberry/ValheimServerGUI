@@ -406,8 +406,11 @@ namespace ValheimServerGUI.Game
             var players = FindPlayersByQuery(query);
             foreach (var player in players)
             {
+                if (player.PlayerName == response.Name) continue;
+
                 player.PlayerName = response.Name;
-                Logger.Information($"Mapped player name from API: {player.Key}");
+                Logger.Information($"Player lookup successful: {player.Key}, {player.PlayerName}");
+                PlayerStatusChanged?.Invoke(this, player);
             }
 
             UpsertBulk(players);

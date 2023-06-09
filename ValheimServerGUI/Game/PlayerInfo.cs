@@ -9,7 +9,7 @@ namespace ValheimServerGUI.Game
     public class PlayerInfo : IPrimaryKeyEntity
     {
         [JsonIgnore]
-        public string Key => GetIdentifier();
+        public string Key => $"{Platform}:{PlayerId}";
 
         /// <summary>
         /// The platform that this player is playing Valheim on.
@@ -79,18 +79,6 @@ namespace ValheimServerGUI.Game
         {
             character = Characters?.FirstOrDefault(c => c.CharacterName == characterName);
             return character != null;
-        }
-
-        private string GetIdentifier()
-        {
-            var identifier = $"{Platform}:{PlayerId}";
-
-            if (!string.IsNullOrWhiteSpace(PlayerName))
-            {
-                identifier += $":{PlayerName}";
-            }
-
-            return identifier;
         }
 
         public class CharacterInfo

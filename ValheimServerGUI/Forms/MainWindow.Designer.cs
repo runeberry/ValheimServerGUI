@@ -112,8 +112,8 @@ namespace ValheimServerGUI.Forms
             ButtonRemovePlayer = new System.Windows.Forms.Button();
             ButtonPlayerDetails = new System.Windows.Forms.Button();
             PlayersTable = new ValheimServerGUI.Controls.DataListView();
-            ColumnPlayerStatus = new System.Windows.Forms.ColumnHeader();
             ColumnPlayerName = new System.Windows.Forms.ColumnHeader();
+            ColumnPlayerStatus = new System.Windows.Forms.ColumnHeader();
             ColumnPlayerUpdated = new System.Windows.Forms.ColumnHeader();
             ImageList = new System.Windows.Forms.ImageList(components);
             TabLogs = new System.Windows.Forms.TabPage();
@@ -982,37 +982,35 @@ namespace ValheimServerGUI.Forms
             ButtonPlayerDetails.Enabled = false;
             ButtonPlayerDetails.Location = new System.Drawing.Point(3, 3);
             ButtonPlayerDetails.Name = "ButtonPlayerDetails";
-            ButtonPlayerDetails.Size = new System.Drawing.Size(92, 23);
+            ButtonPlayerDetails.Size = new System.Drawing.Size(132, 23);
             ButtonPlayerDetails.TabIndex = 0;
-            ButtonPlayerDetails.Text = "Player Info...";
+            ButtonPlayerDetails.Text = "View Player Details...";
             ButtonPlayerDetails.UseVisualStyleBackColor = true;
             // 
             // PlayersTable
             // 
             PlayersTable.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            PlayersTable.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { ColumnPlayerStatus, ColumnPlayerName, ColumnPlayerUpdated });
+            PlayersTable.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] { ColumnPlayerName, ColumnPlayerStatus, ColumnPlayerUpdated });
             PlayersTable.Icons = ImageList;
             PlayersTable.Location = new System.Drawing.Point(3, 32);
             PlayersTable.Name = "PlayersTable";
             PlayersTable.Size = new System.Drawing.Size(446, 217);
             PlayersTable.TabIndex = 2;
             // 
-            // ColumnPlayerStatus
-            // 
-            ColumnPlayerStatus.DisplayIndex = 1;
-            ColumnPlayerStatus.Text = "Status";
-            ColumnPlayerStatus.Width = 120;
-            // 
             // ColumnPlayerName
             // 
-            ColumnPlayerName.DisplayIndex = 0;
-            ColumnPlayerName.Text = "Character Name";
-            ColumnPlayerName.Width = 160;
+            ColumnPlayerName.Text = "Player (Character)";
+            ColumnPlayerName.Width = 240;
+            // 
+            // ColumnPlayerStatus
+            // 
+            ColumnPlayerStatus.Text = "Status";
+            ColumnPlayerStatus.Width = 80;
             // 
             // ColumnPlayerUpdated
             // 
             ColumnPlayerUpdated.Text = "Since";
-            ColumnPlayerUpdated.Width = 160;
+            ColumnPlayerUpdated.Width = 120;
             // 
             // ImageList
             // 
@@ -1036,6 +1034,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogsFolderOpenButton
             // 
+            LogsFolderOpenButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             LogsFolderOpenButton.HelpText = "Open the logs folder in Explorer";
             LogsFolderOpenButton.Location = new System.Drawing.Point(258, 25);
             LogsFolderOpenButton.Name = "LogsFolderOpenButton";
@@ -1055,6 +1054,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LogViewSelectField
             // 
+            LogViewSelectField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("LogViewSelectField.DataSource");
             LogViewSelectField.DropdownEnabled = true;
             LogViewSelectField.EmptyText = "";
             LogViewSelectField.HelpText = "";

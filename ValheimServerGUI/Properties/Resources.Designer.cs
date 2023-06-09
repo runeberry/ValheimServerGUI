@@ -481,6 +481,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Steam_16x {
+            get {
+                object obj = ResourceManager.GetObject("Steam_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Stop_16x {
             get {
                 object obj = ResourceManager.GetObject("Stop_16x", resourceCulture);
@@ -648,6 +658,16 @@ namespace ValheimServerGUI.Properties {
         internal static System.Drawing.Bitmap vsg_logo_16 {
             get {
                 object obj = ResourceManager.GetObject("vsg_logo_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap XboxLive_16x {
+            get {
+                object obj = ResourceManager.GetObject("XboxLive_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

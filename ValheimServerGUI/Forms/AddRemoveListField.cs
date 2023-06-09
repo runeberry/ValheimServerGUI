@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows.Forms;
 
@@ -111,6 +112,16 @@ namespace ValheimServerGUI.Forms
             RemoveButton.Click += RemoveButton_Click;
 
             RefreshButtonState();
+        }
+
+        public IEnumerable<string> GetItems()
+        {
+            return SelectListField.GetItems();
+        }
+
+        public void SetItems(IEnumerable<string> items)
+        {
+            SelectListField.SetItems(items);
         }
 
         private void SelectListField_ValueChanged(object sender, string selectedItem)

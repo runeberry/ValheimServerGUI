@@ -38,15 +38,7 @@ namespace ValheimServerGUI.Controls
                 var index = GetItemIndex(value);
                 if (index != ListBox.SelectedIndex)
                 {
-                    ListBox.SelectedIndex = GetItemIndex(value);
-                    if (ListBox.SelectedIndex >= 0)
-                    {
-                        ValueChanged?.Invoke(this, value);
-                    }
-                    else
-                    {
-                        ValueChanged?.Invoke(this, null);
-                    }
+                    ListBox.SelectedIndex = index;
                 }
             }
         }
@@ -62,6 +54,8 @@ namespace ValheimServerGUI.Controls
         public SelectListField()
         {
             InitializeComponent();
+
+            ListBox.SelectedValueChanged += ListBox_SelectedValueChanged;
         }
 
         /// <summary>
@@ -161,7 +155,7 @@ namespace ValheimServerGUI.Controls
         {
             if (!IsValidIndex(index)) return;
 
-            ListBox.Items.Remove(index);
+            ListBox.Items.RemoveAt(index);
             ItemsChanged?.Invoke();
         }
 
@@ -253,6 +247,11 @@ namespace ValheimServerGUI.Controls
         private bool IsValidItem(string item)
         {
             return !string.IsNullOrWhiteSpace(item);
+        }
+
+        private void ListBox_SelectedValueChanged(object sender, EventArgs e)
+        {
+            ValueChanged?.Invoke(this, Value);
         }
     }
 }

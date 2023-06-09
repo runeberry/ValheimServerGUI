@@ -35,6 +35,19 @@ namespace ValheimServerGUI.Forms
             OnValidate = onValidate;
         }
 
+        public static string Prompt(
+            string title,
+            string message,
+            string startingText = null,
+            string helpText = null,
+            Func<string, bool> onValidate = null)
+        {
+            var popout = new TextPromptPopout(title, message, startingText);
+            popout.SetValidation(helpText, onValidate);
+            popout.ShowDialog();
+            return popout.Value;
+        }
+
         #region Form events
 
         private void ButtonOK_Click(object sender, EventArgs e)
@@ -63,7 +76,7 @@ namespace ValheimServerGUI.Forms
             string errMessage = null;
             try
             {
-                if (!OnValidate(userInput))
+                if (OnValidate != null && !OnValidate(userInput))
                 {
                     errMessage = TextInputField.HelpText ?? "The provided string is invalid.";
                 }

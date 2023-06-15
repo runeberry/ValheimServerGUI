@@ -32,6 +32,7 @@ In order to run ValheimServerGUI, you will need the following:
 * **It remembers!** - Stores your server info between sessions, and it can't be overwritten by Steam
 * **Status updates** - Clearly shows when your server is running, starting, or stopping
 * **Online players** - Show which players are online or offline, and when they arrived/left
+* **Cross-platform support** - Recognizes players from Steam and Xbox platforms
 * **Easy IP address** - No more guessing, copy the right IP address to give to your friends straight from the app
 * **Cleaner server logs** - Eliminates a lot of the noisy debug logs produced by the server
 * **Input validation** - Prevents you from creating a server with bad info that would fail to launch
@@ -57,7 +58,7 @@ Why choose a dedicated server, and why use ValheimServerGUI? Find the answers on
 
 ## Contributing
 
-Interesting in contributing code to ValheimServerGUI? Check out the guidelines and full developer's guide [here](CONTRIBUTING.md).
+Interested in contributing code to ValheimServerGUI? Check out the guidelines and full developer's guide [here](CONTRIBUTING.md).
 
 ## Support
 

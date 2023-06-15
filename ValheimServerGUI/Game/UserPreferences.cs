@@ -23,6 +23,8 @@ namespace ValheimServerGUI.Game
 
         public bool SaveProfileOnStart { get; set; } = true;
 
+        public bool WriteApplicationLogsToFile { get; set; } = true;
+
         public List<ServerPreferences> Servers { get; set; } = new();
 
         public static UserPreferences FromFile(UserPreferencesFile file)
@@ -37,6 +39,7 @@ namespace ValheimServerGUI.Game
             prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
             prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
+            prefs.WriteApplicationLogsToFile = file.WriteApplicationLogsToFile ?? prefs.WriteApplicationLogsToFile;
 
             if (file.Servers != null)
             {
@@ -60,6 +63,7 @@ namespace ValheimServerGUI.Game
                 StartWithWindows = StartWithWindows,
                 StartMinimized = StartMinimized,
                 SaveProfileOnStart = SaveProfileOnStart,
+                WriteApplicationLogsToFile = WriteApplicationLogsToFile,
                 Servers = new(),
             };
 

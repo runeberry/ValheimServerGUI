@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
+using Serilog;
 using ValheimServerGUI.Serverless.Middleware;
+using ValheimServerGUI.Serverless.Services;
+using ValheimServerGUI.Tools.Http;
 
 namespace ValheimServerGUI.Serverless
 {
@@ -20,17 +22,19 @@ namespace ValheimServerGUI.Serverless
         // This method gets called by the runtime. Use this method to add services to the container
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddNewtonsoftJson();
+
+            services.AddSingleton<ILogger, ServerlessLogger>();
+            services.AddSingleton<IHttpClientProvider, HttpClientProvider>();
+            services.AddSingleton<IRestClientContext, RestClientContext>();
+
+            services.AddSingleton<ISteamApiClient, SteamApiClient>();
+            services.AddSingleton<IXboxApiClient, XboxApiClient>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseHttpsRedirection();
 
             app.UseRouting();

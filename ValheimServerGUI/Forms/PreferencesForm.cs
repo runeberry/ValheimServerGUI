@@ -1,16 +1,16 @@
-﻿using Microsoft.Extensions.Logging;
-using System;
+﻿using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Forms
 {
     public partial class PreferencesForm : Form
     {
         private readonly IUserPreferencesProvider UserPrefsProvider;
-        private readonly ILogger Logger;
+        private readonly IApplicationLogger Logger;
 
         public PreferencesForm()
         {
@@ -18,7 +18,7 @@ namespace ValheimServerGUI.Forms
             this.AddApplicationIcon();
         }
 
-        public PreferencesForm(IUserPreferencesProvider userPrefsProvider, ILogger logger) : this()
+        public PreferencesForm(IUserPreferencesProvider userPrefsProvider, IApplicationLogger logger) : this()
         {
             UserPrefsProvider = userPrefsProvider;
             Logger = logger;
@@ -39,6 +39,7 @@ namespace ValheimServerGUI.Forms
             CheckForUpdatesField.Value = prefs.CheckForUpdates;
             StartWithWindowsField.Value = prefs.StartWithWindows;
             StartMinimizedField.Value = prefs.StartMinimized;
+            WriteLogFileField.Value = prefs.WriteApplicationLogsToFile;
 
             var startupInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
             CheckForUpdatesField.HelpText = CheckForUpdatesField.HelpText?.Replace("{startupInterval}", $"{startupInterval.TotalHours} hours");
@@ -52,6 +53,7 @@ namespace ValheimServerGUI.Forms
             prefs.CheckForUpdates = CheckForUpdatesField.Value;
             prefs.StartWithWindows = StartWithWindowsField.Value;
             prefs.StartMinimized = StartMinimizedField.Value;
+            prefs.WriteApplicationLogsToFile = WriteLogFileField.Value;
 
             StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, Logger);
 
@@ -72,6 +74,7 @@ namespace ValheimServerGUI.Forms
             CheckForUpdatesField.Value = prefs.CheckForUpdates;
             StartWithWindowsField.Value = prefs.StartWithWindows;
             StartMinimizedField.Value = prefs.StartMinimized;
+            WriteLogFileField.Value = prefs.WriteApplicationLogsToFile;
         }
     }
 }

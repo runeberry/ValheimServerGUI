@@ -1,10 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ValheimServerGUI.Properties;
-using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -65,11 +64,11 @@ namespace ValheimServerGUI.Game
             {
                 var file = preferences.ToFile();
                 SaveAsync(UserPrefsFilePath, file).GetAwaiter().GetResult();
-                Logger.LogInformation("User preferences saved");
+                Logger.Information("User preferences saved");
             }
             catch (Exception e)
             {
-                Logger.LogException(e, "Failed to save user preferences");
+                Logger.Error(e, "Failed to save user preferences");
                 return;
             }
 
@@ -97,7 +96,7 @@ namespace ValheimServerGUI.Game
             }
             catch (Exception e)
             {
-                Logger.LogException(e, "Failed to load user preferences");
+                Logger.Error(e, "Failed to load user preferences");
                 return UserPreferences.GetDefault();
             }
         }
@@ -123,7 +122,7 @@ namespace ValheimServerGUI.Game
 
             try
             {
-                Logger.LogInformation("Migrating userprefs.txt to userprefs.json...");
+                Logger.Information("Migrating userprefs.txt to userprefs.json...");
 
                 prefs = new UserPreferences();
 
@@ -149,13 +148,13 @@ namespace ValheimServerGUI.Game
                 SaveInternal(prefs);
                 File.Delete(LegacyPath);
 
-                Logger.LogInformation("Migration OK!");
+                Logger.Information("Migration OK!");
 
                 return true;
             }
             catch (Exception e)
             {
-                Logger.LogException(e, "Migration failed");
+                Logger.Error(e, "Migration failed");
                 prefs = null;
                 return false;
             }

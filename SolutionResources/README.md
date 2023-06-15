@@ -8,9 +8,9 @@ In some cases, however, you may want to supply your own mock secret values for t
 
 This is only needed when publishing the desktop client application in the Release configuration. If you need to publish the application locally for some reason, simply change the Publish Profile (.pubxml) to publish to Debug configuration temporarily.
 
-### Secrets.Values.cs
+### ClientSecrets.Values.cs
 
-This is a... "clever" way of providing secret information to both the client and Serverless applications at compile time. Use this partial static class to set the values of any properties in **Secrets.cs**.
+This is a... "clever" way of providing secret information to both the client and Serverless applications at compile time. Use this partial static class to set the values of any properties in **ClientSecrets.cs**.
 
 ```csharp
 namespace ValheimServerGUI.Properties
@@ -23,16 +23,6 @@ namespace ValheimServerGUI.Properties
       RuneberryApiKeyHeader = "some-header-key";
     }
   }
-}
-```
-
-### appsettings.secret.json
-
-Configuration values for the Serverless application, both when running locally and deployed. This file **must** exist when deploying the Serverless application, else it will fail to start.
-
-```jsonc
-{
-  "SteamApiKey": "", // Not yet used, but planned for an upcoming update
 }
 ```
 

@@ -6,7 +6,7 @@
         "dotnet lambda help",
         "All the command line options for the Lambda command can be specified in this file."
     ],
-    "profile"     : "default",
+    "profile"     : "toolkit-sso",
     "region"      : "us-east-1",
     "configuration" : "Release",
     "s3-prefix"     : "ValheimServerGUI.Serverless/",

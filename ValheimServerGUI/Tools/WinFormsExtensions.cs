@@ -4,7 +4,6 @@ using System.Drawing;
 using System.Globalization;
 using System.Linq;
 using System.Resources;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using ValheimServerGUI.Properties;
 
@@ -14,6 +13,18 @@ namespace ValheimServerGUI.Tools
     {
         #region Control extensions
 
+        public static Action<TArgs> BuildActionHandler<TArgs>(this Control control, Action<TArgs> action)
+        {
+            var eventHandler = control.BuildEventHandler(action);
+            return (args) => eventHandler(null, args);
+        }
+
+        public static Action BuildActionHandler(this Control control, Action action)
+        {
+            var eventHandler = control.BuildEventHandler(action);
+            return () => eventHandler(null, null);
+        }
+
         public static EventHandler<TArgs> BuildEventHandler<TArgs>(this Control control, Action<TArgs> action)
         {
             return (sender, args) =>
@@ -22,7 +33,7 @@ namespace ValheimServerGUI.Tools
 
                 if (control.InvokeRequired)
                 {
-                    control.Invoke(new Action<TArgs>(action), new object[] { args });
+                    control.BeginInvoke(action, new object[] { args });
                     return;
                 }
 
@@ -40,7 +51,7 @@ namespace ValheimServerGUI.Tools
                 // See here: https://stackoverflow.com/questions/519233/writing-to-a-textbox-from-another-thread
                 if (control.InvokeRequired)
                 {
-                    control.Invoke(action);
+                    control.BeginInvoke(action);
                     return;
                 }
 
@@ -48,47 +59,48 @@ namespace ValheimServerGUI.Tools
             };
         }
 
-        public static EventHandler<TArgs> BuildEventHandlerAsync<TArgs>(this Control control, Func<TArgs, Task> taskFunc, int taskDelay = 0)
-        {
-            return async (sender, args) =>
-            {
-                if (taskDelay > 0) await Task.Delay(taskDelay);
+        // (jb, 3/25/23) Commenting out these extensions because I'm not using them.
+        //public static EventHandler<TArgs> BuildEventHandlerAsync<TArgs>(this Control control, Func<TArgs, Task> taskFunc, int taskDelay = 0)
+        //{
+        //    return async (sender, args) =>
+        //    {
+        //        if (taskDelay > 0) await Task.Delay(taskDelay);
 
-                await Task.Run(() =>
-                {
-                    if (control.IsDisposed) return;
+        //        await Task.Run(() =>
+        //        {
+        //            if (control.IsDisposed) return;
 
-                    if (control.InvokeRequired)
-                    {
-                        control.Invoke(new Func<TArgs, Task>(taskFunc), new object[] { args });
-                        return;
-                    }
+        //            if (control.InvokeRequired)
+        //            {
+        //                control.BeginInvoke(new Func<TArgs, Task>(taskFunc), new object[] { args });
+        //                return;
+        //            }
 
-                    taskFunc(args);
-                });
-            };
-        }
+        //            taskFunc(args);
+        //        });
+        //    };
+        //}
 
-        public static EventHandler BuildEventHandlerAsync(this Control control, Func<Task> taskFunc, int taskDelay = 0)
-        {
-            return async (sender, args) =>
-            {
-                if (taskDelay > 0) await Task.Delay(taskDelay);
+        //public static EventHandler BuildEventHandlerAsync(this Control control, Func<Task> taskFunc, int taskDelay = 0)
+        //{
+        //    return async (sender, args) =>
+        //    {
+        //        if (taskDelay > 0) await Task.Delay(taskDelay);
 
-                await Task.Run(() =>
-                {
-                    if (control.IsDisposed) return;
+        //        await Task.Run(() =>
+        //        {
+        //            if (control.IsDisposed) return;
 
-                    if (control.InvokeRequired)
-                    {
-                        control.Invoke(new Func<Task>(taskFunc));
-                        return;
-                    }
+        //            if (control.InvokeRequired)
+        //            {
+        //                control.BeginInvoke(new Func<Task>(taskFunc));
+        //                return;
+        //            }
 
-                    taskFunc();
-                });
-            };
-        }
+        //            taskFunc();
+        //        });
+        //    };
+        //}
 
         /// <summary>
         /// (jb, 5/9/21) For some reason, you cannot set a Form's icon from a Resource in the Designer, so I've been setting it

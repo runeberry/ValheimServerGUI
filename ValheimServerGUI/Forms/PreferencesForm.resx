@@ -63,4 +63,13 @@ when the app starts up, and again every {startupInterval}.
 
 If disabled, you can check for updates anytime from Help &gt; Check for updates.</value>
   </data>
+  <data name="WriteLogFileField.HelpText" xml:space="preserve">
+    <value>If enabled, any application logs from ValheimServerGUI
+will be written to a daily rolling log file on disk. Logs older
+than 30 days will be deleted automatically.
+
+Note: this setting does not affect your server's logs.
+You can toggle server logs under the Advanced Controls
+tab for each server profile.</value>
+  </data>
 </root>

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Serilog;
 using System;
 using System.Windows.Forms;
 using ValheimServerGUI.Forms;
@@ -43,7 +43,6 @@ namespace ValheimServerGUI
 
         public static void ConfigureServices(IServiceCollection services, string[] args)
         {
-            var applicationLogger = new ApplicationLogger();
             var startupArgsProvider = new StartupArgsProvider(args);
 
             // Tools
@@ -52,8 +51,9 @@ namespace ValheimServerGUI
                 .AddSingleton<IFileProvider, JsonFileProvider>()
                 .AddSingleton<IFormProvider, FormProvider>()
                 .AddSingleton<IProcessProvider, ProcessProvider>()
-                .AddSingleton<ILogger>(applicationLogger)
-                .AddSingleton<IEventLogger>(applicationLogger)
+                .AddSingleton<ApplicationLogger>()
+                .AddSingleton<ILogger>(sp => sp.GetRequiredService<ApplicationLogger>())
+                .AddSingleton<IApplicationLogger>(sp => sp.GetRequiredService<ApplicationLogger>())
                 .AddSingleton<IHttpClientProvider, HttpClientProvider>()
                 .AddSingleton<IRestClientContext, RestClientContext>()
                 .AddSingleton<IIpAddressProvider, IpAddressProvider>()
@@ -68,7 +68,6 @@ namespace ValheimServerGUI
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
                 .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
-                .AddTransient<ValheimServerLogger>()
                 .AddTransient<ValheimServer>();
 
             // Forms

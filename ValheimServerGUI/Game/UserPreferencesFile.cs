@@ -38,6 +38,9 @@ namespace ValheimServerGUI.Game
         [JsonProperty("saveProfileOnStart")]
         public bool? SaveProfileOnStart { get; set; }
 
+        [JsonProperty("writeApplicationLogsToFile")]
+        public bool? WriteApplicationLogsToFile { get; set; }
+
         [JsonProperty("servers")]
         public List<ServerPreferencesFile> Servers { get; set; }
     }

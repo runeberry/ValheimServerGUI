@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Diagnostics;
 using ValheimServerGUI.Tools.Processes;
 
@@ -7,19 +7,26 @@ namespace ValheimServerGUI.Tests.Tools
 {
     public class MockProcessProvider : IProcessProvider
     {
+        private readonly ConcurrentDictionary<string, Process> Processes = new();
+
         public void AddProcess(string key, Process process)
         {
-            throw new NotImplementedException("Cannot add processes in unit tests!");
+            if (!Processes.TryAdd(key, process))
+            {
+                throw new InvalidOperationException($"Failed to add process with key: {key}");
+            }
         }
 
         public Process GetProcess(string key)
         {
-            throw new NotImplementedException("Cannot get processes in unit tests!");
+            if (!Processes.TryGetValue(key, out var process)) return null;
+            return process;
         }
 
-        public List<Process> FindExistingProcessesByName(string name)
+
+        public void StartIO(Process process)
         {
-            return new();
+            // no-op for testing
         }
     }
 }

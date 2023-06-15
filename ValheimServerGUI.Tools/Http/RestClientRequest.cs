@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -73,7 +72,7 @@ namespace ValheimServerGUI.Tools.Http
 
                 if (!responseMessage.IsSuccessStatusCode)
                 {
-                    Context.Logger.LogError("HTTP request was not successful ({0}): {1}", statusCode, logAddress);
+                    Context.Logger.Error("HTTP request was not successful ({0}): {1}", statusCode, logAddress);
                     return responseMessage;
                 }
 
@@ -83,7 +82,7 @@ namespace ValheimServerGUI.Tools.Http
                     ResponseContent = JsonConvert.DeserializeObject(responseContentStr, ResponseContentType);
                 }
 
-                Context.Logger.LogTrace("HTTP request was successful ({0}): {1}", statusCode, logAddress);
+                Context.Logger.Debug("HTTP request was successful ({0}): {1}", statusCode, logAddress);
 
                 foreach (var callback in Callbacks)
                 {
@@ -94,9 +93,9 @@ namespace ValheimServerGUI.Tools.Http
                     catch (Exception callbackException)
                     {
                         // Log the error, but keep iterating over callbacks
-                        Context.Logger.LogError(callbackException, "HTTP request callback encountered an unexpected error: {0}", logAddress);
-                        Context.Logger.LogError(callbackException.Message);
-                        Context.Logger.LogError(callbackException.StackTrace);
+                        Context.Logger.Error(callbackException, "HTTP request callback encountered an unexpected error: {0}", logAddress);
+                        Context.Logger.Error(callbackException.Message);
+                        Context.Logger.Error(callbackException.StackTrace);
                     }
                 }
 
@@ -104,9 +103,9 @@ namespace ValheimServerGUI.Tools.Http
             }
             catch (Exception e)
             {
-                Context.Logger.LogError(e, "HTTP request encountered an unexpected error: {0}", logAddress);
-                Context.Logger.LogError(e.Message);
-                Context.Logger.LogError(e.StackTrace);
+                Context.Logger.Error(e, "HTTP request encountered an unexpected error: {0}", logAddress);
+                Context.Logger.Error(e.Message);
+                Context.Logger.Error(e.StackTrace);
                 return null;
             }
         }

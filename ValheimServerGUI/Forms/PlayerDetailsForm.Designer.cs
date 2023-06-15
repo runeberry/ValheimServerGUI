@@ -30,148 +30,192 @@ namespace ValheimServerGUI.Forms
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlayerDetailsForm));
-            this.PlayerNameField = new ValheimServerGUI.Controls.LabelField();
-            this.ButtonOK = new System.Windows.Forms.Button();
-            this.ButtonRefresh = new System.Windows.Forms.Button();
-            this.SteamIdField = new ValheimServerGUI.Controls.LabelField();
-            this.ZdoIdField = new ValheimServerGUI.Controls.LabelField();
-            this.OnlineStatusField = new ValheimServerGUI.Controls.LabelField();
-            this.StatusChangedField = new ValheimServerGUI.Controls.LabelField();
-            this.SteamIdWarningIcon = new System.Windows.Forms.PictureBox();
-            this.SteamIdCopyButton = new ValheimServerGUI.Forms.CopyButton();
-            ((System.ComponentModel.ISupportInitialize)(this.SteamIdWarningIcon)).BeginInit();
-            this.SuspendLayout();
+            PlayerNameField = new ValheimServerGUI.Controls.LabelField();
+            ButtonOK = new System.Windows.Forms.Button();
+            ButtonRefresh = new System.Windows.Forms.Button();
+            PlatformIdField = new ValheimServerGUI.Controls.LabelField();
+            ZdoIdField = new ValheimServerGUI.Controls.LabelField();
+            OnlineStatusField = new ValheimServerGUI.Controls.LabelField();
+            StatusChangedField = new ValheimServerGUI.Controls.LabelField();
+            SteamIdCopyButton = new CopyButton();
+            CharacterListField = new AddRemoveListField();
+            PlatformIcon = new System.Windows.Forms.PictureBox();
+            CurrentCharacterNameField = new ValheimServerGUI.Controls.LabelField();
+            PlayerNameEditButton = new EditButton();
+            ((System.ComponentModel.ISupportInitialize)PlatformIcon).BeginInit();
+            SuspendLayout();
             // 
             // PlayerNameField
             // 
-            this.PlayerNameField.HelpText = resources.GetString("PlayerNameField.HelpText");
-            this.PlayerNameField.LabelSplitRatio = 0.5D;
-            this.PlayerNameField.LabelText = "Character Name:";
-            this.PlayerNameField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.PlayerNameField.Location = new System.Drawing.Point(12, 12);
-            this.PlayerNameField.Name = "PlayerNameField";
-            this.PlayerNameField.Size = new System.Drawing.Size(240, 15);
-            this.PlayerNameField.TabIndex = 0;
-            this.PlayerNameField.Value = "";
-            this.PlayerNameField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            PlayerNameField.HelpText = "The player's Steam/Xbox username. This will be determined\r\nautomatically, but in case it doesn't work, you may edit the\r\nplayer's name manually.";
+            PlayerNameField.LabelSplitRatio = 0.5D;
+            PlayerNameField.LabelText = "Player Name:";
+            PlayerNameField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            PlayerNameField.Location = new System.Drawing.Point(12, 12);
+            PlayerNameField.Name = "PlayerNameField";
+            PlayerNameField.Size = new System.Drawing.Size(240, 15);
+            PlayerNameField.TabIndex = 0;
+            PlayerNameField.Value = "";
+            PlayerNameField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // ButtonOK
             // 
-            this.ButtonOK.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonOK.Location = new System.Drawing.Point(202, 120);
-            this.ButtonOK.Name = "ButtonOK";
-            this.ButtonOK.Size = new System.Drawing.Size(75, 23);
-            this.ButtonOK.TabIndex = 7;
-            this.ButtonOK.Text = "OK";
-            this.ButtonOK.UseVisualStyleBackColor = true;
+            ButtonOK.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            ButtonOK.Location = new System.Drawing.Point(199, 277);
+            ButtonOK.Name = "ButtonOK";
+            ButtonOK.Size = new System.Drawing.Size(75, 23);
+            ButtonOK.TabIndex = 7;
+            ButtonOK.Text = "OK";
+            ButtonOK.UseVisualStyleBackColor = true;
             // 
             // ButtonRefresh
             // 
-            this.ButtonRefresh.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.ButtonRefresh.Image = global::ValheimServerGUI.Properties.Resources.Restart_16x;
-            this.ButtonRefresh.Location = new System.Drawing.Point(173, 120);
-            this.ButtonRefresh.Name = "ButtonRefresh";
-            this.ButtonRefresh.Size = new System.Drawing.Size(23, 23);
-            this.ButtonRefresh.TabIndex = 6;
-            this.ButtonRefresh.UseVisualStyleBackColor = true;
+            ButtonRefresh.Anchor = System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right;
+            ButtonRefresh.Image = Properties.Resources.Restart_16x;
+            ButtonRefresh.Location = new System.Drawing.Point(170, 277);
+            ButtonRefresh.Name = "ButtonRefresh";
+            ButtonRefresh.Size = new System.Drawing.Size(23, 23);
+            ButtonRefresh.TabIndex = 6;
+            ButtonRefresh.UseVisualStyleBackColor = true;
             // 
-            // SteamIdField
+            // PlatformIdField
             // 
-            this.SteamIdField.HelpText = "The ID associated with the player\'s Steam account. You can use this ID to ban or " +
-    "block players, or add players as admins.";
-            this.SteamIdField.LabelSplitRatio = 0.5D;
-            this.SteamIdField.LabelText = "Steam ID:";
-            this.SteamIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.SteamIdField.Location = new System.Drawing.Point(12, 33);
-            this.SteamIdField.Name = "SteamIdField";
-            this.SteamIdField.Size = new System.Drawing.Size(240, 15);
-            this.SteamIdField.TabIndex = 1;
-            this.SteamIdField.Value = "";
-            this.SteamIdField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            PlatformIdField.HelpText = "The ID associated with the player's Steam or Xbox account.\r\nYou can use this ID to allow or ban players, or add players as admins.";
+            PlatformIdField.LabelSplitRatio = 0.5D;
+            PlatformIdField.LabelText = "Platform ID:";
+            PlatformIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            PlatformIdField.Location = new System.Drawing.Point(12, 33);
+            PlatformIdField.Name = "PlatformIdField";
+            PlatformIdField.Size = new System.Drawing.Size(240, 15);
+            PlatformIdField.TabIndex = 1;
+            PlatformIdField.Value = "";
+            PlatformIdField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // ZdoIdField
             // 
-            this.ZdoIdField.HelpText = "The player\'s object ID in game. This changes with each game session.";
-            this.ZdoIdField.LabelSplitRatio = 0.5D;
-            this.ZdoIdField.LabelText = "ZDOID:";
-            this.ZdoIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.ZdoIdField.Location = new System.Drawing.Point(12, 54);
-            this.ZdoIdField.Name = "ZdoIdField";
-            this.ZdoIdField.Size = new System.Drawing.Size(240, 15);
-            this.ZdoIdField.TabIndex = 3;
-            this.ZdoIdField.Value = "";
-            this.ZdoIdField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            ZdoIdField.HelpText = "The player's object ID in game. This changes with each game session.";
+            ZdoIdField.LabelSplitRatio = 0.5D;
+            ZdoIdField.LabelText = "ZDOID:";
+            ZdoIdField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            ZdoIdField.Location = new System.Drawing.Point(12, 54);
+            ZdoIdField.Name = "ZdoIdField";
+            ZdoIdField.Size = new System.Drawing.Size(240, 15);
+            ZdoIdField.TabIndex = 3;
+            ZdoIdField.Value = "";
+            ZdoIdField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // OnlineStatusField
             // 
-            this.OnlineStatusField.HelpText = "Possible statuses are: Online, Offline, Joining, or Leaving";
-            this.OnlineStatusField.LabelSplitRatio = 0.5D;
-            this.OnlineStatusField.LabelText = "Online Status:";
-            this.OnlineStatusField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.OnlineStatusField.Location = new System.Drawing.Point(12, 75);
-            this.OnlineStatusField.Name = "OnlineStatusField";
-            this.OnlineStatusField.Size = new System.Drawing.Size(240, 15);
-            this.OnlineStatusField.TabIndex = 4;
-            this.OnlineStatusField.Value = "";
-            this.OnlineStatusField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            OnlineStatusField.HelpText = "Possible statuses are: Online, Offline, Joining, or Leaving";
+            OnlineStatusField.LabelSplitRatio = 0.5D;
+            OnlineStatusField.LabelText = "Online Status:";
+            OnlineStatusField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            OnlineStatusField.Location = new System.Drawing.Point(12, 96);
+            OnlineStatusField.Name = "OnlineStatusField";
+            OnlineStatusField.Size = new System.Drawing.Size(240, 15);
+            OnlineStatusField.TabIndex = 4;
+            OnlineStatusField.Value = "";
+            OnlineStatusField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // StatusChangedField
             // 
-            this.StatusChangedField.HelpText = "";
-            this.StatusChangedField.LabelSplitRatio = 0.5D;
-            this.StatusChangedField.LabelText = "Status Changed:";
-            this.StatusChangedField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
-            this.StatusChangedField.Location = new System.Drawing.Point(12, 96);
-            this.StatusChangedField.Name = "StatusChangedField";
-            this.StatusChangedField.Size = new System.Drawing.Size(240, 15);
-            this.StatusChangedField.TabIndex = 5;
-            this.StatusChangedField.Value = "";
-            this.StatusChangedField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
-            // 
-            // SteamIdWarningIcon
-            // 
-            this.SteamIdWarningIcon.Image = global::ValheimServerGUI.Properties.Resources.StatusWarning_16x;
-            this.SteamIdWarningIcon.Location = new System.Drawing.Point(258, 12);
-            this.SteamIdWarningIcon.Name = "SteamIdWarningIcon";
-            this.SteamIdWarningIcon.Size = new System.Drawing.Size(16, 16);
-            this.SteamIdWarningIcon.TabIndex = 7;
-            this.SteamIdWarningIcon.TabStop = false;
-            this.SteamIdWarningIcon.Visible = false;
+            StatusChangedField.HelpText = "";
+            StatusChangedField.LabelSplitRatio = 0.5D;
+            StatusChangedField.LabelText = "Status Changed:";
+            StatusChangedField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            StatusChangedField.Location = new System.Drawing.Point(12, 117);
+            StatusChangedField.Name = "StatusChangedField";
+            StatusChangedField.Size = new System.Drawing.Size(240, 15);
+            StatusChangedField.TabIndex = 5;
+            StatusChangedField.Value = "";
+            StatusChangedField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
             // 
             // SteamIdCopyButton
             // 
-            this.SteamIdCopyButton.CopyFunction = null;
-            this.SteamIdCopyButton.Location = new System.Drawing.Point(258, 34);
-            this.SteamIdCopyButton.Name = "SteamIdCopyButton";
-            this.SteamIdCopyButton.Size = new System.Drawing.Size(16, 16);
-            this.SteamIdCopyButton.TabIndex = 2;
-            this.SteamIdCopyButton.TabStop = false;
-            this.SteamIdCopyButton.HelpText = "Copy Steam ID to clipboard";
+            SteamIdCopyButton.CopyFunction = null;
+            SteamIdCopyButton.HelpText = "Copy Steam ID to clipboard";
+            SteamIdCopyButton.Location = new System.Drawing.Point(258, 34);
+            SteamIdCopyButton.Name = "SteamIdCopyButton";
+            SteamIdCopyButton.Size = new System.Drawing.Size(16, 16);
+            SteamIdCopyButton.TabIndex = 2;
+            SteamIdCopyButton.TabStop = false;
+            // 
+            // CharacterListField
+            // 
+            CharacterListField.AddEnabled = true;
+            CharacterListField.AddFunction = null;
+            CharacterListField.AllowDuplicates = false;
+            CharacterListField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            CharacterListField.EditEnabled = true;
+            CharacterListField.EditFunction = null;
+            CharacterListField.HelpText = resources.GetString("CharacterListField.HelpText");
+            CharacterListField.LabelText = "Known Characters";
+            CharacterListField.Location = new System.Drawing.Point(12, 138);
+            CharacterListField.Name = "CharacterListField";
+            CharacterListField.RemoveEnabled = true;
+            CharacterListField.RemoveFunction = null;
+            CharacterListField.Size = new System.Drawing.Size(265, 133);
+            CharacterListField.TabIndex = 8;
+            CharacterListField.Value = null;
+            // 
+            // PlatformIcon
+            // 
+            PlatformIcon.ErrorImage = null;
+            PlatformIcon.InitialImage = null;
+            PlatformIcon.Location = new System.Drawing.Point(38, 11);
+            PlatformIcon.Name = "PlatformIcon";
+            PlatformIcon.Size = new System.Drawing.Size(16, 16);
+            PlatformIcon.TabIndex = 9;
+            PlatformIcon.TabStop = false;
+            // 
+            // CurrentCharacterNameField
+            // 
+            CurrentCharacterNameField.HelpText = "The character that this player is currently playing, or\r\nif they're offline, the last character they logged in as.";
+            CurrentCharacterNameField.LabelSplitRatio = 0.5D;
+            CurrentCharacterNameField.LabelText = "Latest Character:";
+            CurrentCharacterNameField.LabelTextAlign = System.Drawing.ContentAlignment.TopRight;
+            CurrentCharacterNameField.Location = new System.Drawing.Point(12, 75);
+            CurrentCharacterNameField.Name = "CurrentCharacterNameField";
+            CurrentCharacterNameField.Size = new System.Drawing.Size(240, 15);
+            CurrentCharacterNameField.TabIndex = 10;
+            CurrentCharacterNameField.Value = "";
+            CurrentCharacterNameField.ValueTextAlign = System.Drawing.ContentAlignment.TopLeft;
+            // 
+            // PlayerNameEditButton
+            // 
+            PlayerNameEditButton.EditFunction = null;
+            PlayerNameEditButton.HelpText = "Edit Player Name";
+            PlayerNameEditButton.Location = new System.Drawing.Point(258, 12);
+            PlayerNameEditButton.Name = "PlayerNameEditButton";
+            PlayerNameEditButton.Size = new System.Drawing.Size(16, 16);
+            PlayerNameEditButton.TabIndex = 11;
             // 
             // PlayerDetailsForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(289, 155);
-            this.Controls.Add(this.SteamIdCopyButton);
-            this.Controls.Add(this.SteamIdWarningIcon);
-            this.Controls.Add(this.StatusChangedField);
-            this.Controls.Add(this.OnlineStatusField);
-            this.Controls.Add(this.ZdoIdField);
-            this.Controls.Add(this.SteamIdField);
-            this.Controls.Add(this.ButtonRefresh);
-            this.Controls.Add(this.ButtonOK);
-            this.Controls.Add(this.PlayerNameField);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "PlayerDetailsForm";
-            this.ShowInTaskbar = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
-            this.Text = "Player Info";
-            ((System.ComponentModel.ISupportInitialize)(this.SteamIdWarningIcon)).EndInit();
-            this.ResumeLayout(false);
-
+            AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            ClientSize = new System.Drawing.Size(289, 320);
+            Controls.Add(PlayerNameEditButton);
+            Controls.Add(CurrentCharacterNameField);
+            Controls.Add(PlatformIcon);
+            Controls.Add(CharacterListField);
+            Controls.Add(SteamIdCopyButton);
+            Controls.Add(StatusChangedField);
+            Controls.Add(OnlineStatusField);
+            Controls.Add(ZdoIdField);
+            Controls.Add(PlatformIdField);
+            Controls.Add(ButtonRefresh);
+            Controls.Add(ButtonOK);
+            Controls.Add(PlayerNameField);
+            FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "PlayerDetailsForm";
+            ShowInTaskbar = false;
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterParent;
+            Text = "Player Info";
+            ((System.ComponentModel.ISupportInitialize)PlatformIcon).EndInit();
+            ResumeLayout(false);
         }
 
         #endregion
@@ -179,11 +223,14 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.LabelField PlayerNameField;
         private System.Windows.Forms.Button ButtonOK;
         private System.Windows.Forms.Button ButtonRefresh;
-        private ValheimServerGUI.Controls.LabelField SteamIdField;
+        private ValheimServerGUI.Controls.LabelField PlatformIdField;
         private ValheimServerGUI.Controls.LabelField ZdoIdField;
         private ValheimServerGUI.Controls.LabelField OnlineStatusField;
         private ValheimServerGUI.Controls.LabelField StatusChangedField;
-        private System.Windows.Forms.PictureBox SteamIdWarningIcon;
         private CopyButton SteamIdCopyButton;
+        private AddRemoveListField CharacterListField;
+        private System.Windows.Forms.PictureBox PlatformIcon;
+        private ValheimServerGUI.Controls.LabelField CurrentCharacterNameField;
+        private EditButton PlayerNameEditButton;
     }
 }

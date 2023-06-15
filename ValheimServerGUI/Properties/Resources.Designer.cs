@@ -63,6 +63,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Add_16x {
+            get {
+                object obj = ResourceManager.GetObject("Add_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap AddImmediateWindow_16x {
             get {
                 object obj = ResourceManager.GetObject("AddImmediateWindow_16x", resourceCulture);
@@ -213,6 +223,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Edit_16x {
+            get {
+                object obj = ResourceManager.GetObject("Edit_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap FolderInformation_16x {
             get {
                 object obj = ResourceManager.GetObject("FolderInformation_16x", resourceCulture);
@@ -247,6 +267,15 @@ namespace ValheimServerGUI.Properties {
             get {
                 object obj = ResourceManager.GetObject("Loading_Blue_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\logs.
+        /// </summary>
+        internal static string LogsFolderPath {
+            get {
+                return ResourceManager.GetString("LogsFolderPath", resourceCulture);
             }
         }
         
@@ -301,11 +330,21 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\players.json.
+        ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\players-cache.json.
         /// </summary>
         internal static string PlayerListFilePath {
             get {
                 return ResourceManager.GetString("PlayerListFilePath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap Remove_Red_16x {
+            get {
+                object obj = ResourceManager.GetObject("Remove_Red_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
             }
         }
         
@@ -442,6 +481,16 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
+        internal static System.Drawing.Bitmap Steam_16x {
+            get {
+                object obj = ResourceManager.GetObject("Steam_16x", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
         internal static System.Drawing.Bitmap Stop_16x {
             get {
                 object obj = ResourceManager.GetObject("Stop_16x", resourceCulture);
@@ -541,6 +590,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions.
+        /// </summary>
+        internal static string UrlHelpCharacterNames {
+            get {
+                return ResourceManager.GetString("UrlHelpCharacterNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server.
         /// </summary>
         internal static string UrlPortForwardingGuide {
@@ -609,6 +667,16 @@ namespace ValheimServerGUI.Properties {
         internal static System.Drawing.Bitmap vsg_logo_16 {
             get {
                 object obj = ResourceManager.GetObject("vsg_logo_16", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Bitmap.
+        /// </summary>
+        internal static System.Drawing.Bitmap XboxLive_16x {
+            get {
+                object obj = ResourceManager.GetObject("XboxLive_16x", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

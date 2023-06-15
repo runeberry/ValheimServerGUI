@@ -37,6 +37,8 @@ namespace ValheimServerGUI.Game
 
         public string SaveDataFolderPath { get; set; }
 
+        public bool WriteServerLogsToFile { get; set; } = true;
+
         public static ServerPreferences FromFile(ServerPreferencesFile file)
         {
             var prefs = new ServerPreferences();
@@ -59,6 +61,7 @@ namespace ValheimServerGUI.Game
             prefs.AdditionalArgs = file.AdditionalArgs ?? prefs.AdditionalArgs;
             prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
             prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
+            prefs.WriteServerLogsToFile = file.WriteServerLogsToFile ?? prefs.WriteServerLogsToFile;
 
             return prefs;
         }
@@ -83,6 +86,7 @@ namespace ValheimServerGUI.Game
                 AdditionalArgs = AdditionalArgs,
                 ServerExePath = ServerExePath,
                 SaveDataFolderPath = SaveDataFolderPath,
+                WriteServerLogsToFile = WriteServerLogsToFile,
             };
 
             return file;

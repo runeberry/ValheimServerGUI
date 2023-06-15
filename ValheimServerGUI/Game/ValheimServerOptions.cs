@@ -30,6 +30,10 @@ namespace ValheimServerGUI.Game
 
         public string SaveDataFolderPath { get; set; }
 
+        public bool LogToFile { get; set; }
+
+        public Action<string> LogMessageHandler { get; set; }
+
         public void Validate()
         {
             // Ensure all required fields exist
@@ -60,6 +64,10 @@ namespace ValheimServerGUI.Game
             if (BackupLong < 1) throw new ArgumentException($"Long backup interval must be greater than 0.");
             if (SaveInterval > BackupShort || SaveInterval > BackupLong) throw new ArgumentException($"Save interval must be less than or equal to the backup intervals.");
             if (BackupShort > BackupLong) throw new ArgumentException($"Short backup interval must be less than or equal to the long backup interval.");
+
+            // Additional args
+            // Using the native -logFile command will prevent logs from being piped to VSG, so don't allow it.
+            if (AdditionalArgs.ToLower().Contains("-logfile")) throw new ArgumentException($"ValheimServerGUI does not support the '-logFile' server argument. Instead, enable writing server logs to file under Advanced Controls.");
 
             // Filepaths
             this.GetValidatedServerExe();
@@ -94,5 +102,9 @@ namespace ValheimServerGUI.Game
         string ServerExePath { get; }
 
         string SaveDataFolderPath { get; }
+
+        bool LogToFile { get; }
+
+        Action<string> LogMessageHandler { get; }
     }
 }

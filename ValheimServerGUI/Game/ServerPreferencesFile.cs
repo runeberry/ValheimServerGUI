@@ -52,5 +52,8 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("valheimSaveDataFolder")]
         public string SaveDataFolderPath { get; set; }
+
+        [JsonProperty("writeServerLogsToFile")]
+        public bool? WriteServerLogsToFile { get; set; }
     }
 }

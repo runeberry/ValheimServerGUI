@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Linq;
 using System.Net;
@@ -84,7 +83,7 @@ namespace ValheimServerGUI.Tools
 
             if (!addresses.Any())
             {
-                Logger.LogWarning("Failed to find internal IP address: No network interfaces are UP with any IPv4 addresses");
+                Logger.Warning("Failed to find internal IP address: No network interfaces are UP with any IPv4 addresses");
                 return Task.CompletedTask;
             }
 

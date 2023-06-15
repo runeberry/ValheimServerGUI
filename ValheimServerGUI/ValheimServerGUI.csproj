@@ -10,7 +10,7 @@
 		<Description>A simple user interface for running Valheim Dedicated Server on Windows.</Description>
 		<Copyright>2022</Copyright>
 		<PackageLicenseExpression>GNU GPLv3</PackageLicenseExpression>
-		<Version>2.1.0</Version>
+		<Version>2.2.0-rc.2</Version>
     <!-- Build date adapted from: https://rmauro.dev/add-build-time-to-your-csharp-assembly/ -->
     <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))</SourceRevisionId>
 	</PropertyGroup>
@@ -33,15 +33,16 @@
 		<PackageReference Include="DeviceId" Version="6.2.0" />
 		<PackageReference Include="Humanizer" Version="2.14.1" />
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="6.0.3" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
 		<PackageReference Include="Semver" Version="2.2.0" />
+		<PackageReference Include="Serilog" Version="2.12.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Compile Include="..\SolutionResources\Secrets.cs" Link="Properties\Secrets.cs" />
-		<Compile Include="..\SolutionResources\Secrets.Values.cs" Link="Properties\Secrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\Secrets.Values.cs')" />
-	</ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\SolutionResources\ClientSecrets.cs" Link="Properties\ClientSecrets.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\ClientSecrets.cs')" />
+    <Compile Include="..\SolutionResources\ClientSecrets.Values.cs" Link="Properties\ClientSecrets.Values.cs" Condition="'$(Configuration)'=='Release' Or Exists('..\SolutionResources\ClientSecrets.Values.cs')" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<Compile Update="Properties\Resources.Designer.cs">

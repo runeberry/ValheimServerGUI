@@ -1,4 +1,3 @@
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,7 +11,7 @@ using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
-using ValheimServerGUI.Tools.Processes;
+using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.Forms
 {
@@ -48,8 +47,6 @@ namespace ValheimServerGUI.Forms
         public bool StartServerAutomatically { get; set; }
 
         private static readonly string NL = Environment.NewLine;
-        private const string LogViewServer = "Server";
-        private const string LogViewApplication = "Application";
         private const string IpLoadingText = "Loading...";
 
         private readonly Stopwatch ServerUptimeTimer = new();
@@ -67,11 +64,9 @@ namespace ValheimServerGUI.Forms
         private readonly IServerPreferencesProvider ServerPrefsProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
-        private readonly IEventLogger Logger;
+        private readonly IApplicationLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
-        private readonly IProcessProvider ProcessProvider;
-        private readonly IStartupArgsProvider StartupArgsProvider;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -79,11 +74,9 @@ namespace ValheimServerGUI.Forms
             IServerPreferencesProvider serverPrefsProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
-            IEventLogger appLogger,
+            IApplicationLogger appLogger,
             IIpAddressProvider ipAddressProvider,
-            ISoftwareUpdateProvider softwareUpdateProvider,
-            IProcessProvider processProvider,
-            IStartupArgsProvider startupArgsProvider)
+            ISoftwareUpdateProvider softwareUpdateProvider)
         {
 #if DEBUG
             if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
@@ -96,8 +89,6 @@ namespace ValheimServerGUI.Forms
             Logger = appLogger;
             IpAddressProvider = ipAddressProvider;
             SoftwareUpdateProvider = softwareUpdateProvider;
-            ProcessProvider = processProvider;
-            StartupArgsProvider = startupArgsProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             this.AddApplicationIcon();
@@ -116,8 +107,6 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeServices()
         {
-            Logger.LogReceived += this.BuildEventHandler<EventLogContext>(OnApplicationLogReceived);
-            Server.LogReceived += this.BuildEventHandler<EventLogContext>(OnServerLogReceived);
             Server.StatusChanged += this.BuildEventHandler<ServerStatus>(OnServerStatusChanged);
             Server.WorldSaved += this.BuildEventHandler<decimal>(OnWorldSaved);
             Server.InviteCodeReady += this.BuildEventHandler<string>(OnInviteCodeReady);
@@ -176,7 +165,9 @@ namespace ValheimServerGUI.Forms
             ButtonStopServer.Click += this.BuildEventHandler(ButtonStopServer_Click);
             ButtonClearLogs.Click += ButtonClearLogs_Click;
             ButtonSaveLogs.Click += ButtonSaveLogs_Click;
+            LogsFolderOpenButton.PathFunction = () => Resources.LogsFolderPath;
             ButtonPlayerDetails.Click += ButtonPlayerDetails_Click;
+            LinkCharacterNamesHelp.Click += LinkCharacterNamesHelp_Click;
             ButtonRemovePlayer.Click += ButtonRemovePlayer_Click;
             CopyButtonServerPassword.CopyFunction = () => ServerPasswordField.Value;
             WorldsListRefreshButton.RefreshFunction = WorldsListRefreshButton_Click;
@@ -201,8 +192,16 @@ namespace ValheimServerGUI.Forms
 
         private void InitializeFormFields()
         {
-            LogViewSelectField.DataSource = new[] { LogViewServer, LogViewApplication };
-            LogViewSelectField.Value = LogViewServer;
+            // Write message backlog to application log view...
+            foreach (var message in Logger.LogBuffer)
+            {
+                LogViewer.AddLogToView(message, LogViews.Application);
+            }
+            // ...then write all new messages to that log view.
+            Logger.LogReceived += this.BuildActionHandler<string>(OnApplicationLogReceived);
+
+            LogViewSelectField.DataSource = new[] { LogViews.Server, LogViews.Application };
+            LogViewSelectField.Value = LogViews.Server;
             ServerExePathField.ConfigureFileDialog(dialog => dialog.Filter = "Applications (*.exe)|*.exe");
 
             RefreshFormFields();
@@ -249,7 +248,7 @@ namespace ValheimServerGUI.Forms
         {
             PlayersTable.AddRowBinding<PlayerInfo>(row =>
             {
-                row.AddCellBinding(ColumnPlayerName.Index, p => p.PlayerName ?? $"(...{p.SteamId[^4..]})");
+                row.AddCellBinding(ColumnPlayerName.Index, GetPlayerDisplayName);
                 row.AddCellBinding(ColumnPlayerStatus.Index, p => p.PlayerStatus);
                 row.AddCellBinding(ColumnPlayerUpdated.Index, p => new TimeAgo(p.LastStatusChange));
             });
@@ -274,7 +273,7 @@ namespace ValheimServerGUI.Forms
             CheckFilePaths();
             NotifyIcon.Visible = true;
 
-            Logger.LogInformation("Valheim Server GUI v{version} - Loaded OK", AssemblyHelper.GetApplicationVersion());
+            Logger.Information("Valheim Server GUI v{version} - Loaded OK", AssemblyHelper.GetApplicationVersion());
         }
 
         private void OnProfileChanged(string _)
@@ -504,16 +503,27 @@ namespace ValheimServerGUI.Forms
         {
             if (string.IsNullOrWhiteSpace(LogViewer.GetCurrentViewText()))
             {
-                Logger.LogWarning("No logs to save!");
+                Logger.Warning("No logs to save!");
                 return;
+            }
+
+            string initialDirectory;
+            try
+            {
+                initialDirectory = PathExtensions.GetDirectoryInfo(Resources.LogsFolderPath).FullName;
+            }
+            catch
+            {
+                initialDirectory = null;
             }
 
             var dialog = new SaveFileDialog
             {
-                FileName = $"{LogViewer.LogView}Logs-{DateTime.Now:u}.txt",
+                FileName = $"{PathExtensions.GetValidFileName(LogViewer.LogView, true)}.txt",
                 Filter = "Text Files (*.txt)|*.txt",
                 CheckPathExists = true,
                 RestoreDirectory = true,
+                InitialDirectory = initialDirectory,
             };
 
             var result = dialog.ShowDialog();
@@ -527,7 +537,7 @@ namespace ValheimServerGUI.Forms
                 }
                 catch (Exception exception)
                 {
-                    Logger.LogError(exception, $"Failed to write log file: {dialog.FileName}");
+                    Logger.Error(exception, "Failed to write log file: {fileName}", dialog.FileName);
                 }
             }
         }
@@ -539,6 +549,11 @@ namespace ValheimServerGUI.Forms
             var form = FormProvider.GetForm<PlayerDetailsForm>();
             form.SetPlayerData(row.Entity);
             form.ShowDialog();
+        }
+
+        private void LinkCharacterNamesHelp_Click(object sender, EventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.UrlHelpCharacterNames);
         }
 
         private void ButtonRemovePlayer_Click(object sender, EventArgs e)
@@ -657,14 +672,14 @@ namespace ValheimServerGUI.Forms
 
         #region Service Events
 
-        private void OnApplicationLogReceived(EventLogContext logEvent)
+        private void OnApplicationLogReceived(string message)
         {
-            AddLog(logEvent.Message, LogViewApplication);
+            LogViewer.AddLogToView(message, LogViews.Application);
         }
 
-        private void OnServerLogReceived(EventLogContext logEvent)
+        private void OnServerLogReceived(string message)
         {
-            AddLog(logEvent.Message, LogViewServer);
+            LogViewer.AddLogToView(message, LogViews.Server);
         }
 
         private void OnServerStatusChanged(ServerStatus status)
@@ -825,11 +840,6 @@ namespace ValheimServerGUI.Forms
 
         #region View Setters
 
-        private void AddLog(string message, string viewName)
-        {
-            LogViewer.AddLogToView(message, viewName);
-        }
-
         private void ClearCurrentLogView()
         {
             LogViewer.ClearLogView(LogViewer.LogView);
@@ -852,33 +862,33 @@ namespace ValheimServerGUI.Forms
         {
             var playerRows = PlayersTable
                 .GetRowsWithType<PlayerInfo>()
-                .Where(p => p.Entity.SteamId == player.SteamId);
+                .Where(r => r.Entity.Platform == player.Platform && r.Entity.PlayerId == player.PlayerId);
 
             var playerRow = playerRows.FirstOrDefault(p => p.Entity.Key == player.Key) ?? PlayersTable.AddRowFromEntity(player);
             if (playerRow == null) return;
 
-            // Update styles based on player status
-            var imageIndex = -1;
+            // Update styles based on player status and platform
+            var platformImageIndex = -1;
             var color = PlayersTable.ForeColor;
+
+            switch (player.Platform)
+            {
+                case PlayerPlatforms.Steam:
+                    platformImageIndex = GetImageIndex(nameof(Resources.Steam_16x));
+                    break;
+                case PlayerPlatforms.Xbox:
+                    platformImageIndex = GetImageIndex(nameof(Resources.XboxLive_16x));
+                    break;
+            }
 
             switch (player.PlayerStatus)
             {
-                case PlayerStatus.Online:
-                    imageIndex = GetImageIndex(nameof(Resources.StatusOK_16x));
-                    break;
-                case PlayerStatus.Joining:
-                    imageIndex = GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
-                    break;
-                case PlayerStatus.Leaving:
-                    imageIndex = GetImageIndex(nameof(Resources.UnsyncedCommits_16x_Horiz));
-                    break;
                 case PlayerStatus.Offline:
-                    imageIndex = GetImageIndex(nameof(Resources.StatusNotStarted_16x));
                     color = Color.Gray;
                     break;
             }
 
-            playerRow.ImageIndex = imageIndex;
+            playerRow.ImageIndex = platformImageIndex;
             playerRow.ForeColor = color;
         }
 
@@ -928,6 +938,7 @@ namespace ValheimServerGUI.Forms
             ServerAdditionalArgsField.Enabled = allowServerChanges;
             ServerExePathField.Enabled = allowServerChanges;
             ServerSaveDataFolderPathField.Enabled = allowServerChanges;
+            ServerLogFileField.Enabled = allowServerChanges;
 
             MenuItemFileNewProfile.Enabled = allowServerChanges;
             MenuItemFileLoadProfile.Enabled = allowServerChanges;
@@ -1008,7 +1019,7 @@ namespace ValheimServerGUI.Forms
             {
                 var elapsed = ServerUptimeTimer.Elapsed;
                 var days = elapsed.Days;
-                var timestr = elapsed.ToString(@"hh\:mm\:ss");
+                var timestr = elapsed.ToServerElapsedFormat();
 
                 if (days == 1) timestr = $"1 day + {timestr}";
                 else if (days > 1) timestr = $"{days} days + {timestr}";
@@ -1035,7 +1046,7 @@ namespace ValheimServerGUI.Forms
                 // Show no worlds if something goes wrong
                 WorldSelectExistingNameField.DataSource = null;
                 WorldSelectExistingNameField.DropdownEnabled = false;
-                Logger.LogError("Error refreshing world select: {message}", e.Message);
+                Logger.Error("Error refreshing world select: {message}", e.Message);
             }
         }
 
@@ -1084,6 +1095,7 @@ namespace ValheimServerGUI.Forms
             prefs.AdditionalArgs = ServerAdditionalArgsField.Value;
             prefs.ServerExePath = ServerExePathField.Value;
             prefs.SaveDataFolderPath = ServerSaveDataFolderPathField.Value;
+            prefs.WriteServerLogsToFile = ServerLogFileField.Value;
 
             return prefs;
         }
@@ -1112,6 +1124,8 @@ namespace ValheimServerGUI.Forms
                 SaveDataFolderPath = !string.IsNullOrWhiteSpace(serverPrefs.SaveDataFolderPath)
                     ? serverPrefs.SaveDataFolderPath
                     : userPrefs.SaveDataFolderPath,
+                LogToFile = serverPrefs.WriteServerLogsToFile,
+                LogMessageHandler = this.BuildActionHandler<string>(OnServerLogReceived),
             };
 
             return options;
@@ -1122,7 +1136,7 @@ namespace ValheimServerGUI.Forms
             var prefs = ServerPrefsProvider.LoadPreferences(profileName);
             if (prefs == null)
             {
-                Logger.LogWarning("Unable to set form state: no server profile exists with name '{name}'", profileName);
+                Logger.Warning("Unable to set form state: no server profile exists with name '{name}'", profileName);
                 return prefs;
             }
 
@@ -1134,7 +1148,7 @@ namespace ValheimServerGUI.Forms
         {
             if (prefs == null)
             {
-                Logger.LogWarning($"Unable to set form state: {nameof(prefs)} cannot be null");
+                Logger.Warning($"Unable to set form state: {nameof(prefs)} cannot be null");
                 return;
             }
 
@@ -1154,6 +1168,7 @@ namespace ValheimServerGUI.Forms
             ServerAdditionalArgsField.Value = prefs.AdditionalArgs;
             ServerExePathField.Value = prefs.ServerExePath;
             ServerSaveDataFolderPathField.Value = prefs.SaveDataFolderPath;
+            ServerLogFileField.Value = prefs.WriteServerLogsToFile;
 
             RefreshWorldSelect();
             var worldName = prefs.WorldName;
@@ -1185,7 +1200,7 @@ namespace ValheimServerGUI.Forms
                 }
                 else
                 {
-                    Logger.LogError("Error starting server: {message}", message);
+                    Logger.Error("Error starting server: {message}", message);
                 }
             };
 
@@ -1359,6 +1374,19 @@ namespace ValheimServerGUI.Forms
         private int GetImageIndex(string key)
         {
             return ImageList.Images.IndexOfKey(key);
+        }
+
+        private string GetPlayerDisplayName(PlayerInfo player)
+        {
+            // Show the last 4 digits of the player's platform ID if their name is not yet known
+            var name = player.PlayerName ?? $"[...{player.PlayerId[^4..]}]";
+
+            if (!string.IsNullOrWhiteSpace(player.LastStatusCharacter))
+            {
+                name += $" ({player.LastStatusCharacter})";
+            }
+
+            return name;
         }
 
         #endregion

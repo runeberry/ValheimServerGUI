@@ -109,6 +109,7 @@ namespace ValheimServerGUI.Forms
             LabelLocalIpAddress = new ValheimServerGUI.Controls.LabelField();
             LabelInternalIpAddress = new ValheimServerGUI.Controls.LabelField();
             TabPlayers = new System.Windows.Forms.TabPage();
+            LinkCharacterNamesHelp = new System.Windows.Forms.LinkLabel();
             ButtonRemovePlayer = new System.Windows.Forms.Button();
             ButtonPlayerDetails = new System.Windows.Forms.Button();
             PlayersTable = new ValheimServerGUI.Controls.DataListView();
@@ -956,6 +957,7 @@ namespace ValheimServerGUI.Forms
             // 
             // TabPlayers
             // 
+            TabPlayers.Controls.Add(LinkCharacterNamesHelp);
             TabPlayers.Controls.Add(ButtonRemovePlayer);
             TabPlayers.Controls.Add(ButtonPlayerDetails);
             TabPlayers.Controls.Add(PlayersTable);
@@ -965,6 +967,16 @@ namespace ValheimServerGUI.Forms
             TabPlayers.TabIndex = 3;
             TabPlayers.Text = "Players";
             TabPlayers.UseVisualStyleBackColor = true;
+            // 
+            // LinkCharacterNamesHelp
+            // 
+            LinkCharacterNamesHelp.AutoSize = true;
+            LinkCharacterNamesHelp.Location = new System.Drawing.Point(224, 7);
+            LinkCharacterNamesHelp.Name = "LinkCharacterNamesHelp";
+            LinkCharacterNamesHelp.Size = new System.Drawing.Size(196, 15);
+            LinkCharacterNamesHelp.TabIndex = 3;
+            LinkCharacterNamesHelp.TabStop = true;
+            LinkCharacterNamesHelp.Text = "Character names wrong? Click here.";
             // 
             // ButtonRemovePlayer
             // 
@@ -1184,6 +1196,7 @@ namespace ValheimServerGUI.Forms
             groupBox1.ResumeLayout(false);
             groupBox1.PerformLayout();
             TabPlayers.ResumeLayout(false);
+            TabPlayers.PerformLayout();
             TabLogs.ResumeLayout(false);
             TrayContextMenuStrip.ResumeLayout(false);
             ResumeLayout(false);
@@ -1294,5 +1307,6 @@ namespace ValheimServerGUI.Forms
         private RefreshButton WorldsListRefreshButton;
         private ValheimServerGUI.Controls.CheckboxFormField ServerLogFileField;
         private OpenButton LogsFolderOpenButton;
+        private System.Windows.Forms.LinkLabel LinkCharacterNamesHelp;
     }
 }

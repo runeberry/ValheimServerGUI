@@ -590,6 +590,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions.
+        /// </summary>
+        internal static string UrlHelpCharacterNames {
+            get {
+                return ResourceManager.GetString("UrlHelpCharacterNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server.
         /// </summary>
         internal static string UrlPortForwardingGuide {

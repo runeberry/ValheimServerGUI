@@ -167,6 +167,7 @@ namespace ValheimServerGUI.Forms
             ButtonSaveLogs.Click += ButtonSaveLogs_Click;
             LogsFolderOpenButton.PathFunction = () => Resources.LogsFolderPath;
             ButtonPlayerDetails.Click += ButtonPlayerDetails_Click;
+            LinkCharacterNamesHelp.Click += LinkCharacterNamesHelp_Click;
             ButtonRemovePlayer.Click += ButtonRemovePlayer_Click;
             CopyButtonServerPassword.CopyFunction = () => ServerPasswordField.Value;
             WorldsListRefreshButton.RefreshFunction = WorldsListRefreshButton_Click;
@@ -548,6 +549,11 @@ namespace ValheimServerGUI.Forms
             var form = FormProvider.GetForm<PlayerDetailsForm>();
             form.SetPlayerData(row.Entity);
             form.ShowDialog();
+        }
+
+        private void LinkCharacterNamesHelp_Click(object sender, EventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.UrlHelpCharacterNames);
         }
 
         private void ButtonRemovePlayer_Click(object sender, EventArgs e)

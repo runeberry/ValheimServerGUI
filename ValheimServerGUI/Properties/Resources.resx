@@ -287,6 +287,9 @@
   <data name="UrlHelp" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/wiki</value>
   </data>
+  <data name="UrlHelpCharacterNames" xml:space="preserve">
+    <value>https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions</value>
+  </data>
   <data name="UrlPortForwardingGuide" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server</value>
   </data>

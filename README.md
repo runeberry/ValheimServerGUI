@@ -40,7 +40,7 @@ In order to run ValheimServerGUI, you will need the following:
 * **Automatic startup** - If enabled, can automatically start up your server when Windows starts
 * **Minimize to tray** - Minimize this app and control your server entirely from the Windows system tray
 * **Multi-server support** - Run multiple servers at once by creating separate server profiles (see [FAQs](https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions) for details)
-* **Works with mods!** - Tested and working with server-side mods such as [Valheim Plus](https://www.nexusmods.com/valheim/mods/4).
+* **Works with mods!** - Tested and working with server-side mods such as ~~[Valheim Plus](https://www.nexusmods.com/valheim/mods/4)~~ *NEW* [Valheim Plus](https://www.nexusmods.com/valheim/mods/2323).
 
 ## Quick guide
 

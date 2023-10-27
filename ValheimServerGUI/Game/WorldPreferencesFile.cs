@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 
 namespace ValheimServerGUI.Game
@@ -7,6 +8,9 @@ namespace ValheimServerGUI.Game
     {
         [JsonProperty("worldName")]
         public string WorldName { get; set; }
+
+        [JsonProperty("lastSaved")]
+        public DateTime? LastSaved { get; set; }
 
         [JsonProperty("preset")]
         public string Preset { get; set; }

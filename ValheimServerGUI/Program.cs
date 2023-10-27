@@ -67,6 +67,7 @@ namespace ValheimServerGUI
                 .AddSingleton<IPlayerDataRepository, PlayerDataRepository>()
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
+                .AddSingleton<IWorldPreferencesProvider, WorldPreferencesProvider>()
                 .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
                 .AddTransient<ValheimServer>();
 

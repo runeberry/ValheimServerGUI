@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ValheimServerGUI.Game
 {
@@ -34,6 +36,12 @@ namespace ValheimServerGUI.Game
 
         public Action<string> LogMessageHandler { get; set; }
 
+        public string WorldPreset { get; set; }
+
+        public Dictionary<string, string> WorldModifiers { get; set; }
+
+        public HashSet<string> WorldKeys { get; set; }
+
         public void Validate()
         {
             // Ensure all required fields exist
@@ -64,6 +72,30 @@ namespace ValheimServerGUI.Game
             if (BackupLong < 1) throw new ArgumentException($"Long backup interval must be greater than 0.");
             if (SaveInterval > BackupShort || SaveInterval > BackupLong) throw new ArgumentException($"Save interval must be less than or equal to the backup intervals.");
             if (BackupShort > BackupLong) throw new ArgumentException($"Short backup interval must be less than or equal to the long backup interval.");
+
+            // World generation settings
+            if (WorldPreset != null)
+            {
+                if (!WorldGenPresets.All.Contains(WorldPreset)) throw new ArgumentException($"World preset value '${WorldPreset}' is not allowed. Supported values are: ${string.Join(", ", WorldGenPresets.All)}");
+                if (WorldModifiers != null && WorldModifiers.Count > 0) throw new ArgumentException($"World modifiers may not be set when a world preset is selected.");
+            }
+            else if (WorldModifiers != null)
+            {
+                foreach (var (key, value) in WorldModifiers)
+                {
+                    if (!WorldGenModifiers.All.Contains(key)) throw new ArgumentException($"World modifier key '${key}' is not allowed. Supported values are: ${string.Join(", ", WorldGenModifiers.All)}");
+                    var allowedValues = WorldGenModifiers.AllowedValues[key];
+                    if (!allowedValues.Contains(value)) throw new ArgumentException($"World modifier value '${value}' is not allowed for key '${key}'. Supported values are: ${string.Join(", ", allowedValues)}");
+                }
+            }
+
+            if (WorldKeys != null)
+            {
+                foreach (var key in WorldKeys)
+                {
+                    if (!WorldGenKeys.All.Contains(key)) throw new ArgumentException($"World key value '${key}' is not allowed. Supported values are: ${string.Join(", ", WorldGenKeys.All)}");
+                }
+            }
 
             // Additional args
             // Using the native -logFile command will prevent logs from being piped to VSG, so don't allow it.
@@ -106,5 +138,11 @@ namespace ValheimServerGUI.Game
         bool LogToFile { get; }
 
         Action<string> LogMessageHandler { get; }
+
+        public string WorldPreset { get; }
+
+        public Dictionary<string, string> WorldModifiers { get; }
+
+        public HashSet<string> WorldKeys { get; }
     }
 }

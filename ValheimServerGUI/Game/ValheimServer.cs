@@ -366,6 +366,26 @@ namespace ValheimServerGUI.Game
                 processArgs += " -crossplay";
             }
 
+            if (!string.IsNullOrWhiteSpace(options.WorldPreset))
+            {
+                processArgs += $" -preset {options.WorldPreset}";
+            }
+            else if (options.WorldModifiers != null)
+            {
+                foreach (var (key, value) in options.WorldModifiers)
+                {
+                    processArgs += $" -modifier {key} {value}";
+                }
+            }
+
+            if (options.WorldKeys != null)
+            {
+                foreach (var key in options.WorldKeys)
+                {
+                    processArgs += $" -setkey {key}";
+                }
+            }
+
             if (!string.IsNullOrWhiteSpace(options.AdditionalArgs))
             {
                 processArgs += $" {options.AdditionalArgs}";

@@ -27,6 +27,8 @@ namespace ValheimServerGUI.Game
 
         public List<ServerPreferences> Servers { get; set; } = new();
 
+        public List<WorldPreferences> Worlds { get; set; } = new();
+
         public static UserPreferences FromFile(UserPreferencesFile file)
         {
             var prefs = new UserPreferences();
@@ -50,6 +52,15 @@ namespace ValheimServerGUI.Game
                     .ToList();
             }
 
+            if (file.Worlds != null)
+            {
+                prefs.Worlds = file.Worlds
+                    .Where(f => f != null)
+                    .Select(f => WorldPreferences.FromFile(f))
+                    .DistinctBy(f => f.WorldName)
+                    .ToList();
+            }
+
             return prefs;
         }
 
@@ -65,6 +76,7 @@ namespace ValheimServerGUI.Game
                 SaveProfileOnStart = SaveProfileOnStart,
                 WriteApplicationLogsToFile = WriteApplicationLogsToFile,
                 Servers = new(),
+                Worlds = new(),
             };
 
             if (Servers != null)
@@ -75,6 +87,16 @@ namespace ValheimServerGUI.Game
                     .DistinctBy(p => p.ProfileName); // Remove duplicate entries by profile name
 
                 file.Servers.AddRange(servers);
+            }
+
+            if (Worlds != null)
+            {
+                var worlds = Worlds
+                    .Select(p => p.ToFile())
+                    .Where(p => !string.IsNullOrWhiteSpace(p.WorldName)) // Remove world settings with no name
+                    .DistinctBy(p => p.WorldName); // Remove duplicate entries by world name
+
+                file.Worlds.AddRange(worlds);
             }
 
             return file;

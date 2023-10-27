@@ -368,7 +368,7 @@ namespace ValheimServerGUI.Game
 
             if (!string.IsNullOrWhiteSpace(options.AdditionalArgs))
             {
-                processArgs += options.AdditionalArgs;
+                processArgs += $" {options.AdditionalArgs}";
             }
 
             return processArgs;

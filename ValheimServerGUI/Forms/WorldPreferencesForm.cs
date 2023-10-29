@@ -5,6 +5,7 @@ using System.Linq;
 using System.Windows.Forms;
 using ValheimServerGUI.Controls;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Forms
@@ -307,6 +308,11 @@ namespace ValheimServerGUI.Forms
         private void ButtonDefaults_Click(object sender, EventArgs e)
         {
             SetFormDefaultValues();
+        }
+
+        private void WikiLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.ValheimWikiWorldModifiersUrl);
         }
 
         #endregion

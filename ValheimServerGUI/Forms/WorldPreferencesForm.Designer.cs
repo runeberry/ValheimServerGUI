@@ -28,7 +28,6 @@
         /// </summary>
         private void InitializeComponent()
         {
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WorldPreferencesForm));
             ModifiersGroupBox = new System.Windows.Forms.GroupBox();
             ModifierPortalsFormField = new ValheimServerGUI.Controls.DropdownFormField();
             ModifierResourcesFormField = new ValheimServerGUI.Controls.DropdownFormField();
@@ -44,6 +43,8 @@
             ButtonCancel = new System.Windows.Forms.Button();
             ButtonOK = new System.Windows.Forms.Button();
             ButtonDefaults = new System.Windows.Forms.Button();
+            WikiLinkLabel = new System.Windows.Forms.LinkLabel();
+            label1 = new System.Windows.Forms.Label();
             ModifiersGroupBox.SuspendLayout();
             KeysGroupBox.SuspendLayout();
             SuspendLayout();
@@ -65,7 +66,6 @@
             // ModifierPortalsFormField
             // 
             ModifierPortalsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierPortalsFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierPortalsFormField.DataSource");
             ModifierPortalsFormField.DropdownEnabled = true;
             ModifierPortalsFormField.EmptyText = "";
             ModifierPortalsFormField.HelpText = "";
@@ -79,7 +79,6 @@
             // ModifierResourcesFormField
             // 
             ModifierResourcesFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierResourcesFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierResourcesFormField.DataSource");
             ModifierResourcesFormField.DropdownEnabled = true;
             ModifierResourcesFormField.EmptyText = "";
             ModifierResourcesFormField.HelpText = "";
@@ -93,7 +92,6 @@
             // ModifierRaidsFormField
             // 
             ModifierRaidsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierRaidsFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierRaidsFormField.DataSource");
             ModifierRaidsFormField.DropdownEnabled = true;
             ModifierRaidsFormField.EmptyText = "";
             ModifierRaidsFormField.HelpText = "";
@@ -107,7 +105,6 @@
             // ModifierDeathPenaltyFormField
             // 
             ModifierDeathPenaltyFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierDeathPenaltyFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierDeathPenaltyFormField.DataSource");
             ModifierDeathPenaltyFormField.DropdownEnabled = true;
             ModifierDeathPenaltyFormField.EmptyText = "";
             ModifierDeathPenaltyFormField.HelpText = "";
@@ -121,7 +118,6 @@
             // ModifierCombatFormField
             // 
             ModifierCombatFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierCombatFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierCombatFormField.DataSource");
             ModifierCombatFormField.DropdownEnabled = true;
             ModifierCombatFormField.EmptyText = "";
             ModifierCombatFormField.HelpText = "";
@@ -189,15 +185,14 @@
             KeyNoBuildCostFormField.TabIndex = 0;
             KeyNoBuildCostFormField.Value = false;
             // 
-            // PresetDropDownFormField
+            // PresetFormField
             // 
-            PresetFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("PresetDropDownFormField.DataSource");
             PresetFormField.DropdownEnabled = true;
             PresetFormField.EmptyText = "";
             PresetFormField.HelpText = "";
             PresetFormField.LabelText = "Modifier Preset";
             PresetFormField.Location = new System.Drawing.Point(12, 12);
-            PresetFormField.Name = "PresetDropDownFormField";
+            PresetFormField.Name = "PresetFormField";
             PresetFormField.Size = new System.Drawing.Size(200, 41);
             PresetFormField.TabIndex = 0;
             PresetFormField.Value = null;
@@ -235,17 +230,39 @@
             ButtonDefaults.UseVisualStyleBackColor = true;
             ButtonDefaults.Click += ButtonDefaults_Click;
             // 
+            // WikiLinkLabel
+            // 
+            WikiLinkLabel.AutoSize = true;
+            WikiLinkLabel.Location = new System.Drawing.Point(266, 27);
+            WikiLinkLabel.Name = "WikiLinkLabel";
+            WikiLinkLabel.Size = new System.Drawing.Size(78, 15);
+            WikiLinkLabel.TabIndex = 6;
+            WikiLinkLabel.TabStop = true;
+            WikiLinkLabel.Text = "Valheim Wiki.";
+            WikiLinkLabel.LinkClicked += WikiLinkLabel_LinkClicked;
+            // 
+            // label1
+            // 
+            label1.AutoSize = true;
+            label1.Location = new System.Drawing.Point(228, 12);
+            label1.Name = "label1";
+            label1.Size = new System.Drawing.Size(184, 30);
+            label1.TabIndex = 7;
+            label1.Text = "Read more about world modifiers\r\non the";
+            // 
             // WorldPreferencesForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(434, 377);
+            Controls.Add(WikiLinkLabel);
             Controls.Add(ButtonDefaults);
             Controls.Add(ButtonOK);
             Controls.Add(ButtonCancel);
             Controls.Add(PresetFormField);
             Controls.Add(KeysGroupBox);
             Controls.Add(ModifiersGroupBox);
+            Controls.Add(label1);
             FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             MaximizeBox = false;
             MinimizeBox = false;
@@ -256,6 +273,7 @@
             ModifiersGroupBox.ResumeLayout(false);
             KeysGroupBox.ResumeLayout(false);
             ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -275,5 +293,7 @@
         private System.Windows.Forms.Button ButtonCancel;
         private System.Windows.Forms.Button ButtonOK;
         private System.Windows.Forms.Button ButtonDefaults;
+        private System.Windows.Forms.LinkLabel WikiLinkLabel;
+        private System.Windows.Forms.Label label1;
     }
 }

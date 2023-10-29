@@ -113,6 +113,7 @@ namespace ValheimServerGUI.Forms
             }
 
             InitializeDropDownOptions();
+            InitializeFormEvents();
             SetFormDefaultValues();
             LoadFormFromPreferences();
         }
@@ -126,6 +127,11 @@ namespace ValheimServerGUI.Forms
             ModifierResourcesFormField.DataSource = ModifierResourcesMapping.Keys.ToList();
             ModifierRaidsFormField.DataSource = ModifierRaidsMapping.Keys.ToList();
             ModifierPortalsFormField.DataSource = ModifierPortalsMapping.Keys.ToList();
+        }
+
+        private void InitializeFormEvents()
+        {
+            PresetFormField.ValueChanged += PresetFormField_ValueChanged;
         }
 
         private void SetFormDefaultValues()
@@ -243,12 +249,12 @@ namespace ValheimServerGUI.Forms
                 SaveModifierToPreferences(prefs, WorldGenModifiers.Resources, ModifierResourcesFormField, ModifierResourcesMapping);
                 SaveModifierToPreferences(prefs, WorldGenModifiers.Raids, ModifierRaidsFormField, ModifierRaidsMapping);
                 SaveModifierToPreferences(prefs, WorldGenModifiers.Portals, ModifierPortalsFormField, ModifierPortalsMapping);
-
-                SaveKeyToPreferences(prefs, WorldGenKeys.NoBuildCost, KeyNoBuildCostFormField);
-                SaveKeyToPreferences(prefs, WorldGenKeys.PlayerEvents, KeyPlayerEventsFormField);
-                SaveKeyToPreferences(prefs, WorldGenKeys.PassiveMobs, KeyPassiveMobsFormField);
-                SaveKeyToPreferences(prefs, WorldGenKeys.NoMap, KeyNoMapFormField);
             }
+
+            SaveKeyToPreferences(prefs, WorldGenKeys.NoBuildCost, KeyNoBuildCostFormField);
+            SaveKeyToPreferences(prefs, WorldGenKeys.PlayerEvents, KeyPlayerEventsFormField);
+            SaveKeyToPreferences(prefs, WorldGenKeys.PassiveMobs, KeyPassiveMobsFormField);
+            SaveKeyToPreferences(prefs, WorldGenKeys.NoMap, KeyNoMapFormField);
 
             WorldPrefsProvider.SavePreferences(prefs);
         }
@@ -308,6 +314,18 @@ namespace ValheimServerGUI.Forms
         private void ButtonDefaults_Click(object sender, EventArgs e)
         {
             SetFormDefaultValues();
+        }
+
+        private void PresetFormField_ValueChanged(object sender, string e)
+        {
+            if (string.IsNullOrWhiteSpace(e) || e == KeywordNoPreset)
+            {
+                ModifiersGroupBox.Enabled = true;
+            }
+            else
+            {
+                ModifiersGroupBox.Enabled = false;
+            }
         }
 
         private void WikiLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

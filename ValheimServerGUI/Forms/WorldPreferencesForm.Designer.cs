@@ -67,10 +67,9 @@
             // ModifierPortalsFormField
             // 
             ModifierPortalsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierPortalsFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierPortalsFormField.DataSource");
             ModifierPortalsFormField.DropdownEnabled = true;
             ModifierPortalsFormField.EmptyText = "";
-            ModifierPortalsFormField.HelpText = "";
+            ModifierPortalsFormField.HelpText = "Changes how portals work in the game.";
             ModifierPortalsFormField.LabelText = "Portals";
             ModifierPortalsFormField.Location = new System.Drawing.Point(6, 210);
             ModifierPortalsFormField.Name = "ModifierPortalsFormField";
@@ -81,12 +80,11 @@
             // ModifierResourcesFormField
             // 
             ModifierResourcesFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierResourcesFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierResourcesFormField.DataSource");
             ModifierResourcesFormField.DropdownEnabled = true;
             ModifierResourcesFormField.EmptyText = "";
-            ModifierResourcesFormField.HelpText = "";
-            ModifierResourcesFormField.LabelText = "Resources";
-            ModifierResourcesFormField.Location = new System.Drawing.Point(6, 163);
+            ModifierResourcesFormField.HelpText = "Governs the amount of resources you gain from\r\nthe world and from enemies.";
+            ModifierResourcesFormField.LabelText = "Resource Rate";
+            ModifierResourcesFormField.Location = new System.Drawing.Point(6, 116);
             ModifierResourcesFormField.Name = "ModifierResourcesFormField";
             ModifierResourcesFormField.Size = new System.Drawing.Size(188, 41);
             ModifierResourcesFormField.TabIndex = 4;
@@ -95,12 +93,11 @@
             // ModifierRaidsFormField
             // 
             ModifierRaidsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierRaidsFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierRaidsFormField.DataSource");
             ModifierRaidsFormField.DropdownEnabled = true;
             ModifierRaidsFormField.EmptyText = "";
-            ModifierRaidsFormField.HelpText = "";
+            ModifierRaidsFormField.HelpText = "Governs how often enemies may raid your base.\r\n";
             ModifierRaidsFormField.LabelText = "Raids";
-            ModifierRaidsFormField.Location = new System.Drawing.Point(6, 116);
+            ModifierRaidsFormField.Location = new System.Drawing.Point(6, 163);
             ModifierRaidsFormField.Name = "ModifierRaidsFormField";
             ModifierRaidsFormField.Size = new System.Drawing.Size(188, 41);
             ModifierRaidsFormField.TabIndex = 3;
@@ -109,10 +106,9 @@
             // ModifierDeathPenaltyFormField
             // 
             ModifierDeathPenaltyFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierDeathPenaltyFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierDeathPenaltyFormField.DataSource");
             ModifierDeathPenaltyFormField.DropdownEnabled = true;
             ModifierDeathPenaltyFormField.EmptyText = "";
-            ModifierDeathPenaltyFormField.HelpText = "";
+            ModifierDeathPenaltyFormField.HelpText = "Governs what happens when you die. See the wiki\r\nfor an explanation of the different options.";
             ModifierDeathPenaltyFormField.LabelText = "Death Penalty";
             ModifierDeathPenaltyFormField.Location = new System.Drawing.Point(6, 69);
             ModifierDeathPenaltyFormField.Name = "ModifierDeathPenaltyFormField";
@@ -123,10 +119,9 @@
             // ModifierCombatFormField
             // 
             ModifierCombatFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            ModifierCombatFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierCombatFormField.DataSource");
             ModifierCombatFormField.DropdownEnabled = true;
             ModifierCombatFormField.EmptyText = "";
-            ModifierCombatFormField.HelpText = "";
+            ModifierCombatFormField.HelpText = "Governs how much damage you give and take.\r\nAlso governs how likely you are to encounter\r\nhigher leveled enemies, and how dangerous\r\nthey are.";
             ModifierCombatFormField.LabelText = "Combat";
             ModifierCombatFormField.Location = new System.Drawing.Point(6, 22);
             ModifierCombatFormField.Name = "ModifierCombatFormField";
@@ -150,9 +145,9 @@
             // KeyNoMapFormField
             // 
             KeyNoMapFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            KeyNoMapFormField.HelpText = "";
+            KeyNoMapFormField.HelpText = "You will not have access to the map or the minimap.\r\nThis makes the game harder than intended.";
             KeyNoMapFormField.LabelText = "No map";
-            KeyNoMapFormField.Location = new System.Drawing.Point(6, 45);
+            KeyNoMapFormField.Location = new System.Drawing.Point(6, 91);
             KeyNoMapFormField.Name = "KeyNoMapFormField";
             KeyNoMapFormField.Size = new System.Drawing.Size(188, 17);
             KeyNoMapFormField.TabIndex = 3;
@@ -161,9 +156,9 @@
             // KeyPassiveMobsFormField
             // 
             KeyPassiveMobsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            KeyPassiveMobsFormField.HelpText = "";
+            KeyPassiveMobsFormField.HelpText = "Enemies won't attack until you provoke them.";
             KeyPassiveMobsFormField.LabelText = "Passive enemies";
-            KeyPassiveMobsFormField.Location = new System.Drawing.Point(6, 68);
+            KeyPassiveMobsFormField.Location = new System.Drawing.Point(6, 45);
             KeyPassiveMobsFormField.Name = "KeyPassiveMobsFormField";
             KeyPassiveMobsFormField.Size = new System.Drawing.Size(188, 17);
             KeyPassiveMobsFormField.TabIndex = 2;
@@ -172,9 +167,9 @@
             // KeyPlayerEventsFormField
             // 
             KeyPlayerEventsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            KeyPlayerEventsFormField.HelpText = "";
+            KeyPlayerEventsFormField.HelpText = resources.GetString("KeyPlayerEventsFormField.HelpText");
             KeyPlayerEventsFormField.LabelText = "Player based raids";
-            KeyPlayerEventsFormField.Location = new System.Drawing.Point(6, 91);
+            KeyPlayerEventsFormField.Location = new System.Drawing.Point(6, 68);
             KeyPlayerEventsFormField.Name = "KeyPlayerEventsFormField";
             KeyPlayerEventsFormField.Size = new System.Drawing.Size(188, 17);
             KeyPlayerEventsFormField.TabIndex = 1;
@@ -183,7 +178,7 @@
             // KeyNoBuildCostFormField
             // 
             KeyNoBuildCostFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
-            KeyNoBuildCostFormField.HelpText = "";
+            KeyNoBuildCostFormField.HelpText = "Build pieces require no materials to build. You still\r\nneed to discover recipes as per usual.";
             KeyNoBuildCostFormField.LabelText = "No build cost";
             KeyNoBuildCostFormField.Location = new System.Drawing.Point(6, 22);
             KeyNoBuildCostFormField.Name = "KeyNoBuildCostFormField";
@@ -193,11 +188,10 @@
             // 
             // PresetFormField
             // 
-            PresetFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("PresetFormField.DataSource");
             PresetFormField.DropdownEnabled = true;
             PresetFormField.EmptyText = "";
-            PresetFormField.HelpText = "";
-            PresetFormField.LabelText = "Modifier Preset";
+            PresetFormField.HelpText = "Presets are quick sets of options to help you get a\r\nserver up and running quickly.\r\n\r\nIf you select a preset and change any individual\r\nsettings, then the preset will be deselected.";
+            PresetFormField.LabelText = "Difficulty Preset";
             PresetFormField.Location = new System.Drawing.Point(12, 12);
             PresetFormField.Name = "PresetFormField";
             PresetFormField.Size = new System.Drawing.Size(200, 41);

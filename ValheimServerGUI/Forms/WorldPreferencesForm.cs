@@ -33,7 +33,7 @@ namespace ValheimServerGUI.Forms
             public const string PresetHard = "Hard";
             public const string PresetHardcore = "Hardcore";
             public const string PresetCasual = "Casual";
-            public const string PresetHammer = "Hammer Mode";
+            public const string PresetHammer = "Hammer Mode (Creative)";
             public const string PresetImmersive = "Immersive";
 
             public const string CombatVeryEasy = "Very Easy";

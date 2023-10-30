@@ -28,6 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(WorldPreferencesForm));
             ModifiersGroupBox = new System.Windows.Forms.GroupBox();
             ModifierPortalsFormField = new ValheimServerGUI.Controls.DropdownFormField();
             ModifierResourcesFormField = new ValheimServerGUI.Controls.DropdownFormField();
@@ -66,6 +67,7 @@
             // ModifierPortalsFormField
             // 
             ModifierPortalsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ModifierPortalsFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierPortalsFormField.DataSource");
             ModifierPortalsFormField.DropdownEnabled = true;
             ModifierPortalsFormField.EmptyText = "";
             ModifierPortalsFormField.HelpText = "";
@@ -79,6 +81,7 @@
             // ModifierResourcesFormField
             // 
             ModifierResourcesFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ModifierResourcesFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierResourcesFormField.DataSource");
             ModifierResourcesFormField.DropdownEnabled = true;
             ModifierResourcesFormField.EmptyText = "";
             ModifierResourcesFormField.HelpText = "";
@@ -92,6 +95,7 @@
             // ModifierRaidsFormField
             // 
             ModifierRaidsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ModifierRaidsFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierRaidsFormField.DataSource");
             ModifierRaidsFormField.DropdownEnabled = true;
             ModifierRaidsFormField.EmptyText = "";
             ModifierRaidsFormField.HelpText = "";
@@ -105,6 +109,7 @@
             // ModifierDeathPenaltyFormField
             // 
             ModifierDeathPenaltyFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ModifierDeathPenaltyFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierDeathPenaltyFormField.DataSource");
             ModifierDeathPenaltyFormField.DropdownEnabled = true;
             ModifierDeathPenaltyFormField.EmptyText = "";
             ModifierDeathPenaltyFormField.HelpText = "";
@@ -118,6 +123,7 @@
             // ModifierCombatFormField
             // 
             ModifierCombatFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            ModifierCombatFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("ModifierCombatFormField.DataSource");
             ModifierCombatFormField.DropdownEnabled = true;
             ModifierCombatFormField.EmptyText = "";
             ModifierCombatFormField.HelpText = "";
@@ -145,7 +151,7 @@
             // 
             KeyNoMapFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             KeyNoMapFormField.HelpText = "";
-            KeyNoMapFormField.LabelText = "No Map";
+            KeyNoMapFormField.LabelText = "No map";
             KeyNoMapFormField.Location = new System.Drawing.Point(6, 45);
             KeyNoMapFormField.Name = "KeyNoMapFormField";
             KeyNoMapFormField.Size = new System.Drawing.Size(188, 17);
@@ -156,7 +162,7 @@
             // 
             KeyPassiveMobsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             KeyPassiveMobsFormField.HelpText = "";
-            KeyPassiveMobsFormField.LabelText = "Passive Mobs";
+            KeyPassiveMobsFormField.LabelText = "Passive enemies";
             KeyPassiveMobsFormField.Location = new System.Drawing.Point(6, 68);
             KeyPassiveMobsFormField.Name = "KeyPassiveMobsFormField";
             KeyPassiveMobsFormField.Size = new System.Drawing.Size(188, 17);
@@ -167,7 +173,7 @@
             // 
             KeyPlayerEventsFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             KeyPlayerEventsFormField.HelpText = "";
-            KeyPlayerEventsFormField.LabelText = "Player Events";
+            KeyPlayerEventsFormField.LabelText = "Player based raids";
             KeyPlayerEventsFormField.Location = new System.Drawing.Point(6, 91);
             KeyPlayerEventsFormField.Name = "KeyPlayerEventsFormField";
             KeyPlayerEventsFormField.Size = new System.Drawing.Size(188, 17);
@@ -178,7 +184,7 @@
             // 
             KeyNoBuildCostFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             KeyNoBuildCostFormField.HelpText = "";
-            KeyNoBuildCostFormField.LabelText = "No Build Cost";
+            KeyNoBuildCostFormField.LabelText = "No build cost";
             KeyNoBuildCostFormField.Location = new System.Drawing.Point(6, 22);
             KeyNoBuildCostFormField.Name = "KeyNoBuildCostFormField";
             KeyNoBuildCostFormField.Size = new System.Drawing.Size(188, 17);
@@ -187,6 +193,7 @@
             // 
             // PresetFormField
             // 
+            PresetFormField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("PresetFormField.DataSource");
             PresetFormField.DropdownEnabled = true;
             PresetFormField.EmptyText = "";
             PresetFormField.HelpText = "";

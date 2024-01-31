@@ -365,6 +365,7 @@ namespace ValheimServerGUI.Forms
             // 
             // CopyButtonServerPassword
             // 
+            CopyButtonServerPassword.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             CopyButtonServerPassword.CopyFunction = null;
             CopyButtonServerPassword.HelpText = "Copy password to clipboard";
             CopyButtonServerPassword.Location = new System.Drawing.Point(236, 69);
@@ -375,6 +376,7 @@ namespace ValheimServerGUI.Forms
             // 
             // JoinOptionsGroupBox
             // 
+            JoinOptionsGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             JoinOptionsGroupBox.Controls.Add(CommunityServerField);
             JoinOptionsGroupBox.Controls.Add(ServerCrossplayField);
             JoinOptionsGroupBox.Location = new System.Drawing.Point(249, 94);
@@ -406,6 +408,7 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldSelectGroupBox
             // 
+            WorldSelectGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             WorldSelectGroupBox.Controls.Add(WorldsListSettingsButton);
             WorldSelectGroupBox.Controls.Add(WorldsListRefreshButton);
             WorldSelectGroupBox.Controls.Add(WorldsFolderOpenButton);
@@ -422,6 +425,7 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldsListSettingsButton
             // 
+            WorldsListSettingsButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             WorldsListSettingsButton.ClickFunction = null;
             WorldsListSettingsButton.HelpText = "World Modifier Settings";
             WorldsListSettingsButton.Location = new System.Drawing.Point(166, 24);
@@ -431,6 +435,7 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldsListRefreshButton
             // 
+            WorldsListRefreshButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             WorldsListRefreshButton.HelpText = "Refresh the worlds list";
             WorldsListRefreshButton.Location = new System.Drawing.Point(188, 23);
             WorldsListRefreshButton.Name = "WorldsListRefreshButton";
@@ -441,6 +446,7 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldsFolderOpenButton
             // 
+            WorldsFolderOpenButton.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             WorldsFolderOpenButton.HelpText = "Open the save data folder in Explorer";
             WorldsFolderOpenButton.Location = new System.Drawing.Point(210, 23);
             WorldsFolderOpenButton.Name = "WorldsFolderOpenButton";
@@ -451,10 +457,11 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldSelectNewNameField
             // 
+            WorldSelectNewNameField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             WorldSelectNewNameField.HelpText = "";
             WorldSelectNewNameField.HideValue = false;
             WorldSelectNewNameField.LabelText = "New World Name";
-            WorldSelectNewNameField.Location = new System.Drawing.Point(3, 45);
+            WorldSelectNewNameField.Location = new System.Drawing.Point(6, 45);
             WorldSelectNewNameField.MaxLength = 20;
             WorldSelectNewNameField.Multiline = false;
             WorldSelectNewNameField.Name = "WorldSelectNewNameField";
@@ -487,6 +494,7 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldSelectExistingNameField
             // 
+            WorldSelectExistingNameField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             WorldSelectExistingNameField.DataSource = (System.Collections.Generic.IEnumerable<string>)resources.GetObject("WorldSelectExistingNameField.DataSource");
             WorldSelectExistingNameField.DropdownEnabled = true;
             WorldSelectExistingNameField.EmptyText = "(no worlds)";
@@ -501,6 +509,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerPortField
             // 
+            ServerPortField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             ServerPortField.HelpText = "";
             ServerPortField.LabelText = "Port";
             ServerPortField.Location = new System.Drawing.Point(236, 0);
@@ -526,6 +535,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ShowPasswordField
             // 
+            ShowPasswordField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             ShowPasswordField.HelpText = "";
             ShowPasswordField.LabelText = "Show Password";
             ShowPasswordField.Location = new System.Drawing.Point(255, 68);
@@ -536,6 +546,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerPasswordField
             // 
+            ServerPasswordField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ServerPasswordField.HelpText = "Your server must be protected with a password. The password must be at least 5 characters \r\nand must not contain the name of the server or the world that you're hosting.";
             ServerPasswordField.HideValue = true;
             ServerPasswordField.LabelText = "Server Password";
@@ -549,6 +560,7 @@ namespace ValheimServerGUI.Forms
             // 
             // ServerNameField
             // 
+            ServerNameField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             ServerNameField.HelpText = "This is the name that will appear in the Community Servers list within Valheim.";
             ServerNameField.HideValue = false;
             ServerNameField.LabelText = "Server Name";
@@ -601,6 +613,7 @@ namespace ValheimServerGUI.Forms
             // 
             // SavingGroupBox
             // 
+            SavingGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             SavingGroupBox.Controls.Add(ServerLongBackupIntervalField);
             SavingGroupBox.Controls.Add(ServerSaveIntervalField);
             SavingGroupBox.Controls.Add(ServerShortBackupIntervalField);
@@ -666,6 +679,7 @@ namespace ValheimServerGUI.Forms
             // 
             // OtherSettingsGroupBox
             // 
+            OtherSettingsGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             OtherSettingsGroupBox.Controls.Add(ServerLogFileField);
             OtherSettingsGroupBox.Controls.Add(ServerAutoStartField);
             OtherSettingsGroupBox.Controls.Add(ServerAdditionalArgsField);
@@ -714,6 +728,7 @@ namespace ValheimServerGUI.Forms
             // 
             // DirectoriesGroupBox
             // 
+            DirectoriesGroupBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             DirectoriesGroupBox.Controls.Add(ServerSaveDataPathOpenButton);
             DirectoriesGroupBox.Controls.Add(ServerExePathOpenButton);
             DirectoriesGroupBox.Controls.Add(ServerSaveDataFolderPathField);
@@ -981,6 +996,7 @@ namespace ValheimServerGUI.Forms
             // 
             // LinkCharacterNamesHelp
             // 
+            LinkCharacterNamesHelp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right;
             LinkCharacterNamesHelp.AutoSize = true;
             LinkCharacterNamesHelp.Location = new System.Drawing.Point(224, 7);
             LinkCharacterNamesHelp.Name = "LinkCharacterNamesHelp";

@@ -47,7 +47,7 @@ namespace ValheimServerGUI.Forms
             ButtonCancel.Location = new System.Drawing.Point(272, 182);
             ButtonCancel.Name = "ButtonCancel";
             ButtonCancel.Size = new System.Drawing.Size(75, 23);
-            ButtonCancel.TabIndex = 7;
+            ButtonCancel.TabIndex = 8;
             ButtonCancel.Text = "Cancel";
             ButtonCancel.UseVisualStyleBackColor = true;
             ButtonCancel.Click += ButtonCancel_Click;
@@ -58,7 +58,7 @@ namespace ValheimServerGUI.Forms
             ButtonOK.Location = new System.Drawing.Point(191, 182);
             ButtonOK.Name = "ButtonOK";
             ButtonOK.Size = new System.Drawing.Size(75, 23);
-            ButtonOK.TabIndex = 6;
+            ButtonOK.TabIndex = 7;
             ButtonOK.Text = "OK";
             ButtonOK.UseVisualStyleBackColor = true;
             ButtonOK.Click += ButtonOK_Click;
@@ -69,7 +69,7 @@ namespace ValheimServerGUI.Forms
             ButtonDefaults.Location = new System.Drawing.Point(12, 182);
             ButtonDefaults.Name = "ButtonDefaults";
             ButtonDefaults.Size = new System.Drawing.Size(111, 23);
-            ButtonDefaults.TabIndex = 5;
+            ButtonDefaults.TabIndex = 6;
             ButtonDefaults.Text = "Restore Defaults";
             ButtonDefaults.UseVisualStyleBackColor = true;
             ButtonDefaults.Click += ButtonDefaults_Click;
@@ -81,7 +81,7 @@ namespace ValheimServerGUI.Forms
             CheckForUpdatesField.Location = new System.Drawing.Point(12, 12);
             CheckForUpdatesField.Name = "CheckForUpdatesField";
             CheckForUpdatesField.Size = new System.Drawing.Size(335, 17);
-            CheckForUpdatesField.TabIndex = 1;
+            CheckForUpdatesField.TabIndex = 0;
             CheckForUpdatesField.Value = false;
             // 
             // SaveProfileOnStartField
@@ -91,7 +91,7 @@ namespace ValheimServerGUI.Forms
             SaveProfileOnStartField.Location = new System.Drawing.Point(12, 35);
             SaveProfileOnStartField.Name = "SaveProfileOnStartField";
             SaveProfileOnStartField.Size = new System.Drawing.Size(335, 17);
-            SaveProfileOnStartField.TabIndex = 0;
+            SaveProfileOnStartField.TabIndex = 1;
             SaveProfileOnStartField.Value = false;
             // 
             // StartWithWindowsField
@@ -101,7 +101,7 @@ namespace ValheimServerGUI.Forms
             StartWithWindowsField.Location = new System.Drawing.Point(12, 104);
             StartWithWindowsField.Name = "StartWithWindowsField";
             StartWithWindowsField.Size = new System.Drawing.Size(335, 17);
-            StartWithWindowsField.TabIndex = 3;
+            StartWithWindowsField.TabIndex = 4;
             StartWithWindowsField.Value = false;
             // 
             // StartMinimizedField
@@ -111,7 +111,7 @@ namespace ValheimServerGUI.Forms
             StartMinimizedField.Location = new System.Drawing.Point(12, 127);
             StartMinimizedField.Name = "StartMinimizedField";
             StartMinimizedField.Size = new System.Drawing.Size(335, 17);
-            StartMinimizedField.TabIndex = 4;
+            StartMinimizedField.TabIndex = 5;
             StartMinimizedField.Value = false;
             // 
             // WriteLogFileField
@@ -121,7 +121,7 @@ namespace ValheimServerGUI.Forms
             WriteLogFileField.Location = new System.Drawing.Point(12, 81);
             WriteLogFileField.Name = "WriteLogFileField";
             WriteLogFileField.Size = new System.Drawing.Size(335, 17);
-            WriteLogFileField.TabIndex = 2;
+            WriteLogFileField.TabIndex = 3;
             WriteLogFileField.Value = false;
             // 
             // PasswordValidationField
@@ -131,7 +131,7 @@ namespace ValheimServerGUI.Forms
             PasswordValidationField.Location = new System.Drawing.Point(12, 58);
             PasswordValidationField.Name = "PasswordValidationField";
             PasswordValidationField.Size = new System.Drawing.Size(335, 17);
-            PasswordValidationField.TabIndex = 8;
+            PasswordValidationField.TabIndex = 2;
             PasswordValidationField.Value = false;
             // 
             // PreferencesForm

@@ -174,7 +174,7 @@ namespace ValheimServerGUI.Forms
             var newCharacters = new List<PlayerInfo.CharacterInfo>();
             foreach (var characterName in CharacterListField.GetItems())
             {
-                var existing = Player.Characters.FirstOrDefault(c => c.CharacterName == characterName);
+                var existing = Player.Characters?.FirstOrDefault(c => c.CharacterName == characterName);
                 if (existing != null)
                 {
                     newCharacters.Add(existing);

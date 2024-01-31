@@ -38,6 +38,7 @@ namespace ValheimServerGUI.Forms
             StartWithWindowsField = new ValheimServerGUI.Controls.CheckboxFormField();
             StartMinimizedField = new ValheimServerGUI.Controls.CheckboxFormField();
             WriteLogFileField = new ValheimServerGUI.Controls.CheckboxFormField();
+            PasswordValidationField = new ValheimServerGUI.Controls.CheckboxFormField();
             SuspendLayout();
             // 
             // ButtonCancel
@@ -77,9 +78,9 @@ namespace ValheimServerGUI.Forms
             // 
             CheckForUpdatesField.HelpText = resources.GetString("CheckForUpdatesField.HelpText");
             CheckForUpdatesField.LabelText = "Automatically check for updates";
-            CheckForUpdatesField.Location = new System.Drawing.Point(12, 35);
+            CheckForUpdatesField.Location = new System.Drawing.Point(12, 12);
             CheckForUpdatesField.Name = "CheckForUpdatesField";
-            CheckForUpdatesField.Size = new System.Drawing.Size(334, 17);
+            CheckForUpdatesField.Size = new System.Drawing.Size(335, 17);
             CheckForUpdatesField.TabIndex = 1;
             CheckForUpdatesField.Value = false;
             // 
@@ -87,9 +88,9 @@ namespace ValheimServerGUI.Forms
             // 
             SaveProfileOnStartField.HelpText = "If enabled, any changes you made to your server profile\r\nwill be saved when you click Start Server. Otherwise, you\r\nmust manually save changes with File > Save.";
             SaveProfileOnStartField.LabelText = "Auto save profile when starting server";
-            SaveProfileOnStartField.Location = new System.Drawing.Point(12, 12);
+            SaveProfileOnStartField.Location = new System.Drawing.Point(12, 35);
             SaveProfileOnStartField.Name = "SaveProfileOnStartField";
-            SaveProfileOnStartField.Size = new System.Drawing.Size(334, 17);
+            SaveProfileOnStartField.Size = new System.Drawing.Size(335, 17);
             SaveProfileOnStartField.TabIndex = 0;
             SaveProfileOnStartField.Value = false;
             // 
@@ -97,19 +98,19 @@ namespace ValheimServerGUI.Forms
             // 
             StartWithWindowsField.HelpText = "To start your server(s) on Windows startup, enable this setting \r\nalong with \"Start this server when ValheimServerGUI starts\"\r\nunder Advanced Controls for each server.";
             StartWithWindowsField.LabelText = "Start ValheimServerGUI with Windows";
-            StartWithWindowsField.Location = new System.Drawing.Point(12, 81);
+            StartWithWindowsField.Location = new System.Drawing.Point(12, 104);
             StartWithWindowsField.Name = "StartWithWindowsField";
-            StartWithWindowsField.Size = new System.Drawing.Size(334, 17);
+            StartWithWindowsField.Size = new System.Drawing.Size(335, 17);
             StartWithWindowsField.TabIndex = 3;
             StartWithWindowsField.Value = false;
             // 
             // StartMinimizedField
             // 
-            StartMinimizedField.HelpText = "";
+            StartMinimizedField.HelpText = "Enable this setting to minimize VSG to the Windows system\r\ntray when it starts up.";
             StartMinimizedField.LabelText = "Start ValheimServerGUI minimized";
-            StartMinimizedField.Location = new System.Drawing.Point(12, 104);
+            StartMinimizedField.Location = new System.Drawing.Point(12, 127);
             StartMinimizedField.Name = "StartMinimizedField";
-            StartMinimizedField.Size = new System.Drawing.Size(334, 17);
+            StartMinimizedField.Size = new System.Drawing.Size(335, 17);
             StartMinimizedField.TabIndex = 4;
             StartMinimizedField.Value = false;
             // 
@@ -117,17 +118,28 @@ namespace ValheimServerGUI.Forms
             // 
             WriteLogFileField.HelpText = resources.GetString("WriteLogFileField.HelpText");
             WriteLogFileField.LabelText = "Write application logs to file";
-            WriteLogFileField.Location = new System.Drawing.Point(12, 58);
+            WriteLogFileField.Location = new System.Drawing.Point(12, 81);
             WriteLogFileField.Name = "WriteLogFileField";
-            WriteLogFileField.Size = new System.Drawing.Size(334, 17);
+            WriteLogFileField.Size = new System.Drawing.Size(335, 17);
             WriteLogFileField.TabIndex = 2;
             WriteLogFileField.Value = false;
+            // 
+            // PasswordValidationField
+            // 
+            PasswordValidationField.HelpText = resources.GetString("PasswordValidationField.HelpText");
+            PasswordValidationField.LabelText = "Validate password when starting server";
+            PasswordValidationField.Location = new System.Drawing.Point(12, 58);
+            PasswordValidationField.Name = "PasswordValidationField";
+            PasswordValidationField.Size = new System.Drawing.Size(335, 17);
+            PasswordValidationField.TabIndex = 8;
+            PasswordValidationField.Value = false;
             // 
             // PreferencesForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(359, 217);
+            Controls.Add(PasswordValidationField);
             Controls.Add(WriteLogFileField);
             Controls.Add(StartMinimizedField);
             Controls.Add(StartWithWindowsField);
@@ -154,5 +166,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.CheckboxFormField StartWithWindowsField;
         private ValheimServerGUI.Controls.CheckboxFormField StartMinimizedField;
         private ValheimServerGUI.Controls.CheckboxFormField WriteLogFileField;
+        private ValheimServerGUI.Controls.CheckboxFormField PasswordValidationField;
     }
 }

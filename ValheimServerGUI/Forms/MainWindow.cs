@@ -1151,6 +1151,7 @@ namespace ValheimServerGUI.Forms
             {
                 Name = serverPrefs.Name,
                 Password = serverPrefs.Password,
+                PasswordValidation = userPrefs.EnablePasswordValidation,
                 WorldName = serverPrefs.WorldName, // Server automatically creates a new world if a world doesn't yet exist w/ that name
                 Public = serverPrefs.Public,
                 Port = serverPrefs.Port,

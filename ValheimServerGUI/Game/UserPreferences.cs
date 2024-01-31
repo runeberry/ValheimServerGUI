@@ -25,6 +25,8 @@ namespace ValheimServerGUI.Game
 
         public bool WriteApplicationLogsToFile { get; set; } = true;
 
+        public bool EnablePasswordValidation { get; set; } = true;
+
         public List<ServerPreferences> Servers { get; set; } = new();
 
         public List<WorldPreferences> Worlds { get; set; } = new();
@@ -42,6 +44,7 @@ namespace ValheimServerGUI.Game
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
             prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
             prefs.WriteApplicationLogsToFile = file.WriteApplicationLogsToFile ?? prefs.WriteApplicationLogsToFile;
+            prefs.EnablePasswordValidation = file.EnablePasswordValidation ?? prefs.EnablePasswordValidation;
 
             if (file.Servers != null)
             {
@@ -75,6 +78,7 @@ namespace ValheimServerGUI.Game
                 StartMinimized = StartMinimized,
                 SaveProfileOnStart = SaveProfileOnStart,
                 WriteApplicationLogsToFile = WriteApplicationLogsToFile,
+                EnablePasswordValidation = EnablePasswordValidation,
                 Servers = new(),
                 Worlds = new(),
             };

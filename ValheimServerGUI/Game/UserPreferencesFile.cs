@@ -41,6 +41,9 @@ namespace ValheimServerGUI.Game
         [JsonProperty("writeApplicationLogsToFile")]
         public bool? WriteApplicationLogsToFile { get; set; }
 
+        [JsonProperty("enablePasswordValidation")]
+        public bool? EnablePasswordValidation { get; set; }
+
         [JsonProperty("servers")]
         public List<ServerPreferencesFile> Servers { get; set; }
 

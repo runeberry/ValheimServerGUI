@@ -10,6 +10,8 @@ namespace ValheimServerGUI.Game
 
         public string Password { get; set; }
 
+        public bool PasswordValidation { get; set; }
+
         public string WorldName { get; set; }
 
         public bool Public { get; set; }
@@ -52,15 +54,18 @@ namespace ValheimServerGUI.Game
             if (Name == WorldName) throw new ArgumentException($"The server name cannot be the same as the world name ({WorldName}).");
 
             // Password validation
-            if (string.IsNullOrWhiteSpace(Password))
+            if (PasswordValidation)
             {
-                if (Public) throw new ArgumentException($"A password is required for all public games. Either set a password or disable the Community Server option.");
-            }
-            else
-            {
-                if (Password.Length < 5) throw new ArgumentException($"Password must be at least 5 characters.");
-                if (Password.Contains(Name)) throw new ArgumentException($"Password cannot contain your server name ({Name}).");
-                if (Password.Contains(WorldName)) throw new ArgumentException($"Password cannot contain your world name ({WorldName}).");
+                if (string.IsNullOrWhiteSpace(Password))
+                {
+                    if (Public) throw new ArgumentException($"A password is required for all public games. Either set a password or disable the Community Server option.");
+                }
+                else
+                {
+                    if (Password.Length < 5) throw new ArgumentException($"Password must be at least 5 characters.");
+                    if (Password.Contains(Name)) throw new ArgumentException($"Password cannot contain your server name ({Name}).");
+                    if (Password.Contains(WorldName)) throw new ArgumentException($"Password cannot contain your world name ({WorldName}).");
+                }
             }
 
             // Port validation

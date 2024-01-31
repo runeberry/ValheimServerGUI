@@ -40,6 +40,7 @@ namespace ValheimServerGUI.Forms
             StartWithWindowsField.Value = prefs.StartWithWindows;
             StartMinimizedField.Value = prefs.StartMinimized;
             WriteLogFileField.Value = prefs.WriteApplicationLogsToFile;
+            PasswordValidationField.Value = prefs.EnablePasswordValidation;
 
             var startupInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
             CheckForUpdatesField.HelpText = CheckForUpdatesField.HelpText?.Replace("{startupInterval}", $"{startupInterval.TotalHours} hours");
@@ -54,6 +55,7 @@ namespace ValheimServerGUI.Forms
             prefs.StartWithWindows = StartWithWindowsField.Value;
             prefs.StartMinimized = StartMinimizedField.Value;
             prefs.WriteApplicationLogsToFile = WriteLogFileField.Value;
+            prefs.EnablePasswordValidation = PasswordValidationField.Value;
 
             StartupHelper.ApplyStartupSetting(prefs.StartWithWindows, Logger);
 
@@ -75,6 +77,7 @@ namespace ValheimServerGUI.Forms
             StartWithWindowsField.Value = prefs.StartWithWindows;
             StartMinimizedField.Value = prefs.StartMinimized;
             WriteLogFileField.Value = prefs.WriteApplicationLogsToFile;
+            PasswordValidationField.Value = prefs.EnablePasswordValidation;
         }
     }
 }

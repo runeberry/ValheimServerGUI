@@ -662,6 +662,15 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://valheim.fandom.com/wiki/World_Modifiers.
+        /// </summary>
+        internal static string ValheimWikiWorldModifiersUrl {
+            get {
+                return ResourceManager.GetString("ValheimWikiWorldModifiersUrl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Bitmap.
         /// </summary>
         internal static System.Drawing.Bitmap vsg_logo_16 {

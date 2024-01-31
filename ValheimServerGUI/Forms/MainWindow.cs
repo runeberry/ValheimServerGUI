@@ -62,6 +62,7 @@ namespace ValheimServerGUI.Forms
         private readonly IFormProvider FormProvider;
         private readonly IUserPreferencesProvider UserPrefsProvider;
         private readonly IServerPreferencesProvider ServerPrefsProvider;
+        private readonly IWorldPreferencesProvider WorldPrefsProvider;
         private readonly IPlayerDataRepository PlayerDataProvider;
         private readonly ValheimServer Server;
         private readonly IApplicationLogger Logger;
@@ -72,6 +73,7 @@ namespace ValheimServerGUI.Forms
             IFormProvider formProvider,
             IUserPreferencesProvider userPrefsProvider,
             IServerPreferencesProvider serverPrefsProvider,
+            IWorldPreferencesProvider worldPrefsProvider,
             IPlayerDataRepository playerDataProvider,
             ValheimServer server,
             IApplicationLogger appLogger,
@@ -84,6 +86,7 @@ namespace ValheimServerGUI.Forms
             FormProvider = formProvider;
             UserPrefsProvider = userPrefsProvider;
             ServerPrefsProvider = serverPrefsProvider;
+            WorldPrefsProvider = worldPrefsProvider;
             PlayerDataProvider = playerDataProvider;
             Server = server;
             Logger = appLogger;
@@ -170,6 +173,7 @@ namespace ValheimServerGUI.Forms
             LinkCharacterNamesHelp.Click += LinkCharacterNamesHelp_Click;
             ButtonRemovePlayer.Click += ButtonRemovePlayer_Click;
             CopyButtonServerPassword.CopyFunction = () => ServerPasswordField.Value;
+            WorldsListSettingsButton.ClickFunction = WorldsListSettingsButton_Click;
             WorldsListRefreshButton.RefreshFunction = WorldsListRefreshButton_Click;
             WorldsFolderOpenButton.PathFunction = () => GetServerOptionsFromFormState().SaveDataFolderPath;
             CopyButtonExternalIpAddress.CopyFunction = () => LabelExternalIpAddress.Value;
@@ -657,6 +661,44 @@ namespace ValheimServerGUI.Forms
             RefocusWindow();
         }
 
+        private void WorldsListSettingsButton_Click()
+        {
+            string worldName;
+
+            if (WorldSelectRadioNew.Value)
+            {
+                worldName = WorldSelectNewNameField.Value;
+
+                if (string.IsNullOrWhiteSpace(worldName))
+                {
+                    MessageBox.Show(
+                        "Please enter a new world name before changing modifier settings.",
+                        "World Name Missing",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+            }
+            else
+            {
+                worldName = WorldSelectExistingNameField.Value;
+
+                if (string.IsNullOrWhiteSpace(worldName))
+                {
+                    MessageBox.Show(
+                        "Unable to change modifier settings. No world is selected.",
+                        "World Name Missing",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                    return;
+                }
+            }
+
+            var form = FormProvider.GetForm<WorldPreferencesForm>();
+            form.SetWorld(worldName);
+            form.ShowDialog();
+        }
+
         private void WorldsListRefreshButton_Click()
         {
             RefreshWorldSelect();
@@ -1127,6 +1169,26 @@ namespace ValheimServerGUI.Forms
                 LogToFile = serverPrefs.WriteServerLogsToFile,
                 LogMessageHandler = this.BuildActionHandler<string>(OnServerLogReceived),
             };
+
+            // If a world is selected, load preferences for that world
+            var worldName = serverPrefs.WorldName;
+            if (!string.IsNullOrWhiteSpace(worldName))
+            {
+                var worldPrefs = WorldPrefsProvider.LoadPreferences(worldName);
+                if (worldPrefs != null)
+                {
+                    if (!string.IsNullOrEmpty(worldPrefs.Preset))
+                    {
+                        options.WorldPreset = worldPrefs.Preset;
+                    }
+                    else
+                    {
+                        options.WorldModifiers = worldPrefs.Modifiers;
+                    }
+
+                    options.WorldKeys = worldPrefs.Keys;
+                }
+            }
 
             return options;
         }

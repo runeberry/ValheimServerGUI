@@ -65,6 +65,7 @@ namespace ValheimServerGUI.Forms
             CommunityServerField = new ValheimServerGUI.Controls.CheckboxFormField();
             ServerCrossplayField = new ValheimServerGUI.Controls.CheckboxFormField();
             WorldSelectGroupBox = new System.Windows.Forms.GroupBox();
+            WorldsListSettingsButton = new ValheimServerGUI.Controls.SettingsButton();
             WorldsListRefreshButton = new RefreshButton();
             WorldsFolderOpenButton = new OpenButton();
             WorldSelectNewNameField = new Controls.TextFormField();
@@ -405,6 +406,7 @@ namespace ValheimServerGUI.Forms
             // 
             // WorldSelectGroupBox
             // 
+            WorldSelectGroupBox.Controls.Add(WorldsListSettingsButton);
             WorldSelectGroupBox.Controls.Add(WorldsListRefreshButton);
             WorldSelectGroupBox.Controls.Add(WorldsFolderOpenButton);
             WorldSelectGroupBox.Controls.Add(WorldSelectNewNameField);
@@ -417,6 +419,15 @@ namespace ValheimServerGUI.Forms
             WorldSelectGroupBox.TabIndex = 5;
             WorldSelectGroupBox.TabStop = false;
             WorldSelectGroupBox.Text = "World";
+            // 
+            // WorldsListSettingsButton
+            // 
+            WorldsListSettingsButton.ClickFunction = null;
+            WorldsListSettingsButton.HelpText = "World Modifier Settings";
+            WorldsListSettingsButton.Location = new System.Drawing.Point(166, 24);
+            WorldsListSettingsButton.Name = "WorldsListSettingsButton";
+            WorldsListSettingsButton.Size = new System.Drawing.Size(16, 16);
+            WorldsListSettingsButton.TabIndex = 6;
             // 
             // WorldsListRefreshButton
             // 
@@ -1308,5 +1319,6 @@ namespace ValheimServerGUI.Forms
         private ValheimServerGUI.Controls.CheckboxFormField ServerLogFileField;
         private OpenButton LogsFolderOpenButton;
         private System.Windows.Forms.LinkLabel LinkCharacterNamesHelp;
+        private ValheimServerGUI.Controls.SettingsButton WorldsListSettingsButton;
     }
 }

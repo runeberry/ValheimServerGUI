@@ -43,5 +43,8 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("servers")]
         public List<ServerPreferencesFile> Servers { get; set; }
+
+        [JsonProperty("worlds")]
+        public List<WorldPreferencesFile> Worlds { get; set; }
     }
 }

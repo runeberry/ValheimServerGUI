@@ -67,6 +67,7 @@ namespace ValheimServerGUI
                 .AddSingleton<IPlayerDataRepository, PlayerDataRepository>()
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
+                .AddSingleton<IWorldPreferencesProvider, WorldPreferencesProvider>()
                 .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
                 .AddTransient<ValheimServer>();
 
@@ -78,7 +79,8 @@ namespace ValheimServerGUI
                 .AddSingleton<PreferencesForm>()
                 .AddSingleton<BugReportForm>()
                 .AddSingleton<AboutForm>()
-                .AddTransient<PlayerDetailsForm>();
+                .AddTransient<PlayerDetailsForm>()
+                .AddTransient<WorldPreferencesForm>();
         }
     }
 }

@@ -448,7 +448,7 @@ namespace ValheimServerGUI.Forms
 
         private void MenuItemHelpPortForwarding_Click(object sender, EventArgs e)
         {
-            OpenHelper.OpenWebAddress(Resources.UrlPortForwardingGuide);
+            OpenHelper.OpenWebAddress(Resources.UrlHelpPortForwarding);
         }
 
         private void MenuItemHelpBugReport_Click(object sender, EventArgs e)

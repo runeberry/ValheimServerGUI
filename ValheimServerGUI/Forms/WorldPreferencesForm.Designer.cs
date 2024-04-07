@@ -46,6 +46,8 @@
             ButtonDefaults = new System.Windows.Forms.Button();
             WikiLinkLabel = new System.Windows.Forms.LinkLabel();
             label1 = new System.Windows.Forms.Label();
+            label2 = new System.Windows.Forms.Label();
+            ModifiersLinkLabel = new System.Windows.Forms.LinkLabel();
             ModifiersGroupBox.SuspendLayout();
             KeysGroupBox.SuspendLayout();
             SuspendLayout();
@@ -137,7 +139,7 @@
             KeysGroupBox.Controls.Add(KeyNoBuildCostFormField);
             KeysGroupBox.Location = new System.Drawing.Point(222, 59);
             KeysGroupBox.Name = "KeysGroupBox";
-            KeysGroupBox.Size = new System.Drawing.Size(200, 262);
+            KeysGroupBox.Size = new System.Drawing.Size(200, 123);
             KeysGroupBox.TabIndex = 2;
             KeysGroupBox.TabStop = false;
             KeysGroupBox.Text = "Additional Keys";
@@ -251,11 +253,33 @@
             label1.TabIndex = 7;
             label1.Text = "Read more about world modifiers\r\non the";
             // 
+            // label2
+            // 
+            label2.AutoSize = true;
+            label2.Location = new System.Drawing.Point(228, 201);
+            label2.Name = "label2";
+            label2.Size = new System.Drawing.Size(178, 45);
+            label2.TabIndex = 8;
+            label2.Text = "Modifiers not working like you\r\nexpected? You may already have\r\nmodifiers set in-game.";
+            // 
+            // ModifiersLinkLabel
+            // 
+            ModifiersLinkLabel.AutoSize = true;
+            ModifiersLinkLabel.Location = new System.Drawing.Point(228, 248);
+            ModifiersLinkLabel.Name = "ModifiersLinkLabel";
+            ModifiersLinkLabel.Size = new System.Drawing.Size(93, 15);
+            ModifiersLinkLabel.TabIndex = 9;
+            ModifiersLinkLabel.TabStop = true;
+            ModifiersLinkLabel.Text = "Read more here.";
+            ModifiersLinkLabel.LinkClicked += ModifiersLinkLabel_LinkClicked;
+            // 
             // WorldPreferencesForm
             // 
             AutoScaleDimensions = new System.Drawing.SizeF(7F, 15F);
             AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             ClientSize = new System.Drawing.Size(434, 377);
+            Controls.Add(ModifiersLinkLabel);
+            Controls.Add(label2);
             Controls.Add(WikiLinkLabel);
             Controls.Add(ButtonDefaults);
             Controls.Add(ButtonOK);
@@ -296,5 +320,7 @@
         private System.Windows.Forms.Button ButtonDefaults;
         private System.Windows.Forms.LinkLabel WikiLinkLabel;
         private System.Windows.Forms.Label label1;
+        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.LinkLabel ModifiersLinkLabel;
     }
 }

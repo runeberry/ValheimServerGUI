@@ -466,7 +466,12 @@ namespace ValheimServerGUI.Forms
 
         private void WikiLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            OpenHelper.OpenWebAddress(Resources.ValheimWikiWorldModifiersUrl);
+            OpenHelper.OpenWebAddress(Resources.UrlValheimWikiWorldModifiers);
+        }
+
+        private void ModifiersLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            OpenHelper.OpenWebAddress(Resources.UrlHelpWorldModifiers);
         }
 
         #endregion

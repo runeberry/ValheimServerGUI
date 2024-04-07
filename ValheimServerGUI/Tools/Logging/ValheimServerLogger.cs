@@ -1,5 +1,4 @@
 ﻿using Serilog;
-using System.Text.RegularExpressions;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Logging.Components;
 
@@ -17,18 +16,28 @@ namespace ValheimServerGUI.Tools.Logging
         {
             Options = options;
 
-            // Remove default timestamp on some logs
-            AddModifier((_, message) => Regex.Replace(message, @"^\d+\/\d+\/\d+ \d+:\d+:\d+:\s+", ""));
+            // Remove default timestamp when it's present on a log
+            AddRule(RegexTransformer.Remove(@"^\d+\/\d+\/\d+ \d+:\d+:\d+:\s+"));
+
+            if (!Options.LogFilteringDisabled)
+            {
+                // Ignore excess Unity logs
+                AddRule(RegexFilter.Exclude(@"^\(Filename:"));
+                AddRule(RegexFilter.Exclude(@"^Console: "));
+
+                // Ignore empty lines
+                AddRule(RegexFilter.Exclude(@"^\s*?$"));
+            }
+
+            // Add a timestamp after filtering
+            AddRule(TimestampTransformer.Default);
         }
 
-        #region DynamicLogger overrides
+        #region BaseLogger overrides
 
         protected override void ConfigureLogger(LoggerConfiguration config)
         {
             if (Options.LogToFile) AddFileLogging(config, $"ServerLogs-{Options.Name}");
-
-            // Ignore Unity debug logs
-            config.AddRegexExclusion(@"^\(Filename:");
         }
 
         #endregion

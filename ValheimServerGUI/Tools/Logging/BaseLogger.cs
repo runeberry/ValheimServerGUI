@@ -19,10 +19,8 @@ namespace ValheimServerGUI.Tools.Logging
     /// </summary>
     public abstract class BaseLogger : IBaseLogger
     {
-        public delegate string LogEventModifier(LogEvent logEvent, string renderedMessage);
-
         private readonly LogBufferSink LogBufferSink = new(1000);
-        private readonly List<LogEventModifier> Modifiers = new();
+        private readonly List<LogRule> Rules = new();
         private ILogger Logger;
 
         #region IBaseLogger implementation
@@ -35,9 +33,13 @@ namespace ValheimServerGUI.Tools.Logging
 
         #region Protected methods
 
-        protected void AddModifier(LogEventModifier modifier)
+        /// <summary>
+        /// Adds a rule to filter or transform messages in this logger. Order matters!
+        /// </summary>
+        /// <param name="rule"></param>
+        protected void AddRule(LogRule rule)
         {
-            Modifiers.Add(modifier);
+            Rules.Add(rule);
         }
 
         /// <summary>
@@ -91,19 +93,20 @@ namespace ValheimServerGUI.Tools.Logging
 
         public void Write(LogEvent logEvent)
         {
+            // Wait until first log is written to create logger, so all dependencies are resolved
+            Logger ??= CreateLogger();
+
             var message = logEvent.RenderMessage();
 
-            foreach (var modifier in Modifiers)
+            foreach (var rule in Rules)
             {
-                message = modifier(logEvent, message);
-            }
+                var include = rule.Include(logEvent, message);
 
-            message = $"{logEvent.Timestamp.ToLogPrefixFormat()} {message}";
+                // Exclude message at the first filter which returns false
+                if (!include) return;
 
-            if (Logger == null)
-            {
-                // Wait until first log is written to create logger, so all dependencies are resolved
-                Logger = CreateLogger();
+                // Update the rendered message with each pass
+                message = rule.Transform(logEvent, message);
             }
 
             Logger.Write(logEvent.Level, message);

@@ -1,5 +1,4 @@
-﻿using Serilog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -8,6 +7,7 @@ using System.Windows.Forms;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Forms
 {
@@ -33,7 +33,7 @@ namespace ValheimServerGUI.Forms
         private readonly IUserPreferencesProvider UserPrefsProvider;
         private readonly IServerPreferencesProvider ServerPrefsProvider;
         private readonly IPlayerDataRepository PlayerDataRepository;
-        private readonly ILogger Logger;
+        private readonly IApplicationLogger Logger;
 
         public SplashForm(
             IFormProvider formProvider,
@@ -43,7 +43,7 @@ namespace ValheimServerGUI.Forms
             IUserPreferencesProvider userPrefsProvider,
             IServerPreferencesProvider serverPrefsProvider,
             IPlayerDataRepository playerDataRepository,
-            ILogger logger)
+            IApplicationLogger logger)
         {
             FormProvider = formProvider;
             IpAddressProvider = ipAddressProvider;

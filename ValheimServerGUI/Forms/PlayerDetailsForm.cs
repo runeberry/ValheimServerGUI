@@ -154,7 +154,8 @@ namespace ValheimServerGUI.Forms
             OnlineStatusField.Value = Player.PlayerStatus.ToString();
             StatusChangedField.Value = new TimeAgo(Player.LastStatusChange).ToString();
 
-            var characterNames = Player.Characters.Select(GetCharacterDisplayName);
+            var characterNames = Player.Characters?.Select(GetCharacterDisplayName) ?? new List<string>();
+
             CharacterListField.SetItems(characterNames);
 
             if (Player.Platform == PlayerPlatforms.Steam)

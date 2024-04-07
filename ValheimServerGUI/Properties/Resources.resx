@@ -290,8 +290,11 @@
   <data name="UrlHelpCharacterNames" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions</value>
   </data>
-  <data name="UrlPortForwardingGuide" xml:space="preserve">
+  <data name="UrlHelpPortForwarding" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server</value>
+  </data>
+  <data name="UrlHelpWorldModifiers" xml:space="preserve">
+    <value>https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions</value>
   </data>
   <data name="UrlRuneberryApi" xml:space="preserve">
     <value>https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod</value>
@@ -299,21 +302,21 @@
   <data name="UrlUpdates" xml:space="preserve">
     <value>https://github.com/runeberry/ValheimServerGUI/releases</value>
   </data>
+  <data name="UrlValheimGameSite" xml:space="preserve">
+    <value>https://www.valheimgame.com/</value>
+  </data>
+  <data name="UrlValheimWikiWorldModifiers" xml:space="preserve">
+    <value>https://valheim.fandom.com/wiki/World_Modifiers</value>
+  </data>
   <data name="UserPrefsFilePath" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt</value>
   </data>
   <data name="UserPrefsFilePathV2" xml:space="preserve">
     <value>%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.json</value>
   </data>
-  <data name="ValheimGameSiteUrl" xml:space="preserve">
-    <value>https://www.valheimgame.com/</value>
-  </data>
   <data name="ValheimSteamAppId" xml:space="preserve">
     <value>892970</value>
     <comment>From start_headless_server.bat</comment>
-  </data>
-  <data name="ValheimWikiWorldModifiersUrl" xml:space="preserve">
-    <value>https://valheim.fandom.com/wiki/World_Modifiers</value>
   </data>
   <data name="vsg_logo_16" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\vsg_logo_16.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Serilog;
-using Serilog.Events;
 using System;
-using System.Collections.Generic;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools.Logging.Components;
 
 namespace ValheimServerGUI.Tools.Logging
 {
@@ -16,22 +15,13 @@ namespace ValheimServerGUI.Tools.Logging
         private readonly IServiceProvider ServiceProvider;
         private IUserPreferencesProvider UserPrefsProvider;
 
-        private static readonly Dictionary<LogEventLevel, string> LevelPrefixes = new()
-        {
-            { LogEventLevel.Verbose, "[VER] " },
-            { LogEventLevel.Debug, "[DBG] " },
-            { LogEventLevel.Information, "" },
-            { LogEventLevel.Warning, "[WRN] " },
-            { LogEventLevel.Error, "[ERR] " },
-            { LogEventLevel.Fatal, "[FAT] " },
-        };
-
         public ApplicationLogger(IServiceProvider services)
         {
             // Dependencies are injected late to avoid creating a circular dependency
             ServiceProvider = services;
 
-            AddModifier((evt, message) => $"{LevelPrefixes[evt.Level]}{message}");
+            AddRule(LogLevelTransformer.Default);
+            AddRule(TimestampTransformer.Default);
         }
 
         private void OnUserPreferencesSaved(object sender, UserPreferences prefs)

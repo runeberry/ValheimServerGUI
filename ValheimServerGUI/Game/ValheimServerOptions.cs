@@ -36,6 +36,10 @@ namespace ValheimServerGUI.Game
 
         public bool LogToFile { get; set; }
 
+        // TODO: This option is not currently exposed in the UI, so log filtering
+        // cannot be functionally disabled. Can add this if someone wants it.
+        public bool LogFilteringDisabled { get; set; }
+
         public Action<string> LogMessageHandler { get; set; }
 
         public string WorldPreset { get; set; }
@@ -141,6 +145,8 @@ namespace ValheimServerGUI.Game
         string SaveDataFolderPath { get; }
 
         bool LogToFile { get; }
+
+        bool LogFilteringDisabled { get; }
 
         Action<string> LogMessageHandler { get; }
 

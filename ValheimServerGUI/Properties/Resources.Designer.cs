@@ -601,9 +601,18 @@ namespace ValheimServerGUI.Properties {
         /// <summary>
         ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server.
         /// </summary>
-        internal static string UrlPortForwardingGuide {
+        internal static string UrlHelpPortForwarding {
             get {
-                return ResourceManager.GetString("UrlPortForwardingGuide", resourceCulture);
+                return ResourceManager.GetString("UrlHelpPortForwarding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions.
+        /// </summary>
+        internal static string UrlHelpWorldModifiers {
+            get {
+                return ResourceManager.GetString("UrlHelpWorldModifiers", resourceCulture);
             }
         }
         
@@ -626,6 +635,24 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to https://www.valheimgame.com/.
+        /// </summary>
+        internal static string UrlValheimGameSite {
+            get {
+                return ResourceManager.GetString("UrlValheimGameSite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to https://valheim.fandom.com/wiki/World_Modifiers.
+        /// </summary>
+        internal static string UrlValheimWikiWorldModifiers {
+            get {
+                return ResourceManager.GetString("UrlValheimWikiWorldModifiers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to %USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI\userprefs.txt.
         /// </summary>
         internal static string UserPrefsFilePath {
@@ -644,29 +671,11 @@ namespace ValheimServerGUI.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://www.valheimgame.com/.
-        /// </summary>
-        internal static string ValheimGameSiteUrl {
-            get {
-                return ResourceManager.GetString("ValheimGameSiteUrl", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to 892970.
         /// </summary>
         internal static string ValheimSteamAppId {
             get {
                 return ResourceManager.GetString("ValheimSteamAppId", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to https://valheim.fandom.com/wiki/World_Modifiers.
-        /// </summary>
-        internal static string ValheimWikiWorldModifiersUrl {
-            get {
-                return ResourceManager.GetString("ValheimWikiWorldModifiersUrl", resourceCulture);
             }
         }
         

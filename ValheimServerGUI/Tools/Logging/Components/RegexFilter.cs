@@ -1,48 +1,40 @@
-﻿using Serilog;
-using Serilog.Core;
-using Serilog.Events;
-using System;
+﻿using Serilog.Events;
 using System.Text.RegularExpressions;
 
 namespace ValheimServerGUI.Tools.Logging.Components
 {
-    public class RegexFilter : ILogEventFilter
+    public class RegexFilter : LogFilter
     {
-        private readonly string Pattern;
-        private readonly bool Include;
+        private readonly Regex Pattern;
+        private readonly bool IncludeMatch;
+        private readonly bool MatchAgainstTemplate;
 
-        public RegexFilter(string pattern, bool include)
+        public RegexFilter(Regex pattern, bool includeMatch, bool matchAgainstTemplate)
         {
-            if (string.IsNullOrEmpty(pattern)) throw new ArgumentNullException(nameof(pattern));
-
             Pattern = pattern;
-            Include = include;
+            IncludeMatch = includeMatch;
+            MatchAgainstTemplate = matchAgainstTemplate;
         }
 
-        public bool IsEnabled(LogEvent logEvent)
+        public RegexFilter(string pattern, bool includeMatch, bool matchAgainstTemplate)
+            : this(new Regex(pattern), includeMatch, matchAgainstTemplate) { }
+
+        public static RegexFilter Exclude(string pattern) => new(pattern, false, false);
+        public static RegexFilter Include(string pattern) => new(pattern, true, false);
+        public static RegexFilter ExcludeTemplate(string pattern) => new(pattern, false, true);
+        public static RegexFilter IncludeTemplate(string pattern) => new(pattern, true, true);
+
+        #region LogFilter implementation
+
+        public override bool Include(LogEvent logEvent, string renderedMessage)
         {
-            var isMatch = Regex.IsMatch(logEvent.MessageTemplate.Text, Pattern);
+            var message = MatchAgainstTemplate ? logEvent.MessageTemplate.Text : renderedMessage;
+            var isMatch = Pattern.IsMatch(message);
+            var include = IncludeMatch ? isMatch : !isMatch;
 
-            return Include ? isMatch : !isMatch;
-        }
-    }
-
-    public static class RegexFilterExtensions
-    {
-        /// <summary>
-        /// Only include logs that match the specified pattern.
-        /// </summary>
-        public static LoggerConfiguration AddRegexInclusion(this LoggerConfiguration config, string pattern)
-        {
-            return config.Filter.With(new RegexFilter(pattern, true));
+            return include;
         }
 
-        /// <summary>
-        /// Exclude logs that match the specified pattern.
-        /// </summary>
-        public static LoggerConfiguration AddRegexExclusion(this LoggerConfiguration config, string pattern)
-        {
-            return config.Filter.With(new RegexFilter(pattern, false));
-        }
+        #endregion
     }
 }

@@ -91,6 +91,7 @@ namespace ValheimServerGUI.Game
             // Disconnected
             LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", OnPlayerDisconnected); // This is technically "disconnecting" but it's the best terminator I can find
             LogBasedActions.Add(@"Destroying abandoned non persistent zdo ([\d-]+?):.*$", OnPlayerDisconnected); // Crossplay
+            LogBasedActions.Add(@"Disconnect: The client \((\w+?)_(\d+?)\)", OnPlayerDisconnectedCrossplay); // Valheim Plus version mismatch
         }
 
         private void InitializeStatusBasedActions()
@@ -315,6 +316,15 @@ namespace ValheimServerGUI.Game
             };
 
             PlayerDataRepository.SetPlayerOffline(query);
+        }
+
+        private void OnPlayerDisconnectedCrossplay(params string[] captures)
+        {
+            var hasValidPlatform = PlayerPlatforms.TryGetValidPlatform(captures[0], out var platform);
+            var playerId = captures[1];
+            if (!hasValidPlatform || string.IsNullOrWhiteSpace(playerId)) return;
+
+            PlayerDataRepository.SetPlayerOffline(new() { Platform = platform, PlayerId = playerId });
         }
 
         private void OnWorldSaved(params string[] captures)

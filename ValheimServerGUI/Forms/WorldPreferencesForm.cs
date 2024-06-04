@@ -178,6 +178,7 @@ namespace ValheimServerGUI.Forms
                 case WorldGenPresets.Immersive:
                     ModifierPortalsFormField.Value = DisplayNames.PortalsVeryHard;
                     KeyNoMapFormField.Value = true;
+                    KeyFireFormField.Value = true;
                     break;
                 default:
                     break;
@@ -253,6 +254,7 @@ namespace ValheimServerGUI.Forms
             KeyPlayerEventsFormField.ValueChanged += KeyFormField_ValueChanged;
             KeyPassiveMobsFormField.ValueChanged += KeyFormField_ValueChanged;
             KeyNoMapFormField.ValueChanged += KeyFormField_ValueChanged;
+            KeyFireFormField.ValueChanged += KeyFormField_ValueChanged;
         }
 
         private void SetFormDefaultValues()
@@ -269,6 +271,7 @@ namespace ValheimServerGUI.Forms
             KeyPlayerEventsFormField.Value = false;
             KeyPassiveMobsFormField.Value = false;
             KeyNoMapFormField.Value = false;
+            KeyFireFormField.Value = false;
         }
 
         #region Load methods
@@ -298,6 +301,7 @@ namespace ValheimServerGUI.Forms
                 LoadKeyFromPreferences(prefs, WorldGenKeys.PlayerEvents, KeyPlayerEventsFormField);
                 LoadKeyFromPreferences(prefs, WorldGenKeys.PassiveMobs, KeyPassiveMobsFormField);
                 LoadKeyFromPreferences(prefs, WorldGenKeys.NoMap, KeyNoMapFormField);
+                LoadKeyFromPreferences(prefs, WorldGenKeys.Fire, KeyFireFormField);
             }
         }
 
@@ -376,6 +380,7 @@ namespace ValheimServerGUI.Forms
                 SaveKeyToPreferences(prefs, WorldGenKeys.PlayerEvents, KeyPlayerEventsFormField);
                 SaveKeyToPreferences(prefs, WorldGenKeys.PassiveMobs, KeyPassiveMobsFormField);
                 SaveKeyToPreferences(prefs, WorldGenKeys.NoMap, KeyNoMapFormField);
+                SaveKeyToPreferences(prefs, WorldGenKeys.Fire, KeyFireFormField);
             }
 
             WorldPrefsProvider.SavePreferences(prefs);

@@ -8,6 +8,7 @@ namespace ValheimServerGUI.Game
         public const string PlayerEvents = "playerevents";
         public const string PassiveMobs = "passivemobs";
         public const string NoMap = "nomap";
+        public const string Fire = "fire";
 
         public static readonly IReadOnlyList<string> All = new List<string>
         {
@@ -15,6 +16,7 @@ namespace ValheimServerGUI.Game
             PlayerEvents,
             PassiveMobs,
             NoMap,
+            Fire,
         };
     }
 }

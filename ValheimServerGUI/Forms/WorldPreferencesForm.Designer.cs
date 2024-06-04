@@ -36,6 +36,7 @@
             ModifierDeathPenaltyFormField = new ValheimServerGUI.Controls.DropdownFormField();
             ModifierCombatFormField = new ValheimServerGUI.Controls.DropdownFormField();
             KeysGroupBox = new System.Windows.Forms.GroupBox();
+            KeyFireFormField = new ValheimServerGUI.Controls.CheckboxFormField();
             KeyNoMapFormField = new ValheimServerGUI.Controls.CheckboxFormField();
             KeyPassiveMobsFormField = new ValheimServerGUI.Controls.CheckboxFormField();
             KeyPlayerEventsFormField = new ValheimServerGUI.Controls.CheckboxFormField();
@@ -76,7 +77,7 @@
             ModifierPortalsFormField.Location = new System.Drawing.Point(6, 210);
             ModifierPortalsFormField.Name = "ModifierPortalsFormField";
             ModifierPortalsFormField.Size = new System.Drawing.Size(188, 41);
-            ModifierPortalsFormField.TabIndex = 5;
+            ModifierPortalsFormField.TabIndex = 4;
             ModifierPortalsFormField.Value = null;
             // 
             // ModifierResourcesFormField
@@ -89,7 +90,7 @@
             ModifierResourcesFormField.Location = new System.Drawing.Point(6, 116);
             ModifierResourcesFormField.Name = "ModifierResourcesFormField";
             ModifierResourcesFormField.Size = new System.Drawing.Size(188, 41);
-            ModifierResourcesFormField.TabIndex = 4;
+            ModifierResourcesFormField.TabIndex = 2;
             ModifierResourcesFormField.Value = null;
             // 
             // ModifierRaidsFormField
@@ -133,16 +134,28 @@
             // 
             // KeysGroupBox
             // 
+            KeysGroupBox.Controls.Add(KeyFireFormField);
             KeysGroupBox.Controls.Add(KeyNoMapFormField);
             KeysGroupBox.Controls.Add(KeyPassiveMobsFormField);
             KeysGroupBox.Controls.Add(KeyPlayerEventsFormField);
             KeysGroupBox.Controls.Add(KeyNoBuildCostFormField);
             KeysGroupBox.Location = new System.Drawing.Point(222, 59);
             KeysGroupBox.Name = "KeysGroupBox";
-            KeysGroupBox.Size = new System.Drawing.Size(200, 123);
+            KeysGroupBox.Size = new System.Drawing.Size(200, 141);
             KeysGroupBox.TabIndex = 2;
             KeysGroupBox.TabStop = false;
             KeysGroupBox.Text = "Additional Keys";
+            // 
+            // KeyFireFormField
+            // 
+            KeyFireFormField.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            KeyFireFormField.HelpText = "Wood can catch fire and spread throughout the\r\nwhole world, not just in the Ashlands.";
+            KeyFireFormField.LabelText = "Fire hazards";
+            KeyFireFormField.Location = new System.Drawing.Point(6, 114);
+            KeyFireFormField.Name = "KeyFireFormField";
+            KeyFireFormField.Size = new System.Drawing.Size(188, 17);
+            KeyFireFormField.TabIndex = 4;
+            KeyFireFormField.Value = false;
             // 
             // KeyNoMapFormField
             // 
@@ -163,7 +176,7 @@
             KeyPassiveMobsFormField.Location = new System.Drawing.Point(6, 45);
             KeyPassiveMobsFormField.Name = "KeyPassiveMobsFormField";
             KeyPassiveMobsFormField.Size = new System.Drawing.Size(188, 17);
-            KeyPassiveMobsFormField.TabIndex = 2;
+            KeyPassiveMobsFormField.TabIndex = 1;
             KeyPassiveMobsFormField.Value = false;
             // 
             // KeyPlayerEventsFormField
@@ -174,7 +187,7 @@
             KeyPlayerEventsFormField.Location = new System.Drawing.Point(6, 68);
             KeyPlayerEventsFormField.Name = "KeyPlayerEventsFormField";
             KeyPlayerEventsFormField.Size = new System.Drawing.Size(188, 17);
-            KeyPlayerEventsFormField.TabIndex = 1;
+            KeyPlayerEventsFormField.TabIndex = 2;
             KeyPlayerEventsFormField.Value = false;
             // 
             // KeyNoBuildCostFormField
@@ -256,7 +269,7 @@
             // label2
             // 
             label2.AutoSize = true;
-            label2.Location = new System.Drawing.Point(228, 201);
+            label2.Location = new System.Drawing.Point(228, 203);
             label2.Name = "label2";
             label2.Size = new System.Drawing.Size(178, 45);
             label2.TabIndex = 8;
@@ -322,5 +335,6 @@
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.LinkLabel ModifiersLinkLabel;
+        private ValheimServerGUI.Controls.CheckboxFormField KeyFireFormField;
     }
 }

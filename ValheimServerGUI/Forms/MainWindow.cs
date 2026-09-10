@@ -98,6 +98,7 @@ namespace ValheimServerGUI.Forms
             InitializeImages();
             InitializeServices();
             InitializeFormEvents();
+            InitializeBackupMenu(); // Valheim 1.0 manual backup/restore support
             InitializeFormFields(); // Display data back to user, always last
         }
 

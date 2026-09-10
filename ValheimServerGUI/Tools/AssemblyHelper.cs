@@ -45,11 +45,25 @@ namespace ValheimServerGUI.Tools
         /// <returns></returns>
         public static int CompareVersion(string version)
         {
+            return CompareVersions(GetApplicationVersion(), version);
+        }
+
+        /// <summary>
+        /// Pure comparison backing <see cref="CompareVersion(string)"/>. Returns...
+        ///   * 1 if <paramref name="otherVersion"/> is newer than <paramref name="currentVersion"/>
+        ///   * -1 if <paramref name="otherVersion"/> is older than <paramref name="currentVersion"/>
+        ///   * 0 if the two are equal
+        /// ...using semantic-version precedence, in which a stable release outranks its own
+        /// pre-releases (e.g. 2.4.0 is newer than 2.4.0-rc.1). Returns -2 if either version could
+        /// not be parsed. Both arguments accept an optional leading "v", as GitHub release tags carry.
+        /// </summary>
+        public static int CompareVersions(string currentVersion, string otherVersion)
+        {
             try
             {
-                var appVersion = SemVersion.Parse(GetApplicationVersion(), SemVersionStyles.Any);
-                var otherVersion = SemVersion.Parse(version, SemVersionStyles.Any);
-                return SemVersion.CompareSortOrder(otherVersion, appVersion);
+                var current = SemVersion.Parse(currentVersion, SemVersionStyles.Any);
+                var other = SemVersion.Parse(otherVersion, SemVersionStyles.Any);
+                return SemVersion.CompareSortOrder(other, current);
             }
             catch
             {

@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ValheimServerGUI.Properties;
@@ -29,13 +30,24 @@ namespace ValheimServerGUI.Tools
                 throw new Exception("Unable to reach GitHub.");
             }
 
-            var latestRelease = releases
+            return SelectLatestRelease(releases);
+        }
+
+        /// <summary>
+        /// Selects the release the app treats as "latest" for update checks: the most recently
+        /// published release that has at least one asset and is neither a draft nor flagged as a
+        /// GitHub pre-release. The pre-release exclusion is by GitHub's own flag, not the version
+        /// string -- a pre-release version (e.g. 2.4.0-rc.1) published as an ordinary
+        /// (non-pre-release) release is deliberately eligible, so that update checks surface it.
+        /// Returns null if no release qualifies.
+        /// </summary>
+        public static GitHubRelease SelectLatestRelease(IEnumerable<GitHubRelease> releases)
+        {
+            return releases
                 .Where(r => r.Assets != null && r.Assets.Any())
                 .Where(r => !r.Prerelease && !r.Draft)
                 .OrderByDescending(r => r.PublishedAt)
                 .FirstOrDefault();
-
-            return latestRelease;
         }
     }
 

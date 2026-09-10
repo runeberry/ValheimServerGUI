@@ -1,0 +1,167 @@
+# Build, test, sign, and publish a GitHub Release when the app version is bumped.
+#
+# HOW IT DECIDES TO RELEASE
+#   On every push to main it reads <Version> from ValheimServerGUI/ValheimServerGUI.csproj
+#   and checks whether a tag "v<Version>" already exists. If it does, the run stops (no
+#   redundant build). If it does not, the version was bumped -> build, test, sign, release.
+#   So: to cut a release, bump <Version> in the csproj and merge to main.
+#
+# WHAT IT PRODUCES
+#   Tag  v<Version>  (e.g. v2.4.0) on the main commit, and a Release named the same, with
+#   ValheimServerGUI-<Version>.zip (the single signed .exe) attached. Release notes are the
+#   subject lines of the commits since the previous tag, as bullet points. (Expect to hand-edit
+#   the notes afterward -- that part is intentionally not automated.)
+#
+# ── REQUIRED ONE-TIME SETUP ──────────────────────────────────────────────────────────────
+#   Repo SECRETS (Settings > Secrets and variables > Actions > Secrets):
+#     VSG_SNK_BASE64            base64 of SolutionResources/ValheimServerGUI.snk
+#                               (create: `base64 -w0 ValheimServerGUI.snk`  /  PowerShell:
+#                                [Convert]::ToBase64String([IO.File]::ReadAllBytes("ValheimServerGUI.snk")))
+#     VSG_CLIENT_SECRETS_VALUES full text of SolutionResources/ClientSecrets.Values.cs
+#     AZURE_TENANT_ID           Azure AD tenant of the Trusted/Artifact Signing account
+#     AZURE_CLIENT_ID           service-principal app id with access to the signing account
+#     AZURE_CLIENT_SECRET       service-principal secret
+#   Repo VARIABLES (same page > Variables):
+#     AZURE_SIGNING_ENDPOINT    e.g. https://wus2.codesigning.azure.net  (region of your account)
+#     AZURE_SIGNING_ACCOUNT     the Trusted/Artifact Signing account name
+#     AZURE_SIGNING_PROFILE     the Public Trust certificate profile name
+#   The token that PUSHES this file needs the "Workflows" write permission (fine-grained PAT)
+#   or `workflow` scope (classic). See project memory: mochi-rawr's default token lacked it.
+#
+# NOTE: Azure signing can't run until the Azure Artifact Signing account + identity validation
+#   exist (see project memory: code-signing-strategy). Until the secrets/vars above are set,
+#   the sign step fails -- everything up to it (build/test/publish) still works.
+
+name: release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: {}
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # create tags and releases
+
+jobs:
+  check:
+    name: Check for version bump
+    runs-on: ubuntu-latest
+    outputs:
+      should_release: ${{ steps.gate.outputs.should_release }}
+      version: ${{ steps.gate.outputs.version }}
+      tag: ${{ steps.gate.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history + tags for the gate and changelog
+
+      - id: gate
+        shell: bash
+        run: |
+          version="$(grep -oPm1 '(?<=<Version>)[^<]+' ValheimServerGUI/ValheimServerGUI.csproj)"
+          if [ -z "$version" ]; then echo "Could not read <Version> from csproj" >&2; exit 1; fi
+          tag="v$version"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag"         >> "$GITHUB_OUTPUT"
+          if git rev-parse -q --verify "refs/tags/$tag" >/dev/null; then
+            echo "Tag $tag already exists -> nothing to release."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version $version has no tag yet -> will release $tag."
+            echo "should_release=true" >> "$GITHUB_OUTPUT"
+          fi
+
+  release:
+    name: Build, sign, and release
+    needs: check
+    if: needs.check.outputs.should_release == 'true'
+    runs-on: windows-latest
+    env:
+      VERSION: ${{ needs.check.outputs.version }}
+      TAG: ${{ needs.check.outputs.tag }}
+      PUBLISH_DIR: publish/small-x64
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            6.0.x
+            8.0.x
+
+      - name: Restore private build files from secrets
+        shell: pwsh
+        env:
+          VSG_SNK_BASE64: ${{ secrets.VSG_SNK_BASE64 }}
+          VSG_CLIENT_SECRETS_VALUES: ${{ secrets.VSG_CLIENT_SECRETS_VALUES }}
+        run: |
+          if (-not $env:VSG_SNK_BASE64) { throw "Missing secret VSG_SNK_BASE64" }
+          if (-not $env:VSG_CLIENT_SECRETS_VALUES) { throw "Missing secret VSG_CLIENT_SECRETS_VALUES" }
+          [IO.File]::WriteAllBytes("SolutionResources/ValheimServerGUI.snk", [Convert]::FromBase64String($env:VSG_SNK_BASE64))
+          Set-Content -Path "SolutionResources/ClientSecrets.Values.cs" -Value $env:VSG_CLIENT_SECRETS_VALUES
+
+      - name: Test (desktop app)
+        run: dotnet test ValheimServerGUI.Tests/ValheimServerGUI.Tests.csproj -c Release
+
+      - name: Publish single-file exe
+        run: dotnet publish ValheimServerGUI/ValheimServerGUI.csproj -p:PublishProfile=small-x64-release
+
+      - name: Sign the exe (Azure Artifact / Trusted Signing)
+        uses: azure/trusted-signing-action@v0.5.1
+        with:
+          azure-tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          azure-client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          azure-client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          endpoint: ${{ vars.AZURE_SIGNING_ENDPOINT }}
+          trusted-signing-account-name: ${{ vars.AZURE_SIGNING_ACCOUNT }}
+          certificate-profile-name: ${{ vars.AZURE_SIGNING_PROFILE }}
+          files-folder: ${{ github.workspace }}\${{ env.PUBLISH_DIR }}
+          files-folder-filter: exe
+          file-digest: SHA256
+          timestamp-rfc3161: http://timestamp.acs.microsoft.com
+          timestamp-digest: SHA256
+
+      - name: Verify signature (gate — no release if unsigned)
+        shell: pwsh
+        run: |
+          $exe = "$env:PUBLISH_DIR/ValheimServerGUI.exe"
+          $sig = Get-AuthenticodeSignature $exe
+          Write-Host "Status : $($sig.Status)"
+          Write-Host "Signer : $($sig.SignerCertificate.Subject)"
+          Write-Host "Stamp  : $($sig.TimeStamperCertificate.Subject)"
+          if ($sig.Status -ne 'Valid') {
+            throw "Refusing to publish: signature status is '$($sig.Status)', not 'Valid'. The app must be signed before a release is created."
+          }
+
+      - name: Package release zip
+        shell: pwsh
+        run: |
+          $zip = "ValheimServerGUI-$env:VERSION.zip"
+          Compress-Archive -Path "$env:PUBLISH_DIR/ValheimServerGUI.exe" -DestinationPath $zip -Force
+          "ZIP=$zip" | Out-File -FilePath $env:GITHUB_ENV -Append
+
+      - name: Build release notes (commit subjects since last tag)
+        shell: bash
+        run: |
+          prev="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          if [ -n "$prev" ]; then range="$prev..HEAD"; else range="HEAD"; fi
+          echo "Changelog range: ${prev:-<start>}..HEAD"
+          git log "$range" --no-merges --pretty=format:'- %s' > release-notes.md
+          echo "" >> release-notes.md
+
+      - name: Create GitHub release + tag
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$TAG" "$ZIP" \
+            --target "$GITHUB_SHA" \
+            --title "$TAG" \
+            --notes-file release-notes.md

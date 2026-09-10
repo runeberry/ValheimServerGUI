@@ -20,7 +20,9 @@
 		<AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
 	</PropertyGroup>
 
-	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
+	<!-- post-publish.bat signs the exe from the local machine cert store. Skipped under CI
+	     ($(CI)=true on GitHub Actions), where signing is done by the Azure signing step instead. -->
+	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release' And '$(CI)' != 'true'">
 		<Exec Command="post-publish.bat" />
 	</Target>
 

@@ -11,8 +11,9 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// These are automatic backup files created by Valheim with the transition to
         /// the worlds_local folder on 6/20/22. Do not list these as world names.
+        /// Covers both the "_backup_&lt;date&gt;-&lt;time&gt;" and "_backup_auto-&lt;timestamp&gt;" naming schemes.
         /// </summary>
-        private static readonly Regex AutoBackupRegex = new(@"^.*?_backup_\d+?-\d+?");
+        private static readonly Regex AutoBackupRegex = new(@"^.*?_backup_(auto-\d|\d+?-\d+?)");
 
         public static FileInfo GetValidatedServerExe(this IValheimServerOptions options)
         {
@@ -34,10 +35,17 @@ namespace ValheimServerGUI.Game
                 {
                     if (!Directory.Exists(info.FullName)) continue;
 
+                    // Legacy format: one "<WorldName>.fwl" file per world
                     allNames.AddRange(info
                         .GetFiles("*.fwl")
                         .Where(f => !AutoBackupRegex.IsMatch(f.Name))
                         .Select(f => Path.GetFileNameWithoutExtension(f.FullName)));
+
+                    // Valheim 1.0+ format: a "<WorldName>" folder containing a "*.fwl2" file
+                    allNames.AddRange(info
+                        .GetDirectories()
+                        .Where(d => !AutoBackupRegex.IsMatch(d.Name) && d.GetFiles("*.fwl2").Any())
+                        .Select(d => d.Name));
                 }
 
                 return allNames;
@@ -56,8 +64,7 @@ namespace ValheimServerGUI.Game
             try
             {
                 return !saveDataFolder.GetWorldsFolders()
-                    .Select(p => Path.Join(p.FullName, $"{worldName}.fwl"))
-                    .Any(p => File.Exists(p));
+                    .Any(folder => WorldExists(folder, worldName));
             }
             catch
             {
@@ -72,6 +79,16 @@ namespace ValheimServerGUI.Game
         {
             yield return PathExtensions.GetDirectoryInfo(Path.Join(saveDataFolder.FullName, "worlds"));
             yield return PathExtensions.GetDirectoryInfo(Path.Join(saveDataFolder.FullName, "worlds_local"));
+        }
+
+        private static bool WorldExists(DirectoryInfo worldsFolder, string worldName)
+        {
+            // Legacy format: "<WorldName>.fwl" file
+            if (File.Exists(Path.Join(worldsFolder.FullName, $"{worldName}.fwl"))) return true;
+
+            // Valheim 1.0+ format: "<WorldName>" folder containing a "*.fwl2" file
+            var worldFolder = Path.Join(worldsFolder.FullName, worldName);
+            return Directory.Exists(worldFolder) && Directory.GetFiles(worldFolder, "*.fwl2").Any();
         }
 
         #endregion

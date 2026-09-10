@@ -68,6 +68,7 @@ namespace ValheimServerGUI
                 .AddSingleton<IUserPreferencesProvider, UserPreferencesProvider>()
                 .AddSingleton<IServerPreferencesProvider, ServerPreferencesProvider>()
                 .AddSingleton<IWorldPreferencesProvider, WorldPreferencesProvider>()
+                .AddSingleton<ISteamCloudWorldProvider, SteamCloudWorldProvider>()
                 .AddSingleton<IStartupArgsProvider>(startupArgsProvider)
                 .AddTransient<ValheimServer>();
 

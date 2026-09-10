@@ -168,7 +168,7 @@
     <value>%USERPROFILE%\AppData\LocalLow\IronGate\Valheim</value>
   </data>
   <data name="DiscordLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\resources\discordlogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+    <value>..\Resources\DiscordLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="DonateLogo" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\DonateLogo.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>

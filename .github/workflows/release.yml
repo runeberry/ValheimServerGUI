@@ -17,7 +17,12 @@
 #     VSG_SNK_BASE64            base64 of SolutionResources/ValheimServerGUI.snk
 #                               (create: `base64 -w0 ValheimServerGUI.snk`  /  PowerShell:
 #                                [Convert]::ToBase64String([IO.File]::ReadAllBytes("ValheimServerGUI.snk")))
-#     VSG_CLIENT_SECRETS_VALUES full text of SolutionResources/ClientSecrets.Values.cs
+#     RUNEBERRY_CLIENT_API_KEY  the Runeberry API key  (-> ClientSecrets.RuneberryClientApiKey)
+#     RUNEBERRY_API_KEY_HEADER  the API key header name (-> ClientSecrets.RuneberryApiKeyHeader)
+#                               (workflow generates SolutionResources/ClientSecrets.Values.cs from these
+#                                two. If ClientSecrets.cs gains another secret property, add a matching
+#                                secret + a line in the generate step. The header name isn't really a
+#                                credential -- move it to a repo Variable if you'd rather.)
 #     AZURE_TENANT_ID           Azure AD tenant of the Trusted/Artifact Signing account
 #     AZURE_CLIENT_ID           service-principal app id with access to the signing account
 #     AZURE_CLIENT_SECRET       service-principal secret
@@ -100,12 +105,34 @@ jobs:
         shell: pwsh
         env:
           VSG_SNK_BASE64: ${{ secrets.VSG_SNK_BASE64 }}
-          VSG_CLIENT_SECRETS_VALUES: ${{ secrets.VSG_CLIENT_SECRETS_VALUES }}
+          RUNEBERRY_CLIENT_API_KEY: ${{ secrets.RUNEBERRY_CLIENT_API_KEY }}
+          RUNEBERRY_API_KEY_HEADER: ${{ secrets.RUNEBERRY_API_KEY_HEADER }}
         run: |
           if (-not $env:VSG_SNK_BASE64) { throw "Missing secret VSG_SNK_BASE64" }
-          if (-not $env:VSG_CLIENT_SECRETS_VALUES) { throw "Missing secret VSG_CLIENT_SECRETS_VALUES" }
+          if (-not $env:RUNEBERRY_CLIENT_API_KEY) { throw "Missing secret RUNEBERRY_CLIENT_API_KEY" }
+          if (-not $env:RUNEBERRY_API_KEY_HEADER) { throw "Missing secret RUNEBERRY_API_KEY_HEADER" }
+
+          # Strong-name key
           [IO.File]::WriteAllBytes("SolutionResources/ValheimServerGUI.snk", [Convert]::FromBase64String($env:VSG_SNK_BASE64))
-          Set-Content -Path "SolutionResources/ClientSecrets.Values.cs" -Value $env:VSG_CLIENT_SECRETS_VALUES
+
+          # Generate ClientSecrets.Values.cs from the discrete secret values. C# verbatim strings
+          # (@"...") so the values need no escaping beyond doubling any embedded quote.
+          $hdr = $env:RUNEBERRY_API_KEY_HEADER -replace '"','""'
+          $key = $env:RUNEBERRY_CLIENT_API_KEY -replace '"','""'
+          $lines = @(
+            'namespace ValheimServerGUI.Properties'
+            '{'
+            '    public static partial class ClientSecrets'
+            '    {'
+            '        static ClientSecrets()'
+            '        {'
+            "            RuneberryApiKeyHeader = @`"$hdr`";"
+            "            RuneberryClientApiKey = @`"$key`";"
+            '        }'
+            '    }'
+            '}'
+          )
+          Set-Content -Path "SolutionResources/ClientSecrets.Values.cs" -Value $lines
 
       - name: Test (desktop app)
         run: dotnet test ValheimServerGUI.Tests/ValheimServerGUI.Tests.csproj -c Release

@@ -11,8 +11,9 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// These are automatic backup files created by Valheim with the transition to
         /// the worlds_local folder on 6/20/22. Do not list these as world names.
+        /// Covers both the "_backup_&lt;date&gt;-&lt;time&gt;" and "_backup_auto-&lt;timestamp&gt;" naming schemes.
         /// </summary>
-        private static readonly Regex AutoBackupRegex = new(@"^.*?_backup_\d+?-\d+?");
+        private static readonly Regex AutoBackupRegex = new(@"^.*?_backup_(auto-\d|\d+?-\d+?)");
 
         public static FileInfo GetValidatedServerExe(this IValheimServerOptions options)
         {

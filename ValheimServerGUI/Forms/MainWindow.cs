@@ -49,6 +49,9 @@ namespace ValheimServerGUI.Forms
         private static readonly string NL = Environment.NewLine;
         private const string IpLoadingText = "Loading...";
 
+        // Marks a world that lives only in Steam Cloud; applied and stripped exclusively by MainWindow
+        private const string CloudWorldSuffix = " (cloud)";
+
         private readonly Stopwatch ServerUptimeTimer = new();
         private readonly Queue<decimal> WorldSaveTimes = new();
         private readonly Dictionary<ServerStatus, Image> ServerStatusIconMap = new()
@@ -68,6 +71,7 @@ namespace ValheimServerGUI.Forms
         private readonly IApplicationLogger Logger;
         private readonly IIpAddressProvider IpAddressProvider;
         private readonly ISoftwareUpdateProvider SoftwareUpdateProvider;
+        private readonly ISteamCloudWorldProvider SteamCloudWorldProvider;
 
         public MainWindow(
             IFormProvider formProvider,
@@ -78,7 +82,8 @@ namespace ValheimServerGUI.Forms
             ValheimServer server,
             IApplicationLogger appLogger,
             IIpAddressProvider ipAddressProvider,
-            ISoftwareUpdateProvider softwareUpdateProvider)
+            ISoftwareUpdateProvider softwareUpdateProvider,
+            ISteamCloudWorldProvider steamCloudWorldProvider)
         {
 #if DEBUG
             if (SimulateConstructorException) throw new InvalidOperationException("Intentional exception thrown for testing");
@@ -92,6 +97,7 @@ namespace ValheimServerGUI.Forms
             Logger = appLogger;
             IpAddressProvider = ipAddressProvider;
             SoftwareUpdateProvider = softwareUpdateProvider;
+            SteamCloudWorldProvider = steamCloudWorldProvider;
 
             InitializeComponent(); // WinForms generated code, always first
             this.AddApplicationIcon();
@@ -1077,7 +1083,13 @@ namespace ValheimServerGUI.Forms
                 // Refresh the existing worlds list, then re-select whatever was originally selected
                 var selectedWorld = WorldSelectExistingNameField.Value;
                 var options = GetServerOptionsFromFormState();
-                var worlds = options.GetValidatedSaveDataFolder().GetWorldNames();
+                var localWorlds = options.GetValidatedSaveDataFolder().GetWorldNames();
+
+                // Also surface Steam Cloud worlds so they can be imported and hosted; local wins on a name collision
+                var cloudWorlds = SteamCloudWorldProvider.GetCloudWorldNames()
+                    .Where(n => !localWorlds.Contains(n, StringComparer.OrdinalIgnoreCase))
+                    .Select(n => n + CloudWorldSuffix);
+                var worlds = localWorlds.Concat(cloudWorlds).ToList();
 
                 WorldSelectExistingNameField.DataSource = worlds;
                 WorldSelectExistingNameField.DropdownEnabled = worlds.Any();
@@ -1267,6 +1279,38 @@ namespace ValheimServerGUI.Forms
                 }
             };
 
+            // A selected cloud world isn't hostable until its files are brought into the local save folder.
+            // Import it here, before options are built, so the suffix never reaches validation or saved prefs.
+            if (WorldSelectRadioExisting.Value)
+            {
+                var selected = WorldSelectExistingNameField.Value;
+                if (selected != null && selected.EndsWith(CloudWorldSuffix))
+                {
+                    var cloudWorldName = selected[..^CloudWorldSuffix.Length];
+
+                    var choice = PromptCloudWorldImport(cloudWorldName);
+                    if (choice == CloudImportChoice.Cancel) return;
+
+                    var cloudSaveFolder = GetServerOptionsFromFormState().GetValidatedSaveDataFolder();
+                    try
+                    {
+                        SteamCloudWorldProvider.ImportCloudWorld(cloudWorldName, cloudSaveFolder, move: choice == CloudImportChoice.Move);
+                        Logger.Information("{action} cloud world '{world}' into local save folder",
+                            choice == CloudImportChoice.Move ? "Moved" : "Copied", cloudWorldName);
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex, "Failed to import cloud world '{world}'", cloudWorldName);
+                        onError($"Failed to import cloud world '{cloudWorldName}': {ex.Message}");
+                        return;
+                    }
+
+                    // The world is now local; re-list it without the suffix and select it for the start below
+                    RefreshWorldSelect();
+                    WorldSelectExistingNameField.Value = cloudWorldName;
+                }
+            }
+
             var options = GetServerOptionsFromFormState();
 
             // Run standard input validation first
@@ -1345,6 +1389,33 @@ namespace ValheimServerGUI.Forms
                 var serverPrefs = GetPrefsFromFormState();
                 ServerPrefsProvider.SavePreferences(serverPrefs);
             }
+        }
+
+        private enum CloudImportChoice { Move, Copy, Cancel }
+
+        private static CloudImportChoice PromptCloudWorldImport(string worldName)
+        {
+            var moveButton = new TaskDialogButton("Move");
+            var copyButton = new TaskDialogButton("Copy");
+            var cancelButton = new TaskDialogButton("Cancel");
+
+            var page = new TaskDialogPage
+            {
+                Caption = "Import cloud world",
+                Heading = $"Host the cloud world '{worldName}'?",
+                Text = "This world is saved to Steam Cloud and must be brought into the server's local save " +
+                    "folder to be hosted." + NL + NL +
+                    "Move: bring the world over and remove the Steam Cloud copy." + NL +
+                    "Copy: bring a copy over and leave the Steam Cloud copy in place.",
+                Icon = TaskDialogIcon.Information,
+                Buttons = { moveButton, copyButton, cancelButton },
+                DefaultButton = copyButton,
+            };
+
+            var result = TaskDialog.ShowDialog(page);
+            if (result == moveButton) return CloudImportChoice.Move;
+            if (result == copyButton) return CloudImportChoice.Copy;
+            return CloudImportChoice.Cancel;
         }
 
         private void CheckFilePaths()

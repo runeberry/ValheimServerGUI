@@ -65,5 +65,25 @@ namespace ValheimServerGUI.Tests.Game
             var empty = new DirectoryInfo(Path.Join(SaveFolder.FullName, "nonexistent"));
             Assert.Empty(empty.GetWorldNames());
         }
+
+        [Fact]
+        public void IsWorldNameAvailable_TrueForCacheOnlyFolder()
+        {
+            // Valheim writes local minimap cache (cacheMinimap*) for a cloud world played in-game,
+            // leaving a save-file-less folder. That must not read as an existing world, or a cloud
+            // world could never be imported over it.
+            var dir = Directory.CreateDirectory(Path.Join(WorldsLocal, "CloudWorld"));
+            File.WriteAllText(Path.Join(dir.FullName, "cacheMinimapMeta"), "");
+
+            Assert.True(SaveFolder.IsWorldNameAvailable("CloudWorld"));
+        }
+
+        [Fact]
+        public void IsWorldNameAvailable_FalseWhenWorldFilesPresent()
+        {
+            WriteFolderWorld("RealWorld");
+
+            Assert.False(SaveFolder.IsWorldNameAvailable("RealWorld"));
+        }
     }
 }

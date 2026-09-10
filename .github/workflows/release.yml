@@ -19,10 +19,11 @@
 #                                [Convert]::ToBase64String([IO.File]::ReadAllBytes("ValheimServerGUI.snk")))
 #     RUNEBERRY_CLIENT_API_KEY  the Runeberry API key  (-> ClientSecrets.RuneberryClientApiKey)
 #     RUNEBERRY_API_KEY_HEADER  the API key header name (-> ClientSecrets.RuneberryApiKeyHeader)
-#                               (workflow generates SolutionResources/ClientSecrets.Values.cs from these
-#                                two. If ClientSecrets.cs gains another secret property, add a matching
-#                                secret + a line in the generate step. The header name isn't really a
-#                                credential -- move it to a repo Variable if you'd rather.)
+#                               (CI fills these into SolutionResources/ClientSecrets.Values.cs.template
+#                                to produce ClientSecrets.Values.cs. If ClientSecrets.cs gains another
+#                                secret property, add a __PLACEHOLDER__ to that template + a matching
+#                                secret. The header name isn't really a credential -- move it to a repo
+#                                Variable if you'd rather.)
 #     AZURE_TENANT_ID           Azure AD tenant of the Trusted/Artifact Signing account
 #     AZURE_CLIENT_ID           service-principal app id with access to the signing account
 #     AZURE_CLIENT_SECRET       service-principal secret
@@ -115,24 +116,15 @@ jobs:
           # Strong-name key
           [IO.File]::WriteAllBytes("SolutionResources/ValheimServerGUI.snk", [Convert]::FromBase64String($env:VSG_SNK_BASE64))
 
-          # Generate ClientSecrets.Values.cs from the discrete secret values. C# verbatim strings
-          # (@"...") so the values need no escaping beyond doubling any embedded quote.
+          # Fill the tracked ClientSecrets.Values.cs.template with the secret values. The template
+          # holds the C# structure; only the values are injected here. Double any embedded quote so
+          # it stays valid inside the template's C# verbatim (@"...") strings, and use literal
+          # String.Replace so a '$' in a value isn't treated as a regex substitution.
           $hdr = $env:RUNEBERRY_API_KEY_HEADER -replace '"','""'
           $key = $env:RUNEBERRY_CLIENT_API_KEY -replace '"','""'
-          $lines = @(
-            'namespace ValheimServerGUI.Properties'
-            '{'
-            '    public static partial class ClientSecrets'
-            '    {'
-            '        static ClientSecrets()'
-            '        {'
-            "            RuneberryApiKeyHeader = @`"$hdr`";"
-            "            RuneberryClientApiKey = @`"$key`";"
-            '        }'
-            '    }'
-            '}'
-          )
-          Set-Content -Path "SolutionResources/ClientSecrets.Values.cs" -Value $lines
+          $tpl = Get-Content "SolutionResources/ClientSecrets.Values.cs.template" -Raw
+          $tpl = $tpl.Replace('__RUNEBERRY_API_KEY_HEADER__', $hdr).Replace('__RUNEBERRY_CLIENT_API_KEY__', $key)
+          Set-Content -Path "SolutionResources/ClientSecrets.Values.cs" -Value $tpl
 
       - name: Test (desktop app)
         run: dotnet test ValheimServerGUI.Tests/ValheimServerGUI.Tests.csproj -c Release

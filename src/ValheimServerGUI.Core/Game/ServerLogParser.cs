@@ -44,7 +44,11 @@ namespace ValheimServerGUI.Game
         private void InitializeLogBasedActions()
         {
             LogBasedActions.Add(@"Game server connected", OnServerConnected);
+            // Legacy world-save line (pre-1.0 dedicated server): "World saved ( 20ms )".
             LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", OnWorldSaved);
+            // Valheim 1.0+ logs a 5-step save sequence instead; the "World saved ( Nms )" line is gone.
+            // Match the completion line and pull the total time from its "[<n>ms]" (tier-4 live smoke, E9).
+            LogBasedActions.Add(@"World save \(\d+/\d+\) done\. Total time \[([\d.]+)ms\]", OnWorldSaved);
             LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", OnCrossplayJoinCodeAvailable);
 
             // Connecting

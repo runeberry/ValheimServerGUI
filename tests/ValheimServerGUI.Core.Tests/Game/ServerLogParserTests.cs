@@ -186,6 +186,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(2, player.Characters!.Count);
         }
 
+        // Legacy (pre-1.0) dedicated-server save line.
         [Fact]
         public void WorldSaved_RaisesEventWithDuration()
         {
@@ -195,6 +196,24 @@ namespace ValheimServerGUI.Core.Tests.Game
             _parser.ProcessLine("World saved ( 123.45ms )");
 
             Assert.Equal(123.45m, saved);
+        }
+
+        // Valheim 1.0+ multi-step save sequence (captured live, tier-4): only the final "(5/5) done. Total
+        // time [..ms]" line raises the event; the intermediate steps must not. Pins the current log format
+        // the live smoke verified against the real binary.
+        [Fact]
+        public void WorldSaved_CurrentMultiStepFormat_RaisesEventOnlyOnCompletion()
+        {
+            decimal? saved = null;
+            _parser.WorldSaved += (_, ms) => saved = ms;
+
+            _parser.ProcessLine("World save (1/5) Cloud & Backup checks done [0ms] => Save number 1");
+            _parser.ProcessLine("World save (2/5) Chunks writing done [5ms]");
+            Assert.Null(saved); // intermediate steps do not fire
+
+            _parser.ProcessLine("World save (5/5) done. Total time [20ms]");
+
+            Assert.Equal(20m, saved);
         }
 
         [Fact]

@@ -2,13 +2,15 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels"
         mc:Ignorable="d"
         x:Class="ValheimServerGUI.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
         Width="900" Height="640"
-        Title="Valheim Server GUI">
+        Title="{Binding Title}">
 
-    <!-- Wave 0 scaffold placeholder. Fleshed out into the real MainWindow chrome in Wave 3. -->
+    <!-- Chrome (menus, status bar, tabs, tray) is built out in Wave 3+. -->
     <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-               Text="Valheim Server GUI" FontSize="20" />
+               Text="{Binding Title}" FontSize="20" />
 
 </Window>

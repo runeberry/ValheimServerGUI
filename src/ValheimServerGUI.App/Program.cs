@@ -1,6 +1,6 @@
 using System;
 using Avalonia;
-using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Infrastructure;
 
 namespace ValheimServerGUI.App;
 
@@ -10,7 +10,16 @@ internal static class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        var services = ServiceConfiguration.BuildServiceProvider(args);
+        // Single-instance, multi-window (§2.2): a second launch forwards its args to the primary and exits.
+        var singleInstance = new SingleInstanceManager();
+        if (!singleInstance.TryAcquire())
+        {
+            singleInstance.ForwardArgs(args);
+            singleInstance.Dispose();
+            return;
+        }
+
+        var services = ServiceConfiguration.BuildServiceProvider(args, singleInstance);
         BuildAvaloniaApp(services).StartWithClassicDesktopLifetime(args);
     }
 

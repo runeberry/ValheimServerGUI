@@ -44,6 +44,9 @@ namespace ValheimServerGUI.Game
         [JsonProperty("enablePasswordValidation")]
         public bool? EnablePasswordValidation { get; set; }
 
+        [JsonProperty("lastActiveProfile")]
+        public string? LastActiveProfile { get; set; }
+
         [JsonProperty("servers")]
         public List<ServerPreferencesFile>? Servers { get; set; }
 

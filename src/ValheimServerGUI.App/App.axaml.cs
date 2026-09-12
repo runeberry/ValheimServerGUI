@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -6,6 +7,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Infrastructure;
+using ValheimServerGUI.App.Startup;
+using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
 using ValheimServerGUI.Tools;
 
@@ -43,14 +47,39 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // The app lives until the last window closes (multi-window: §2.2), not tied to a single main window.
+            // The app lives until the last window closes (multi-window: §2.2). The splash is shown first,
+            // then closed once the main window(s) are up, so the count never hits zero mid-startup.
             desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
-
-            var window = Services.GetRequiredService<MainWindow>();
-            window.Show();
+            _ = StartShellAsync();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    // Splash → async startup tasks → main window(s) → hide splash → begin serving second-launch forwards.
+    private async Task StartShellAsync()
+    {
+        try
+        {
+            var splashViewModel = Services.GetRequiredService<SplashViewModel>();
+            var splash = new SplashWindow(splashViewModel);
+            splash.Show();
+
+            var coordinator = Services.GetRequiredService<ShellCoordinator>();
+            await coordinator.RunStartupTasksAsync(splashViewModel);
+            coordinator.CreateAndShowStartupWindows();
+
+            splash.Close();
+
+            var singleInstance = Services.GetRequiredService<SingleInstanceManager>();
+            singleInstance.ArgsReceived += forwarded =>
+                Dispatcher.UIThread.Post(() => coordinator.OpenOrFocusProfile(forwarded.FirstOrDefault()));
+            singleInstance.StartListening();
+        }
+        catch (Exception ex)
+        {
+            HandleException(ex, "Startup failed");
+        }
     }
 
     // Route the three unhandled-exception channels (§9.6) through the Core exception handler.

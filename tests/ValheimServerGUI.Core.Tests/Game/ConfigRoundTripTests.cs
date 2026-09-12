@@ -116,5 +116,21 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Contains(WorldGenKeys.NoMap, restored.Keys);
             Assert.Equal(WorldGenModifiers.Values.CombatHard, restored.Modifiers[WorldGenModifiers.Combat]);
         }
+
+        // §16.2 enhancement: LastActiveProfile round-trips, and an empty file leaves it null (so the
+        // startup selection falls back to most-recently-saved).
+        [Fact]
+        public void UserPreferences_LastActiveProfile_RoundTrips()
+        {
+            var prefs = new UserPreferences { LastActiveProfile = "Nightshade" };
+            var restored = UserPreferences.FromFile(prefs.ToFile());
+            Assert.Equal("Nightshade", restored.LastActiveProfile);
+        }
+
+        [Fact]
+        public void UserPreferences_LastActiveProfile_DefaultsNull()
+        {
+            Assert.Null(UserPreferences.FromFile(new UserPreferencesFile()).LastActiveProfile);
+        }
     }
 }

@@ -1,0 +1,26 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+        x:Class="ValheimServerGUI.App.Views.SplashWindow"
+        x:DataType="vm:SplashViewModel"
+        Width="420" Height="200"
+        CanResize="False"
+        WindowDecorations="None"
+        WindowStartupLocation="CenterScreen"
+        ShowInTaskbar="False"
+        Title="Valheim Server GUI">
+
+    <Border Background="{DynamicResource SystemChromeMediumColor}" Padding="24">
+        <Grid RowDefinitions="*,Auto,Auto">
+            <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
+                <TextBlock Text="Valheim Server GUI" FontSize="22" FontWeight="SemiBold"
+                           HorizontalAlignment="Center" />
+            </StackPanel>
+
+            <ProgressBar Grid.Row="1" Minimum="0" Maximum="100"
+                         Value="{Binding ProgressPercent}" Height="6" Margin="0,0,0,8" />
+            <TextBlock Grid.Row="2" Text="{Binding StatusText}"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        </Grid>
+    </Border>
+</Window>

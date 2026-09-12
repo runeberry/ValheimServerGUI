@@ -25,6 +25,12 @@ namespace ValheimServerGUI.Game
 
         public bool EnablePasswordValidation { get; set; } = true;
 
+        /// <summary>
+        /// Profile name last loaded/saved in a window. Preferred by the startup profile selection (§2.3
+        /// / §16.2) over the most-recently-saved fallback, so relaunch reopens where the user left off.
+        /// </summary>
+        public string? LastActiveProfile { get; set; }
+
         public List<ServerPreferences> Servers { get; set; } = new();
 
         public List<WorldPreferences> Worlds { get; set; } = new();
@@ -43,6 +49,7 @@ namespace ValheimServerGUI.Game
             prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
             prefs.WriteApplicationLogsToFile = file.WriteApplicationLogsToFile ?? prefs.WriteApplicationLogsToFile;
             prefs.EnablePasswordValidation = file.EnablePasswordValidation ?? prefs.EnablePasswordValidation;
+            prefs.LastActiveProfile = file.LastActiveProfile ?? prefs.LastActiveProfile;
 
             if (file.Servers != null)
             {
@@ -77,6 +84,7 @@ namespace ValheimServerGUI.Game
                 SaveProfileOnStart = SaveProfileOnStart,
                 WriteApplicationLogsToFile = WriteApplicationLogsToFile,
                 EnablePasswordValidation = EnablePasswordValidation,
+                LastActiveProfile = LastActiveProfile,
                 Servers = new(),
                 Worlds = new(),
             };

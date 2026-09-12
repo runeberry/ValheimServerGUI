@@ -10,6 +10,10 @@ namespace ValheimServerGUI.Tools
 
         event EventHandler<SoftwareUpdateEventArgs> UpdateCheckFinished;
 
+        /// <summary>The result of the most recent completed check, or null if none has finished yet. Lets a
+        /// window created after the startup check (which runs before the main window exists) show its result.</summary>
+        SoftwareUpdateEventArgs? LastResult { get; }
+
         Task CheckForUpdatesAsync(bool isManualCheck);
     }
 
@@ -60,6 +64,8 @@ namespace ValheimServerGUI.Tools
 
         public event EventHandler<SoftwareUpdateEventArgs>? UpdateCheckFinished;
 
+        public SoftwareUpdateEventArgs? LastResult { get; private set; }
+
         public async Task CheckForUpdatesAsync(bool isManualCheck)
         {
             if (!isManualCheck)
@@ -92,6 +98,7 @@ namespace ValheimServerGUI.Tools
                 eventArgs = new SoftwareUpdateEventArgs(e, isManualCheck);
             }
 
+            LastResult = eventArgs;
             UpdateCheckFinished?.Invoke(this, eventArgs);
         }
     }

@@ -53,6 +53,7 @@ public sealed class UpdateStatusToIconConverter : IValueConverter
     {
         UpdateCheckStatus.Checking => "Loading_Blue_16x",
         UpdateCheckStatus.UpToDate => "StatusOK_16x",
+        UpdateCheckStatus.PreRelease => "StatusOK_16x",
         UpdateCheckStatus.Available => "StatusWarning_16x",
         UpdateCheckStatus.Error => "StatusCriticalError_16x",
         _ => null,

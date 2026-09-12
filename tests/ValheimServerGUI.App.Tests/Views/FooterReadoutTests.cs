@@ -39,14 +39,15 @@ public class FooterReadoutTests
 
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
         window.Show();
-        update.RaiseFinished(new SoftwareUpdateEventArgs("0.0.0", isManualCheck: false));
+        var current = ValheimServerGUI.Tools.AssemblyHelper.GetApplicationVersion();
+        update.RaiseFinished(new SoftwareUpdateEventArgs(current, isManualCheck: false));
         Dispatcher.UIThread.RunJobs();
         window.Measure(new Size(700, 500));
         window.Arrange(new Rect(new Size(700, 500)));
 
         Assert.False(vm.UpdateIsLink); // "up to date" is not a link
         var readout = window.GetVisualDescendants().OfType<TextBlock>()
-            .First(t => t.Text == "Up to date" && t.IsVisible);
+            .First(t => t.Text != null && t.Text.StartsWith("Up to date") && t.IsVisible);
         var color = (readout.Foreground as ISolidColorBrush)!.Color;
         Assert.Equal(255, color.A); // fully opaque, not the dimmed disabled colour
     }

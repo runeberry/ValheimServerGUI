@@ -11,6 +11,8 @@ internal sealed class FakeSoftwareUpdateProvider : ISoftwareUpdateProvider
     public bool? LastIsManual { get; private set; }
     public bool ThrowOnCheck { get; set; }
 
+    public SoftwareUpdateEventArgs? LastResult { get; private set; }
+
     public event EventHandler? UpdateCheckStarted;
     public event EventHandler<SoftwareUpdateEventArgs>? UpdateCheckFinished;
 
@@ -24,5 +26,9 @@ internal sealed class FakeSoftwareUpdateProvider : ISoftwareUpdateProvider
     }
 
     // Kept to satisfy the interface + silence unused-event warnings.
-    public void RaiseFinished(SoftwareUpdateEventArgs args) => UpdateCheckFinished?.Invoke(this, args);
+    public void RaiseFinished(SoftwareUpdateEventArgs args)
+    {
+        LastResult = args;
+        UpdateCheckFinished?.Invoke(this, args);
+    }
 }

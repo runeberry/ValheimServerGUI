@@ -44,6 +44,7 @@ public enum UpdateCheckStatus
     Checking,
     UpToDate,
     Available,
+    PreRelease,
     Error,
 }
 
@@ -107,6 +108,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
         // The "choose an existing world" gate depends on the world list being non-empty.
         Form.Worlds.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CanSelectExistingWorld));
+
+        // The startup update check runs before this window exists, so its live events are missed. Seed the
+        // readout from the provider's last result; a still-running or future check updates it via the events.
+        if (_updateProvider.LastResult is { } lastResult)
+            ApplyUpdateResult(lastResult);
 
         RefreshProfiles();
     }
@@ -560,32 +566,49 @@ public partial class MainWindowViewModel : ViewModelBase
         });
 
     private void OnUpdateCheckFinished(object? sender, SoftwareUpdateEventArgs e)
-        => RunOnUi(() =>
-        {
-            if (!e.IsSuccessful)
-            {
-                UpdateStatusText = "Update check failed";
-                UpdateStatus = UpdateCheckStatus.Error;
-                _updateLinkTarget = AppConstants.UrlReleases;
-                UpdateIsLink = true;
-                return;
-            }
+        => RunOnUi(() => ApplyUpdateResult(e));
 
-            if (AssemblyHelper.CompareVersion(e.LatestVersion!) > 0)
-            {
-                UpdateStatusText = $"Update available: {e.LatestVersion}";
+    // Mirror the WinForms status-bar logic: show the compared version in the text, and distinguish
+    // up-to-date / update-available / pre-release / parse-failure (CompareVersion returns 1 / 0 / -1 / -2).
+    private void ApplyUpdateResult(SoftwareUpdateEventArgs e)
+    {
+        if (!e.IsSuccessful)
+        {
+            UpdateStatusText = "Update check failed";
+            UpdateStatus = UpdateCheckStatus.Error;
+            _updateLinkTarget = AppConstants.UrlReleases;
+            UpdateIsLink = true;
+            return;
+        }
+
+        switch (AssemblyHelper.CompareVersion(e.LatestVersion!))
+        {
+            case > 0:
+                UpdateStatusText = $"Update available ({e.LatestVersion})";
                 UpdateStatus = UpdateCheckStatus.Available;
                 _updateLinkTarget = AppConstants.UrlReleases;
                 UpdateIsLink = true;
-            }
-            else
-            {
-                UpdateStatusText = "Up to date";
+                break;
+            case 0:
+                UpdateStatusText = $"Up to date ({e.LatestVersion})";
                 UpdateStatus = UpdateCheckStatus.UpToDate;
                 _updateLinkTarget = null;
                 UpdateIsLink = false;
-            }
-        });
+                break;
+            case -1:
+                UpdateStatusText = $"Pre-release build ({AssemblyHelper.GetApplicationVersion()})";
+                UpdateStatus = UpdateCheckStatus.PreRelease;
+                _updateLinkTarget = null;
+                UpdateIsLink = false;
+                break;
+            default:
+                UpdateStatusText = $"Unable to parse version ({e.LatestVersion})";
+                UpdateStatus = UpdateCheckStatus.Error;
+                _updateLinkTarget = AppConstants.UrlReleases;
+                UpdateIsLink = true;
+                break;
+        }
+    }
 
     private void OnServerPreferencesSaved(object? sender, List<ServerPreferences> profiles)
         => RunOnUi(RefreshProfiles);

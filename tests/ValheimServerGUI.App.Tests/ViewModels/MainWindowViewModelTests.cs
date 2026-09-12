@@ -21,6 +21,13 @@ public class MainWindowViewModelTests
         IEnumerable<ServerPreferences>? profiles = null)
     {
         update = new FakeSoftwareUpdateProvider();
+        return Build(update, profiles);
+    }
+
+    private static MainWindowViewModel Build(
+        FakeSoftwareUpdateProvider update,
+        IEnumerable<ServerPreferences>? profiles = null)
+    {
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
         return new MainWindowViewModel(
             Core.GetRequiredService<ValheimServer>(),
@@ -129,14 +136,53 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void Up_to_date_is_not_a_link()
+    public void Up_to_date_shows_the_version_and_is_not_a_link()
     {
         var vm = Build(out var update);
-        // The test host reports version "0.0.0"; anything not-newer is "up to date".
-        update.RaiseFinished(new SoftwareUpdateEventArgs("0.0.0", isManualCheck: true));
+        var current = AssemblyHelper.GetApplicationVersion();
+        update.RaiseFinished(new SoftwareUpdateEventArgs(current, isManualCheck: true));
 
+        Assert.Equal($"Up to date ({current})", vm.UpdateStatusText); // version shown, WinForms-style
+        Assert.Equal(UpdateCheckStatus.UpToDate, vm.UpdateStatus);
         Assert.False(vm.UpdateIsLink);
         Assert.False(vm.UpdateLinkCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Older_latest_than_current_is_a_pre_release_build()
+    {
+        var vm = Build(out var update);
+        // A latest older than the running (pre-release) build → "Pre-release build (<current>)".
+        update.RaiseFinished(new SoftwareUpdateEventArgs("0.0.1", isManualCheck: true));
+
+        Assert.StartsWith("Pre-release build", vm.UpdateStatusText);
+        Assert.Contains(AssemblyHelper.GetApplicationVersion(), vm.UpdateStatusText);
+        Assert.Equal(UpdateCheckStatus.PreRelease, vm.UpdateStatus);
+        Assert.False(vm.UpdateIsLink);
+    }
+
+    [Fact]
+    public void Unparseable_latest_version_is_an_error_link()
+    {
+        var vm = Build(out var update);
+        update.RaiseFinished(new SoftwareUpdateEventArgs("not-a-version", isManualCheck: true));
+
+        Assert.Contains("Unable to parse", vm.UpdateStatusText);
+        Assert.Equal(UpdateCheckStatus.Error, vm.UpdateStatus);
+        Assert.True(vm.UpdateIsLink);
+    }
+
+    [Fact]
+    public void Readout_is_seeded_from_the_startup_check_result()
+    {
+        // The startup check completes before this window's VM exists; a VM built afterwards must still
+        // reflect it from LastResult (not sit blank).
+        var update = new FakeSoftwareUpdateProvider();
+        update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", isManualCheck: false)); // sets LastResult
+
+        var vm = Build(update);
+        Assert.Contains("9.9.9", vm.UpdateStatusText);
+        Assert.Equal(UpdateCheckStatus.Available, vm.UpdateStatus);
     }
 
     [Fact]

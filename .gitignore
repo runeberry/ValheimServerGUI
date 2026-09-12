@@ -358,3 +358,6 @@ CLAUDE.local.md
 
 # Packaging output
 /dist/
+
+# Live integration-test config (machine-specific Steam paths; see scripts/integration.local.env.example)
+scripts/integration.local.env

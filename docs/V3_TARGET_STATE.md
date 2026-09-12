@@ -428,7 +428,8 @@ There is NO pattern for crash / world-gen failure / port-in-use (silent gaps —
 | # | Regex (verbatim) | Event |
 |---|---|---|
 | 1 | `Game server connected` | → `Running` (unless Stopping) |
-| 2 | `World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$` | world-save duration → `WorldSaved` |
+| 2a | `World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$` | legacy (pre-1.0) world-save duration → `WorldSaved` |
+| 2b | `World save \(\d+/\d+\) done\. Total time \[([\d.]+)ms\]` | **Valheim 1.0+** world-save total time → `WorldSaved` (the live smoke found the pre-1.0 line is gone; pattern 2a alone silently stopped detecting saves) |
 | 3 | `Session ".*?" with join code (.*?) ` | crossplay invite code → `InviteCodeReady` |
 | 4 | `Got connection SteamID (\d+?)\D*?$` | Steam player joining |
 | 5 | `PlayFab socket with remote ID .*? received local Platform ID (\w+?)_(\d+?)$` | crossplay player joining (platform_id) |
@@ -439,9 +440,10 @@ There is NO pattern for crash / world-gen failure / port-in-use (silent gaps —
 | 10 | `Disconnect: The client \((\w+?)_(\d+?)\)` | Valheim-Plus version-mismatch disconnect → Offline |
 
 These patterns depend on exact Valheim log strings; a game update that rewords any silently breaks
-the corresponding feature with no error. **Target:** externalize the pattern → handler table as
-configuration so a Valheim update can be patched without a code release, and treat it as a known
-fragility point in tests (golden capture-once/replay — §13).
+the corresponding feature with no error — as happened to the world-save line (2a → 2b), caught by the
+Phase 2.5 tier-4 live smoke. **Target:** externalize the pattern → handler table as configuration so a
+Valheim update can be patched without a code release, and treat it as a known fragility point in tests
+(golden capture-once/replay — §13, plus the live-log fixture-drift guard in the tier-4 smoke).
 
 Events emitted by the server controller: `StatusChanged`, `WorldSaved`, `InviteCodeReady`. Player
 events flow into the player repository, not through these events.
@@ -840,11 +842,16 @@ MVVM enforces the UI/logic split; the safety net lives mostly in `Valheim.Core.T
    flows: button/tray enablement tracks status; tab-visible refresh; new-world post-start
    reselection; cloud-world Move/Copy/Cancel; profile new/save/save-as/load/remove; close-while-
    running defer; dialogs' OK/Cancel/Restore-Defaults + unsaved-changes guard; log view switching.
-4. **Live smoke** (CI, no game client). Boot the **real Linux dedicated server** (Steam appid
-   896660) with `-public 1`, assert lifecycle (Starting→Running via the real "connected" line,
-   graceful SIGINT stop flushes a save) and the graceful-stop save-flush that `taskkill`/SIGINT is
-   there to guarantee. Tiers 1+4 cover each other's blind spots (fixture snapshot vs. current
-   binary). No headless *client* exists anywhere, so join/leave-with-names stays fixture-based
+4. **Live smoke** (no game client) — **automated** (`scripts/integration.sh` +
+   `tests/ValheimServerGUI.Integration.Tests`, Phase 2.5). Boots the **real Linux dedicated server**
+   (Steam appid 896660) with `-public 1` and asserts lifecycle (Starting→Running via the real
+   "connected" line), the graceful-stop save-flush A/B that `taskkill`/SIGINT is there to guarantee
+   (graceful SIGINT advances the world-save mtime; a hard kill does not), a Steam Cloud world
+   import round-trip, and a fixture-drift guard (the captured live log still matches the parser
+   patterns). The test project is intentionally **not** in `ValheimServerGUI.slnx` and every test is
+   env-gated (machine-specific Steam paths from a gitignored config), so `validate.sh` never runs it
+   and an accidental direct run skips. Tiers 1+4 cover each other's blind spots (fixture snapshot vs.
+   current binary). No headless *client* exists anywhere, so join/leave-with-names stays fixture-based
    (tier 2).
 
 Design principles enforced in tests (per project conventions): **derive-never-mirror** (tray and

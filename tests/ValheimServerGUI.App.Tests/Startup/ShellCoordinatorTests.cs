@@ -38,6 +38,8 @@ public class ShellCoordinatorTests
                 Core.GetRequiredService<IWorldPreferencesProvider>(),
                 Core.GetRequiredService<ISteamCloudWorldProvider>(),
                 Core.GetRequiredService<IIpAddressProvider>(),
+                Core.GetRequiredService<IPlayerDataRepository>(),
+                Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
                 new FakeSoftwareUpdateProvider(), shell, pathResolver);
         var startupService = new StartupService(new FakeSoftwareUpdateProvider(), new FakePlayerDataRepository(), TestLog.Silent);
 

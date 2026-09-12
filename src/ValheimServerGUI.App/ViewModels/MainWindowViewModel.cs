@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.App.ViewModels;
 
@@ -62,6 +63,8 @@ public partial class MainWindowViewModel : ViewModelBase
         IWorldPreferencesProvider worldPrefs,
         ISteamCloudWorldProvider cloudProvider,
         IIpAddressProvider ipProvider,
+        IPlayerDataRepository playerRepo,
+        IApplicationLogger appLogger,
         ISoftwareUpdateProvider updateProvider,
         IShellLauncher shell,
         IValheimPathResolver pathResolver)
@@ -78,6 +81,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
         _serverStatus = _server.Status;
         StartAction = _server.Start;
+
+        Details = new ServerDetailsViewModel(server, ipProvider, () => Form.Port);
+        Players = new PlayersViewModel(playerRepo);
+        Logs = new LogsViewModel(appLogger, shell, pathResolver);
 
         _server.StatusChanged += HandleServerStatusChanged;
         _server.StopTimedOut += OnServerStopTimedOut;
@@ -110,6 +117,15 @@ public partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>The editable Server Controls + Advanced Controls form.</summary>
     public ServerFormViewModel Form { get; } = new();
+
+    /// <summary>Server Details tab.</summary>
+    public ServerDetailsViewModel Details { get; }
+
+    /// <summary>Players tab.</summary>
+    public PlayersViewModel Players { get; }
+
+    /// <summary>Logs tab.</summary>
+    public LogsViewModel Logs { get; }
 
     // --- profile identity (single CurrentProfile source) ---
     [ObservableProperty]
@@ -404,6 +420,7 @@ public partial class MainWindowViewModel : ViewModelBase
                 ? serverPrefs.SaveDataFolderPath
                 : userPrefs.SaveDataFolderPath,
             LogToFile = serverPrefs.WriteServerLogsToFile,
+            LogMessageHandler = Logs.AppendServerLine,
         };
 
         var worldName = serverPrefs.WorldName;
@@ -556,6 +573,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _updateProvider.UpdateCheckStarted -= OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished -= OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved -= OnServerPreferencesSaved;
+        Details.Dispose();
+        Players.Dispose();
+        Logs.Dispose();
         _server.Dispose();
     }
 }

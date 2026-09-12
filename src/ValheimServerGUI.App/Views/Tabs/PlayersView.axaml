@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.PlayersView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <DockPanel Margin="8">
+        <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" Spacing="8" Margin="0,8,0,0">
+            <Button Content="View Player Details" Command="{Binding Players.ViewDetailsCommand}" />
+            <Button Content="Remove Player" Command="{Binding Players.RemoveCommand}" />
+            <Button Classes="link" Content="Character names wrong?" Command="{Binding OnlineManualCommand}"
+                    VerticalAlignment="Center" />
+        </StackPanel>
+
+        <DataGrid ItemsSource="{Binding Players.Players}"
+                  SelectedItem="{Binding Players.SelectedPlayer}"
+                  IsReadOnly="True" CanUserReorderColumns="False"
+                  GridLinesVisibility="Horizontal">
+            <DataGrid.Styles>
+                <Style Selector="DataGridRow" x:DataType="vm:PlayerRowViewModel">
+                    <Setter Property="Opacity"
+                            Value="{Binding IsOffline, Converter={x:Static conv:OfflineOpacityConverter.Instance}}" />
+                </Style>
+            </DataGrid.Styles>
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="" Binding="{Binding PlatformGlyph}" Width="Auto" />
+                <DataGridTextColumn Header="Player (Character)" Binding="{Binding DisplayName}" Width="*" />
+                <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="Auto" />
+                <DataGridTextColumn Header="Since" Binding="{Binding SinceText}" Width="Auto" />
+            </DataGrid.Columns>
+        </DataGrid>
+    </DockPanel>
+</UserControl>

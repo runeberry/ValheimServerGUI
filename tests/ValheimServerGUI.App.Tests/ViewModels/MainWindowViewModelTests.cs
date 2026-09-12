@@ -29,6 +29,8 @@ public class MainWindowViewModelTests
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             Core.GetRequiredService<ISteamCloudWorldProvider>(),
             Core.GetRequiredService<IIpAddressProvider>(),
+            Core.GetRequiredService<IPlayerDataRepository>(),
+            Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
             update,
             shell,
             Core.GetRequiredService<IValheimPathResolver>());

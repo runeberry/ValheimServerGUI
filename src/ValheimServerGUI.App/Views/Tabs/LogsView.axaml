@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.LogsView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <DockPanel Margin="8">
+        <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto,Auto,Auto" Margin="0,0,0,6">
+            <ComboBox Grid.Column="0" ItemsSource="{Binding Logs.Views}" SelectedItem="{Binding Logs.SelectedView}"
+                      MinWidth="140" />
+            <Button Grid.Column="2" Content="Clear Logs" Command="{Binding Logs.ClearLogsCommand}" Margin="4,0,0,0" />
+            <Button Grid.Column="3" Content="Save Logs…" Command="{Binding Logs.SaveLogsCommand}" Margin="4,0,0,0" />
+            <Button Grid.Column="4" Content="Open Logs Folder" Command="{Binding Logs.OpenLogsFolderCommand}" Margin="4,0,0,0" />
+        </Grid>
+
+        <Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
+            <ListBox ItemsSource="{Binding Logs.CurrentLines}" FontFamily="Cascadia Mono,Consolas,Menlo,monospace"
+                     FontSize="12">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding}" TextWrapping="NoWrap" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Border>
+    </DockPanel>
+</UserControl>

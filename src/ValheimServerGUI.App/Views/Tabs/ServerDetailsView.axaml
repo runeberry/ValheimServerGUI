@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.ServerDetailsView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="8" Spacing="4">
+            <TextBlock Text="Connection Details" FontWeight="SemiBold" />
+            <Grid ColumnDefinitions="140,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="12,4,0,0">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="External IP:" VerticalAlignment="Center" />
+                <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.ExternalIp}" VerticalAlignment="Center" />
+                <Button Grid.Row="0" Grid.Column="2" Content="Copy" Click="CopyExternal" Margin="4" />
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Internal IP:" VerticalAlignment="Center" />
+                <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.InternalIp}" VerticalAlignment="Center" />
+                <Button Grid.Row="1" Grid.Column="2" Content="Copy" Click="CopyInternal" Margin="4" />
+
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Local IP:" VerticalAlignment="Center" />
+                <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.LocalIp}" VerticalAlignment="Center" />
+                <Button Grid.Row="2" Grid.Column="2" Content="Copy" Click="CopyLocal" Margin="4" />
+
+                <TextBlock Grid.Row="3" Grid.Column="0" Text="Invite Code:" VerticalAlignment="Center" />
+                <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Details.InviteCode}" VerticalAlignment="Center" />
+                <Button Grid.Row="3" Grid.Column="2" Content="Copy" Click="CopyInvite" Margin="4"
+                        IsVisible="{Binding Details.InviteCodeCopyable}" />
+            </Grid>
+            <TextBlock Margin="12,4,0,0" FontStyle="Italic"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                       Text="Trouble connecting? See Help &gt; Port Forwarding." />
+
+            <TextBlock Text="Statistics" FontWeight="SemiBold" Margin="0,12,0,0" />
+            <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto" Margin="12,4,0,0">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Server Uptime:" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.Uptime}" />
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="Last World Save:" />
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.LastWorldSave}" />
+                <TextBlock Grid.Row="2" Grid.Column="0" Text="Avg World Save:" />
+                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.AverageWorldSave}" />
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

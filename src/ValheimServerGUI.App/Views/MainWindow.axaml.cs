@@ -49,6 +49,14 @@ public partial class MainWindow : Window
             await ViewModel.StartServerAsync(isManual: false);
     }
 
+    // Tab-visible lazy refresh (§10.2): the Details/Players 1s timers run only while their tab is shown.
+    private void OnTabChanged(object? sender, SelectionChangedEventArgs e)
+    {
+        if (ViewModel is null) return;
+        ViewModel.Details.SetActive(DetailsTab.IsSelected);
+        ViewModel.Players.SetActive(PlayersTab.IsSelected);
+    }
+
     private async Task<CloudImportChoice> ShowCloudImportAsync(string worldName)
         => await new CloudImportWindow(worldName).ShowDialog<CloudImportChoice>(this);
 

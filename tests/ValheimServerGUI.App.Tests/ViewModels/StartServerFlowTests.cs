@@ -60,6 +60,8 @@ public sealed class StartServerFlowTests : IDisposable
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             cloud,
             Core.GetRequiredService<IIpAddressProvider>(),
+            Core.GetRequiredService<IPlayerDataRepository>(),
+            Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(),
             shell,
             Core.GetRequiredService<IValheimPathResolver>());

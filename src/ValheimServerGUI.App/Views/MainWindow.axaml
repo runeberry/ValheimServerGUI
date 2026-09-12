@@ -13,24 +13,6 @@
         MinWidth="500" MinHeight="371"
         Title="{Binding Title}">
 
-    <Window.Styles>
-        <!-- Status-bar update link: coloured/clickable when actionable, muted plain text when disabled. -->
-        <Style Selector="Button.link">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderThickness" Value="0" />
-            <Setter Property="Padding" Value="2,0" />
-            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
-            <Setter Property="Cursor" Value="Hand" />
-        </Style>
-        <Style Selector="Button.link:disabled">
-            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-            <Setter Property="Cursor" Value="Arrow" />
-        </Style>
-        <Style Selector="Button.link:disabled /template/ ContentPresenter">
-            <Setter Property="Opacity" Value="1" />
-        </Style>
-    </Window.Styles>
-
     <DockPanel>
         <!-- ===== Menu ===== -->
         <Menu DockPanel.Dock="Top">
@@ -99,22 +81,22 @@
             <Button Content="Stop" Command="{Binding StopCommand}" MinWidth="80" />
         </StackPanel>
 
-        <!-- ===== Tabs (content filled in Waves 4–5) ===== -->
-        <TabControl Margin="8,0,8,8">
+        <!-- ===== Tabs ===== -->
+        <TabControl Margin="8,0,8,8" x:Name="Tabs" SelectionChanged="OnTabChanged">
             <TabItem Header="Server Controls">
                 <tabs:ServerControlsView />
             </TabItem>
             <TabItem Header="Advanced Controls">
                 <tabs:AdvancedControlsView />
             </TabItem>
-            <TabItem Header="Server Details">
-                <TextBlock Margin="8" Text="Server Details — Wave 5" />
+            <TabItem Header="Server Details" x:Name="DetailsTab">
+                <tabs:ServerDetailsView />
             </TabItem>
-            <TabItem Header="Players">
-                <TextBlock Margin="8" Text="Players — Wave 5" />
+            <TabItem Header="Players" x:Name="PlayersTab">
+                <tabs:PlayersView />
             </TabItem>
             <TabItem Header="Logs">
-                <TextBlock Margin="8" Text="Logs — Wave 5" />
+                <tabs:LogsView />
             </TabItem>
         </TabControl>
     </DockPanel>

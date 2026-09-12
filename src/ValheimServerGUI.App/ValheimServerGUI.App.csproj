@@ -13,6 +13,8 @@
 
   <ItemGroup>
     <AvaloniaResource Include="Assets/vsg_logo_256.png" />
+    <!-- Restored WinForms icon set (VS Image Library glyphs + brand logos); see Assets/Icons/README.md. -->
+    <AvaloniaResource Include="Assets/Icons/**/*.png" />
   </ItemGroup>
 
   <ItemGroup>

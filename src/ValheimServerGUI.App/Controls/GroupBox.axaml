@@ -1,0 +1,33 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:ValheimServerGUI.App.Controls">
+
+    <!-- Classic etched group box (§ V3 styling): a 1px inset frame with the title notching the top-left
+         edge. The frame is dropped ~8px so the title's vertical centre lands on the border line, and the
+         title's own opaque background (the box's Background) paints over the line to make the notch. -->
+    <ControlTheme x:Key="{x:Type c:GroupBox}" TargetType="c:GroupBox">
+        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <Setter Property="Margin" Value="0,4" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid>
+                    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                            BorderThickness="1" CornerRadius="3" Margin="0,8,0,0">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          ContentTemplate="{TemplateBinding ContentTemplate}"
+                                          Padding="8,8,8,6" />
+                    </Border>
+
+                    <Border HorizontalAlignment="Left" VerticalAlignment="Top"
+                            Margin="8,0,0,0" Padding="4,0"
+                            Background="{TemplateBinding Background}">
+                        <ContentPresenter Content="{TemplateBinding Header}"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          TextElement.Foreground="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+                    </Border>
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

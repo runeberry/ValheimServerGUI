@@ -10,6 +10,8 @@
             <ResourceDictionary.MergedDictionaries>
                 <!-- Shared form-row template + input styling (§11.2). -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormControls.axaml" />
+                <!-- Etched group-box control theme. -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

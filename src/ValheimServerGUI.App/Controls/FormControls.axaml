@@ -3,32 +3,32 @@
                     xmlns:c="using:ValheimServerGUI.App.Controls"
                     xmlns:conv="using:ValheimServerGUI.App.Converters">
 
-    <!-- Shared "form row" template (§11.2): label + input slot + collapsible "?" help glyph. All the
-         editable tabs' rows use this so the label column, spacing, and help affordance stay uniform. -->
+    <!-- Shared "form row" template (§11.2): WinForms-style label-on-top, input below, with a blue "?"
+         help glyph pinned to the field's top-right. Its tooltip carries HelpText; the glyph collapses when
+         HelpText is empty. The FormRow/HelpText API is unchanged — only this layout differs. -->
     <ControlTheme x:Key="{x:Type c:FormRow}" TargetType="c:FormRow">
         <Setter Property="Margin" Value="0,3" />
         <Setter Property="Template">
             <ControlTemplate>
-                <Grid ColumnDefinitions="Auto,*,Auto">
-                    <ContentControl Grid.Column="0"
-                                    Content="{TemplateBinding Header}"
-                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
-                                    VerticalAlignment="Center"
-                                    MinWidth="170"
-                                    Margin="0,0,8,0" />
-                    <ContentPresenter Grid.Column="1"
+                <Grid RowDefinitions="Auto,Auto">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,1">
+                        <ContentControl Grid.Column="0"
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                        VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="1"
+                                   Text="?"
+                                   FontWeight="Bold"
+                                   VerticalAlignment="Center"
+                                   Cursor="Hand"
+                                   Foreground="#0066CC"
+                                   ToolTip.Tip="{TemplateBinding HelpText}"
+                                   IsVisible="{TemplateBinding HelpText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+                    </Grid>
+                    <ContentPresenter Grid.Row="1"
                                       Content="{TemplateBinding Content}"
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
-                                      VerticalAlignment="Center"
                                       HorizontalAlignment="Stretch" />
-                    <TextBlock Grid.Column="2"
-                               Text="?"
-                               FontWeight="Bold"
-                               Margin="8,0,0,0"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                               ToolTip.Tip="{TemplateBinding HelpText}"
-                               IsVisible="{TemplateBinding HelpText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
                 </Grid>
             </ControlTemplate>
         </Setter>

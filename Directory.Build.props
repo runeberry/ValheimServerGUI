@@ -1,5 +1,22 @@
 <Project>
+
+  <!--
+    Redirect ALL build output (bin + obj, every project) to a PRIVATE per-user directory
+    instead of the shared working tree.
+
+    Two developers (mochi, nuffle) share this checkout via the `developers` group. Building
+    in-tree makes one user's obj/ artifacts unrestampable by the other: MSBuild's up-to-date
+    marker needs file *ownership* to set a timestamp (group write is not enough), so the
+    second user's build dies with "Access to the path ...Up2Date is denied" (MSB3374).
+
+    Routing every project's output under $HOME (via the SDK's artifacts-output layout)
+    eliminates the collision for every entrypoint at once - make targets, scripts,
+    raw `dotnet build/test/run/publish`, and IDE builds - and keeps the repo tree free of
+    build output entirely. The path is per-user, so the two never share intermediates.
+  -->
   <PropertyGroup>
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <UseArtifactsOutput>true</UseArtifactsOutput>
+    <ArtifactsPath>$(HOME)/.cache/valheim-server-gui/artifacts</ArtifactsPath>
   </PropertyGroup>
+
 </Project>

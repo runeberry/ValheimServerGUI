@@ -12,14 +12,19 @@ namespace ValheimServerGUI.Tools
 {
     public static class AssemblyHelper
     {
-        private static string _appVersion;
+        private static string? _appVersion;
         private static string AppVersion => _appVersion ??= GetInformationalVersion();
         private const string BuildPrefix = "+build";
-        private static string ClientCorrelationId;
+        private static string? ClientCorrelationId;
 
         public static string GetApplicationVersion()
         {
-            return AppVersion[..AppVersion.IndexOf(BuildPrefix)];
+            // The informational version carries an optional "+build<timestamp>" suffix (set as
+            // SourceRevisionId in the csproj). Guard its absence: without a build suffix (e.g. a
+            // test host, or a build that did not stamp one) IndexOf returns -1 and the range would
+            // throw. Fall back to the whole version string in that case.
+            var index = AppVersion.IndexOf(BuildPrefix);
+            return index < 0 ? AppVersion : AppVersion[..index];
         }
 
 

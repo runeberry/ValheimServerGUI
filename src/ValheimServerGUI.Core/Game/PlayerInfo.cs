@@ -15,20 +15,20 @@ namespace ValheimServerGUI.Game
         /// The platform that this player is playing Valheim on.
         /// </summary>
         [JsonProperty("platform")]
-        public string Platform { get; set; }
+        public string? Platform { get; set; }
 
         /// <summary>
         /// The ID used to identify the player on this platform.
         /// The same player may log in with multiple characters.
         /// </summary>
         [JsonProperty("playerId")]
-        public string PlayerId { get; set; }
+        public string? PlayerId { get; set; }
 
         /// <summary>
         /// The player's username on the specified platform.
         /// </summary>
         [JsonProperty("playerName")]
-        public string PlayerName { get; set; }
+        public string? PlayerName { get; set; }
 
         /// <summary>
         /// The last time the player logged on to the server.
@@ -37,13 +37,13 @@ namespace ValheimServerGUI.Game
         public DateTimeOffset LastStatusChange { get; set; }
 
         [JsonProperty("lastStatusCharacter")]
-        public string LastStatusCharacter { get; set; }
+        public string? LastStatusCharacter { get; set; }
 
         /// <summary>
         /// A list of characters that this player has played in Valheim.
         /// </summary>
         [JsonProperty("characters")]
-        public List<CharacterInfo> Characters { get; set; }
+        public List<CharacterInfo>? Characters { get; set; }
 
         /// <summary>
         /// The player's current status on the server.
@@ -55,7 +55,7 @@ namespace ValheimServerGUI.Game
         /// The player's current object id in-game. Changes with each session.
         /// </summary>
         [JsonIgnore]
-        public string ZdoId { get; set; }
+        public string? ZdoId { get; set; }
 
         public CharacterInfo AddCharacter(string characterName, bool matchConfident = true)
         {
@@ -75,7 +75,7 @@ namespace ValheimServerGUI.Game
             return character;
         }
 
-        public bool TryGetCharacter(string characterName, out CharacterInfo character)
+        public bool TryGetCharacter(string characterName, out CharacterInfo? character)
         {
             character = Characters?.FirstOrDefault(c => c.CharacterName == characterName);
             return character != null;
@@ -87,7 +87,7 @@ namespace ValheimServerGUI.Game
             /// The character's name as it appears within Valheim.
             /// </summary>
             [JsonProperty("characterName")]
-            public string CharacterName { get; set; }
+            public string? CharacterName { get; set; }
 
             /// <summary>
             /// Could we confidently match up the player's name and platformId?

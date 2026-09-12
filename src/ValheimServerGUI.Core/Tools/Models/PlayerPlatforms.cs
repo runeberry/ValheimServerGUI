@@ -16,7 +16,7 @@ namespace ValheimServerGUI.Tools.Models
         /// <summary>
         /// Gets a case-corrected platform name from an input string.
         /// </summary>
-        public static bool TryGetValidPlatform(string input, out string platform)
+        public static bool TryGetValidPlatform(string? input, out string? platform)
         {
             if (input == null)
             {

@@ -33,7 +33,7 @@ namespace ValheimServerGUI.Tools.Logging
             }
         }
 
-        public T Dequeue()
+        public T? Dequeue()
         {
             if (ConcurrentQueue.TryDequeue(out var item))
             {

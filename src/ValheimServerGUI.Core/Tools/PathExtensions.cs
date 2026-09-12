@@ -7,7 +7,7 @@ namespace ValheimServerGUI.Tools
     {
         private static readonly string NL = Environment.NewLine;
 
-        public static FileInfo GetFileInfo(string path, string extension = null)
+        public static FileInfo GetFileInfo(string path, string? extension = null)
         {
             path = Environment.ExpandEnvironmentVariables(path);
 

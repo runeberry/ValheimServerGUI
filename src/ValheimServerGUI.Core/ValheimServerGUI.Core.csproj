@@ -1,0 +1,35 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ValheimServerGUI.Core.Tests" />
+  </ItemGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="DeviceId" Version="6.2.0" />
+    <PackageReference Include="Humanizer" Version="2.14.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
+    <PackageReference Include="Semver" Version="2.2.0" />
+    <PackageReference Include="Serilog" Version="2.12.0" />
+    <PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="..\..\SolutionResources\ClientSecrets.cs" Link="ClientSecrets.cs"
+             Condition="'$(Configuration)'=='Release' Or Exists('..\..\SolutionResources\ClientSecrets.cs')" />
+    <Compile Include="..\..\SolutionResources\ClientSecrets.Values.cs" Link="ClientSecrets.Values.cs"
+             Condition="'$(Configuration)'=='Release' Or Exists('..\..\SolutionResources\ClientSecrets.Values.cs')" />
+  </ItemGroup>
+
+</Project>

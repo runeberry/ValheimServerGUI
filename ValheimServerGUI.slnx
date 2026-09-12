@@ -5,4 +5,8 @@
   <Folder Name="/tests/">
     <Project Path="tests/ValheimServerGUI.Core.Tests/ValheimServerGUI.Core.Tests.csproj" />
   </Folder>
+  <Folder Name="/serverless/">
+    <Project Path="ValheimServerGUI.Serverless/ValheimServerGUI.Serverless.csproj" />
+    <Project Path="ValheimServerGUI.Serverless.Tests/ValheimServerGUI.Serverless.Tests.csproj" />
+  </Folder>
 </Solution>

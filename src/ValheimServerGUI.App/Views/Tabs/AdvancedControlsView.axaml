@@ -10,63 +10,59 @@
             <StackPanel Grid.Column="0" Spacing="2">
                 <c:GroupBox Header="Directory Overrides (for just this Profile)">
                     <StackPanel Spacing="2">
-                        <c:FormRow Header="Valheim Dedicated Server .exe"
-                                   HelpText="Leave blank to use the default from Preferences.">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding Form.ServerExePath}" IsEnabled="{Binding AllowServerChanges}" />
-                                <Button Grid.Column="1" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open server folder"
+                        <c:FilenameFormField LabelText="Valheim Dedicated Server .exe" SelectMode="File"
+                                             HelpText="Leave blank to use the default from Preferences."
+                                             Value="{Binding Form.ServerExePath}" IsEnabled="{Binding AllowServerChanges}">
+                            <c:FilenameFormField.TrailingContent>
+                                <Button Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open server folder"
                                         Command="{Binding OpenServerExeFolderCommand}">
                                     <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"
                                            RenderOptions.BitmapInterpolationMode="HighQuality" />
                                 </Button>
-                            </Grid>
-                        </c:FormRow>
-                        <c:FormRow Header="Valheim Save Data Folder"
-                                   HelpText="Leave blank to use the default from Preferences.">
-                            <Grid ColumnDefinitions="*,Auto">
-                                <TextBox Grid.Column="0" Text="{Binding Form.SaveDataFolderPath}" IsEnabled="{Binding AllowServerChanges}" />
-                                <Button Grid.Column="1" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
+                            </c:FilenameFormField.TrailingContent>
+                        </c:FilenameFormField>
+                        <c:FilenameFormField LabelText="Valheim Save Data Folder" SelectMode="Directory"
+                                             HelpText="Leave blank to use the default from Preferences."
+                                             Value="{Binding Form.SaveDataFolderPath}" IsEnabled="{Binding AllowServerChanges}">
+                            <c:FilenameFormField.TrailingContent>
+                                <Button Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
                                         Command="{Binding OpenSaveFolderCommand}">
                                     <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"
                                            RenderOptions.BitmapInterpolationMode="HighQuality" />
                                 </Button>
-                            </Grid>
-                        </c:FormRow>
+                            </c:FilenameFormField.TrailingContent>
+                        </c:FilenameFormField>
                     </StackPanel>
                 </c:GroupBox>
 
                 <c:GroupBox Header="Other Settings">
                     <StackPanel Spacing="4">
-                        <CheckBox Content="Start this server when ValheimServerGUI starts"
-                                  IsChecked="{Binding Form.AutoStart}" IsEnabled="{Binding AllowServerChanges}" />
-                        <CheckBox Content="Write server logs to file"
-                                  IsChecked="{Binding Form.WriteServerLogsToFile}" IsEnabled="{Binding AllowServerChanges}" />
-                        <c:FormRow Header="Additional Command Line Args"
-                                   HelpText="Extra arguments passed to the server (the -logFile argument is not allowed).">
-                            <TextBox Text="{Binding Form.AdditionalArgs}" MaxLength="32767" IsEnabled="{Binding AllowServerChanges}" />
-                        </c:FormRow>
+                        <c:CheckBoxFormField LabelText="Start this server when ValheimServerGUI starts"
+                                             Value="{Binding Form.AutoStart}" IsEnabled="{Binding AllowServerChanges}" />
+                        <c:CheckBoxFormField LabelText="Write server logs to file"
+                                             Value="{Binding Form.WriteServerLogsToFile}" IsEnabled="{Binding AllowServerChanges}" />
+                        <c:TextFormField LabelText="Additional Command Line Args"
+                                         HelpText="Extra arguments passed to the server (the -logFile argument is not allowed)."
+                                         Value="{Binding Form.AdditionalArgs}" MaxLength="32767"
+                                         IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>
                 </c:GroupBox>
             </StackPanel>
 
             <c:GroupBox Grid.Column="2" Header="Saving &amp; Backups" VerticalAlignment="Top">
                 <StackPanel Spacing="2" Width="150">
-                    <c:FormRow Header="Save Interval" HelpText="How often the world is auto-saved, in seconds (60–86400).">
-                        <NumericUpDown Value="{Binding Form.SaveInterval}" Minimum="60" Maximum="86400"
-                                       FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
-                    </c:FormRow>
-                    <c:FormRow Header="Backups" HelpText="Number of world backups to retain (1–1000).">
-                        <NumericUpDown Value="{Binding Form.BackupCount}" Minimum="1" Maximum="1000"
-                                       FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
-                    </c:FormRow>
-                    <c:FormRow Header="Short Backup" HelpText="Short backup interval, in seconds (300–2592000).">
-                        <NumericUpDown Value="{Binding Form.BackupIntervalShort}" Minimum="300" Maximum="2592000"
-                                       FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
-                    </c:FormRow>
-                    <c:FormRow Header="Long Backup" HelpText="Long backup interval, in seconds (300–2592000).">
-                        <NumericUpDown Value="{Binding Form.BackupIntervalLong}" Minimum="300" Maximum="2592000"
-                                       FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
-                    </c:FormRow>
+                    <c:NumericFormField LabelText="Save Interval" Value="{Binding Form.SaveInterval}"
+                                        Minimum="60" Maximum="86400" IsEnabled="{Binding AllowServerChanges}"
+                                        HelpText="How often the world is auto-saved, in seconds (60–86400)." />
+                    <c:NumericFormField LabelText="Backups" Value="{Binding Form.BackupCount}"
+                                        Minimum="1" Maximum="1000" IsEnabled="{Binding AllowServerChanges}"
+                                        HelpText="Number of world backups to retain (1–1000)." />
+                    <c:NumericFormField LabelText="Short Backup" Value="{Binding Form.BackupIntervalShort}"
+                                        Minimum="300" Maximum="2592000" IsEnabled="{Binding AllowServerChanges}"
+                                        HelpText="Short backup interval, in seconds (300–2592000)." />
+                    <c:NumericFormField LabelText="Long Backup" Value="{Binding Form.BackupIntervalLong}"
+                                        Minimum="300" Maximum="2592000" IsEnabled="{Binding AllowServerChanges}"
+                                        HelpText="Long backup interval, in seconds (300–2592000)." />
                 </StackPanel>
             </c:GroupBox>
         </Grid>

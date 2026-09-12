@@ -97,14 +97,18 @@
                            Source="{Binding ServerStatus, Converter={x:Static conv:ServerStatusToIconConverter.Instance}}" />
                     <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
                 </StackPanel>
-                <Button Grid.Column="1" Classes="link" Command="{Binding UpdateLinkCommand}">
-                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                        <Image Width="16" Height="16" VerticalAlignment="Center"
-                               RenderOptions.BitmapInterpolationMode="HighQuality"
-                               Source="{Binding UpdateStatus, Converter={x:Static conv:UpdateStatusToIconConverter.Instance}}" />
-                        <TextBlock Text="{Binding UpdateStatusText}" VerticalAlignment="Center" />
-                    </StackPanel>
-                </Button>
+                <!-- Icon + text always render at full contrast; only the text turns into a clickable link
+                     when there is somewhere to go (UpdateIsLink). Previously the whole readout was a Button
+                     that went disabled when not a link, dimming the icon and text to near-invisibility. -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                    <Image Width="16" Height="16" VerticalAlignment="Center"
+                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                           Source="{Binding UpdateStatus, Converter={x:Static conv:UpdateStatusToIconConverter.Instance}}" />
+                    <TextBlock Text="{Binding UpdateStatusText}" VerticalAlignment="Center"
+                               IsVisible="{Binding UpdateIsLink, Converter={x:Static conv:InverseBooleanConverter.Instance}}" />
+                    <Button Classes="link" Padding="0" Content="{Binding UpdateStatusText}"
+                            Command="{Binding UpdateLinkCommand}" IsVisible="{Binding UpdateIsLink}" />
+                </StackPanel>
             </Grid>
         </Border>
 

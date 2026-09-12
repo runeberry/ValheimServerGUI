@@ -28,6 +28,7 @@ public partial class MainWindow : Window
 
     public MainWindow(MainWindowViewModel viewModel) : this()
     {
+        Icon = AppIcon.Load();
         ViewModel = viewModel;
         DataContext = viewModel;
 
@@ -220,7 +221,7 @@ public partial class MainWindow : Window
 
             _trayIcon = new TrayIcon
             {
-                Icon = PlaceholderIcon.Create(),
+                Icon = AppIcon.Load(),
                 ToolTipText = ViewModel.Title,
                 Menu = menu,
                 IsVisible = true,

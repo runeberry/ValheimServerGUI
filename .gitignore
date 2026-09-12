@@ -352,3 +352,9 @@ MigrationBackup/
 # Claude Code files
 .claude/
 CLAUDE.local.md
+
+# Persistent reference clones / scratch (not part of the repo)
+/tmp/
+
+# Packaging output
+/dist/

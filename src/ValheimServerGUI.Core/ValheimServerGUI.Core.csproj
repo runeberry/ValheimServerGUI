@@ -15,7 +15,12 @@
     <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">build$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd"))</SourceRevisionId>
   </PropertyGroup>
 
-  <ItemGroup>
+  <!--
+    Only exposed to the (unsigned) test assembly in non-Release builds. In Release the assembly is
+    strong-name signed, and an unqualified InternalsVisibleTo to an unsigned friend is a hard error
+    (CS1726). Tests run in Debug, so scoping this out of Release lets Release publish/packaging succeed.
+  -->
+  <ItemGroup Condition="'$(Configuration)' != 'Release'">
     <InternalsVisibleTo Include="ValheimServerGUI.Core.Tests" />
   </ItemGroup>
 

@@ -27,11 +27,14 @@
         <Setter Property="Padding" Value="10,2" />
     </Style>
 
-    <!-- Icon-only 16x16 button: no min width, just enough padding to frame the glyph. -->
+    <!-- Icon-only 16x16 button: no min width, fixed to the standard input height so a row of
+         [text box | icon button] stays a uniform height and the two align. -->
     <Style Selector="Button.icon">
         <Setter Property="MinWidth" Value="0" />
-        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Height" Value="24" />
         <Setter Property="Padding" Value="4" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
     <Style Selector="TextBox">

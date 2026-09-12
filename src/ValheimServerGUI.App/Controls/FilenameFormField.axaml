@@ -5,7 +5,7 @@
              x:Name="Root" x:CompileBindings="False">
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <Grid ColumnDefinitions="*,Auto,Auto">
-            <TextBox Grid.Column="0" Text="{Binding #Root.Value, Mode=TwoWay}" />
+            <TextBox Grid.Column="0" VerticalAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}" />
             <Button Grid.Column="1" Classes="icon" Content="…" Margin="4,0,0,0"
                     ToolTip.Tip="Browse…" Click="Browse" />
             <ContentControl Grid.Column="2" Content="{Binding #Root.TrailingContent}"

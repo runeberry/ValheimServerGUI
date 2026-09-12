@@ -7,6 +7,7 @@
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <Grid ColumnDefinitions="*,Auto">
             <TextBox Grid.Column="0"
+                     VerticalAlignment="Center"
                      Text="{Binding #Root.Value, Mode=TwoWay}"
                      MaxLength="{Binding #Root.MaxLength}"
                      PlaceholderText="{Binding #Root.Watermark}"

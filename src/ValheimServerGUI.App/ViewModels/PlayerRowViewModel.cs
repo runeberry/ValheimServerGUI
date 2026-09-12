@@ -1,4 +1,5 @@
 using System;
+using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.Game;
@@ -18,7 +19,7 @@ public partial class PlayerRowViewModel : ObservableObject
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private string _sinceText = string.Empty;
     [ObservableProperty] private bool _isOffline;
-    [ObservableProperty] private string _platformGlyph = string.Empty;
+    [ObservableProperty] private Bitmap? _platformIcon;
 
     public void Update(PlayerInfo player)
     {
@@ -31,7 +32,7 @@ public partial class PlayerRowViewModel : ObservableObject
 
         StatusText = player.PlayerStatus.ToString();
         IsOffline = player.PlayerStatus == PlayerStatus.Offline;
-        PlatformGlyph = PlatformToIconConverter.ForPlatform(player.Platform);
+        PlatformIcon = PlatformToIconConverter.ForPlatform(player.Platform);
         RefreshSince();
     }
 

@@ -35,6 +35,19 @@ public enum CloudImportChoice
 }
 
 /// <summary>
+/// The update-check outcome shown in the status bar. The single source of truth the status text and the
+/// status-bar icon both derive from (mirrors the WinForms status icon set).
+/// </summary>
+public enum UpdateCheckStatus
+{
+    None,
+    Checking,
+    UpToDate,
+    Available,
+    Error,
+}
+
+/// <summary>
 /// One server window's view-model (§10.5). Owns a transient <see cref="ValheimServer"/> over the shared
 /// singleton providers. Exposes the chrome surface (status + the single Can*/AllowServerChanges gate,
 /// update status, profile list, menu/button commands) and the editable form (<see cref="Form"/>) plus the
@@ -163,6 +176,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UpdateLinkCommand))]
     private bool _updateIsLink;
+
+    /// <summary>The update-check outcome the status-bar icon derives from (see the status text below).</summary>
+    [ObservableProperty]
+    private UpdateCheckStatus _updateStatus;
 
     // ===== commands =====
 
@@ -520,6 +537,7 @@ public partial class MainWindowViewModel : ViewModelBase
         => RunOnUi(() =>
         {
             UpdateStatusText = "Checking for updates…";
+            UpdateStatus = UpdateCheckStatus.Checking;
             UpdateIsLink = false;
             _updateLinkTarget = null;
         });
@@ -530,6 +548,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (!e.IsSuccessful)
             {
                 UpdateStatusText = "Update check failed";
+                UpdateStatus = UpdateCheckStatus.Error;
                 _updateLinkTarget = AppConstants.UrlReleases;
                 UpdateIsLink = true;
                 return;
@@ -538,12 +557,14 @@ public partial class MainWindowViewModel : ViewModelBase
             if (AssemblyHelper.CompareVersion(e.LatestVersion!) > 0)
             {
                 UpdateStatusText = $"Update available: {e.LatestVersion}";
+                UpdateStatus = UpdateCheckStatus.Available;
                 _updateLinkTarget = AppConstants.UrlReleases;
                 UpdateIsLink = true;
             }
             else
             {
                 UpdateStatusText = "Up to date";
+                UpdateStatus = UpdateCheckStatus.UpToDate;
                 _updateLinkTarget = null;
                 UpdateIsLink = false;
             }

@@ -24,7 +24,15 @@
                 </Style>
             </DataGrid.Styles>
             <DataGrid.Columns>
-                <DataGridTextColumn Header="" Binding="{Binding PlatformGlyph}" Width="Auto" />
+                <DataGridTemplateColumn Header="" Width="Auto">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
+                            <Image Source="{Binding PlatformIcon}" Width="16" Height="16"
+                                   Margin="6,0" VerticalAlignment="Center"
+                                   RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
                 <DataGridTextColumn Header="Player (Character)" Binding="{Binding DisplayName}" Width="*" />
                 <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="Auto" />
                 <DataGridTextColumn Header="Since" Binding="{Binding SinceText}" Width="Auto" />

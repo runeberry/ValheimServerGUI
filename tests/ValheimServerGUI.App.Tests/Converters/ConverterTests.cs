@@ -1,6 +1,7 @@
 using System;
 using System.Globalization;
 using ValheimServerGUI.App.Converters;
+using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
@@ -61,19 +62,40 @@ public class ConverterTests
     }
 
     [Theory]
-    [InlineData("Steam")]
-    [InlineData("steam")]
-    [InlineData("Xbox")]
-    public void PlatformToIcon_known_platforms_get_a_glyph(string platform)
+    [InlineData("Steam", "Steam_16x")]
+    [InlineData("steam", "Steam_16x")]
+    [InlineData("Xbox", "XboxLive_16x")]
+    public void PlatformToIcon_known_platforms_map_to_an_icon(string platform, string expected)
     {
-        Assert.False(string.IsNullOrEmpty(PlatformToIconConverter.ForPlatform(platform)));
+        Assert.Equal(expected, PlatformToIconConverter.IconNameForPlatform(platform));
     }
 
     [Fact]
-    public void PlatformToIcon_unknown_falls_back()
+    public void PlatformToIcon_unknown_has_no_icon()
     {
-        Assert.Equal("•", PlatformToIconConverter.ForPlatform("nope"));
-        Assert.Equal("•", PlatformToIconConverter.ForPlatform(null));
+        Assert.Null(PlatformToIconConverter.IconNameForPlatform("nope"));
+        Assert.Null(PlatformToIconConverter.IconNameForPlatform(null));
+    }
+
+    [Theory]
+    [InlineData(ServerStatus.Stopped, "StatusPause_grey_16x")]
+    [InlineData(ServerStatus.Starting, "UnsyncedCommits_16x_Horiz")]
+    [InlineData(ServerStatus.Running, "StatusRun_16x")]
+    [InlineData(ServerStatus.Stopping, "UnsyncedCommits_16x_Horiz")]
+    public void ServerStatusToIcon_maps_every_status(ServerStatus status, string expected)
+    {
+        Assert.Equal(expected, ServerStatusToIconConverter.IconNameForStatus(status));
+    }
+
+    [Theory]
+    [InlineData(UpdateCheckStatus.None, null)]
+    [InlineData(UpdateCheckStatus.Checking, "Loading_Blue_16x")]
+    [InlineData(UpdateCheckStatus.UpToDate, "StatusOK_16x")]
+    [InlineData(UpdateCheckStatus.Available, "StatusWarning_16x")]
+    [InlineData(UpdateCheckStatus.Error, "StatusCriticalError_16x")]
+    public void UpdateStatusToIcon_maps_every_status(UpdateCheckStatus status, string? expected)
+    {
+        Assert.Equal(expected, UpdateStatusToIconConverter.IconNameForStatus(status));
     }
 
     [Theory]

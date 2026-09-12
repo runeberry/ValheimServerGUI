@@ -7,7 +7,7 @@
          help glyph pinned to the field's top-right. Its tooltip carries HelpText; the glyph collapses when
          HelpText is empty. The FormRow/HelpText API is unchanged — only this layout differs. -->
     <ControlTheme x:Key="{x:Type c:FormRow}" TargetType="c:FormRow">
-        <Setter Property="Margin" Value="0,3" />
+        <Setter Property="Margin" Value="0,1.5" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="Auto,Auto">
@@ -24,7 +24,7 @@
                                    FontWeight="Bold"
                                    VerticalAlignment="Center"
                                    Cursor="Hand"
-                                   Foreground="#0066CC"
+                                   Foreground="{DynamicResource HelpGlyphBrush}"
                                    ToolTip.Tip="{TemplateBinding HelpText}"
                                    IsVisible="{TemplateBinding HelpText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
                     </Grid>

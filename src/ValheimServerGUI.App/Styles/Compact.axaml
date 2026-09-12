@@ -21,7 +21,8 @@
     <Style Selector="Window">
         <Setter Property="FontFamily" Value="Segoe UI, Inter" />
         <Setter Property="FontSize" Value="12" />
-        <Setter Property="Background" Value="{DynamicResource LayerBase}" />
+        <!-- App background blends with the menu/footer (darkest); only tabs + content stand out. -->
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
     </Style>
 
     <Style Selector="Button">
@@ -60,16 +61,28 @@
         <Setter Property="MinHeight" Value="20" />
         <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
-    <!-- Shrink the check box itself (Fluent's box is a touch-sized 20px square inside a 32px-tall row)
-         toward the WinForms ~16px box. Resizes the existing template parts so all Fluent states and
-         animations are preserved. Part names verified against Avalonia 12's Fluent CheckBox template. -->
+    <!-- Shrink the check box (Fluent's is a 20px square in a 32px row) to a 12px box. Resizes the existing
+         template parts so all Fluent states/animations are preserved. Part names verified against Avalonia 12. -->
     <Style Selector="CheckBox /template/ Border#PART_Border">
-        <Setter Property="MinHeight" Value="22" />
+        <Setter Property="MinHeight" Value="16" />
     </Style>
     <Style Selector="CheckBox /template/ Border#NormalRectangle">
-        <Setter Property="Width" Value="16" />
-        <Setter Property="Height" Value="16" />
-        <Setter Property="MinWidth" Value="16" />
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+        <Setter Property="MinWidth" Value="12" />
+    </Style>
+
+    <!-- Shrink the radio button's circle (20px -> 12px) and its centre dot, and the row height. -->
+    <Style Selector="RadioButton /template/ Border#RootBorder">
+        <Setter Property="MinHeight" Value="16" />
+    </Style>
+    <Style Selector="RadioButton /template/ Ellipse#OuterEllipse, RadioButton /template/ Ellipse#CheckOuterEllipse">
+        <Setter Property="Width" Value="12" />
+        <Setter Property="Height" Value="12" />
+    </Style>
+    <Style Selector="RadioButton /template/ Ellipse#CheckGlyph">
+        <Setter Property="Width" Value="5" />
+        <Setter Property="Height" Value="5" />
     </Style>
 
     <Style Selector="RadioButton">

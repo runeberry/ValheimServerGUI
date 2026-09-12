@@ -64,6 +64,7 @@ public class PaletteTests
         Assert.NotEqual(darkest, baseColor);
         Assert.NotEqual(baseColor, content);
 
-        Assert.Equal(baseColor, (window.Background as ISolidColorBrush)!.Color);
+        // App background blends with the menu/footer (darkest layer).
+        Assert.Equal(darkest, (window.Background as ISolidColorBrush)!.Color);
     }
 }

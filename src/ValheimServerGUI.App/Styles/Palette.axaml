@@ -6,6 +6,10 @@
            LayerBase     — app/window background + inactive tabs
            LayerContent  — active tab + tab content (the "raised" surface)
          AppBorderBrush is the hairline used for tab/frame borders. -->
+    <!-- The "?" help glyph shares the controls' accent (checkbox/radio/focus) instead of a hardcoded
+         blue. Reusable token; tracks SystemAccentColor so it always matches the control highlight. -->
+    <SolidColorBrush x:Key="HelpGlyphBrush" Color="{DynamicResource SystemAccentColor}" />
+
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="LayerDarkest" Color="#1E1E1E" />

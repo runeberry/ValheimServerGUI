@@ -12,7 +12,6 @@ namespace ValheimServerGUI.Game
         //public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
 
         public string ServerExePath { get; set; } = Resources.DefaultServerPath;
-
         public string SaveDataFolderPath { get; set; } = Resources.DefaultValheimSaveFolder;
 
         public bool CheckForUpdates { get; set; } = true;
@@ -27,6 +26,19 @@ namespace ValheimServerGUI.Game
 
         public bool EnablePasswordValidation { get; set; } = true;
 
+        public bool DiscordStatusNotifications { get; set; }
+
+        public string DiscordWebhookUrl { get; set; }
+
+        // Per-event Discord notification preferences.
+        // Default to true so existing users keep the same behavior after upgrading.
+        public bool DiscordNotifyServerOnline { get; set; } = true;
+        public bool DiscordNotifyServerOffline { get; set; } = true;
+        public bool DiscordNotifyPlayerJoined { get; set; } = true;
+        public bool DiscordNotifyPlayerLeft { get; set; } = true;
+        public bool DiscordNotifyPlayerDied { get; set; } = true;
+        public bool DiscordNotifyJoinCode { get; set; } = true;
+
         public List<ServerPreferences> Servers { get; set; } = new();
 
         public List<WorldPreferences> Worlds { get; set; } = new();
@@ -36,7 +48,6 @@ namespace ValheimServerGUI.Game
             var prefs = new UserPreferences();
 
             if (file == null) return prefs;
-
             prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
             prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
@@ -45,6 +56,21 @@ namespace ValheimServerGUI.Game
             prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
             prefs.WriteApplicationLogsToFile = file.WriteApplicationLogsToFile ?? prefs.WriteApplicationLogsToFile;
             prefs.EnablePasswordValidation = file.EnablePasswordValidation ?? prefs.EnablePasswordValidation;
+            prefs.DiscordStatusNotifications = file.DiscordStatusNotifications ?? prefs.DiscordStatusNotifications;
+            prefs.DiscordWebhookUrl = file.DiscordWebhookUrl ?? prefs.DiscordWebhookUrl;
+
+            prefs.DiscordNotifyServerOnline =
+                file.DiscordNotifyServerOnline ?? prefs.DiscordNotifyServerOnline;
+            prefs.DiscordNotifyServerOffline =
+                file.DiscordNotifyServerOffline ?? prefs.DiscordNotifyServerOffline;
+            prefs.DiscordNotifyPlayerJoined =
+                file.DiscordNotifyPlayerJoined ?? prefs.DiscordNotifyPlayerJoined;
+            prefs.DiscordNotifyPlayerLeft =
+                file.DiscordNotifyPlayerLeft ?? prefs.DiscordNotifyPlayerLeft;
+            prefs.DiscordNotifyPlayerDied =
+                file.DiscordNotifyPlayerDied ?? prefs.DiscordNotifyPlayerDied;
+            prefs.DiscordNotifyJoinCode =
+                file.DiscordNotifyJoinCode ?? prefs.DiscordNotifyJoinCode;
 
             if (file.Servers != null)
             {
@@ -54,7 +80,6 @@ namespace ValheimServerGUI.Game
                     .DistinctBy(f => f.ProfileName)
                     .ToList();
             }
-
             if (file.Worlds != null)
             {
                 prefs.Worlds = file.Worlds
@@ -79,6 +104,16 @@ namespace ValheimServerGUI.Game
                 SaveProfileOnStart = SaveProfileOnStart,
                 WriteApplicationLogsToFile = WriteApplicationLogsToFile,
                 EnablePasswordValidation = EnablePasswordValidation,
+                DiscordStatusNotifications = DiscordStatusNotifications,
+                DiscordWebhookUrl = DiscordWebhookUrl,
+
+                DiscordNotifyServerOnline = DiscordNotifyServerOnline,
+                DiscordNotifyServerOffline = DiscordNotifyServerOffline,
+                DiscordNotifyPlayerJoined = DiscordNotifyPlayerJoined,
+                DiscordNotifyPlayerLeft = DiscordNotifyPlayerLeft,
+                DiscordNotifyPlayerDied = DiscordNotifyPlayerDied,
+                DiscordNotifyJoinCode = DiscordNotifyJoinCode,
+
                 Servers = new(),
                 Worlds = new(),
             };
@@ -87,8 +122,8 @@ namespace ValheimServerGUI.Game
             {
                 var servers = Servers
                     .Select(p => p.ToFile())
-                    .Where(p => !string.IsNullOrWhiteSpace(p.ProfileName)) // Remove profiles with no name
-                    .DistinctBy(p => p.ProfileName); // Remove duplicate entries by profile name
+                    .Where(p => !string.IsNullOrWhiteSpace(p.ProfileName))
+                    .DistinctBy(p => p.ProfileName);
 
                 file.Servers.AddRange(servers);
             }
@@ -97,8 +132,8 @@ namespace ValheimServerGUI.Game
             {
                 var worlds = Worlds
                     .Select(p => p.ToFile())
-                    .Where(p => !string.IsNullOrWhiteSpace(p.WorldName)) // Remove world settings with no name
-                    .DistinctBy(p => p.WorldName); // Remove duplicate entries by world name
+                    .Where(p => !string.IsNullOrWhiteSpace(p.WorldName))
+                    .DistinctBy(p => p.WorldName);
 
                 file.Worlds.AddRange(worlds);
             }

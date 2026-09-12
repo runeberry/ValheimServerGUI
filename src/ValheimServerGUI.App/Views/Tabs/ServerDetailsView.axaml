@@ -1,43 +1,80 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels"
              x:Class="ValheimServerGUI.App.Views.Tabs.ServerDetailsView"
              x:DataType="vm:MainWindowViewModel">
 
+    <UserControl.Styles>
+        <!-- Right-aligned caption + blue "?" help glyph reused across the detail rows. -->
+        <Style Selector="TextBlock.caption">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,0,8,0" />
+        </Style>
+        <Style Selector="TextBlock.help">
+            <Setter Property="Text" Value="?" />
+            <Setter Property="FontWeight" Value="Bold" />
+            <Setter Property="Foreground" Value="#0066CC" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="6,0" />
+        </Style>
+    </UserControl.Styles>
+
     <ScrollViewer>
         <StackPanel Margin="8" Spacing="4">
-            <TextBlock Text="Connection Details" FontWeight="SemiBold" />
-            <Grid ColumnDefinitions="140,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto" Margin="12,4,0,0">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="External IP:" VerticalAlignment="Center" />
-                <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.ExternalIp}" VerticalAlignment="Center" />
-                <Button Grid.Row="0" Grid.Column="2" Content="Copy" Click="CopyExternal" Margin="4" />
+            <c:GroupBox Header="Connection Details">
+                <StackPanel Spacing="2">
+                    <Grid ColumnDefinitions="130,*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
+                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="External IP Address:" />
+                        <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.ExternalIp}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="0" Grid.Column="2" Classes="help" ToolTip.Tip="Your public IP — share this with friends on the internet." />
+                        <Button Grid.Row="0" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyExternal">
+                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        </Button>
 
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Internal IP:" VerticalAlignment="Center" />
-                <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.InternalIp}" VerticalAlignment="Center" />
-                <Button Grid.Row="1" Grid.Column="2" Content="Copy" Click="CopyInternal" Margin="4" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Classes="caption" Text="Internal IP Address:" />
+                        <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.InternalIp}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="1" Grid.Column="2" Classes="help" ToolTip.Tip="Your IP on the local network." />
+                        <Button Grid.Row="1" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyInternal">
+                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        </Button>
 
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Local IP:" VerticalAlignment="Center" />
-                <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.LocalIp}" VerticalAlignment="Center" />
-                <Button Grid.Row="2" Grid.Column="2" Content="Copy" Click="CopyLocal" Margin="4" />
+                        <TextBlock Grid.Row="2" Grid.Column="0" Classes="caption" Text="Local IP Address:" />
+                        <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.LocalIp}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="2" Grid.Column="2" Classes="help" ToolTip.Tip="The loopback address for connecting from this machine." />
+                        <Button Grid.Row="2" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyLocal">
+                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        </Button>
 
-                <TextBlock Grid.Row="3" Grid.Column="0" Text="Invite Code:" VerticalAlignment="Center" />
-                <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Details.InviteCode}" VerticalAlignment="Center" />
-                <Button Grid.Row="3" Grid.Column="2" Content="Copy" Click="CopyInvite" Margin="4"
-                        IsVisible="{Binding Details.InviteCodeCopyable}" />
-            </Grid>
-            <TextBlock Margin="12,4,0,0" FontStyle="Italic"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                       Text="Trouble connecting? See Help &gt; Port Forwarding." />
+                        <TextBlock Grid.Row="3" Grid.Column="0" Classes="caption" Text="Invite Code:" />
+                        <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Details.InviteCode}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Row="3" Grid.Column="2" Classes="help" ToolTip.Tip="Crossplay invite code friends can use to join." />
+                        <Button Grid.Row="3" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyInvite"
+                                IsVisible="{Binding Details.InviteCodeCopyable}">
+                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        </Button>
+                    </Grid>
+                    <TextBlock Margin="0,4,0,0" FontStyle="Italic"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               Text="Trouble connecting? See Help &gt; Port Forwarding." />
+                </StackPanel>
+            </c:GroupBox>
 
-            <TextBlock Text="Statistics" FontWeight="SemiBold" Margin="0,12,0,0" />
-            <Grid ColumnDefinitions="140,*" RowDefinitions="Auto,Auto,Auto" Margin="12,4,0,0">
-                <TextBlock Grid.Row="0" Grid.Column="0" Text="Server Uptime:" />
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.Uptime}" />
-                <TextBlock Grid.Row="1" Grid.Column="0" Text="Last World Save:" />
-                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.LastWorldSave}" />
-                <TextBlock Grid.Row="2" Grid.Column="0" Text="Avg World Save:" />
-                <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.AverageWorldSave}" />
-            </Grid>
+            <c:GroupBox Header="Statistics">
+                <Grid ColumnDefinitions="130,*,Auto" RowDefinitions="Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="Server Uptime:" />
+                    <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Details.Uptime}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Classes="caption" Text="Last World Save:" />
+                    <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Details.LastWorldSave}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Classes="caption" Text="Avg. World Save:" />
+                    <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Details.AverageWorldSave}" />
+                    <TextBlock Grid.Row="2" Grid.Column="2" Classes="help" ToolTip.Tip="Average time taken to write a world save." />
+                </Grid>
+            </c:GroupBox>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

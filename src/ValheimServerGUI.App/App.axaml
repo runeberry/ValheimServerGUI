@@ -1,0 +1,11 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ValheimServerGUI.App.App"
+             RequestedThemeVariant="Default">
+    <!-- "Default" follows the OS theme variant; the App applies the user's Light/Dark/System
+         preference at startup via RequestedThemeVariant (see App.axaml.cs). -->
+
+    <Application.Styles>
+        <FluentTheme />
+    </Application.Styles>
+</Application>

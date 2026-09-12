@@ -1,0 +1,25 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Layered surface palette (VS Code-inspired), theme-variant aware. No pure black anywhere.
+         Three depths, darkest to lightest:
+           LayerDarkest  — menu bar + footer
+           LayerBase     — app/window background + inactive tabs
+           LayerContent  — active tab + tab content (the "raised" surface)
+         AppBorderBrush is the hairline used for tab/frame borders. -->
+    <ResourceDictionary.ThemeDictionaries>
+        <ResourceDictionary x:Key="Dark">
+            <SolidColorBrush x:Key="LayerDarkest" Color="#1E1E1E" />
+            <SolidColorBrush x:Key="LayerBase" Color="#252526" />
+            <SolidColorBrush x:Key="LayerContent" Color="#2D2D30" />
+            <SolidColorBrush x:Key="LayerBaseHover" Color="#323233" />
+            <SolidColorBrush x:Key="AppBorderBrush" Color="#3F3F46" />
+        </ResourceDictionary>
+        <ResourceDictionary x:Key="Light">
+            <SolidColorBrush x:Key="LayerDarkest" Color="#D4D4D4" />
+            <SolidColorBrush x:Key="LayerBase" Color="#ECECEC" />
+            <SolidColorBrush x:Key="LayerContent" Color="#FBFBFB" />
+            <SolidColorBrush x:Key="LayerBaseHover" Color="#E0E0E0" />
+            <SolidColorBrush x:Key="AppBorderBrush" Color="#BFBFBF" />
+        </ResourceDictionary>
+    </ResourceDictionary.ThemeDictionaries>
+</ResourceDictionary>

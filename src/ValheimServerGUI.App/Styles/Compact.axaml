@@ -16,10 +16,12 @@
         <x:Double x:Key="MenuFlyoutThemeMinHeight">26</x:Double>
     </Styles.Resources>
 
-    <!-- Base font: Segoe UI on Windows, the bundled Inter elsewhere. Inherits to every descendant. -->
+    <!-- Base font: Segoe UI on Windows, the bundled Inter elsewhere. Inherits to every descendant.
+         Base surface is the layered app background (no pure black); menu/footer paint darker themselves. -->
     <Style Selector="Window">
         <Setter Property="FontFamily" Value="Segoe UI, Inter" />
         <Setter Property="FontSize" Value="12" />
+        <Setter Property="Background" Value="{DynamicResource LayerBase}" />
     </Style>
 
     <Style Selector="Button">
@@ -75,13 +77,12 @@
         <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
 
-    <Style Selector="TabItem">
-        <Setter Property="MinHeight" Value="28" />
-        <Setter Property="FontSize" Value="13" />
-    </Style>
+    <!-- TabItem look lives in Controls/TabStyles.axaml (the custom bordered tab theme). -->
 
     <Style Selector="Menu">
         <Setter Property="MinHeight" Value="0" />
+        <!-- Menu bar is the darkest layer. -->
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
     </Style>
     <Style Selector="Menu > MenuItem">
         <Setter Property="Padding" Value="8,3" />

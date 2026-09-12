@@ -18,6 +18,7 @@
 
         <DataGrid ItemsSource="{Binding Players.Players}"
                   SelectedItem="{Binding Players.SelectedPlayer}"
+                  Background="{DynamicResource LayerBase}"
                   IsReadOnly="True" CanUserReorderColumns="False"
                   GridLinesVisibility="Horizontal">
             <DataGrid.Styles>

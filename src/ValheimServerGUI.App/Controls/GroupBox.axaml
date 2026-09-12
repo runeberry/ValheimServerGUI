@@ -6,12 +6,13 @@
          edge. The frame is dropped ~8px so the title's vertical centre lands on the border line, and the
          title's own opaque background (the box's Background) paints over the line to make the notch. -->
     <ControlTheme x:Key="{x:Type c:GroupBox}" TargetType="c:GroupBox">
-        <Setter Property="Background" Value="{DynamicResource SystemControlBackgroundAltHighBrush}" />
+        <!-- Notch background matches the content surface the box sits on (the raised content layer). -->
+        <Setter Property="Background" Value="{DynamicResource LayerContent}" />
         <Setter Property="Margin" Value="0,4" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid>
-                    <Border BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}"
+                    <Border BorderBrush="{DynamicResource AppBorderBrush}"
                             BorderThickness="1" CornerRadius="3" Margin="0,8,0,0">
                         <ContentPresenter Content="{TemplateBinding Content}"
                                           ContentTemplate="{TemplateBinding ContentTemplate}"

@@ -88,8 +88,8 @@
         </Menu>
 
         <!-- ===== Status bar ===== -->
-        <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0"
-                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" Padding="8,4">
+        <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" Background="{DynamicResource LayerDarkest}"
+                BorderBrush="{DynamicResource AppBorderBrush}" Padding="8,4">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                     <Image Width="16" Height="16" VerticalAlignment="Center"

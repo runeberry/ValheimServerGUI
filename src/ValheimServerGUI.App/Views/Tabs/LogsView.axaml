@@ -19,9 +19,9 @@
             <Button Grid.Column="5" Content="Clear Logs" Command="{Binding Logs.ClearLogsCommand}" Margin="4,0,0,0" />
         </Grid>
 
-        <Border BorderThickness="1" BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}">
-            <ListBox ItemsSource="{Binding Logs.CurrentLines}" FontFamily="Cascadia Mono,Consolas,Menlo,monospace"
-                     FontSize="12">
+        <Border BorderThickness="1" BorderBrush="{DynamicResource AppBorderBrush}">
+            <ListBox ItemsSource="{Binding Logs.CurrentLines}" Background="{DynamicResource LayerBase}"
+                     FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding}" TextWrapping="NoWrap" />

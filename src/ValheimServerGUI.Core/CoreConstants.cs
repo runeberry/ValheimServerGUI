@@ -45,6 +45,10 @@ namespace ValheimServerGUI
         /// <summary>External IP lookup endpoint. (Resources: UrlExternalIpLookup.)</summary>
         public const string UrlExternalIpLookup = "https://api.ipify.org?format=json";
 
+        /// <summary>Fallback external-IP endpoints tried in order after <see cref="UrlExternalIpLookup"/> (§16.2, E52).</summary>
+        public const string UrlExternalIpLookupFallback1 = "https://ifconfig.co/ip";
+        public const string UrlExternalIpLookupFallback2 = "https://icanhazip.com";
+
         /// <summary>Runeberry backend API base (player-info lookups, crash reports). (Resources: UrlRuneberryApi.)</summary>
         public const string UrlRuneberryApi = "https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod";
     }

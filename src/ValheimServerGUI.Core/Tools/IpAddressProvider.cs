@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -62,11 +63,47 @@ namespace ValheimServerGUI.Tools
 
         public event EventHandler<string?>? InternalIpChanged;
 
-        public Task LoadExternalIpAddressAsync()
+        /// <summary>
+        /// External-IP endpoints tried in order (§16.2 fallback chain, E52): ipify → ifconfig.co →
+        /// icanhazip. The first non-blank result wins; if all fail the previous value is kept.
+        /// </summary>
+        protected virtual IReadOnlyList<string> ExternalIpEndpoints { get; } = new[]
         {
-            return Get(CoreConstants.UrlExternalIpLookup)
-                .WithCallback<ExternalIpResponse>(OnExternalIpResponse)
-                .SendAsync();
+            CoreConstants.UrlExternalIpLookup,
+            CoreConstants.UrlExternalIpLookupFallback1,
+            CoreConstants.UrlExternalIpLookupFallback2,
+        };
+
+        public async Task LoadExternalIpAddressAsync()
+        {
+            foreach (var url in ExternalIpEndpoints)
+            {
+                try
+                {
+                    var ip = await FetchExternalIpAsync(url);
+                    if (!string.IsNullOrWhiteSpace(ip))
+                    {
+                        ExternalIpAddress = ip.Trim();
+                        return;
+                    }
+                }
+                catch (Exception e)
+                {
+                    Logger.Warning(e, "External IP lookup failed for {Url}", url);
+                }
+            }
+
+            // E52: every endpoint failed/blank — keep the previous value (no-op).
+        }
+
+        /// <summary>Fetches the external IP from one endpoint. ipify returns <c>{"ip":…}</c>; the others return the bare IP.</summary>
+        protected virtual async Task<string?> FetchExternalIpAsync(string url)
+        {
+            using var client = Context.HttpClientProvider.CreateClient();
+            var body = (await client.GetStringAsync(url)).Trim();
+            if (body.StartsWith('{'))
+                return JsonConvert.DeserializeObject<ExternalIpResponse>(body)?.Ip;
+            return body;
         }
 
         // Adapted from: https://stackoverflow.com/a/40528818/7071436
@@ -113,12 +150,6 @@ namespace ValheimServerGUI.Tools
         #endregion
 
         #region Non-public methods
-
-        private void OnExternalIpResponse(object? sender, ExternalIpResponse response)
-        {
-            if (string.IsNullOrWhiteSpace(response?.Ip)) return;
-            ExternalIpAddress = response.Ip;
-        }
 
         private class ExternalIpResponse
         {

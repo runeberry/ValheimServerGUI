@@ -41,8 +41,8 @@ public class MainWindowRenderTests
         return vm;
     }
 
-    private static Button FindButton(Visual root, string content)
-        => root.GetVisualDescendants().OfType<Button>().First(b => (b.Content as string) == content);
+    private static Button FindNamedButton(Visual root, string name)
+        => root.GetVisualDescendants().OfType<Button>().First(b => b.Name == name);
 
     // Realizes + binds every tab's view (menus + all 5 tabs) by selecting each tab and forcing a
     // layout pass, which attaches and data-binds the selected tab's content. We deliberately do NOT
@@ -89,8 +89,11 @@ public class MainWindowRenderTests
         var window = new MainWindow(vm);
         window.Show();
 
-        var start = FindButton(window, "Start");
-        var stop = FindButton(window, "Stop");
+        // The Start/Stop buttons live on the (default-selected) Server Controls tab; realize it.
+        ForceLayout(window);
+
+        var start = FindNamedButton(window, "StartButton");
+        var stop = FindNamedButton(window, "StopButton");
 
         vm.ServerStatus = ServerStatus.Stopped;
         Assert.True(start.IsEffectivelyEnabled);

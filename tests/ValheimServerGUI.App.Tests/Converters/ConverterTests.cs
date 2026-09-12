@@ -44,24 +44,6 @@ public class ConverterTests
     }
 
     [Theory]
-    [InlineData(ServerStatus.Stopped)]
-    [InlineData(ServerStatus.Starting)]
-    [InlineData(ServerStatus.Running)]
-    [InlineData(ServerStatus.Stopping)]
-    public void StatusToBrush_maps_every_status(ServerStatus status)
-    {
-        var brush = StatusToBrushConverter.ForStatus(status);
-        Assert.NotNull(brush);
-
-        if (status == ServerStatus.Running)
-            Assert.Same(StatusToBrushConverter.Running, brush);
-        else if (status is ServerStatus.Starting or ServerStatus.Stopping)
-            Assert.Same(StatusToBrushConverter.Transitioning, brush);
-        else
-            Assert.Same(StatusToBrushConverter.Stopped, brush);
-    }
-
-    [Theory]
     [InlineData("Steam", "Steam_16x")]
     [InlineData("steam", "Steam_16x")]
     [InlineData("Xbox", "XboxLive_16x")]

@@ -4,12 +4,13 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels"
         xmlns:conv="using:ValheimServerGUI.App.Converters"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:tabs="using:ValheimServerGUI.App.Views.Tabs"
         mc:Ignorable="d"
         x:Class="ValheimServerGUI.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         x:Name="Root"
-        Width="900" Height="640"
+        Width="500" Height="390"
         MinWidth="500" MinHeight="371"
         Title="{Binding Title}">
 
@@ -17,13 +18,22 @@
         <!-- ===== Menu ===== -->
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
-                <MenuItem Header="New _Window" Command="{Binding NewWindowCommand}" />
-                <MenuItem Header="New _Profile" Command="{Binding NewProfileCommand}" />
-                <MenuItem Header="_Save Profile" Command="{Binding SaveProfileCommand}" />
-                <MenuItem Header="Save Profile _As…" Command="{Binding SaveProfileAsCommand}" />
+                <MenuItem Header="New _Window" Command="{Binding NewWindowCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon AddImmediateWindow_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="New _Profile" Command="{Binding NewProfileCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon NewFile_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Save Profile" Command="{Binding SaveProfileCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon Save_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save Profile _As…" Command="{Binding SaveProfileAsCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon Save_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="_Load Profile" ItemsSource="{Binding Profiles}"
                           IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
+                    <MenuItem.Icon><Image Source="{c:Icon OpenFile_16x}" Width="16" Height="16" /></MenuItem.Icon>
                     <MenuItem.Styles>
                         <Style Selector="MenuItem > MenuItem">
                             <Setter Property="Command"
@@ -34,6 +44,7 @@
                 </MenuItem>
                 <MenuItem Header="_Remove Profile" ItemsSource="{Binding Profiles}"
                           IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
+                    <MenuItem.Icon><Image Source="{c:Icon Cancel_16x}" Width="16" Height="16" /></MenuItem.Icon>
                     <MenuItem.Styles>
                         <Style Selector="MenuItem > MenuItem">
                             <Setter Property="Command"
@@ -43,19 +54,35 @@
                     </MenuItem.Styles>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="_Preferences…" Command="{Binding PreferencesCommand}" />
-                <MenuItem Header="Set _Directories…" Command="{Binding SetDirectoriesCommand}" />
-                <MenuItem Header="_Open Settings Directory…" Command="{Binding OpenSettingsDirectoryCommand}" />
+                <MenuItem Header="_Preferences…" Command="{Binding PreferencesCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon Settings_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Set _Directories…" Command="{Binding SetDirectoriesCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon FolderInformation_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Open Settings Directory…" Command="{Binding OpenSettingsDirectoryCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
                 <Separator />
                 <MenuItem Header="_Close" Command="{Binding CloseCommand}" />
             </MenuItem>
             <MenuItem Header="_Help">
-                <MenuItem Header="Online _Manual" Command="{Binding OnlineManualCommand}" />
-                <MenuItem Header="_Port Forwarding" Command="{Binding PortForwardingCommand}" />
-                <MenuItem Header="Submit a _Bug Report…" Command="{Binding BugReportCommand}" />
+                <MenuItem Header="Online _Manual" Command="{Binding OnlineManualCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon OpenWeb_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Port Forwarding" Command="{Binding PortForwardingCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon OpenWeb_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Submit a _Bug Report…" Command="{Binding BugReportCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon NewBug_16x}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
                 <Separator />
-                <MenuItem Header="Check for _Updates" Command="{Binding CheckForUpdatesCommand}" />
-                <MenuItem Header="Get support in _Discord" Command="{Binding DiscordCommand}" />
+                <MenuItem Header="Check for _Updates" Command="{Binding CheckForUpdatesCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon UnsyncedCommits_16x_Horiz}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Get support in _Discord" Command="{Binding DiscordCommand}">
+                    <MenuItem.Icon><Image Source="{c:Icon DiscordLogo}" Width="16" Height="16" /></MenuItem.Icon>
+                </MenuItem>
                 <MenuItem Header="_About…" Command="{Binding AboutCommand}" />
             </MenuItem>
         </Menu>
@@ -65,24 +92,24 @@
                 BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" Padding="8,4">
             <Grid ColumnDefinitions="*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
-                    <Ellipse Width="10" Height="10" VerticalAlignment="Center"
-                             Fill="{Binding ServerStatus, Converter={x:Static conv:StatusToBrushConverter.Instance}}" />
+                    <Image Width="16" Height="16" VerticalAlignment="Center"
+                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                           Source="{Binding ServerStatus, Converter={x:Static conv:ServerStatusToIconConverter.Instance}}" />
                     <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
                 </StackPanel>
-                <Button Grid.Column="1" Classes="link" Content="{Binding UpdateStatusText}"
-                        Command="{Binding UpdateLinkCommand}" />
+                <Button Grid.Column="1" Classes="link" Command="{Binding UpdateLinkCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                        <Image Width="16" Height="16" VerticalAlignment="Center"
+                               RenderOptions.BitmapInterpolationMode="HighQuality"
+                               Source="{Binding UpdateStatus, Converter={x:Static conv:UpdateStatusToIconConverter.Instance}}" />
+                        <TextBlock Text="{Binding UpdateStatusText}" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </Grid>
         </Border>
 
-        <!-- ===== Always-visible server controls ===== -->
-        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="8">
-            <Button Content="Start" Command="{Binding StartCommand}" MinWidth="80" />
-            <Button Content="Restart" Command="{Binding RestartCommand}" MinWidth="80" />
-            <Button Content="Stop" Command="{Binding StopCommand}" MinWidth="80" />
-        </StackPanel>
-
         <!-- ===== Tabs ===== -->
-        <TabControl Margin="8,0,8,8" x:Name="Tabs" SelectionChanged="OnTabChanged">
+        <TabControl Margin="8" x:Name="Tabs" SelectionChanged="OnTabChanged">
             <TabItem Header="Server Controls">
                 <tabs:ServerControlsView />
             </TabItem>

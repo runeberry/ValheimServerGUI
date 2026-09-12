@@ -8,55 +8,103 @@
 
     <ScrollViewer>
         <StackPanel Margin="8" Spacing="2">
-            <c:FormRow Header="Server Name" HelpText="The public name of your server (max 64 characters).">
-                <TextBox Text="{Binding Form.Name}" MaxLength="64" IsEnabled="{Binding AllowServerChanges}" />
-            </c:FormRow>
+            <!-- Name (wide) + Port (narrow) on one row. -->
+            <Grid ColumnDefinitions="*,12,Auto">
+                <c:FormRow Grid.Column="0" Header="Server Name"
+                           HelpText="The public name of your server (max 64 characters).">
+                    <TextBox Text="{Binding Form.Name}" MaxLength="64" IsEnabled="{Binding AllowServerChanges}" />
+                </c:FormRow>
+                <c:FormRow Grid.Column="2" Header="Port"
+                           HelpText="The UDP port to run on (1–65535). Valheim also uses the next port up.">
+                    <NumericUpDown Width="96" Value="{Binding Form.Port}" Minimum="1" Maximum="65535"
+                                   FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
+                </c:FormRow>
+            </Grid>
 
-            <c:FormRow Header="Port" HelpText="The UDP port to run on (1–65535). Valheim also uses the next port up.">
-                <NumericUpDown Value="{Binding Form.Port}" Minimum="1" Maximum="65535"
-                               FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
-            </c:FormRow>
-
-            <c:FormRow Header="Password" HelpText="At least 5 characters. Required for community servers.">
+            <c:FormRow Header="Server Password" HelpText="At least 5 characters. Required for community servers.">
                 <Grid ColumnDefinitions="*,Auto,Auto">
                     <TextBox Grid.Column="0" Text="{Binding Form.Password}"
                              PasswordChar="{Binding Form.ShowPassword, Converter={x:Static conv:PasswordCharConverter.Instance}}"
                              IsEnabled="{Binding AllowServerChanges}" />
-                    <CheckBox Grid.Column="1" Content="Show" Margin="8,0,0,0"
+                    <Button Grid.Column="1" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Copy password" Click="CopyPassword">
+                        <Image Source="{c:Icon Copy_16x}" Width="16" Height="16"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                    </Button>
+                    <CheckBox Grid.Column="2" Content="Show Password" Margin="8,0,0,0"
                               IsChecked="{Binding Form.ShowPassword}" IsEnabled="{Binding AllowServerChanges}" />
-                    <Button Grid.Column="2" Content="Copy" Margin="8,0,0,0" Click="CopyPassword" />
                 </Grid>
             </c:FormRow>
 
-            <TextBlock Text="World" FontWeight="SemiBold" Margin="0,8,0,2" />
-            <StackPanel Margin="12,0,0,0" Spacing="4">
-                <RadioButton GroupName="World" Content="Use an existing world"
-                             IsChecked="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
-                             IsEnabled="{Binding AllowServerChanges}" />
-                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="24,0,0,0">
-                    <ComboBox Grid.Column="0" HorizontalAlignment="Stretch"
-                              ItemsSource="{Binding Form.Worlds}" SelectedItem="{Binding Form.ExistingWorld}"
-                              IsEnabled="{Binding AllowServerChanges}" />
-                    <Button Grid.Column="1" Content="⚙" Margin="4,0,0,0" ToolTip.Tip="World settings"
-                            Command="{Binding WorldPreferencesCommand}" />
-                    <Button Grid.Column="2" Content="⟳" Margin="4,0,0,0" ToolTip.Tip="Refresh worlds"
-                            Command="{Binding RefreshWorldsCommand}" />
-                    <Button Grid.Column="3" Content="📂" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
-                            Command="{Binding OpenSaveFolderCommand}" />
-                </Grid>
+            <!-- World | Join Options -->
+            <Grid ColumnDefinitions="*,8,*" Margin="0,4,0,0">
+                <c:GroupBox Grid.Column="0" Header="World">
+                    <StackPanel Spacing="4">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+                            <RadioButton Grid.Column="0" GroupName="World" Content="Existing"
+                                         IsChecked="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
+                                         IsEnabled="{Binding AllowServerChanges}" />
+                            <RadioButton Grid.Column="1" GroupName="World" Content="New" Margin="10,0,0,0"
+                                         IsChecked="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
+                            <Button Grid.Column="3" Classes="icon" ToolTip.Tip="World settings"
+                                    Command="{Binding WorldPreferencesCommand}">
+                                <Image Source="{c:Icon Settings_16x}" Width="16" Height="16"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                            </Button>
+                            <Button Grid.Column="4" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Refresh worlds"
+                                    Command="{Binding RefreshWorldsCommand}">
+                                <Image Source="{c:Icon Restart_16x}" Width="16" Height="16"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                            </Button>
+                            <Button Grid.Column="5" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
+                                    Command="{Binding OpenSaveFolderCommand}">
+                                <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                            </Button>
+                        </Grid>
 
-                <RadioButton GroupName="World" Content="Create a new world"
-                             IsChecked="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
-                <TextBox Margin="24,0,0,0" PlaceholderText="New world name (5–20 characters)"
-                         Text="{Binding Form.NewWorldName}" MaxLength="20" IsEnabled="{Binding AllowServerChanges}" />
-            </StackPanel>
+                        <TextBlock Text="Select World" Margin="0,2,0,0" />
+                        <ComboBox HorizontalAlignment="Stretch"
+                                  ItemsSource="{Binding Form.Worlds}" SelectedItem="{Binding Form.ExistingWorld}"
+                                  IsEnabled="{Binding AllowServerChanges}" />
+                        <TextBox PlaceholderText="New world name (5–20 characters)"
+                                 Text="{Binding Form.NewWorldName}" MaxLength="20"
+                                 IsEnabled="{Binding AllowServerChanges}" />
+                    </StackPanel>
+                </c:GroupBox>
 
-            <TextBlock Text="Join Options" FontWeight="SemiBold" Margin="0,8,0,2" />
-            <StackPanel Margin="12,0,0,0" Spacing="4">
-                <CheckBox Content="Community Server (listed publicly)"
-                          IsChecked="{Binding Form.IsPublic}" IsEnabled="{Binding AllowServerChanges}" />
-                <CheckBox Content="Enable Crossplay"
-                          IsChecked="{Binding Form.Crossplay}" IsEnabled="{Binding AllowServerChanges}" />
+                <c:GroupBox Grid.Column="2" Header="Join Options">
+                    <StackPanel Spacing="6">
+                        <CheckBox Content="Community Server (Public)"
+                                  IsChecked="{Binding Form.IsPublic}" IsEnabled="{Binding AllowServerChanges}" />
+                        <CheckBox Content="Enable Crossplay"
+                                  IsChecked="{Binding Form.Crossplay}" IsEnabled="{Binding AllowServerChanges}" />
+                    </StackPanel>
+                </c:GroupBox>
+            </Grid>
+
+            <!-- Start / Restart / Stop -->
+            <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" HorizontalAlignment="Left">
+                <Button x:Name="StartButton" Command="{Binding StartCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Image Source="{c:Icon Run_16x}" Width="16" Height="16" VerticalAlignment="Center"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <TextBlock Text="Start Server" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="RestartButton" Command="{Binding RestartCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Image Source="{c:Icon Restart_16x}" Width="16" Height="16" VerticalAlignment="Center"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <TextBlock Text="Restart Server" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
+                <Button x:Name="StopButton" Command="{Binding StopCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Image Source="{c:Icon Stop_16x}" Width="16" Height="16" VerticalAlignment="Center"
+                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <TextBlock Text="Stop Server" VerticalAlignment="Center" />
+                    </StackPanel>
+                </Button>
             </StackPanel>
         </StackPanel>
     </ScrollViewer>

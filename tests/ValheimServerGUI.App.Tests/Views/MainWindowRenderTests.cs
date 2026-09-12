@@ -1,8 +1,8 @@
 using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
-using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Services;
@@ -44,16 +44,43 @@ public class MainWindowRenderTests
     private static Button FindButton(Visual root, string content)
         => root.GetVisualDescendants().OfType<Button>().First(b => (b.Content as string) == content);
 
+    // Realizes + binds every tab's view (menus + all 5 tabs) by selecting each tab and forcing a
+    // layout pass, which attaches and data-binds the selected tab's content. We deliberately do NOT
+    // call CaptureRenderedFrame(): that forces a real Skia compositor commit which, under CPU load,
+    // reads a thread-affine Brush off the wrong thread (Dispatcher.VerifyAccess throws) and dead-locks
+    // the synchronously-waiting headless UI thread. Layout gives the same "everything realizes + binds
+    // without throwing" coverage without the racy render. See the apptests-headless-deadlock note.
     [AvaloniaFact]
-    public void Window_renders_all_tabs_without_binding_errors()
+    public void Window_realizes_all_tabs_without_errors()
     {
         var window = new MainWindow(BuildViewModel());
         window.Show();
-
         Assert.True(window.IsVisible);
-        // Rendering the frame forces the whole visual tree (menus + 5 tabs) to realize + bind.
-        Assert.NotNull(window.CaptureRenderedFrame());
+
+        var tabs = window.GetVisualDescendants().OfType<TabControl>().Single();
+        Assert.Equal(5, tabs.ItemCount);
+
+        for (var i = 0; i < tabs.ItemCount; i++)
+        {
+            tabs.SelectedIndex = i;
+            ForceLayout(window);
+
+            var item = Assert.IsType<TabItem>(tabs.Items[i]);
+            var view = Assert.IsAssignableFrom<Control>(item.Content);
+            Assert.True(view.IsAttachedToVisualTree(), $"Tab {i} ('{item.Header}') content did not realize.");
+        }
     }
+
+    // Flush the selection-changed handler, then run a synchronous measure/arrange so the newly-selected
+    // tab's content template instantiates and binds. Layout does not touch the compositor.
+    private static void ForceLayout(Window window)
+    {
+        Dispatcher.UIThread.RunJobs();
+        window.Measure(RenderSize);
+        window.Arrange(new Rect(RenderSize));
+    }
+
+    private static readonly Size RenderSize = new(1280, 800);
 
     [AvaloniaFact]
     public void Start_stop_buttons_track_server_status()

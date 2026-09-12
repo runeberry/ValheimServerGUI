@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Views.Dialogs;
@@ -18,6 +20,13 @@ internal sealed class DialogUserPrompt : IUserPrompt
 {
     public bool Confirm(string message, string title)
     {
+        // A modal confirm needs an interactive desktop to answer it. Under a headless / non-desktop
+        // lifetime (unit tests) ShowConfirmSync pushes a nested dispatcher frame for a dialog nobody can
+        // close, which deadlocks — so decline instead of prompting. This matters because the global
+        // exception handler routes here: a background exception must never hang a headless run.
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime)
+            return false;
+
         if (Dispatcher.UIThread.CheckAccess())
             return ShowConfirmSync(message, title);
 

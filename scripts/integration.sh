@@ -37,6 +37,12 @@ ENV_EXAMPLE="$REPO_ROOT/scripts/integration.local.env.example"
 TEST_PROJECT="$REPO_ROOT/tests/ValheimServerGUI.Integration.Tests"
 ARTIFACT_DIR="$REPO_ROOT/dist/integration"
 
+# Hang guard (mirrors validate.sh). The live tests self-bound every await with a finite timeout, so
+# these mainly backstop a wedge in the test infra itself. Thresholds are generous: a cold first boot
+# (world-gen + Steam connect) plus a graceful stop can legitimately take a few minutes.
+TEST_HANG_TIMEOUT=360    # per-test seconds before --blame-hang aborts and dumps
+TEST_HARD_TIMEOUT=1200   # outer wall-clock backstop if the hang guard itself wedges
+
 section() { printf '\n=== %s ===\n' "$1"; }
 ok()   { printf '[ OK ] %s\n' "$1"; }
 fail() { printf '[FAIL] %s\n' "$1"; }
@@ -83,8 +89,10 @@ TEST_LOG="$RUNLOG/test.log"
 mkdir -p "$ARTIFACT_DIR"
 
 cleanup() {
-  # Never leave a live server behind, even if a test bailed mid-boot.
+  # Never leave a live server or orphaned testhost behind, even if a test bailed mid-boot or the run
+  # was force-killed by the hang guard. (Patterns are specific enough not to match this script.)
   pkill -f "valheim_server" 2>/dev/null || true
+  pkill -f "valheim-server-gui/artifacts/bin/ValheimServerGUI.Integration.Tests" 2>/dev/null || true
   if [[ $KEEP -eq 0 ]]; then
     rm -rf "$SAVEDIR" 2>/dev/null || true
   fi
@@ -107,15 +115,34 @@ echo "(booting a real server; first boot does world-gen + Steam connect — allo
 echo
 
 test_status="fail"
-if dotnet test "$TEST_PROJECT" >"$TEST_LOG" 2>&1; then
-  grep -E 'Passed!|Failed!|Skipped!' "$TEST_LOG"
+BLAME_DIR="$RUNLOG/blame"
+
+# --blame-hang bounds + diagnoses a wedged test (dump + sequence file); outer `timeout` is the backstop.
+timeout --kill-after=30 "$TEST_HARD_TIMEOUT" \
+  dotnet test "$TEST_PROJECT" \
+    --blame-hang --blame-hang-timeout "${TEST_HANG_TIMEOUT}s" --blame-hang-dump-type mini \
+    --results-directory "$BLAME_DIR" \
+    >"$TEST_LOG" 2>&1
+test_code=$?
+
+grep -E 'Passed!|Failed!|Skipped!' "$TEST_LOG"
+if [[ $test_code -eq 0 ]]; then
   ok "all live integration tests passed"
   test_status="pass"
+elif [[ $test_code -eq 124 || $test_code -eq 137 ]]; then
+  fail "live tests hit the ${TEST_HARD_TIMEOUT}s hard timeout — the hang guard did not abort in time"
+  echo "  (full output: $TEST_LOG)"
 else
-  grep -E 'Passed!|Failed!|Skipped!' "$TEST_LOG"
-  fail "one or more live integration tests failed"
-  # Surface the failing tests + assertion messages inline so the failure is readable without re-running.
-  grep -E '\[FAIL\]|Failed |Error Message|Assert\.|Skipped ' "$TEST_LOG" | head -40
+  hangseq="$(ls "$BLAME_DIR"/*[Ss]equence*.xml 2>/dev/null | head -1)"
+  if [[ -n "$hangseq" ]] || grep -qiE 'Sequence_|hang dump|blame' "$TEST_LOG"; then
+    fail "live tests ABORTED ON A HANG (>${TEST_HANG_TIMEOUT}s) — dump + sequence in $BLAME_DIR"
+    # The blame sequence flags the test that never finished with Completed="False".
+    [[ -n "$hangseq" ]] && echo "  stuck test: $(grep 'Completed="False"' "$hangseq" 2>/dev/null | grep -oiE 'name="[^"]*"' | head -1)"
+  else
+    fail "one or more live integration tests failed"
+    # Surface the failing tests + assertion messages inline so the failure is readable without re-running.
+    grep -E '\[FAIL\]|Failed |Error Message|Assert\.|Skipped ' "$TEST_LOG" | head -40
+  fi
   echo "  (full output: $TEST_LOG)"
 fi
 

@@ -27,6 +27,14 @@ SOLUTION="$REPO_ROOT/ValheimServerGUI.slnx"
 APP_PROJECT="$REPO_ROOT/src/ValheimServerGUI.App/ValheimServerGUI.App.csproj"
 BOOT_TIMEOUT=20   # seconds the app must survive under Xvfb to count as a healthy boot
 
+# Hang guard for the test phase. The headless-Avalonia suite has intermittently DEADLOCKED (a test
+# that never returns), which used to hang this script indefinitely. These bound and diagnose it
+# without masking it: --blame-hang aborts a test stuck longer than TEST_HANG_TIMEOUT and writes a dump
+# + a sequence file naming the culprit, and the outer `timeout` is a hard backstop. Normal tests run
+# in milliseconds and the whole suite in a few seconds, so these thresholds only ever trip on a hang.
+TEST_HANG_TIMEOUT=120   # per-test seconds before --blame-hang aborts and dumps
+TEST_HARD_TIMEOUT=300   # outer wall-clock backstop if the hang guard itself wedges
+
 RUN_BUILD=1; RUN_TEST=1; RUN_BOOT=1
 case "${1:-}" in
   --quick) RUN_BOOT=0 ;;
@@ -41,9 +49,11 @@ TEST_LOG="$LOGDIR/test.log"
 BOOT_LOG="$LOGDIR/boot.log"
 
 cleanup() {
-  # Never leave a stray app/Xvfb behind if the boot smoke is interrupted.
+  # Never leave a stray app/Xvfb/testhost behind if a phase is interrupted or a test deadlocks.
+  # (These patterns are specific enough not to match this script's own command line.)
   pkill -f "ValheimServerGUI.App" 2>/dev/null || true
   pkill -f "Xvfb" 2>/dev/null || true
+  pkill -f "valheim-server-gui/artifacts/bin/ValheimServerGUI.*Tests" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
@@ -81,15 +91,36 @@ if [[ $RUN_TEST -eq 1 && "$build_status" != "fail" ]]; then
   section "Test"
   test_build_flag="--no-build"
   [[ $RUN_BUILD -eq 0 ]] && test_build_flag=""   # allow test-only invocation to build if needed
-  if dotnet test "$SOLUTION" $test_build_flag >"$TEST_LOG" 2>&1; then
-    grep -E 'Passed!|Failed!' "$TEST_LOG"
+  BLAME_DIR="$LOGDIR/blame"
+
+  # --blame-hang turns a deadlock into a bounded, diagnosable failure (dump + sequence file naming the
+  # stuck test); the outer `timeout` (TERM, then KILL 20s later) is a hard backstop. See the note above.
+  timeout --kill-after=20 "$TEST_HARD_TIMEOUT" \
+    dotnet test "$SOLUTION" $test_build_flag \
+      --blame-hang --blame-hang-timeout "${TEST_HANG_TIMEOUT}s" --blame-hang-dump-type mini \
+      --results-directory "$BLAME_DIR" \
+      >"$TEST_LOG" 2>&1
+  test_code=$?
+
+  grep -E 'Passed!|Failed!' "$TEST_LOG"
+  if [[ $test_code -eq 0 ]]; then
     ok "all tests passed"
     test_status="pass"
+  elif [[ $test_code -eq 124 || $test_code -eq 137 ]]; then
+    fail "test phase hit the ${TEST_HARD_TIMEOUT}s hard timeout — the hang guard did not abort in time"
+    test_status="fail"
   else
-    grep -E 'Passed!|Failed!' "$TEST_LOG"
-    fail "one or more tests failed"
-    # Surface the failing test names + assertion messages inline.
-    grep -E '\[FAIL\]|Failed ' "$TEST_LOG" | head -40
+    # Tell a genuine deadlock (blame-hang fired) apart from ordinary assertion failures.
+    hangseq="$(ls "$BLAME_DIR"/*[Ss]equence*.xml 2>/dev/null | head -1)"
+    if [[ -n "$hangseq" ]] || grep -qiE 'Sequence_|hang dump|blame' "$TEST_LOG"; then
+      fail "test phase ABORTED ON A HANG (>${TEST_HANG_TIMEOUT}s) — likely the intermittent headless-Avalonia deadlock"
+      # The blame sequence flags the test that never finished with Completed="False".
+      [[ -n "$hangseq" ]] && echo "  stuck test: $(grep 'Completed="False"' "$hangseq" 2>/dev/null | grep -oiE 'name="[^"]*"' | head -1)"
+      echo "  hang artifacts (sequence + dump) for root-cause investigation: $BLAME_DIR"
+    else
+      fail "one or more tests failed"
+      grep -E '\[FAIL\]|Failed ' "$TEST_LOG" | head -40
+    fi
     test_status="fail"
   fi
 elif [[ $RUN_TEST -eq 1 ]]; then

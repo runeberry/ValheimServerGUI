@@ -31,6 +31,9 @@ namespace ValheimServerGUI.Game
         /// </summary>
         public string? LastActiveProfile { get; set; }
 
+        /// <summary>UI theme (§16.2 enhancement). Defaults to following the OS.</summary>
+        public AppTheme Theme { get; set; } = AppTheme.System;
+
         public List<ServerPreferences> Servers { get; set; } = new();
 
         public List<WorldPreferences> Worlds { get; set; } = new();
@@ -50,6 +53,7 @@ namespace ValheimServerGUI.Game
             prefs.WriteApplicationLogsToFile = file.WriteApplicationLogsToFile ?? prefs.WriteApplicationLogsToFile;
             prefs.EnablePasswordValidation = file.EnablePasswordValidation ?? prefs.EnablePasswordValidation;
             prefs.LastActiveProfile = file.LastActiveProfile ?? prefs.LastActiveProfile;
+            prefs.Theme = file.Theme ?? prefs.Theme;
 
             if (file.Servers != null)
             {
@@ -85,6 +89,7 @@ namespace ValheimServerGUI.Game
                 WriteApplicationLogsToFile = WriteApplicationLogsToFile,
                 EnablePasswordValidation = EnablePasswordValidation,
                 LastActiveProfile = LastActiveProfile,
+                Theme = Theme,
                 Servers = new(),
                 Worlds = new(),
             };

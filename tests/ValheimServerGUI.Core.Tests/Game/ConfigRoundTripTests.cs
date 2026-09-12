@@ -132,5 +132,19 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             Assert.Null(UserPreferences.FromFile(new UserPreferencesFile()).LastActiveProfile);
         }
+
+        // §16.2 theme enhancement: round-trips, defaults to System.
+        [Fact]
+        public void UserPreferences_Theme_RoundTrips()
+        {
+            var restored = UserPreferences.FromFile(new UserPreferences { Theme = AppTheme.Dark }.ToFile());
+            Assert.Equal(AppTheme.Dark, restored.Theme);
+        }
+
+        [Fact]
+        public void UserPreferences_Theme_DefaultsToSystem()
+        {
+            Assert.Equal(AppTheme.System, UserPreferences.FromFile(new UserPreferencesFile()).Theme);
+        }
     }
 }

@@ -47,6 +47,9 @@ namespace ValheimServerGUI.Game
         [JsonProperty("lastActiveProfile")]
         public string? LastActiveProfile { get; set; }
 
+        [JsonProperty("theme")]
+        public AppTheme? Theme { get; set; }
+
         [JsonProperty("servers")]
         public List<ServerPreferencesFile>? Servers { get; set; }
 

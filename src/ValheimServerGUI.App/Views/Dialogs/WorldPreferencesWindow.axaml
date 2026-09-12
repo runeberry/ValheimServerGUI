@@ -1,0 +1,45 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.WorldPreferencesWindow"
+        x:DataType="vm:WorldPreferencesViewModel"
+        Title="World Preferences"
+        SizeToContent="Height" Width="460" MinWidth="400"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="10">
+        <TextBlock Text="{Binding WorldName, StringFormat='World: {0}'}" FontWeight="SemiBold" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBlock Text="Preset:" VerticalAlignment="Center" MinWidth="90" />
+            <ComboBox ItemsSource="{Binding Presets}" SelectedItem="{Binding SelectedPreset}" MinWidth="180" />
+        </StackPanel>
+
+        <TextBlock Text="Modifiers" FontWeight="SemiBold" Margin="0,6,0,0" />
+        <ItemsControl ItemsSource="{Binding Modifiers}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ModifierRow">
+                    <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,2,0,2">
+                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" MinWidth="110" />
+                        <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" MinWidth="160" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <TextBlock Text="Keys" FontWeight="SemiBold" Margin="0,6,0,0" />
+        <ItemsControl ItemsSource="{Binding Keys}">
+            <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:WorldKeyToggle">
+                    <CheckBox Content="{Binding Key}" IsChecked="{Binding IsSet}" Margin="12,0,0,0" />
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Content="Restore Defaults" Click="OnRestoreDefaults" />
+            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

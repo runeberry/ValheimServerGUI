@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.DirectoriesWindow"
+        x:DataType="vm:DirectoriesViewModel"
+        Title="Set Directories"
+        SizeToContent="Height" Width="560" MinWidth="480"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="10">
+        <TextBlock Text="Default Server Executable" FontWeight="SemiBold" />
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBox Grid.Column="0" Text="{Binding ServerExePath}" />
+            <Button Grid.Column="1" Content="Browse…" Margin="8,0,0,0" Click="BrowseExe" />
+        </Grid>
+
+        <TextBlock Text="Default Save Data Folder" FontWeight="SemiBold" Margin="0,8,0,0" />
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBox Grid.Column="0" Text="{Binding SaveDataFolderPath}" />
+            <Button Grid.Column="1" Content="Browse…" Margin="8,0,0,0" Click="BrowseFolder" />
+        </Grid>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Content="Restore Defaults" Click="OnRestoreDefaults" />
+            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

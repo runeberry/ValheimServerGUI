@@ -4,6 +4,15 @@
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+
+    <!--
+      The real application version lives here, on the Core assembly, because AssemblyHelper reads the
+      EXECUTING assembly (Core) for the update-check comparison and the About dialog. The App version is
+      cosmetic. SourceRevisionId appends a "+build<date>" suffix to the informational version (parsed by
+      AssemblyHelper.GetApplicationBuildDate); GetApplicationVersion strips it before comparison.
+    -->
+    <Version>3.0.0</Version>
+    <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">build$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd"))</SourceRevisionId>
   </PropertyGroup>
 
   <ItemGroup>

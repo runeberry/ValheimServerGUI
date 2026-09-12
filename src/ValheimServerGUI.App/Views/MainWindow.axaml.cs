@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Startup;
 using ValheimServerGUI.App.ViewModels;
+using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
@@ -37,11 +38,94 @@ public partial class MainWindow : Window
         viewModel.StopTimedOutWarning += () =>
             _ = ShowMessageAsync("Server force-stopped",
                 "The server did not shut down in time and was force-stopped. Recent world changes may not have been saved.");
+        viewModel.MenuActionRequested += a => _ = HandleMenuActionAsync(a);
+        viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
+        viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
 
         Closing += OnClosing;
         Opened += OnOpened;
         SetUpTrayIcon();
     }
+
+    private static T Svc<T>() where T : notnull => App.Instance.Services.GetRequiredService<T>();
+
+    private async Task HandleMenuActionAsync(MenuAction action)
+    {
+        if (ViewModel is null) return;
+
+        switch (action)
+        {
+            case MenuAction.NewProfile:
+                await CreateProfileAsync("New Profile");
+                break;
+            case MenuAction.SaveProfile:
+                Svc<IServerPreferencesProvider>().SavePreferences(ViewModel.BuildPreferences());
+                break;
+            case MenuAction.SaveProfileAs:
+                await CreateProfileAsync("Save Profile As", fromForm: true);
+                break;
+            case MenuAction.Preferences:
+                await new PreferencesWindow(new PreferencesViewModel(
+                    Svc<IUserPreferencesProvider>(), Svc<IStartupManager>())).ShowDialog(this);
+                break;
+            case MenuAction.SetDirectories:
+                await new DirectoriesWindow(new DirectoriesViewModel(
+                    Svc<IUserPreferencesProvider>(), Svc<IValheimPathResolver>())).ShowDialog(this);
+                break;
+            case MenuAction.BugReport:
+                await new BugReportWindow(new BugReportViewModel(Svc<IRuneberryApiClient>())).ShowDialog(this);
+                break;
+            case MenuAction.About:
+                await new AboutWindow(new AboutViewModel(Svc<IShellLauncher>())).ShowDialog(this);
+                break;
+            case MenuAction.WorldPreferences:
+                await ShowWorldPreferencesAsync();
+                break;
+        }
+    }
+
+    private async Task CreateProfileAsync(string title, bool fromForm = false)
+    {
+        if (ViewModel is null) return;
+
+        var serverPrefs = Svc<IServerPreferencesProvider>();
+        var name = await new TextPromptWindow(title, "Profile name:", maxLength: 64,
+            validator: n => string.IsNullOrWhiteSpace(n) ? "Enter a profile name."
+                : serverPrefs.LoadPreferences(n) is not null ? "A profile with that name already exists."
+                : null).ShowDialog<string?>(this);
+
+        if (string.IsNullOrWhiteSpace(name)) return;
+
+        var prefs = fromForm
+            ? ViewModel.Form.ToPreferences(new ServerPreferences { ProfileName = name })
+            : new ServerPreferences { ProfileName = name };
+        serverPrefs.SavePreferences(prefs);
+        ViewModel.LoadProfile(prefs);
+    }
+
+    private async Task HandleRemoveProfileAsync(string profileName)
+    {
+        var confirm = await new ConfirmWindow("Remove Profile",
+            $"Remove the profile '{profileName}'? This cannot be undone.").ShowDialog<bool>(this);
+        if (confirm) Svc<IServerPreferencesProvider>().RemovePreferences(profileName);
+    }
+
+    private async Task ShowWorldPreferencesAsync()
+    {
+        var worldName = ViewModel?.Form.SelectedWorldName;
+        if (string.IsNullOrWhiteSpace(worldName))
+        {
+            await ShowMessageAsync("World Preferences", "Select or name a world first.");
+            return;
+        }
+
+        await new WorldPreferencesWindow(new WorldPreferencesViewModel(Svc<IWorldPreferencesProvider>(), worldName))
+            .ShowDialog(this);
+    }
+
+    private async Task ShowPlayerDetailsAsync(ValheimServerGUI.Game.PlayerInfo player)
+        => await new PlayerDetailsWindow(new PlayerDetailsViewModel(Svc<IPlayerDataRepository>(), player.Key))
+            .ShowDialog(this);
 
     private async void OnOpened(object? sender, EventArgs e)
     {

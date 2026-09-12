@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.BugReportWindow"
+        x:DataType="vm:BugReportViewModel"
+        Title="Submit a Bug Report"
+        SizeToContent="Height" Width="480" MinWidth="420"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="10">
+        <TextBlock TextWrapping="Wrap"
+                   Text="Describe the problem. A crash report with your app/OS details and recent logs is included." />
+        <TextBox Text="{Binding Description}" AcceptsReturn="True" TextWrapping="Wrap"
+                 Height="160" VerticalContentAlignment="Top" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Submit" MinWidth="80" IsDefault="True"
+                    IsEnabled="{Binding CanSubmit}" Click="OnSubmit" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

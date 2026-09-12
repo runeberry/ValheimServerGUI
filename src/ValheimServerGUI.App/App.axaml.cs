@@ -5,12 +5,14 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Startup;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
+using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App;
@@ -61,6 +63,8 @@ public partial class App : Application
     {
         try
         {
+            ApplyTheme(Services.GetRequiredService<IUserPreferencesProvider>().LoadPreferences().Theme);
+
             var splashViewModel = Services.GetRequiredService<SplashViewModel>();
             var splash = new SplashWindow(splashViewModel);
             splash.Show();
@@ -103,6 +107,14 @@ public partial class App : Application
             e.Handled = true;
         };
     }
+
+    /// <summary>Applies the user's theme preference (§16.2). Called at startup and when Preferences saves.</summary>
+    public void ApplyTheme(AppTheme theme) => RequestedThemeVariant = theme switch
+    {
+        AppTheme.Light => ThemeVariant.Light,
+        AppTheme.Dark => ThemeVariant.Dark,
+        _ => ThemeVariant.Default,
+    };
 
     private void HandleException(Exception ex, string context)
     {

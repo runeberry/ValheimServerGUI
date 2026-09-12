@@ -1,0 +1,15 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.AsyncOperationWindow"
+        x:DataType="vm:AsyncOperationViewModel"
+        SizeToContent="WidthAndHeight" MinWidth="340"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="24" Spacing="12" MinWidth="280">
+        <ProgressBar IsIndeterminate="True" IsVisible="{Binding IsRunning}" Height="6" />
+        <TextBlock Text="{Binding Message}" TextWrapping="Wrap" HorizontalAlignment="Center" />
+        <Button Content="Close" MinWidth="80" HorizontalAlignment="Center"
+                IsVisible="{Binding IsDone}" IsDefault="True" Click="OnClose" />
+    </StackPanel>
+</Window>

@@ -1,0 +1,29 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.PreferencesWindow"
+        x:DataType="vm:PreferencesViewModel"
+        Title="Preferences"
+        SizeToContent="Height" Width="440" MinWidth="380"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="8">
+        <CheckBox Content="Check for updates on startup" IsChecked="{Binding CheckForUpdates}" />
+        <CheckBox Content="Start with the operating system" IsChecked="{Binding StartWithWindows}" />
+        <CheckBox Content="Start minimized" IsChecked="{Binding StartMinimized}" />
+        <CheckBox Content="Save the profile automatically when starting a server" IsChecked="{Binding SaveProfileOnStart}" />
+        <CheckBox Content="Write application logs to file" IsChecked="{Binding WriteApplicationLogsToFile}" />
+        <CheckBox Content="Enable password validation" IsChecked="{Binding EnablePasswordValidation}" />
+
+        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
+            <TextBlock Text="Theme:" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding Themes}" SelectedItem="{Binding Theme}" MinWidth="140" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Content="Restore Defaults" Click="OnRestoreDefaults" HorizontalAlignment="Left" />
+            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

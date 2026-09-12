@@ -1,0 +1,199 @@
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Tests.Fakes;
+using ValheimServerGUI.App.ViewModels.Dialogs;
+using ValheimServerGUI.Game;
+using Xunit;
+
+namespace ValheimServerGUI.App.Tests.ViewModels.Dialogs;
+
+// §13.3: OK/Cancel/Restore-Defaults + unsaved-changes guard (dirty flag) + WorldPreferences preset↔custom.
+public class DialogViewModelTests
+{
+    private static readonly System.IServiceProvider Core =
+        new ServiceCollection().AddValheimCore().BuildServiceProvider();
+
+    // ----- Preferences -----
+    [Fact]
+    public void Preferences_loads_clean_and_marks_dirty_on_edit()
+    {
+        var vm = new PreferencesViewModel(new FakeUserPreferencesProvider(), new FakeStartupManager());
+        Assert.False(vm.IsDirty);
+        vm.CheckForUpdates = !vm.CheckForUpdates;
+        Assert.True(vm.IsDirty);
+    }
+
+    [Fact]
+    public void Preferences_save_persists_and_applies_startup()
+    {
+        var prefs = new FakeUserPreferencesProvider();
+        var startup = new FakeStartupManager();
+        var vm = new PreferencesViewModel(prefs, startup) { StartWithWindows = true, Theme = AppTheme.Dark };
+
+        vm.Save();
+
+        Assert.True(prefs.LoadPreferences().StartWithWindows);
+        Assert.Equal(AppTheme.Dark, prefs.LoadPreferences().Theme);
+        Assert.Equal(new[] { true }, startup.Applied);
+        Assert.Equal(AppTheme.Dark, vm.SavedTheme);
+    }
+
+    [Fact]
+    public void Preferences_restore_defaults_resets_values()
+    {
+        var vm = new PreferencesViewModel(new FakeUserPreferencesProvider(), new FakeStartupManager())
+        {
+            CheckForUpdates = false,
+            SaveProfileOnStart = false,
+        };
+
+        vm.ApplyDefaults();
+
+        Assert.True(vm.CheckForUpdates); // default true
+        Assert.True(vm.SaveProfileOnStart);
+    }
+
+    // ----- Directories -----
+    [Fact]
+    public void Directories_missing_path_is_detected()
+    {
+        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>())
+        {
+            ServerExePath = "/definitely/not/here",
+        };
+        Assert.True(vm.HasMissingPath);
+    }
+
+    [Fact]
+    public void Directories_existing_paths_are_ok()
+    {
+        var dir = Directory.CreateTempSubdirectory().FullName;
+        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>())
+        {
+            ServerExePath = string.Empty,
+            SaveDataFolderPath = dir,
+        };
+        Assert.False(vm.HasMissingPath);
+        Directory.Delete(dir);
+    }
+
+    // ----- WorldPreferences (preset ↔ custom, keys always persist) -----
+    [Fact]
+    public void World_editing_a_modifier_reverts_preset_to_custom()
+    {
+        var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "W") { SelectedPreset = WorldGenPresets.Hard };
+        Assert.True(vm.IsPresetSelected);
+
+        vm.Modifiers[0].Selected = vm.Modifiers[0].Options[1]; // any non-Normal value
+
+        Assert.Equal(WorldPreferencesViewModel.CustomPreset, vm.SelectedPreset);
+        Assert.False(vm.IsPresetSelected);
+    }
+
+    [Fact]
+    public void World_preset_persists_as_preset_only_but_keys_still_persist()
+    {
+        var provider = new FakeWorldPreferencesProvider();
+        var vm = new WorldPreferencesViewModel(provider, "W") { SelectedPreset = WorldGenPresets.Hard };
+        vm.Keys[0].IsSet = true; // a key
+        Assert.Equal(WorldGenPresets.Hard, vm.SelectedPreset); // toggling a key does NOT revert the preset
+
+        vm.Save();
+
+        var saved = provider.LoadPreferences("W")!;
+        Assert.Equal(WorldGenPresets.Hard, saved.Preset);
+        Assert.Empty(saved.Modifiers);                 // modifiers not persisted under a preset
+        Assert.Contains(WorldGenKeys.All[0], saved.Keys); // keys always persist (§15 #5)
+    }
+
+    [Fact]
+    public void World_custom_persists_modifiers()
+    {
+        var provider = new FakeWorldPreferencesProvider();
+        var vm = new WorldPreferencesViewModel(provider, "W");
+        var combat = vm.Modifiers[0];
+        combat.Selected = combat.Options[1];
+
+        vm.Save();
+
+        var saved = provider.LoadPreferences("W")!;
+        Assert.Null(saved.Preset);
+        Assert.Equal(combat.Options[1], saved.Modifiers[combat.Key]);
+    }
+
+    [Fact]
+    public void World_loads_existing_preferences()
+    {
+        var provider = new FakeWorldPreferencesProvider();
+        provider.SavePreferences(new WorldPreferences
+        {
+            WorldName = "W",
+            Preset = WorldGenPresets.Casual,
+            Keys = new() { WorldGenKeys.NoMap },
+        });
+
+        var vm = new WorldPreferencesViewModel(provider, "W");
+
+        Assert.Equal(WorldGenPresets.Casual, vm.SelectedPreset);
+        Assert.False(vm.IsDirty); // loaded clean
+        Assert.Contains(vm.Keys, k => k.Key == WorldGenKeys.NoMap && k.IsSet);
+    }
+
+    // ----- PlayerDetails -----
+    [Fact]
+    public void PlayerDetails_add_character_sets_dirty_and_saves_confident()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", PlayerName = "Odin" });
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1");
+        Assert.False(vm.IsDirty);
+
+        vm.AddCharacter("Ragnar");
+        Assert.True(vm.IsDirty);
+
+        vm.Save();
+        var player = repo.FindById("Steam:1")!;
+        Assert.Contains(player.Characters!, c => c.CharacterName == "Ragnar" && c.MatchConfident);
+    }
+
+    [Fact]
+    public void PlayerDetails_display_name_override_saves()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1" });
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1") { DisplayName = "Custom" };
+
+        vm.Save();
+        Assert.Equal("Custom", repo.FindById("Steam:1")!.PlayerName);
+    }
+
+    // ----- BugReport -----
+    [Fact]
+    public async Task BugReport_submits_with_bugreport_source()
+    {
+        var client = new FakeRuneberryApiClient();
+        var vm = new BugReportViewModel(client) { Description = "It broke" };
+        Assert.True(vm.CanSubmit);
+
+        await vm.SubmitAsync();
+
+        var report = Assert.Single(client.Reports);
+        Assert.Equal("BugReport", report.Source);
+        Assert.Equal("It broke", report.AdditionalInfo!["Description"]);
+    }
+
+    [Fact]
+    public void BugReport_cannot_submit_when_empty()
+        => Assert.False(new BugReportViewModel(new FakeRuneberryApiClient()).CanSubmit);
+
+    // ----- About -----
+    [Fact]
+    public void About_exposes_version_and_link_commands()
+    {
+        var shell = new ValheimServerGUI.App.Services.ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
+        var vm = new AboutViewModel(shell);
+        Assert.False(string.IsNullOrEmpty(vm.Version));
+        Assert.True(vm.OpenGitHubCommand.CanExecute(null));
+    }
+}

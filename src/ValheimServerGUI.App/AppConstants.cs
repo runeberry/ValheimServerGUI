@@ -21,4 +21,5 @@ internal static class AppConstants
     public const string UrlDiscord = "https://discord.gg/HBsNJTY";
     public const string UrlReleases = "https://github.com/runeberry/ValheimServerGUI/releases";
     public const string UrlDonate = "https://www.buymeacoffee.com/runeberry";
+    public const string UrlGitHub = "https://github.com/runeberry/ValheimServerGUI";
 }

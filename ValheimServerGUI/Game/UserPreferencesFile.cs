@@ -44,6 +44,30 @@ namespace ValheimServerGUI.Game
         [JsonProperty("enablePasswordValidation")]
         public bool? EnablePasswordValidation { get; set; }
 
+        [JsonProperty("discordStatusNotifications")]
+        public bool? DiscordStatusNotifications { get; set; }
+
+        [JsonProperty("discordWebhookUrl")]
+        public string DiscordWebhookUrl { get; set; }
+
+        [JsonProperty("discordNotifyServerOnline")]
+        public bool? DiscordNotifyServerOnline { get; set; }
+
+        [JsonProperty("discordNotifyServerOffline")]
+        public bool? DiscordNotifyServerOffline { get; set; }
+
+        [JsonProperty("discordNotifyPlayerJoined")]
+        public bool? DiscordNotifyPlayerJoined { get; set; }
+
+        [JsonProperty("discordNotifyPlayerLeft")]
+        public bool? DiscordNotifyPlayerLeft { get; set; }
+
+        [JsonProperty("discordNotifyPlayerDied")]
+        public bool? DiscordNotifyPlayerDied { get; set; }
+
+        [JsonProperty("discordNotifyJoinCode")]
+        public bool? DiscordNotifyJoinCode { get; set; }
+
         [JsonProperty("servers")]
         public List<ServerPreferencesFile> Servers { get; set; }
 

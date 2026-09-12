@@ -24,11 +24,11 @@ namespace ValheimServerGUI.Tools
 
         #region IRuneberryApiClient implementation
 
-        public event EventHandler<PlayerInfoResponse> PlayerInfoAvailable;
+        public event EventHandler<PlayerInfoResponse>? PlayerInfoAvailable;
 
         public async Task RequestPlayerInfoAsync(string platform, string playerId)
         {
-            var response = await Get($"{Resources.UrlRuneberryApi}/player-info?platform={platform}&playerId={playerId}")
+            var response = await Get($"{CoreConstants.UrlRuneberryApi}/player-info?platform={platform}&playerId={playerId}")
                 .WithHeader(ClientSecrets.RuneberryApiKeyHeader, ClientSecrets.RuneberryClientApiKey)
                 .SendAsync<PlayerInfoResponse>();
 
@@ -43,7 +43,7 @@ namespace ValheimServerGUI.Tools
 
         public async Task SendCrashReportAsync(CrashReport report)
         {
-            var response = await Post($"{Resources.UrlRuneberryApi}/crash-report", report)
+            var response = await Post($"{CoreConstants.UrlRuneberryApi}/crash-report", report)
                 .WithHeader(ClientSecrets.RuneberryApiKeyHeader, ClientSecrets.RuneberryClientApiKey)
                 .SendAsync();
 
@@ -57,7 +57,7 @@ namespace ValheimServerGUI.Tools
                     {
                         var rawResponse = await response.Content.ReadAsStringAsync();
                         var exceptionResponse = JsonConvert.DeserializeObject<ErrorResponse>(rawResponse);
-                        message = $"({(int)response.StatusCode}) {exceptionResponse.Message}";
+                        message = $"({(int)response.StatusCode}) {exceptionResponse?.Message}";
                     }
                     else
                     {

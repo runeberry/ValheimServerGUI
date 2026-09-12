@@ -17,7 +17,7 @@ namespace ValheimServerGUI.Tools.Data
 
         IEnumerable<TEntity> Data { get; }
 
-        TEntity FindById(string id);
+        TEntity? FindById(string id);
 
         void Upsert(TEntity entity);
 

@@ -14,7 +14,7 @@ namespace ValheimServerGUI.Tools.Http
             Context = context;
         }
 
-        public RestClientRequest Request(HttpMethod method, string uri, object payload = null)
+        public RestClientRequest Request(HttpMethod method, string uri, object? payload = null)
         {
             return BuildRequest(method, uri, payload);
         }
@@ -24,12 +24,12 @@ namespace ValheimServerGUI.Tools.Http
             return BuildRequest(HttpMethod.Get, uri);
         }
 
-        public RestClientRequest Post(string uri, object payload = null)
+        public RestClientRequest Post(string uri, object? payload = null)
         {
             return BuildRequest(HttpMethod.Post, uri, payload);
         }
 
-        private RestClientRequest BuildRequest(HttpMethod method, string uri, object payload = null)
+        private RestClientRequest BuildRequest(HttpMethod method, string uri, object? payload = null)
         {
             return new RestClientRequest(this)
             {

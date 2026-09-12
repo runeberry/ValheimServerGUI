@@ -6,13 +6,13 @@ namespace ValheimServerGUI.Game
 {
     public class ValheimServerOptions : IValheimServerOptions
     {
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
         public bool PasswordValidation { get; set; }
 
-        public string WorldName { get; set; }
+        public string? WorldName { get; set; }
 
         public bool Public { get; set; }
 
@@ -28,11 +28,11 @@ namespace ValheimServerGUI.Game
 
         public int BackupLong { get; set; }
 
-        public string AdditionalArgs { get; set; }
+        public string? AdditionalArgs { get; set; }
 
-        public string ServerExePath { get; set; }
+        public string? ServerExePath { get; set; }
 
-        public string SaveDataFolderPath { get; set; }
+        public string? SaveDataFolderPath { get; set; }
 
         public bool LogToFile { get; set; }
 
@@ -40,13 +40,13 @@ namespace ValheimServerGUI.Game
         // cannot be functionally disabled. Can add this if someone wants it.
         public bool LogFilteringDisabled { get; set; }
 
-        public Action<string> LogMessageHandler { get; set; }
+        public Action<string>? LogMessageHandler { get; set; }
 
-        public string WorldPreset { get; set; }
+        public string? WorldPreset { get; set; }
 
-        public Dictionary<string, string> WorldModifiers { get; set; }
+        public Dictionary<string, string>? WorldModifiers { get; set; }
 
-        public HashSet<string> WorldKeys { get; set; }
+        public HashSet<string>? WorldKeys { get; set; }
 
         public void Validate()
         {
@@ -108,7 +108,7 @@ namespace ValheimServerGUI.Game
 
             // Additional args
             // Using the native -logFile command will prevent logs from being piped to VSG, so don't allow it.
-            if (AdditionalArgs.ToLower().Contains("-logfile")) throw new ArgumentException($"ValheimServerGUI does not support the '-logFile' server argument. Instead, enable writing server logs to file under Advanced Controls.");
+            if ((AdditionalArgs ?? string.Empty).ToLower().Contains("-logfile")) throw new ArgumentException($"ValheimServerGUI does not support the '-logFile' server argument. Instead, enable writing server logs to file under Advanced Controls.");
 
             // Filepaths
             this.GetValidatedServerExe();
@@ -118,11 +118,11 @@ namespace ValheimServerGUI.Game
 
     public interface IValheimServerOptions
     {
-        string Name { get; }
+        string? Name { get; }
 
-        string Password { get; }
+        string? Password { get; }
 
-        string WorldName { get; }
+        string? WorldName { get; }
 
         bool Public { get; }
 
@@ -138,22 +138,22 @@ namespace ValheimServerGUI.Game
 
         int BackupLong { get; }
 
-        string AdditionalArgs { get; }
+        string? AdditionalArgs { get; }
 
-        string ServerExePath { get; }
+        string? ServerExePath { get; }
 
-        string SaveDataFolderPath { get; }
+        string? SaveDataFolderPath { get; }
 
         bool LogToFile { get; }
 
         bool LogFilteringDisabled { get; }
 
-        Action<string> LogMessageHandler { get; }
+        Action<string>? LogMessageHandler { get; }
 
-        public string WorldPreset { get; }
+        public string? WorldPreset { get; }
 
-        public Dictionary<string, string> WorldModifiers { get; }
+        public Dictionary<string, string>? WorldModifiers { get; }
 
-        public HashSet<string> WorldKeys { get; }
+        public HashSet<string>? WorldKeys { get; }
     }
 }

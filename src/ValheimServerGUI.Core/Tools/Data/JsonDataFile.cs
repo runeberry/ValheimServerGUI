@@ -15,6 +15,6 @@ namespace ValheimServerGUI.Tools.Data
         }
 
         [JsonProperty("data")]
-        public Dictionary<string, TEntity> Data { get; set; }
+        public Dictionary<string, TEntity> Data { get; set; } = new();
     }
 }

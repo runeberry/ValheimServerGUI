@@ -13,9 +13,9 @@ namespace ValheimServerGUI.Tools.Logging
     public class ApplicationLogger : BaseLogger, IApplicationLogger
     {
         private readonly IServiceProvider ServiceProvider;
-        private IUserPreferencesProvider UserPrefsProvider;
+        private IUserPreferencesProvider? UserPrefsProvider;
 
-        public ApplicationLogger(IServiceProvider services)
+        public ApplicationLogger(IServiceProvider services, IValheimPathResolver pathResolver) : base(pathResolver)
         {
             // Dependencies are injected late to avoid creating a circular dependency
             ServiceProvider = services;
@@ -24,7 +24,7 @@ namespace ValheimServerGUI.Tools.Logging
             AddRule(TimestampTransformer.Default);
         }
 
-        private void OnUserPreferencesSaved(object sender, UserPreferences prefs)
+        private void OnUserPreferencesSaved(object? sender, UserPreferences prefs)
         {
             RebuildLogger();
         }

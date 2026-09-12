@@ -1,45 +1,44 @@
 ﻿using System;
-using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Game
 {
     public class ServerPreferences
     {
-        public string ProfileName { get; set; } = Resources.DefaultServerProfileName;
+        public string ProfileName { get; set; } = CoreConstants.DefaultServerProfileName;
 
         public DateTime LastSaved { get; set; } = DateTime.UnixEpoch;
 
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
-        public string Password { get; set; }
+        public string? Password { get; set; }
 
-        public string WorldName { get; set; }
+        public string? WorldName { get; set; }
 
         public bool Public { get; set; }
 
-        public int Port { get; set; } = int.Parse(Resources.DefaultServerPort);
+        public int Port { get; set; } = CoreConstants.DefaultServerPort;
 
         public bool Crossplay { get; set; }
 
-        public int SaveInterval { get; set; } = int.Parse(Resources.DefaultSaveInterval);
+        public int SaveInterval { get; set; } = CoreConstants.DefaultSaveInterval;
 
-        public int BackupCount { get; set; } = int.Parse(Resources.DefaultBackupCount);
+        public int BackupCount { get; set; } = CoreConstants.DefaultBackupCount;
 
-        public int BackupIntervalShort { get; set; } = int.Parse(Resources.DefaultBackupIntervalShort);
+        public int BackupIntervalShort { get; set; } = CoreConstants.DefaultBackupIntervalShort;
 
-        public int BackupIntervalLong { get; set; } = int.Parse(Resources.DefaultBackupIntervalLong);
+        public int BackupIntervalLong { get; set; } = CoreConstants.DefaultBackupIntervalLong;
 
         public bool AutoStart { get; set; }
 
-        public string AdditionalArgs { get; set; }
+        public string? AdditionalArgs { get; set; }
 
-        public string ServerExePath { get; set; }
+        public string? ServerExePath { get; set; }
 
-        public string SaveDataFolderPath { get; set; }
+        public string? SaveDataFolderPath { get; set; }
 
         public bool WriteServerLogsToFile { get; set; } = true;
 
-        public static ServerPreferences FromFile(ServerPreferencesFile file)
+        public static ServerPreferences FromFile(ServerPreferencesFile? file)
         {
             var prefs = new ServerPreferences();
 

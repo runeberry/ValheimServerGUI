@@ -12,7 +12,7 @@ namespace ValheimServerGUI.Tools.Logging
     {
         private readonly IValheimServerOptions Options;
 
-        public ValheimServerLogger(IValheimServerOptions options)
+        public ValheimServerLogger(IValheimServerOptions options, IValheimPathResolver pathResolver) : base(pathResolver)
         {
             Options = options;
 

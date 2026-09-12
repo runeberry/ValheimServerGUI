@@ -45,7 +45,7 @@ namespace ValheimServerGUI.Tools.Data
             return DataFileProvider.SaveAsync(FilePath, new JsonDataFile<TEntity>(Entities));
         }
 
-        protected virtual void OnDataLoaded(object sender, object dataFile)
+        protected virtual void OnDataLoaded(object? sender, object dataFile)
         {
             if (dataFile is JsonDataFile<TEntity> typed)
             {
@@ -56,19 +56,19 @@ namespace ValheimServerGUI.Tools.Data
 
         #region IDataRepository<T> implementation
 
-        public event EventHandler DataReady;
+        public event EventHandler? DataReady;
 
-        public event EventHandler DataUpdated;
+        public event EventHandler? DataUpdated;
 
-        public event EventHandler DataCleared;
+        public event EventHandler? DataCleared;
 
-        public event EventHandler<TEntity> EntityUpdated;
+        public event EventHandler<TEntity>? EntityUpdated;
 
-        public event EventHandler<TEntity> EntityRemoved;
+        public event EventHandler<TEntity>? EntityRemoved;
 
         public IEnumerable<TEntity> Data => Entities.Values;
 
-        public virtual TEntity FindById(string id)
+        public virtual TEntity? FindById(string id)
         {
             if (Entities.TryGetValue(id, out var entity))
             {

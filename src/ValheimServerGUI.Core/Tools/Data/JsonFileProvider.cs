@@ -19,7 +19,7 @@ namespace ValheimServerGUI.Tools.Data
             Logger = logger;
         }
 
-        protected virtual void OnDataLoaded<TFile>(TFile data) where TFile : class
+        protected virtual void OnDataLoaded<TFile>(TFile? data) where TFile : class
         {
             if (data == null) return;
             DataLoaded?.Invoke(this, data);
@@ -33,14 +33,14 @@ namespace ValheimServerGUI.Tools.Data
 
         #region ILocalDataProvider implementation
 
-        public event EventHandler<object> DataLoaded;
+        public event EventHandler<object>? DataLoaded;
 
-        public event EventHandler<object> DataSaved;
+        public event EventHandler<object>? DataSaved;
 
-        public virtual Task<TFile> LoadAsync<TFile>(string filePath) where TFile : class
+        public virtual Task<TFile?> LoadAsync<TFile>(string filePath) where TFile : class
         {
             filePath = Environment.ExpandEnvironmentVariables(filePath);
-            TFile dataFile = default;
+            TFile? dataFile = default;
 
             RWLock.EnterReadLock();
 
@@ -56,7 +56,12 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
+                // §15 #8: a corrupt file must not be silently overwritten with defaults. Back it up
+                // aside so the data is recoverable, then fall through to defaults (the caller treats a
+                // null/absent file as "use defaults"). The subsequent save then writes a fresh file
+                // without destroying the corrupt original.
                 Logger.Error(e, "Error loading JSON data from file: {filePath}", filePath);
+                BackupCorruptFile(filePath);
             }
             finally
             {
@@ -76,16 +81,31 @@ namespace ValheimServerGUI.Tools.Data
 
             try
             {
-                if (!Directory.Exists(filePath))
+                var directory = Path.GetDirectoryName(filePath);
+                if (!string.IsNullOrEmpty(directory))
                 {
-                    var directory = Path.GetDirectoryName(filePath);
                     Directory.CreateDirectory(directory);
                 }
 
-                using var streamWriter = File.CreateText(filePath);
-                using var jsonWriter = new JsonTextWriter(streamWriter);
+                // §15 #8: write to a temp file then atomically replace the target, so a crash mid-write
+                // never leaves a half-written (corrupt) config behind.
+                var tempPath = filePath + ".tmp";
+                try
+                {
+                    using (var streamWriter = File.CreateText(tempPath))
+                    using (var jsonWriter = new JsonTextWriter(streamWriter))
+                    {
+                        Serializer.Serialize(jsonWriter, data);
+                    }
 
-                Serializer.Serialize(jsonWriter, data);
+                    File.Move(tempPath, filePath, overwrite: true);
+                }
+                catch
+                {
+                    // Never leave a stray temp file behind on failure.
+                    try { if (File.Exists(tempPath)) File.Delete(tempPath); } catch { /* best effort */ }
+                    throw;
+                }
             }
             catch (Exception e)
             {
@@ -102,5 +122,21 @@ namespace ValheimServerGUI.Tools.Data
         }
 
         #endregion
+
+        private void BackupCorruptFile(string filePath)
+        {
+            try
+            {
+                if (!File.Exists(filePath)) return;
+
+                var backupPath = $"{filePath}.corrupt-{DateTime.UtcNow:yyyyMMdd-HHmmss}";
+                File.Move(filePath, backupPath, overwrite: true);
+                Logger.Warning("Backed up corrupt file {filePath} to {backupPath}", filePath, backupPath);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to back up corrupt file: {filePath}", filePath);
+            }
+        }
     }
 }

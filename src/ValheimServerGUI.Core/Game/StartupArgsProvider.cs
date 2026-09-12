@@ -2,7 +2,7 @@
 {
     public interface IStartupArgsProvider
     {
-        public string ServerProfileName { get; }
+        public string? ServerProfileName { get; }
     }
 
     public class StartupArgsProvider : IStartupArgsProvider
@@ -15,7 +15,7 @@
 
         #region IStartupArgsProvider implementation
 
-        public string ServerProfileName { get; private set; }
+        public string? ServerProfileName { get; private set; }
 
         #endregion
     }

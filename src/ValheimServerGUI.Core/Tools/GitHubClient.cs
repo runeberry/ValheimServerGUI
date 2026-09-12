@@ -3,14 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Http;
 
 namespace ValheimServerGUI.Tools
 {
     public interface IGitHubClient
     {
-        Task<GitHubRelease> GetLatestReleaseAsync();
+        Task<GitHubRelease?> GetLatestReleaseAsync();
     }
 
     public class GitHubClient : RestClient, IGitHubClient
@@ -19,9 +18,9 @@ namespace ValheimServerGUI.Tools
         {
         }
 
-        public async Task<GitHubRelease> GetLatestReleaseAsync()
+        public async Task<GitHubRelease?> GetLatestReleaseAsync()
         {
-            var releases = await Get($"{Resources.UrlGithubApi}/releases")
+            var releases = await Get($"{CoreConstants.UrlGithubApi}/releases")
                 .WithHeader("User-Agent", "ValheimServerGUI")
                 .SendAsync<GitHubRelease[]>();
 
@@ -41,7 +40,7 @@ namespace ValheimServerGUI.Tools
         /// (non-pre-release) release is deliberately eligible, so that update checks surface it.
         /// Returns null if no release qualifies.
         /// </summary>
-        public static GitHubRelease SelectLatestRelease(IEnumerable<GitHubRelease> releases)
+        public static GitHubRelease? SelectLatestRelease(IEnumerable<GitHubRelease> releases)
         {
             return releases
                 .Where(r => r.Assets != null && r.Assets.Any())
@@ -54,19 +53,19 @@ namespace ValheimServerGUI.Tools
     public class GitHubRelease
     {
         [JsonProperty("assets")]
-        public object[] Assets { get; set; }
+        public object[]? Assets { get; set; }
 
         [JsonProperty("body")]
-        public string Body { get; set; }
+        public string? Body { get; set; }
 
         [JsonProperty("draft")]
         public bool Draft { get; set; }
 
         [JsonProperty("html_url")]
-        public string HtmlUrl { get; set; }
+        public string? HtmlUrl { get; set; }
 
         [JsonProperty("name")]
-        public string Name { get; set; }
+        public string? Name { get; set; }
 
         [JsonProperty("prerelease")]
         public bool Prerelease { get; set; }
@@ -75,6 +74,6 @@ namespace ValheimServerGUI.Tools
         public DateTime PublishedAt { get; set; }
 
         [JsonProperty("tag_name")]
-        public string TagName { get; set; }
+        public string? TagName { get; set; }
     }
 }

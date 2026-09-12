@@ -41,6 +41,7 @@ namespace ValheimServerGUI.Tools.Http
         }
 
         public static RestClientRequest WithCallback<TResponse>(this RestClientRequest request, EventHandler<TResponse> callback)
+            where TResponse : class
         {
             request.WithResponseType<TResponse>();
             request.WithCallback((_, message) =>
@@ -49,6 +50,10 @@ namespace ValheimServerGUI.Tools.Http
 
                 var responseContent = message.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 var typed = JsonConvert.DeserializeObject<TResponse>(responseContent);
+
+                // A null/unparseable response is treated as "nothing to report" -- handlers already
+                // degrade on a null payload, so skipping the callback is behaviorally equivalent.
+                if (typed == null) return;
 
                 callback.Invoke(request, typed);
             });

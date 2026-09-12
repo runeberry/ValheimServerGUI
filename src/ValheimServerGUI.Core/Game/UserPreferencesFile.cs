@@ -15,10 +15,10 @@ namespace ValheimServerGUI.Game
         //public string ValheimGamePath { get; set; }
 
         [JsonProperty("valheimServerPath")]
-        public string ServerExePath { get; set; }
+        public string?ServerExePath { get; set; }
 
         [JsonProperty("valheimSaveDataFolder")]
-        public string SaveDataFolderPath { get; set; }
+        public string?SaveDataFolderPath { get; set; }
 
         [JsonProperty("startWithWindows")]
         public bool? StartWithWindows { get; set; }
@@ -45,9 +45,9 @@ namespace ValheimServerGUI.Game
         public bool? EnablePasswordValidation { get; set; }
 
         [JsonProperty("servers")]
-        public List<ServerPreferencesFile> Servers { get; set; }
+        public List<ServerPreferencesFile>? Servers { get; set; }
 
         [JsonProperty("worlds")]
-        public List<WorldPreferencesFile> Worlds { get; set; }
+        public List<WorldPreferencesFile>? Worlds { get; set; }
     }
 }

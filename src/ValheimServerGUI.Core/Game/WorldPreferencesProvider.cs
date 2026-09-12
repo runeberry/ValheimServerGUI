@@ -9,7 +9,7 @@ namespace ValheimServerGUI.Game
     {
         event EventHandler<List<WorldPreferences>> PreferencesSaved;
 
-        WorldPreferences LoadPreferences(string worldName);
+        WorldPreferences? LoadPreferences(string worldName);
 
         IEnumerable<WorldPreferences> LoadPreferences();
 
@@ -33,9 +33,9 @@ namespace ValheimServerGUI.Game
 
         #region IWorldPreferencesProvider implementation
 
-        public event EventHandler<List<WorldPreferences>> PreferencesSaved;
+        public event EventHandler<List<WorldPreferences>>? PreferencesSaved;
 
-        public WorldPreferences LoadPreferences(string worldName)
+        public WorldPreferences? LoadPreferences(string worldName)
         {
             if (string.IsNullOrWhiteSpace(worldName)) throw new ArgumentException($"{nameof(worldName)} must not be null or whitespace");
 
@@ -95,7 +95,7 @@ namespace ValheimServerGUI.Game
 
         #region Non-public methods
 
-        private void OnPreferencesSaved(object sender, UserPreferences preferences)
+        private void OnPreferencesSaved(object? sender, UserPreferences preferences)
         {
             PreferencesSaved?.Invoke(this, preferences.Worlds);
         }

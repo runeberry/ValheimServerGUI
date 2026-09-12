@@ -5,20 +5,19 @@ using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Threading.Tasks;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Http;
 
 namespace ValheimServerGUI.Tools
 {
     public interface IIpAddressProvider
     {
-        public string ExternalIpAddress { get; }
+        public string? ExternalIpAddress { get; }
 
-        public string InternalIpAddress { get; }
+        public string? InternalIpAddress { get; }
 
-        event EventHandler<string> ExternalIpChanged;
+        event EventHandler<string?> ExternalIpChanged;
 
-        event EventHandler<string> InternalIpChanged;
+        event EventHandler<string?> InternalIpChanged;
 
         Task LoadExternalIpAddressAsync();
 
@@ -35,8 +34,8 @@ namespace ValheimServerGUI.Tools
 
         #region IIpAddressProvider implementation
 
-        private string _externalIpAddress;
-        public string ExternalIpAddress
+        private string? _externalIpAddress;
+        public string? ExternalIpAddress
         {
             get => _externalIpAddress;
             private set
@@ -47,8 +46,8 @@ namespace ValheimServerGUI.Tools
             }
         }
 
-        private string _internalIpAddress;
-        public string InternalIpAddress
+        private string? _internalIpAddress;
+        public string? InternalIpAddress
         {
             get => _internalIpAddress;
             private set
@@ -59,13 +58,13 @@ namespace ValheimServerGUI.Tools
             }
         }
 
-        public event EventHandler<string> ExternalIpChanged;
+        public event EventHandler<string?>? ExternalIpChanged;
 
-        public event EventHandler<string> InternalIpChanged;
+        public event EventHandler<string?>? InternalIpChanged;
 
         public Task LoadExternalIpAddressAsync()
         {
-            return Get(Resources.UrlExternalIpLookup)
+            return Get(CoreConstants.UrlExternalIpLookup)
                 .WithCallback<ExternalIpResponse>(OnExternalIpResponse)
                 .SendAsync();
         }
@@ -87,12 +86,11 @@ namespace ValheimServerGUI.Tools
                 return Task.CompletedTask;
             }
 
-            // Prefer addresses from the DHCP server if they're available
-            var eligibleAddresses = addresses.Where(ip => ip.PrefixOrigin == PrefixOrigin.Dhcp);
-            if (!eligibleAddresses.Any())
-            {
-                eligibleAddresses = addresses;
-            }
+            // Prefer addresses from the DHCP server if they're available. PrefixOrigin is a
+            // Windows-only API; the in-lambda OS guard both satisfies the platform analyzer and
+            // implements E51 (on Linux the guard is false, so we fall back to all UP IPv4 addresses).
+            var dhcpAddresses = addresses.Where(ip => OperatingSystem.IsWindows() && ip.PrefixOrigin == PrefixOrigin.Dhcp);
+            var eligibleAddresses = dhcpAddresses.Any() ? dhcpAddresses : addresses;
 
             // If multiple IPs are found, return the first one in alphabetical order (just for consistency)
             var results = eligibleAddresses
@@ -116,7 +114,7 @@ namespace ValheimServerGUI.Tools
 
         #region Non-public methods
 
-        private void OnExternalIpResponse(object sender, ExternalIpResponse response)
+        private void OnExternalIpResponse(object? sender, ExternalIpResponse response)
         {
             if (string.IsNullOrWhiteSpace(response?.Ip)) return;
             ExternalIpAddress = response.Ip;
@@ -125,7 +123,7 @@ namespace ValheimServerGUI.Tools
         private class ExternalIpResponse
         {
             [JsonProperty("ip")]
-            public string Ip { get; set; }
+            public string? Ip { get; set; }
         }
 
         #endregion

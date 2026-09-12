@@ -6,17 +6,17 @@ namespace ValheimServerGUI.Game
 {
     public class WorldPreferences
     {
-        public string WorldName { get; set; }
+        public string? WorldName { get; set; }
 
         public DateTime LastSaved { get; set; } = DateTime.UnixEpoch;
 
-        public string Preset { get; set; }
+        public string? Preset { get; set; }
 
         public Dictionary<string, string> Modifiers { get; set; } = new();
 
         public HashSet<string> Keys { get; set; } = new();
 
-        public static WorldPreferences FromFile(WorldPreferencesFile file)
+        public static WorldPreferences FromFile(WorldPreferencesFile? file)
         {
             var prefs = new WorldPreferences();
 
@@ -25,8 +25,9 @@ namespace ValheimServerGUI.Game
             prefs.WorldName = file.WorldName;
             prefs.LastSaved = file.LastSaved ?? prefs.LastSaved;
             prefs.Preset = file.Preset;
-            prefs.Modifiers = file.Modifiers;
-            prefs.Keys = file.Keys.ToHashSet();
+            // §15 #7: a JSON file with null "modifiers"/"keys" (absent or explicitly null) must not NPE.
+            prefs.Modifiers = file.Modifiers ?? prefs.Modifiers;
+            prefs.Keys = file.Keys?.ToHashSet() ?? prefs.Keys;
 
             return prefs;
         }

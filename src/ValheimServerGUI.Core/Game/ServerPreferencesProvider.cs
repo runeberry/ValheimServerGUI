@@ -9,7 +9,7 @@ namespace ValheimServerGUI.Game
     {
         event EventHandler<List<ServerPreferences>> PreferencesSaved;
 
-        ServerPreferences LoadPreferences(string profileName);
+        ServerPreferences? LoadPreferences(string profileName);
 
         IEnumerable<ServerPreferences> LoadPreferences();
 
@@ -33,9 +33,9 @@ namespace ValheimServerGUI.Game
 
         #region IServerPreferencesProvider implementation
 
-        public event EventHandler<List<ServerPreferences>> PreferencesSaved;
+        public event EventHandler<List<ServerPreferences>>? PreferencesSaved;
 
-        public ServerPreferences LoadPreferences(string profileName)
+        public ServerPreferences? LoadPreferences(string profileName)
         {
             if (string.IsNullOrWhiteSpace(profileName)) throw new ArgumentException($"{nameof(profileName)} must not be null or whitespace");
 
@@ -95,7 +95,7 @@ namespace ValheimServerGUI.Game
 
         #region Non-public methods
 
-        private void OnPreferencesSaved(object sender, UserPreferences preferences)
+        private void OnPreferencesSaved(object? sender, UserPreferences preferences)
         {
             PreferencesSaved?.Invoke(this, preferences.Servers);
         }

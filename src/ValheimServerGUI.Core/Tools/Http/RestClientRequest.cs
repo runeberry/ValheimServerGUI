@@ -13,15 +13,15 @@ namespace ValheimServerGUI.Tools.Http
 
         protected IRestClientContext Context => Client.Context;
 
-        public HttpMethod Method { get; set; }
+        public HttpMethod Method { get; set; } = HttpMethod.Get;
 
-        public string Uri { get; set; }
+        public string Uri { get; set; } = string.Empty;
 
-        public object RequestContent { get; set; }
+        public object? RequestContent { get; set; }
 
-        public object ResponseContent { get; set; }
+        public object? ResponseContent { get; set; }
 
-        public Type ResponseContentType { get; set; }
+        public Type? ResponseContentType { get; set; }
 
         public List<Action<HttpClient>> ClientBuilders { get; } = new();
 
@@ -34,14 +34,14 @@ namespace ValheimServerGUI.Tools.Http
             Client = client;
         }
 
-        public async Task<TResponse> SendAsync<TResponse>()
+        public async Task<TResponse?> SendAsync<TResponse>()
             where TResponse : class
         {
             await this.WithResponseType<TResponse>().SendAsync();
             return ResponseContent as TResponse;
         }
 
-        public async Task<HttpResponseMessage> SendAsync()
+        public async Task<HttpResponseMessage?> SendAsync()
         {
             var logAddress = $"{Method} {Uri}";
 
@@ -95,7 +95,7 @@ namespace ValheimServerGUI.Tools.Http
                         // Log the error, but keep iterating over callbacks
                         Context.Logger.Error(callbackException, "HTTP request callback encountered an unexpected error: {0}", logAddress);
                         Context.Logger.Error(callbackException.Message);
-                        Context.Logger.Error(callbackException.StackTrace);
+                        Context.Logger.Error(callbackException.StackTrace ?? string.Empty);
                     }
                 }
 
@@ -105,7 +105,7 @@ namespace ValheimServerGUI.Tools.Http
             {
                 Context.Logger.Error(e, "HTTP request encountered an unexpected error: {0}", logAddress);
                 Context.Logger.Error(e.Message);
-                Context.Logger.Error(e.StackTrace);
+                Context.Logger.Error(e.StackTrace ?? string.Empty);
                 return null;
             }
         }

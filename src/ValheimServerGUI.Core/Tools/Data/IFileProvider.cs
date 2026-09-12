@@ -5,11 +5,11 @@ namespace ValheimServerGUI.Tools.Data
 {
     public interface IFileProvider
     {
-        event EventHandler<object> DataLoaded;
+        event EventHandler<object>? DataLoaded;
 
-        event EventHandler<object> DataSaved;
+        event EventHandler<object>? DataSaved;
 
-        Task<TFile> LoadAsync<TFile>(string filePath) where TFile : class;
+        Task<TFile?> LoadAsync<TFile>(string filePath) where TFile : class;
 
         Task SaveAsync<TFile>(string filePath, TFile data) where TFile : class;
     }

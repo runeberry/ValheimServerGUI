@@ -2,7 +2,7 @@
 using Serilog.Events;
 using System;
 using System.Collections.Generic;
-using ValheimServerGUI.Properties;
+using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Logging.Components;
 
 namespace ValheimServerGUI.Tools.Logging
@@ -21,11 +21,17 @@ namespace ValheimServerGUI.Tools.Logging
     {
         private readonly LogBufferSink LogBufferSink = new(1000);
         private readonly List<LogRule> Rules = new();
-        private ILogger Logger;
+        private readonly IValheimPathResolver PathResolver;
+        private ILogger? Logger;
+
+        protected BaseLogger(IValheimPathResolver pathResolver)
+        {
+            PathResolver = pathResolver;
+        }
 
         #region IBaseLogger implementation
 
-        public event Action<string> LogReceived;
+        public event Action<string>? LogReceived;
 
         public IEnumerable<string> LogBuffer => LogBufferSink.Logs;
 
@@ -53,7 +59,7 @@ namespace ValheimServerGUI.Tools.Logging
         /// <summary>
         /// Set an output name for your log file, if file logging is enabled.
         /// </summary>
-        protected virtual string LogFileName => null;
+        protected virtual string? LogFileName => null;
 
         protected void RebuildLogger()
         {
@@ -64,7 +70,7 @@ namespace ValheimServerGUI.Tools.Logging
         {
             if (!string.IsNullOrWhiteSpace(fileName))
             {
-                config.WriteToRollingFile(Resources.LogsFolderPath, fileName);
+                config.WriteToRollingFile(PathResolver.LogsFolderPath, fileName);
             }
         }
 

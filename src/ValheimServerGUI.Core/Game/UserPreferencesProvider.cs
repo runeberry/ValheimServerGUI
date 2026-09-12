@@ -3,7 +3,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Data;
 
 namespace ValheimServerGUI.Game
@@ -19,18 +18,20 @@ namespace ValheimServerGUI.Game
 
     public class UserPreferencesProvider : JsonFileProvider, IUserPreferencesProvider
     {
+        private readonly IValheimPathResolver PathResolver;
         private readonly string UserPrefsFilePath;
         private readonly string LegacyPath;
 
-        public UserPreferencesProvider(ILogger logger) : base(logger)
+        public UserPreferencesProvider(ILogger logger, IValheimPathResolver pathResolver) : base(logger)
         {
-            UserPrefsFilePath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePathV2);
-            LegacyPath = Environment.ExpandEnvironmentVariables(Resources.UserPrefsFilePath);
+            PathResolver = pathResolver;
+            UserPrefsFilePath = pathResolver.UserPrefsFilePath;
+            LegacyPath = pathResolver.LegacyUserPrefsFilePath;
         }
 
         #region IUserPreferencesProvider implementation
 
-        public event EventHandler<UserPreferences> PreferencesSaved;
+        public event EventHandler<UserPreferences>? PreferencesSaved;
 
         public UserPreferences LoadPreferences()
         {
@@ -46,7 +47,7 @@ namespace ValheimServerGUI.Game
 
         #region System Events
 
-        private void OnFileChanged(object sender, FileSystemEventArgs e)
+        private void OnFileChanged(object? sender, FileSystemEventArgs e)
         {
             if (e.FullPath != UserPrefsFilePath) return;
 
@@ -77,13 +78,20 @@ namespace ValheimServerGUI.Game
 
         private UserPreferences LoadInternal()
         {
+            var prefs = LoadInternalCore();
+            ApplyPathDefaults(prefs);
+            return prefs;
+        }
+
+        private UserPreferences LoadInternalCore()
+        {
             try
             {
                 if (!File.Exists(UserPrefsFilePath))
                 {
                     if (TryMigrateLegacyPrefs(out var legacyPrefs))
                     {
-                        return legacyPrefs;
+                        return legacyPrefs!;
                     }
                     else
                     {
@@ -101,6 +109,17 @@ namespace ValheimServerGUI.Game
             }
         }
 
+        /// <summary>
+        /// Fill in the OS-specific default paths (formerly hard-coded on the POCO) whenever the loaded
+        /// value is blank, so a fresh install or a file missing those keys still points at sensible
+        /// per-OS locations.
+        /// </summary>
+        private void ApplyPathDefaults(UserPreferences prefs)
+        {
+            if (string.IsNullOrWhiteSpace(prefs.ServerExePath)) prefs.ServerExePath = PathResolver.DefaultServerPath;
+            if (string.IsNullOrWhiteSpace(prefs.SaveDataFolderPath)) prefs.SaveDataFolderPath = PathResolver.DefaultSaveDataFolder;
+        }
+
         private static readonly Dictionary<string, Action<UserPreferences, string>> MigrationActions = new()
         {
             //{ "ValheimGamePath", (p, v) => p.ValheimGamePath = v },
@@ -109,10 +128,10 @@ namespace ValheimServerGUI.Game
             { "ServerPassword", (p, v) => p.Servers[0].Password = v },
             { "ServerWorldName", (p, v) => p.Servers[0].WorldName = v },
             { "ServerPublic", (p, v) => p.Servers[0].Public = bool.TryParse(v, out var v2) ? v2 : false },
-            { "ServerPort", (p, v) => p.Servers[0].Port = int.TryParse(v, out var v2) ? v2 : int.Parse(Resources.DefaultServerPort) },
+            { "ServerPort", (p, v) => p.Servers[0].Port = int.TryParse(v, out var v2) ? v2 : CoreConstants.DefaultServerPort },
         };
 
-        private bool TryMigrateLegacyPrefs(out UserPreferences prefs)
+        private bool TryMigrateLegacyPrefs(out UserPreferences? prefs)
         {
             if (!File.Exists(LegacyPath))
             {

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Game
 {
@@ -8,12 +7,11 @@ namespace ValheimServerGUI.Game
     {
         public static UserPreferences GetDefault() => new();
 
-        // (jb, 2/19/23) This field was recorded, but never used.
-        //public string ValheimGamePath { get; set; } = Resources.DefaultGamePath;
+        // Default paths are OS-specific and no longer hard-coded here: UserPreferencesProvider fills
+        // these from IValheimPathResolver when a loaded value is blank (see ApplyPathDefaults).
+        public string ServerExePath { get; set; } = string.Empty;
 
-        public string ServerExePath { get; set; } = Resources.DefaultServerPath;
-
-        public string SaveDataFolderPath { get; set; } = Resources.DefaultValheimSaveFolder;
+        public string SaveDataFolderPath { get; set; } = string.Empty;
 
         public bool CheckForUpdates { get; set; } = true;
 
@@ -31,7 +29,7 @@ namespace ValheimServerGUI.Game
 
         public List<WorldPreferences> Worlds { get; set; } = new();
 
-        public static UserPreferences FromFile(UserPreferencesFile file)
+        public static UserPreferences FromFile(UserPreferencesFile? file)
         {
             var prefs = new UserPreferences();
 

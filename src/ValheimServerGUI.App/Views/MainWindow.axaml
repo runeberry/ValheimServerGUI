@@ -3,14 +3,118 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+        xmlns:conv="using:ValheimServerGUI.App.Converters"
         mc:Ignorable="d"
         x:Class="ValheimServerGUI.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
+        x:Name="Root"
         Width="900" Height="640"
+        MinWidth="500" MinHeight="371"
         Title="{Binding Title}">
 
-    <!-- Chrome (menus, status bar, tabs, tray) is built out in Wave 3+. -->
-    <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center"
-               Text="{Binding Title}" FontSize="20" />
+    <Window.Styles>
+        <!-- Status-bar update link: coloured/clickable when actionable, muted plain text when disabled. -->
+        <Style Selector="Button.link">
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="BorderThickness" Value="0" />
+            <Setter Property="Padding" Value="2,0" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+            <Setter Property="Cursor" Value="Hand" />
+        </Style>
+        <Style Selector="Button.link:disabled">
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <Setter Property="Cursor" Value="Arrow" />
+        </Style>
+        <Style Selector="Button.link:disabled /template/ ContentPresenter">
+            <Setter Property="Opacity" Value="1" />
+        </Style>
+    </Window.Styles>
 
+    <DockPanel>
+        <!-- ===== Menu ===== -->
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Header="New _Window" Command="{Binding NewWindowCommand}" />
+                <MenuItem Header="New _Profile" Command="{Binding NewProfileCommand}" />
+                <MenuItem Header="_Save Profile" Command="{Binding SaveProfileCommand}" />
+                <MenuItem Header="Save Profile _As…" Command="{Binding SaveProfileAsCommand}" />
+                <Separator />
+                <MenuItem Header="_Load Profile" ItemsSource="{Binding Profiles}"
+                          IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
+                    <MenuItem.Styles>
+                        <Style Selector="MenuItem > MenuItem">
+                            <Setter Property="Command"
+                                    Value="{Binding DataContext.LoadProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.Styles>
+                </MenuItem>
+                <MenuItem Header="_Remove Profile" ItemsSource="{Binding Profiles}"
+                          IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
+                    <MenuItem.Styles>
+                        <Style Selector="MenuItem > MenuItem">
+                            <Setter Property="Command"
+                                    Value="{Binding DataContext.RemoveProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.Styles>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="_Preferences…" Command="{Binding PreferencesCommand}" />
+                <MenuItem Header="Set _Directories…" Command="{Binding SetDirectoriesCommand}" />
+                <MenuItem Header="_Open Settings Directory…" Command="{Binding OpenSettingsDirectoryCommand}" />
+                <Separator />
+                <MenuItem Header="_Close" Command="{Binding CloseCommand}" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="Online _Manual" Command="{Binding OnlineManualCommand}" />
+                <MenuItem Header="_Port Forwarding" Command="{Binding PortForwardingCommand}" />
+                <MenuItem Header="Submit a _Bug Report…" Command="{Binding BugReportCommand}" />
+                <Separator />
+                <MenuItem Header="Check for _Updates" Command="{Binding CheckForUpdatesCommand}" />
+                <MenuItem Header="Get support in _Discord" Command="{Binding DiscordCommand}" />
+                <MenuItem Header="_About…" Command="{Binding AboutCommand}" />
+            </MenuItem>
+        </Menu>
+
+        <!-- ===== Status bar ===== -->
+        <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0"
+                BorderBrush="{DynamicResource SystemControlForegroundBaseLowBrush}" Padding="8,4">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Ellipse Width="10" Height="10" VerticalAlignment="Center"
+                             Fill="{Binding ServerStatus, Converter={x:Static conv:StatusToBrushConverter.Instance}}" />
+                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                </StackPanel>
+                <Button Grid.Column="1" Classes="link" Content="{Binding UpdateStatusText}"
+                        Command="{Binding UpdateLinkCommand}" />
+            </Grid>
+        </Border>
+
+        <!-- ===== Always-visible server controls ===== -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="8">
+            <Button Content="Start" Command="{Binding StartCommand}" MinWidth="80" />
+            <Button Content="Restart" Command="{Binding RestartCommand}" MinWidth="80" />
+            <Button Content="Stop" Command="{Binding StopCommand}" MinWidth="80" />
+        </StackPanel>
+
+        <!-- ===== Tabs (content filled in Waves 4–5) ===== -->
+        <TabControl Margin="8,0,8,8">
+            <TabItem Header="Server Controls">
+                <TextBlock Margin="8" Text="Server Controls — Wave 4" />
+            </TabItem>
+            <TabItem Header="Advanced Controls">
+                <TextBlock Margin="8" Text="Advanced Controls — Wave 4" />
+            </TabItem>
+            <TabItem Header="Server Details">
+                <TextBlock Margin="8" Text="Server Details — Wave 5" />
+            </TabItem>
+            <TabItem Header="Players">
+                <TextBlock Margin="8" Text="Players — Wave 5" />
+            </TabItem>
+            <TabItem Header="Logs">
+                <TextBlock Margin="8" Text="Logs — Wave 5" />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
 </Window>

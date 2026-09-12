@@ -62,6 +62,14 @@ internal sealed class ShellCoordinator
         return windows;
     }
 
+    /// <summary>Opens a fresh window (File &gt; New Window) for the most-recently-saved profile, else Default.</summary>
+    public void OpenNewWindow()
+    {
+        var profile = _serverPrefs.LoadPreferences().OrderByDescending(p => p.LastSaved).FirstOrDefault()
+                      ?? CreateDefaultProfile();
+        ShowWindowFor(new StartupWindowPlan(profile, AutoStart: false), startMinimized: false);
+    }
+
     /// <summary>Opens (or focuses) a window for a profile named by a forwarded second launch (§2.2).</summary>
     public void OpenOrFocusProfile(string? profileName)
     {

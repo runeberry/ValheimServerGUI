@@ -29,8 +29,12 @@ public class ShellCoordinatorTests
     {
         var serverPrefs = new FakeServerPreferencesProvider(profiles);
         var userPrefsProvider = new FakeUserPreferencesProvider(userPrefs);
+        var shell = new ValheimServerGUI.App.Services.ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
+        var pathResolver = Core.GetRequiredService<IValheimPathResolver>();
         Func<MainWindowViewModel> factory = () =>
-            new MainWindowViewModel(Core.GetRequiredService<ValheimServer>(), userPrefsProvider);
+            new MainWindowViewModel(
+                Core.GetRequiredService<ValheimServer>(), userPrefsProvider, serverPrefs,
+                new FakeSoftwareUpdateProvider(), shell, pathResolver);
         var startupService = new StartupService(new FakeSoftwareUpdateProvider(), new FakePlayerDataRepository(), TestLog.Silent);
 
         var coordinator = new ShellCoordinator(

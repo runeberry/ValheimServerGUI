@@ -18,5 +18,7 @@
         <FluentTheme />
         <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
         <StyleInclude Source="avares://ValheimServerGUI.App/Controls/AppStyles.axaml" />
+        <!-- Compact density pass — merged last so it overrides Fluent's touch-sized defaults. -->
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Compact.axaml" />
     </Application.Styles>
 </Application>

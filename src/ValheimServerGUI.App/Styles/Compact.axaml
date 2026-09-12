@@ -1,0 +1,76 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Compact density pass (§ V3 styling). Merged AFTER FluentTheme so these win. Restores the
+         WinForms 2.x information-dense feel: ~12px base font, ~23px control heights, tight margins, and
+         crisp 2px corners — implemented purely as theme-resource + selector overrides so the whole tree
+         (including the separate dialog Windows) inherits it and it still scales cleanly across DPIs. -->
+
+    <Styles.Resources>
+        <!-- Global Fluent knobs many control themes read from. -->
+        <CornerRadius x:Key="ControlCornerRadius">2</CornerRadius>
+        <x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
+        <x:Double x:Key="TabItemHeaderFontSize">13</x:Double>
+        <Thickness x:Key="TabItemHeaderMargin">10,4</Thickness>
+        <Thickness x:Key="ComboBoxDropdownContentMargin">0,2</Thickness>
+        <x:Double x:Key="ComboBoxItemThemeMinHeight">26</x:Double>
+        <x:Double x:Key="MenuFlyoutThemeMinHeight">26</x:Double>
+    </Styles.Resources>
+
+    <!-- Base font: Segoe UI on Windows, the bundled Inter elsewhere. Inherits to every descendant. -->
+    <Style Selector="Window">
+        <Setter Property="FontFamily" Value="Segoe UI, Inter" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Padding" Value="10,2" />
+    </Style>
+
+    <!-- Icon-only 16x16 button: no min width, just enough padding to frame the glyph. -->
+    <Style Selector="Button.icon">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Padding" Value="4" />
+    </Style>
+
+    <Style Selector="TextBox">
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Padding" Value="6,2" />
+    </Style>
+
+    <Style Selector="ComboBox">
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Padding" Value="8,2" />
+    </Style>
+
+    <Style Selector="NumericUpDown">
+        <Setter Property="MinHeight" Value="23" />
+    </Style>
+    <Style Selector="NumericUpDown /template/ TextBox">
+        <Setter Property="MinHeight" Value="21" />
+        <Setter Property="Padding" Value="6,1" />
+    </Style>
+
+    <Style Selector="CheckBox">
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Padding" Value="6,0,0,0" />
+    </Style>
+
+    <Style Selector="RadioButton">
+        <Setter Property="MinHeight" Value="20" />
+        <Setter Property="Padding" Value="6,0,0,0" />
+    </Style>
+
+    <Style Selector="TabItem">
+        <Setter Property="MinHeight" Value="28" />
+        <Setter Property="FontSize" Value="13" />
+    </Style>
+
+    <Style Selector="Menu">
+        <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="Menu > MenuItem">
+        <Setter Property="Padding" Value="8,3" />
+    </Style>
+</Styles>

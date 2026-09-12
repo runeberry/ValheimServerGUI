@@ -25,10 +25,7 @@
             <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Status}" />
         </Grid>
 
-        <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,4,0,0">
-            <TextBlock Text="Display Name:" VerticalAlignment="Center" MinWidth="122" />
-            <TextBox Text="{Binding DisplayName}" MaxLength="64" MinWidth="220" />
-        </StackPanel>
+        <c:TextFormField LabelText="Display Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0" />
 
         <TextBlock Text="Known Characters" FontWeight="SemiBold" Margin="0,6,0,0" />
         <ListBox ItemsSource="{Binding Characters}" SelectedItem="{Binding SelectedCharacter}" Height="120" />

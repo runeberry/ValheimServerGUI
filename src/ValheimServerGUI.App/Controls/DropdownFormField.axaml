@@ -6,6 +6,7 @@
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <ComboBox HorizontalAlignment="Stretch"
                   ItemsSource="{Binding #Root.ItemsSource}"
+                  PlaceholderText="{Binding #Root.PlaceholderText}"
                   SelectedItem="{Binding #Root.Value, Mode=TwoWay}" />
     </c:FormRow>
 </UserControl>

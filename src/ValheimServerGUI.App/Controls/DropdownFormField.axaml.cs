@@ -17,7 +17,17 @@ public partial class DropdownFormField : FormFieldBase
     public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty =
         AvaloniaProperty.Register<DropdownFormField, IEnumerable?>(nameof(ItemsSource));
 
+    /// <summary>Text shown when nothing is selected (e.g. a disabled "-- No worlds --" empty state).</summary>
+    public static readonly StyledProperty<string?> PlaceholderTextProperty =
+        AvaloniaProperty.Register<DropdownFormField, string?>(nameof(PlaceholderText));
+
     public DropdownFormField() => AvaloniaXamlLoader.Load(this);
+
+    public string? PlaceholderText
+    {
+        get => GetValue(PlaceholderTextProperty);
+        set => SetValue(PlaceholderTextProperty, value);
+    }
 
     /// <summary>The selected item (two-way).</summary>
     public object? Value

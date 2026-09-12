@@ -148,4 +148,18 @@ public class MainWindowViewModelTests
         vm.LoadProfile(new ServerPreferences { ProfileName = "Nightshade" });
         Assert.Equal("Valheim Server GUI — Nightshade", vm.Title);
     }
+
+    [Fact]
+    public void CanSelectExistingWorld_requires_stopped_and_at_least_one_world()
+    {
+        var vm = Build(out _);
+        vm.ServerStatus = ServerStatus.Stopped;
+        Assert.False(vm.CanSelectExistingWorld); // no worlds -> disabled empty state
+
+        vm.Form.Worlds.Add("Alpha");
+        Assert.True(vm.CanSelectExistingWorld); // worlds exist and stopped
+
+        vm.ServerStatus = ServerStatus.Running;
+        Assert.False(vm.CanSelectExistingWorld); // locked while running
+    }
 }

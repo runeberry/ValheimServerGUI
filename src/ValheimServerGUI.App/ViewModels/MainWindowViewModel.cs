@@ -105,6 +105,9 @@ public partial class MainWindowViewModel : ViewModelBase
         _updateProvider.UpdateCheckFinished += OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved += OnServerPreferencesSaved;
 
+        // The "choose an existing world" gate depends on the world list being non-empty.
+        Form.Worlds.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CanSelectExistingWorld));
+
         RefreshProfiles();
     }
 
@@ -155,7 +158,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     // --- server status + the single gate ---
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanStart), nameof(CanStop), nameof(CanRestart), nameof(AllowServerChanges), nameof(StatusText))]
+    [NotifyPropertyChangedFor(nameof(CanStart), nameof(CanStop), nameof(CanRestart), nameof(AllowServerChanges), nameof(CanSelectExistingWorld), nameof(StatusText))]
     [NotifyCanExecuteChangedFor(nameof(StartCommand), nameof(StopCommand), nameof(RestartCommand), nameof(NewProfileCommand), nameof(LoadProfileCommand))]
     private ServerStatus _serverStatus;
 
@@ -165,6 +168,10 @@ public partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>The single "server changes allowed" gate: fields are editable only while Stopped (§10.2).</summary>
     public bool AllowServerChanges => ServerStatus == ServerStatus.Stopped;
+
+    /// <summary>The existing-world dropdown is usable only when changes are allowed and worlds exist;
+    /// with no worlds it shows a disabled "-- No worlds --" empty state.</summary>
+    public bool CanSelectExistingWorld => AllowServerChanges && Form.Worlds.Count > 0;
 
     public string StatusText => ServerStatus.ToString();
 
@@ -468,6 +475,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void RefreshWorldList()
     {
+        // Preserve the current selection across the rebuild (a manual Refresh must not blank the picker).
+        var previous = Form.ExistingWorld;
+
         List<string> local;
         try
         {
@@ -477,6 +487,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             // Save folder not configured/available yet — nothing to list.
             Form.Worlds.Clear();
+            Form.ExistingWorld = null;
             return;
         }
 
@@ -488,6 +499,12 @@ public partial class MainWindowViewModel : ViewModelBase
         Form.Worlds.Clear();
         foreach (var world in local.Concat(cloud))
             Form.Worlds.Add(world);
+
+        // Re-select the prior world if it survived the refresh; otherwise fall back to the first one so the
+        // dropdown never lands on an empty selection while worlds exist.
+        Form.ExistingWorld = previous is not null && Form.Worlds.Contains(previous)
+            ? previous
+            : Form.Worlds.FirstOrDefault();
     }
 
     private void SelectWorld(string? worldName)

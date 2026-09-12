@@ -62,10 +62,12 @@
                             </Button>
                         </Grid>
 
-                        <c:DropdownFormField LabelText="Select World"
+                        <c:DropdownFormField LabelText="Select World" PlaceholderText="-- No worlds --"
+                                             IsVisible="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
                                              ItemsSource="{Binding Form.Worlds}" Value="{Binding Form.ExistingWorld}"
-                                             IsEnabled="{Binding AllowServerChanges}" />
+                                             IsEnabled="{Binding CanSelectExistingWorld}" />
                         <c:TextFormField LabelText="New World Name" Watermark="5–20 characters"
+                                         IsVisible="{Binding Form.UseNewWorld}"
                                          Value="{Binding Form.NewWorldName}" MaxLength="20"
                                          IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>

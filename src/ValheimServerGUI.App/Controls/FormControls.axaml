@@ -1,0 +1,37 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:ValheimServerGUI.App.Controls"
+                    xmlns:conv="using:ValheimServerGUI.App.Converters">
+
+    <!-- Shared "form row" template (§11.2): label + input slot + collapsible "?" help glyph. All the
+         editable tabs' rows use this so the label column, spacing, and help affordance stay uniform. -->
+    <ControlTheme x:Key="{x:Type c:FormRow}" TargetType="c:FormRow">
+        <Setter Property="Margin" Value="0,3" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid ColumnDefinitions="Auto,*,Auto">
+                    <ContentControl Grid.Column="0"
+                                    Content="{TemplateBinding Header}"
+                                    ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                    VerticalAlignment="Center"
+                                    MinWidth="170"
+                                    Margin="0,0,8,0" />
+                    <ContentPresenter Grid.Column="1"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      VerticalAlignment="Center"
+                                      HorizontalAlignment="Stretch" />
+                    <TextBlock Grid.Column="2"
+                               Text="?"
+                               FontWeight="Bold"
+                               Margin="8,0,0,0"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               ToolTip.Tip="{TemplateBinding HelpText}"
+                               IsVisible="{TemplateBinding HelpText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

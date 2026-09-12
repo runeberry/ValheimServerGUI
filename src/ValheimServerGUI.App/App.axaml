@@ -5,6 +5,15 @@
     <!-- "Default" follows the OS theme variant; the App applies the user's Light/Dark/System
          preference at startup via RequestedThemeVariant (see App.axaml.cs). -->
 
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Shared form-row template + input styling (§11.2). -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormControls.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
     <Application.Styles>
         <FluentTheme />
     </Application.Styles>

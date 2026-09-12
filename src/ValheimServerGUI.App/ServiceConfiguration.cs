@@ -1,8 +1,11 @@
 using System;
+using System.IO;
 using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Services;
 using ValheimServerGUI.App.Views;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.App;
 
@@ -24,13 +27,33 @@ internal static class ServiceConfiguration
         // Startup args (bucket B: needs the process args, so it is registered here rather than in Core).
         services.AddSingleton<IStartupArgsProvider>(new StartupArgsProvider(args));
 
-        // Bucket-B seams. Wave 0 registers a placeholder prompt so the exception handler is resolvable;
-        // Wave 1 replaces these with the real Window-backed implementations.
-        services.AddSingleton<IUserPrompt, NoOpUserPrompt>();
+        // Bucket-B seams (the OS-integration the Core leaves to the shell).
+        services.AddSingleton<ISystemShell, SystemShell>();
+        services.AddSingleton<IUserPrompt, DialogUserPrompt>();
+        services.AddSingleton<IShellLauncher, ShellLauncher>();
+        services.AddSingleton<IStartupStrategy>(_ => CreateStartupStrategy());
+        services.AddSingleton<IStartupManager, StartupManager>();
 
         // Windows / view-models.
         services.AddTransient<MainWindow>();
 
         return services;
+    }
+
+    // Picks the per-OS run-on-login mechanism, stamped with this process's executable path so the
+    // registration relaunches the actual running app.
+    private static IStartupStrategy CreateStartupStrategy()
+    {
+        var execPath = Environment.ProcessPath ?? string.Empty;
+
+        if (OperatingSystem.IsWindows())
+            return new WindowsRunKeyStrategy(AppConstants.StartupKey, execPath);
+
+        var configHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
+        if (string.IsNullOrEmpty(configHome))
+            configHome = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), ".config");
+        var autostartDir = Path.Combine(configHome, "autostart");
+
+        return new LinuxAutostartStrategy(autostartDir, execPath, AppConstants.ProductName, AppConstants.StartupKey);
     }
 }

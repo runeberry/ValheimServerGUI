@@ -12,6 +12,8 @@
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormControls.axaml" />
                 <!-- Etched group-box control theme. -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
+                <!-- Compact vertically-stacked NumericUpDown spinner (ported from mochi-paint). -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/NumericSpinner.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

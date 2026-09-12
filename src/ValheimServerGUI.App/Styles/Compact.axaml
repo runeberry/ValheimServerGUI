@@ -56,6 +56,17 @@
         <Setter Property="MinHeight" Value="20" />
         <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
+    <!-- Shrink the check box itself (Fluent's box is a touch-sized 20px square inside a 32px-tall row)
+         toward the WinForms ~16px box. Resizes the existing template parts so all Fluent states and
+         animations are preserved. Part names verified against Avalonia 12's Fluent CheckBox template. -->
+    <Style Selector="CheckBox /template/ Border#PART_Border">
+        <Setter Property="MinHeight" Value="22" />
+    </Style>
+    <Style Selector="CheckBox /template/ Border#NormalRectangle">
+        <Setter Property="Width" Value="16" />
+        <Setter Property="Height" Value="16" />
+        <Setter Property="MinWidth" Value="16" />
+    </Style>
 
     <Style Selector="RadioButton">
         <Setter Property="MinHeight" Value="20" />

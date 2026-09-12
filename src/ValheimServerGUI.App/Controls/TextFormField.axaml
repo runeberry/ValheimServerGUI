@@ -10,6 +10,10 @@
                      Text="{Binding #Root.Value, Mode=TwoWay}"
                      MaxLength="{Binding #Root.MaxLength}"
                      PlaceholderText="{Binding #Root.Watermark}"
+                     AcceptsReturn="{Binding #Root.Multiline}"
+                     Height="{Binding #Root.InputHeight}"
+                     TextWrapping="{Binding #Root.Multiline, Converter={x:Static conv:BooleanToTextWrappingConverter.Instance}}"
+                     VerticalContentAlignment="{Binding #Root.Multiline, Converter={x:Static conv:MultilineToVerticalAlignmentConverter.Instance}}"
                      PasswordChar="{Binding #Root.ShowValue, Converter={x:Static conv:PasswordCharConverter.Instance}}" />
             <ContentControl Grid.Column="1" Content="{Binding #Root.TrailingContent}"
                             IsVisible="{Binding #Root.TrailingContent, Converter={x:Static ObjectConverters.IsNotNull}}" />

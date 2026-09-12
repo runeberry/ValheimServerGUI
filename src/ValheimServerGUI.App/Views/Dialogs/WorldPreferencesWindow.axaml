@@ -20,7 +20,7 @@
                 <DataTemplate x:DataType="vm:ModifierRow">
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,2,0,2">
                         <TextBlock Text="{Binding Key}" VerticalAlignment="Center" MinWidth="110" />
-                        <ComboBox ItemsSource="{Binding Options}" SelectedItem="{Binding Selected}" MinWidth="160" />
+                        <c:DropdownFormField Width="160" ItemsSource="{Binding Options}" Value="{Binding Selected}" />
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>

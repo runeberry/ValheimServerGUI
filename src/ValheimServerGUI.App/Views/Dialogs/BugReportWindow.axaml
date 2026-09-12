@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.BugReportWindow"
         x:DataType="vm:BugReportViewModel"
@@ -10,8 +11,7 @@
     <StackPanel Margin="20" Spacing="10">
         <TextBlock TextWrapping="Wrap"
                    Text="Describe the problem. A crash report with your app/OS details and recent logs is included." />
-        <TextBox Text="{Binding Description}" AcceptsReturn="True" TextWrapping="Wrap"
-                 Height="160" VerticalContentAlignment="Top" />
+        <c:TextFormField LabelText="Description" Value="{Binding Description}" Multiline="True" InputHeight="160" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="Submit" MinWidth="80" IsDefault="True"
                     IsEnabled="{Binding CanSubmit}" Click="OnSubmit" />

@@ -48,4 +48,8 @@ public class DialogRenderTests
     public void PlayerDetailsWindow_realizes()
         => Realize(new PlayerDetailsWindow(new PlayerDetailsViewModel(
             Core.GetRequiredService<IPlayerDataRepository>(), "steam-1")));
+
+    [AvaloniaFact]
+    public void BugReportWindow_realizes()
+        => Realize(new BugReportWindow(new BugReportViewModel(new FakeRuneberryApiClient())));
 }

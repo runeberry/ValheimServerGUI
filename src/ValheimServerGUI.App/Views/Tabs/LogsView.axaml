@@ -8,8 +8,8 @@
     <DockPanel Margin="8">
         <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,Auto,Auto,*,Auto,Auto" Margin="0,0,0,6">
             <TextBlock Grid.Column="0" Text="View logs for:" VerticalAlignment="Center" Margin="0,0,6,0" />
-            <ComboBox Grid.Column="1" ItemsSource="{Binding Logs.Views}" SelectedItem="{Binding Logs.SelectedView}"
-                      MinWidth="140" />
+            <c:DropdownFormField Grid.Column="1" MinWidth="140" VerticalAlignment="Center"
+                                 ItemsSource="{Binding Logs.Views}" Value="{Binding Logs.SelectedView}" />
             <Button Grid.Column="2" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open logs folder"
                     Command="{Binding Logs.OpenLogsFolderCommand}">
                 <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"

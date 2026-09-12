@@ -11,7 +11,10 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <Grid RowDefinitions="Auto,Auto">
-                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,1">
+                    <!-- Header row collapses when there is no label, so a label-less field (a toolbar or
+                         list-item picker) renders as just its input. -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,1"
+                          IsVisible="{TemplateBinding Header, Converter={x:Static conv:StringNotEmptyConverter.Instance}}">
                         <ContentControl Grid.Column="0"
                                         Content="{TemplateBinding Header}"
                                         ContentTemplate="{TemplateBinding HeaderTemplate}"

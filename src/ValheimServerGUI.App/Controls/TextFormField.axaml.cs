@@ -29,6 +29,14 @@ public partial class TextFormField : FormFieldBase
     public static readonly StyledProperty<object?> TrailingContentProperty =
         AvaloniaProperty.Register<TextFormField, object?>(nameof(TrailingContent));
 
+    /// <summary>When true the box accepts newlines and wraps (a text area). Default false.</summary>
+    public static readonly StyledProperty<bool> MultilineProperty =
+        AvaloniaProperty.Register<TextFormField, bool>(nameof(Multiline));
+
+    /// <summary>Explicit height for the input box (used with <see cref="Multiline"/>). NaN = auto.</summary>
+    public static readonly StyledProperty<double> InputHeightProperty =
+        AvaloniaProperty.Register<TextFormField, double>(nameof(InputHeight), defaultValue: double.NaN);
+
     public TextFormField() => AvaloniaXamlLoader.Load(this);
 
     public string? Value
@@ -59,5 +67,17 @@ public partial class TextFormField : FormFieldBase
     {
         get => GetValue(TrailingContentProperty);
         set => SetValue(TrailingContentProperty, value);
+    }
+
+    public bool Multiline
+    {
+        get => GetValue(MultilineProperty);
+        set => SetValue(MultilineProperty, value);
+    }
+
+    public double InputHeight
+    {
+        get => GetValue(InputHeightProperty);
+        set => SetValue(InputHeightProperty, value);
     }
 }

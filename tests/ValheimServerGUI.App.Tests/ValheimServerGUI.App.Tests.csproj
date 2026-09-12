@@ -16,8 +16,8 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5" />
     <!-- In-process Avalonia UI testing (built on xunit v3): renders via Skia (UseHeadlessDrawing=false)
          so frames can be pixel-asserted. -->
-    <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.0" />
-    <PackageReference Include="Avalonia.Skia" Version="12.1.0" />
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Skia" Version="12.1.2" />
   </ItemGroup>
 
   <ItemGroup>

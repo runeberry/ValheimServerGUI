@@ -15,24 +15,9 @@
     <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">build$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd"))</SourceRevisionId>
   </PropertyGroup>
 
-  <!--
-    Only exposed to the (unsigned) test assembly in non-Release builds. In Release the assembly is
-    strong-name signed, and an unqualified InternalsVisibleTo to an unsigned friend is a hard error
-    (CS1726). Tests run in Debug, so scoping this out of Release lets Release publish/packaging succeed.
-  -->
-  <ItemGroup Condition="'$(Configuration)' != 'Release'">
+  <ItemGroup>
     <InternalsVisibleTo Include="ValheimServerGUI.Core.Tests" />
   </ItemGroup>
-
-  <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>..\..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
-    <!-- Strong-naming Core makes it warn (CS8002) about unsigned NuGet dependencies
-         it references (e.g. Semver, which ships without a strong name). We can't sign
-         a third-party package, and strong naming is vestigial on modern .NET (no GAC),
-         so the reference is harmless — suppress the noise on the Release publish path. -->
-    <NoWarn>$(NoWarn);CS8002</NoWarn>
-  </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="DeviceId" Version="6.2.0" />

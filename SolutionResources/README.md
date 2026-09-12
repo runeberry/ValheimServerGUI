@@ -4,10 +4,6 @@ This folder contains code, configuration, and/or assets that are used in multipl
 
 In some cases, however, you may want to supply your own mock secret values for testing. Examples of these files are provided below for your reference.
 
-### ValheimServerGUI.snk
-
-This is only needed when publishing the desktop client application in the Release configuration. If you need to publish the application locally for some reason, simply change the Publish Profile (.pubxml) to publish to Debug configuration temporarily.
-
 ### ClientSecrets.Values.cs
 
 This is a... "clever" way of providing secret information to both the client and Serverless applications at compile time. Use this partial static class to set the values of any properties in **ClientSecrets.cs**.

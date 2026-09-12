@@ -110,16 +110,23 @@ if [[ $RUN_TEST -eq 1 && "$build_status" != "fail" ]]; then
     fail "test phase hit the ${TEST_HARD_TIMEOUT}s hard timeout — the hang guard did not abort in time"
     test_status="fail"
   else
-    # Tell a genuine deadlock (blame-hang fired) apart from ordinary assertion failures.
-    hangseq="$(ls "$BLAME_DIR"/*[Ss]equence*.xml 2>/dev/null | head -1)"
-    if [[ -n "$hangseq" ]] || grep -qiE 'Sequence_|hang dump|blame' "$TEST_LOG"; then
-      fail "test phase ABORTED ON A HANG (>${TEST_HANG_TIMEOUT}s) — likely the intermittent headless-Avalonia deadlock"
-      # The blame sequence flags the test that never finished with Completed="False".
-      [[ -n "$hangseq" ]] && echo "  stuck test: $(grep 'Completed="False"' "$hangseq" 2>/dev/null | grep -oiE 'name="[^"]*"' | head -1)"
-      echo "  hang artifacts (sequence + dump) for root-cause investigation: $BLAME_DIR"
-    else
+    # Classify the non-zero exit. A REAL hang leaves a blame sequence file naming a test that never
+    # finished (Completed="False"). A test-host abort with NO such file is usually blame-hang's inactivity
+    # watchdog tripping on a load-slowed host (the test->collector progress IPC starves under CPU
+    # contention) — not a real hang, and the suite passes on a re-run / without induced load.
+    hangseq="$(grep -rlZ 'Completed="False"' "$BLAME_DIR" 2>/dev/null | tr '\0' '\n' | grep -iE 'sequence' | head -1)"
+    if grep -qE 'Failed:  *[1-9]' "$TEST_LOG"; then
       fail "one or more tests failed"
       grep -E '\[FAIL\]|Failed ' "$TEST_LOG" | head -40
+    elif [[ -n "$hangseq" ]]; then
+      fail "test phase ABORTED ON A HANG — a test never completed (>${TEST_HANG_TIMEOUT}s)"
+      echo "  stuck test: $(grep 'Completed="False"' "$hangseq" | grep -oiE 'name="[^"]*"' | head -1)"
+      echo "  hang artifacts (sequence + dump) for root-cause investigation: $BLAME_DIR"
+    elif grep -qiE 'Test host process crashed|Sequence file will not be generated|inactivity time' "$TEST_LOG"; then
+      fail "test host aborted with NO stuck test — likely blame-hang's watchdog on a load-slowed host, not a real hang. Re-run (ideally on an idle machine); investigate $BLAME_DIR only if it recurs."
+    else
+      fail "test phase failed (exit $test_code)"
+      tail -20 "$TEST_LOG"
     fi
     test_status="fail"
   fi

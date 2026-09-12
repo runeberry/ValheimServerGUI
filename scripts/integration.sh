@@ -133,15 +133,23 @@ elif [[ $test_code -eq 124 || $test_code -eq 137 ]]; then
   fail "live tests hit the ${TEST_HARD_TIMEOUT}s hard timeout — the hang guard did not abort in time"
   echo "  (full output: $TEST_LOG)"
 else
-  hangseq="$(ls "$BLAME_DIR"/*[Ss]equence*.xml 2>/dev/null | head -1)"
-  if [[ -n "$hangseq" ]] || grep -qiE 'Sequence_|hang dump|blame' "$TEST_LOG"; then
-    fail "live tests ABORTED ON A HANG (>${TEST_HANG_TIMEOUT}s) — dump + sequence in $BLAME_DIR"
-    # The blame sequence flags the test that never finished with Completed="False".
-    [[ -n "$hangseq" ]] && echo "  stuck test: $(grep 'Completed="False"' "$hangseq" 2>/dev/null | grep -oiE 'name="[^"]*"' | head -1)"
-  else
+  # A REAL hang leaves a blame sequence file naming a test that never finished (Completed="False"). A
+  # host abort with no such file is usually blame-hang's watchdog tripping on a load-slowed host, not a
+  # real hang. (Same classification as validate.sh.)
+  hangseq="$(grep -rlZ 'Completed="False"' "$BLAME_DIR" 2>/dev/null | tr '\0' '\n' | grep -iE 'sequence' | head -1)"
+  if grep -qE 'Failed:  *[1-9]' "$TEST_LOG"; then
     fail "one or more live integration tests failed"
     # Surface the failing tests + assertion messages inline so the failure is readable without re-running.
-    grep -E '\[FAIL\]|Failed |Error Message|Assert\.|Skipped ' "$TEST_LOG" | head -40
+    grep -E '\[FAIL\]|Failed |Error Message|Assert\.' "$TEST_LOG" | head -40
+  elif [[ -n "$hangseq" ]]; then
+    fail "live tests ABORTED ON A HANG — a test never completed (>${TEST_HANG_TIMEOUT}s)"
+    echo "  stuck test: $(grep 'Completed="False"' "$hangseq" | grep -oiE 'name="[^"]*"' | head -1)"
+    echo "  hang artifacts (sequence + dump): $BLAME_DIR"
+  elif grep -qiE 'Test host process crashed|Sequence file will not be generated|inactivity time' "$TEST_LOG"; then
+    fail "test host aborted with NO stuck test — likely blame-hang's watchdog on a load-slowed host, not a real hang. Re-run."
+  else
+    fail "live integration tests failed (exit $test_code)"
+    grep -E '\[FAIL\]|Failed |Error Message|Skipped ' "$TEST_LOG" | head -40
   fi
   echo "  (full output: $TEST_LOG)"
 fi

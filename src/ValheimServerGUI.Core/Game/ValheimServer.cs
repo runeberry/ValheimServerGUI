@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -140,7 +141,25 @@ namespace ValheimServerGUI.Game
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
 
-            process.StartInfo.EnvironmentVariables.Add("SteamAppId", CoreConstants.ValheimSteamAppId);
+            // Indexer, not Add: the inherited environment may already carry SteamAppId (e.g. launched
+            // from a Steam context), and StringDictionary.Add throws on a duplicate key.
+            process.StartInfo.EnvironmentVariables["SteamAppId"] = CoreConstants.ValheimSteamAppId;
+
+            // The server binary loads steamclient.so from its own directory (and linux64/ beneath it)
+            // and reads steam_appid.txt from the working directory, so both must point at the exe's
+            // folder. Windows adds the exe's directory to the DLL search path itself, but on Linux the
+            // loader needs LD_LIBRARY_PATH set explicitly or the raw binary fails to start.
+            var exeDir = Path.GetDirectoryName(exePath);
+            process.StartInfo.WorkingDirectory = exeDir;
+            if (!OperatingSystem.IsWindows() && exeDir is not null)
+            {
+                var envVars = process.StartInfo.EnvironmentVariables;
+                // The indexer throws on a missing key in this runtime, so probe before reading.
+                var prior = envVars.ContainsKey("LD_LIBRARY_PATH") ? envVars["LD_LIBRARY_PATH"] : null;
+                envVars["LD_LIBRARY_PATH"] =
+                    string.Join(':', new[] { exeDir, Path.Combine(exeDir, "linux64"), prior }.Where(s => !string.IsNullOrEmpty(s)));
+            }
+
             process.OutputDataReceived += Process_OnDataReceived;
             process.ErrorDataReceived += Process_OnErrorReceived;
             process.Exited += (obj, e) =>

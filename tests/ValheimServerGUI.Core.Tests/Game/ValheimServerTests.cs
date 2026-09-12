@@ -116,6 +116,30 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Contains("-preset hard", args);
         }
 
+        // Linux launch contract: the server binary resolves steamclient.so from its own directory
+        // (and linux64/ beneath it) and reads steam_appid.txt from the working directory, so Start
+        // must set the working directory to the exe's folder and prepend that folder + linux64/ to
+        // LD_LIBRARY_PATH. Without this the raw valheim_server.x86_64 fails to start on Linux.
+        [Fact]
+        public void Start_SetsWorkingDirectoryAndLibraryPath_ForServerLaunch()
+        {
+            _server.Start(Options());
+
+            var startInfo = _processProvider.LastProcess!.StartInfo;
+
+            Assert.Equal(CoreConstants.ValheimSteamAppId, startInfo.EnvironmentVariables["SteamAppId"]);
+            Assert.Equal(_dir, startInfo.WorkingDirectory);
+
+            // LD_LIBRARY_PATH is only set off-Windows; on Windows the DLL search handles this itself.
+            if (!OperatingSystem.IsWindows())
+            {
+                var libPath = startInfo.EnvironmentVariables["LD_LIBRARY_PATH"];
+                Assert.NotNull(libPath);
+                Assert.Contains(_dir, libPath!.Split(':'));
+                Assert.Contains(Path.Combine(_dir, "linux64"), libPath.Split(':'));
+            }
+        }
+
         [Fact]
         public void ConnectedLogLine_PromotesToRunning()
         {

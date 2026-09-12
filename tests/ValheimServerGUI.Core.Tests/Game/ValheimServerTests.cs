@@ -138,6 +138,40 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Single(_processProvider.SafelyKilledKeys);
         }
 
+        // §16.2 stop-timeout: a graceful stop that never completes gets force-killed after the timeout.
+        [Fact]
+        public void Stop_ThatHangs_ForceKillsAfterTimeout()
+        {
+            _server.GracefulStopTimeout = TimeSpan.FromMilliseconds(100);
+            var timedOut = false;
+            _server.StopTimedOut += (_, _) => timedOut = true;
+
+            _server.Start(Options());
+            _server.Stop();
+            // Simulate a hung process: never raise Exited.
+
+            WaitFor(() => _processProvider.ForceKilledKeys.Count > 0);
+
+            Assert.Single(_processProvider.ForceKilledKeys);
+            Assert.True(timedOut);
+        }
+
+        // A/B for the above: when the process exits gracefully before the timeout, no force-kill happens.
+        [Fact]
+        public void Stop_ThatCompletes_DoesNotForceKill()
+        {
+            _server.GracefulStopTimeout = TimeSpan.FromMilliseconds(100);
+
+            _server.Start(Options());
+            _server.Stop();
+            _processProvider.SimulateExit(); // graceful shutdown completes
+
+            Thread.Sleep(300); // past the timeout window
+
+            Assert.Empty(_processProvider.ForceKilledKeys);
+            Assert.Equal(ServerStatus.Stopped, _server.Status);
+        }
+
         // E6: stop during startup; a late "connected" must not promote Stopping -> Running.
         [Fact]
         public void LateConnected_AfterStop_StaysStopping()

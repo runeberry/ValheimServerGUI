@@ -9,6 +9,12 @@ internal static class AppConstants
     /// <summary>Stable identifier used as the autostart registration key / <c>.desktop</c> file name.</summary>
     public const string StartupKey = "ValheimServerGUI";
 
+    /// <summary>
+    /// View-only marker for a world that lives only in Steam Cloud. Applied and stripped exclusively by the
+    /// world-select surface — it never reaches saved prefs, server options, or validation (§ locked decisions).
+    /// </summary>
+    public const string CloudWorldSuffix = " (cloud)";
+
     // External links (parity with the v2.4 Resources URLs).
     public const string UrlHelp = "https://github.com/runeberry/ValheimServerGUI/wiki";
     public const string UrlPortForwarding = "https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server";

@@ -26,6 +26,9 @@ public class MainWindowViewModelTests
             Core.GetRequiredService<ValheimServer>(),
             new FakeUserPreferencesProvider(),
             new FakeServerPreferencesProvider(profiles),
+            Core.GetRequiredService<IWorldPreferencesProvider>(),
+            Core.GetRequiredService<ISteamCloudWorldProvider>(),
+            Core.GetRequiredService<IIpAddressProvider>(),
             update,
             shell,
             Core.GetRequiredService<IValheimPathResolver>());

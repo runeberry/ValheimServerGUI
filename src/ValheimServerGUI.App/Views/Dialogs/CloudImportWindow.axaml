@@ -1,0 +1,21 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.CloudImportWindow"
+        Title="Import cloud world"
+        SizeToContent="WidthAndHeight"
+        MinWidth="420" MaxWidth="560"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="10">
+        <TextBlock x:Name="HeadingText" FontWeight="SemiBold" TextWrapping="Wrap" />
+        <TextBlock TextWrapping="Wrap"
+                   Text="This world is saved to Steam Cloud and must be brought into the server's local save folder to be hosted.&#10;&#10;Move: bring the world over and remove the Steam Cloud copy.&#10;Copy: bring a copy over and leave the Steam Cloud copy in place." />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+            <Button Content="Move" MinWidth="80" Click="OnMove" />
+            <Button Content="Copy" MinWidth="80" IsDefault="True" Click="OnCopy" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

@@ -38,6 +38,18 @@ namespace ValheimServerGUI.Game
         public event EventHandler<decimal>? WorldSaved;
         public event EventHandler<string>? InviteCodeReady;
 
+        /// <summary>
+        /// Raised when a graceful <see cref="Stop"/> did not complete within <see cref="GracefulStopTimeout"/>
+        /// and the process was force-killed (§16.2). The shell surfaces this as a potential-save-loss warning.
+        /// </summary>
+        public event EventHandler? StopTimedOut;
+
+        /// <summary>
+        /// How long <see cref="Stop"/> waits for a graceful shutdown before force-killing the process
+        /// (§16.2 enhancement). Set to <see cref="TimeSpan.Zero"/> or less to disable the force-kill fallback.
+        /// </summary>
+        public TimeSpan GracefulStopTimeout { get; set; } = TimeSpan.FromSeconds(30);
+
         public bool CanStart => IsAnyStatus(ServerStatus.Stopped) && ProcessKey == null;
         public bool CanStop => IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && ProcessKey != null;
         public bool CanRestart => IsAnyStatus(ServerStatus.Running) && ProcessKey != null;
@@ -165,6 +177,31 @@ namespace ValheimServerGUI.Game
 
             IsRestarting = false;
             Status = ServerStatus.Stopping;
+
+            ScheduleStopTimeout(ProcessKey);
+        }
+
+        // §16.2 enhancement: if the graceful stop leaves the server "Stopping" past the timeout, force-kill
+        // the (same) process and warn about potential save loss. The process's Exited handler resets
+        // ProcessKey/Status, so a normal shutdown before the timeout is a no-op here.
+        private void ScheduleStopTimeout(string? key)
+        {
+            var timeout = GracefulStopTimeout;
+            if (key == null || timeout <= TimeSpan.Zero) return;
+
+            Task.Run(async () =>
+            {
+                await Task.Delay(timeout);
+
+                if (Status != ServerStatus.Stopping || ProcessKey != key) return;
+
+                ApplicationLogger.Warning(
+                    "Server '{name}' did not stop within {timeout}; force-killing (world save may be lost).",
+                    Options.Name, timeout);
+
+                ProcessProvider.ForceKillProcess(key);
+                StopTimedOut?.Invoke(this, EventArgs.Empty);
+            });
         }
 
         /// <summary>

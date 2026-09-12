@@ -19,6 +19,9 @@ namespace ValheimServerGUI.Core.Tests.Fakes
         /// <summary>Keys passed to SafelyKillProcess, in order.</summary>
         public List<string> SafelyKilledKeys { get; } = new();
 
+        /// <summary>Keys passed to ForceKillProcess, in order (graceful-stop timeout fallback).</summary>
+        public List<string> ForceKilledKeys { get; } = new();
+
         /// <summary>The most recently added (launched) process, for inspecting its StartInfo.Arguments.</summary>
         public Process? LastProcess { get; private set; }
 
@@ -38,6 +41,11 @@ namespace ValheimServerGUI.Core.Tests.Fakes
         public void SafelyKillProcess(string key)
         {
             SafelyKilledKeys.Add(key);
+        }
+
+        public void ForceKillProcess(string key)
+        {
+            ForceKilledKeys.Add(key);
         }
 
         /// <summary>Test hook: raise Process.Exited on the most recently launched process.</summary>

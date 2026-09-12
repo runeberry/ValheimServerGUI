@@ -1,0 +1,63 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.ServerControlsView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="8" Spacing="2">
+            <c:FormRow Header="Server Name" HelpText="The public name of your server (max 64 characters).">
+                <TextBox Text="{Binding Form.Name}" MaxLength="64" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+
+            <c:FormRow Header="Port" HelpText="The UDP port to run on (1–65535). Valheim also uses the next port up.">
+                <NumericUpDown Value="{Binding Form.Port}" Minimum="1" Maximum="65535"
+                               FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+
+            <c:FormRow Header="Password" HelpText="At least 5 characters. Required for community servers.">
+                <Grid ColumnDefinitions="*,Auto,Auto">
+                    <TextBox Grid.Column="0" Text="{Binding Form.Password}"
+                             PasswordChar="{Binding Form.ShowPassword, Converter={x:Static conv:PasswordCharConverter.Instance}}"
+                             IsEnabled="{Binding AllowServerChanges}" />
+                    <CheckBox Grid.Column="1" Content="Show" Margin="8,0,0,0"
+                              IsChecked="{Binding Form.ShowPassword}" IsEnabled="{Binding AllowServerChanges}" />
+                    <Button Grid.Column="2" Content="Copy" Margin="8,0,0,0" Click="CopyPassword" />
+                </Grid>
+            </c:FormRow>
+
+            <TextBlock Text="World" FontWeight="SemiBold" Margin="0,8,0,2" />
+            <StackPanel Margin="12,0,0,0" Spacing="4">
+                <RadioButton GroupName="World" Content="Use an existing world"
+                             IsChecked="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
+                             IsEnabled="{Binding AllowServerChanges}" />
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" Margin="24,0,0,0">
+                    <ComboBox Grid.Column="0" HorizontalAlignment="Stretch"
+                              ItemsSource="{Binding Form.Worlds}" SelectedItem="{Binding Form.ExistingWorld}"
+                              IsEnabled="{Binding AllowServerChanges}" />
+                    <Button Grid.Column="1" Content="⚙" Margin="4,0,0,0" ToolTip.Tip="World settings"
+                            Command="{Binding WorldPreferencesCommand}" />
+                    <Button Grid.Column="2" Content="⟳" Margin="4,0,0,0" ToolTip.Tip="Refresh worlds"
+                            Command="{Binding RefreshWorldsCommand}" />
+                    <Button Grid.Column="3" Content="📂" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
+                            Command="{Binding OpenSaveFolderCommand}" />
+                </Grid>
+
+                <RadioButton GroupName="World" Content="Create a new world"
+                             IsChecked="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
+                <TextBox Margin="24,0,0,0" PlaceholderText="New world name (5–20 characters)"
+                         Text="{Binding Form.NewWorldName}" MaxLength="20" IsEnabled="{Binding AllowServerChanges}" />
+            </StackPanel>
+
+            <TextBlock Text="Join Options" FontWeight="SemiBold" Margin="0,8,0,2" />
+            <StackPanel Margin="12,0,0,0" Spacing="4">
+                <CheckBox Content="Community Server (listed publicly)"
+                          IsChecked="{Binding Form.IsPublic}" IsEnabled="{Binding AllowServerChanges}" />
+                <CheckBox Content="Enable Crossplay"
+                          IsChecked="{Binding Form.Crossplay}" IsEnabled="{Binding AllowServerChanges}" />
+            </StackPanel>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

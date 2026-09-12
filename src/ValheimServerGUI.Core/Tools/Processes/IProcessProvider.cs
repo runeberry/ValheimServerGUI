@@ -17,5 +17,13 @@ namespace ValheimServerGUI.Tools.Processes
         /// exactly as Ctrl+C would. No-op if no live process is tracked under the key.
         /// </summary>
         void SafelyKillProcess(string key);
+
+        /// <summary>
+        /// Forcibly terminates the tracked process with the given key (Windows <c>taskkill /f</c>; Linux
+        /// SIGKILL). Unlike <see cref="SafelyKillProcess"/> this does NOT let the server flush a world
+        /// save — it is the last resort when a graceful stop has timed out (§16.2 stop-timeout). No-op if
+        /// no live process is tracked under the key.
+        /// </summary>
+        void ForceKillProcess(string key);
     }
 }

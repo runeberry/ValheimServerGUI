@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
@@ -7,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Startup;
 using ValheimServerGUI.App.ViewModels;
+using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 
@@ -30,10 +32,28 @@ public partial class MainWindow : Window
 
         viewModel.NewWindowRequested += OnNewWindowRequested;
         viewModel.CloseRequested += Close;
+        viewModel.CloudImportPrompt = ShowCloudImportAsync;
+        viewModel.ErrorReported = msg => _ = ShowMessageAsync("Error starting server", msg);
+        viewModel.StopTimedOutWarning += () =>
+            _ = ShowMessageAsync("Server force-stopped",
+                "The server did not shut down in time and was force-stopped. Recent world changes may not have been saved.");
 
         Closing += OnClosing;
+        Opened += OnOpened;
         SetUpTrayIcon();
     }
+
+    private async void OnOpened(object? sender, EventArgs e)
+    {
+        if (ViewModel is { AutoStartOnLoad: true })
+            await ViewModel.StartServerAsync(isManual: false);
+    }
+
+    private async Task<CloudImportChoice> ShowCloudImportAsync(string worldName)
+        => await new CloudImportWindow(worldName).ShowDialog<CloudImportChoice>(this);
+
+    private async Task ShowMessageAsync(string title, string message)
+        => await new MessageWindow(title, message).ShowDialog(this);
 
     /// <summary>The per-window view-model (each window owns its own).</summary>
     public MainWindowViewModel? ViewModel { get; }

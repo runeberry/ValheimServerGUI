@@ -1,0 +1,55 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.AdvancedControlsView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="8" Spacing="2">
+            <TextBlock Text="Directory Overrides (per-profile)" FontWeight="SemiBold" Margin="0,0,0,2" />
+            <c:FormRow Header="Server Executable" HelpText="Leave blank to use the default from Preferences.">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0" Text="{Binding Form.ServerExePath}" IsEnabled="{Binding AllowServerChanges}" />
+                    <Button Grid.Column="1" Content="Open" Margin="8,0,0,0" Command="{Binding OpenServerExeFolderCommand}" />
+                </Grid>
+            </c:FormRow>
+            <c:FormRow Header="Save Data Folder" HelpText="Leave blank to use the default from Preferences.">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBox Grid.Column="0" Text="{Binding Form.SaveDataFolderPath}" IsEnabled="{Binding AllowServerChanges}" />
+                    <Button Grid.Column="1" Content="Open" Margin="8,0,0,0" Command="{Binding OpenSaveFolderCommand}" />
+                </Grid>
+            </c:FormRow>
+
+            <TextBlock Text="Other Settings" FontWeight="SemiBold" Margin="0,8,0,2" />
+            <StackPanel Margin="12,0,0,0" Spacing="4">
+                <CheckBox Content="Auto-start this server when the app launches"
+                          IsChecked="{Binding Form.AutoStart}" IsEnabled="{Binding AllowServerChanges}" />
+                <CheckBox Content="Write server logs to file"
+                          IsChecked="{Binding Form.WriteServerLogsToFile}" IsEnabled="{Binding AllowServerChanges}" />
+            </StackPanel>
+            <c:FormRow Header="Additional Command-line Args"
+                       HelpText="Extra arguments passed to the server (the -logFile argument is not allowed).">
+                <TextBox Text="{Binding Form.AdditionalArgs}" MaxLength="32767" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+
+            <TextBlock Text="Saving &amp; Backups" FontWeight="SemiBold" Margin="0,8,0,2" />
+            <c:FormRow Header="Save Interval (seconds)" HelpText="How often the world is auto-saved (60–86400).">
+                <NumericUpDown Value="{Binding Form.SaveInterval}" Minimum="60" Maximum="86400"
+                               FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+            <c:FormRow Header="Backups to Keep" HelpText="Number of world backups to retain (1–1000).">
+                <NumericUpDown Value="{Binding Form.BackupCount}" Minimum="1" Maximum="1000"
+                               FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+            <c:FormRow Header="Short Backup Interval (seconds)" HelpText="300–2592000.">
+                <NumericUpDown Value="{Binding Form.BackupIntervalShort}" Minimum="300" Maximum="2592000"
+                               FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+            <c:FormRow Header="Long Backup Interval (seconds)" HelpText="300–2592000.">
+                <NumericUpDown Value="{Binding Form.BackupIntervalLong}" Minimum="300" Maximum="2592000"
+                               FormatString="0" IsEnabled="{Binding AllowServerChanges}" />
+            </c:FormRow>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

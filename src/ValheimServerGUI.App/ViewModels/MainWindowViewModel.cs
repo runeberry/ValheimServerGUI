@@ -1,6 +1,9 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
@@ -19,31 +22,46 @@ public enum MenuAction
     SetDirectories,
     BugReport,
     About,
+    WorldPreferences,
+}
+
+/// <summary>The user's answer to the "host a cloud world?" prompt (§ Steam Cloud import).</summary>
+public enum CloudImportChoice
+{
+    Move,
+    Copy,
+    Cancel,
 }
 
 /// <summary>
 /// One server window's view-model (§10.5). Owns a transient <see cref="ValheimServer"/> over the shared
-/// singleton providers. Exposes the chrome surface: server status + the single <c>Can*</c>/
-/// <c>AllowServerChanges</c> gate (buttons AND tray derive from these — never duplicated), the update-check
-/// status, the profile list behind the File menu, and commands for the menus/status bar. Window/lifetime
-/// actions (New Window, Close, Start flow, dialog opens) are surfaced as events the code-behind wires, so
-/// the view-model stays free of window/dialog references.
+/// singleton providers. Exposes the chrome surface (status + the single Can*/AllowServerChanges gate,
+/// update status, profile list, menu/button commands) and the editable form (<see cref="Form"/>) plus the
+/// StartServer flow (cloud import → validate → port check → new-world checks → start → save-on-start →
+/// reselection). Window/dialog interactions are surfaced as events/delegates the code-behind wires.
 /// </summary>
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly ValheimServer _server;
     private readonly IUserPreferencesProvider _userPrefs;
     private readonly IServerPreferencesProvider _serverPrefs;
+    private readonly IWorldPreferencesProvider _worldPrefs;
+    private readonly ISteamCloudWorldProvider _cloudProvider;
+    private readonly IIpAddressProvider _ipProvider;
     private readonly ISoftwareUpdateProvider _updateProvider;
     private readonly IShellLauncher _shell;
     private readonly IValheimPathResolver _pathResolver;
 
     private string? _updateLinkTarget;
+    private string? _startedNewWorld;
 
     public MainWindowViewModel(
         ValheimServer server,
         IUserPreferencesProvider userPrefs,
         IServerPreferencesProvider serverPrefs,
+        IWorldPreferencesProvider worldPrefs,
+        ISteamCloudWorldProvider cloudProvider,
+        IIpAddressProvider ipProvider,
         ISoftwareUpdateProvider updateProvider,
         IShellLauncher shell,
         IValheimPathResolver pathResolver)
@@ -51,13 +69,18 @@ public partial class MainWindowViewModel : ViewModelBase
         _server = server;
         _userPrefs = userPrefs;
         _serverPrefs = serverPrefs;
+        _worldPrefs = worldPrefs;
+        _cloudProvider = cloudProvider;
+        _ipProvider = ipProvider;
         _updateProvider = updateProvider;
         _shell = shell;
         _pathResolver = pathResolver;
 
         _serverStatus = _server.Status;
+        StartAction = _server.Start;
 
-        _server.StatusChanged += OnServerStatusChanged;
+        _server.StatusChanged += HandleServerStatusChanged;
+        _server.StopTimedOut += OnServerStopTimedOut;
         _updateProvider.UpdateCheckStarted += OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished += OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved += OnServerPreferencesSaved;
@@ -65,18 +88,30 @@ public partial class MainWindowViewModel : ViewModelBase
         RefreshProfiles();
     }
 
-    // --- events the code-behind routes (keeps the VM free of window/dialog references) ---
+    // --- events / delegates the code-behind routes ---
     public event Action? NewWindowRequested;
     public event Action? CloseRequested;
-    public event Action<bool>? StartServerRequested;      // isManual — the full flow lands in Wave 4
-    public event Action<MenuAction>? MenuActionRequested;  // dialog opens — Wave 6
-    public event Action<string>? RemoveProfileRequested;   // profile name — Wave 6 (confirm + remove)
+    public event Action<MenuAction>? MenuActionRequested;   // dialog opens — Wave 6
+    public event Action<string>? RemoveProfileRequested;    // profile name — Wave 6
+    public event Action? StopTimedOutWarning;               // §16.2 save-loss warning
+
+    /// <summary>Shows the Move/Copy/Cancel cloud-import prompt. Wired by the window; returns Cancel if unset.</summary>
+    public Func<string, Task<CloudImportChoice>>? CloudImportPrompt { get; set; }
+
+    /// <summary>Surfaces a start-server error (manual start only). Wired by the window.</summary>
+    public Action<string>? ErrorReported { get; set; }
+
+    /// <summary>The actual "start the server" step; overridable in tests so the full flow runs without launching.</summary>
+    internal Action<IValheimServerOptions> StartAction { get; set; }
 
     public ValheimServer Server => _server;
 
     public bool AutoStartOnLoad { get; set; }
 
-    // --- profile identity (single CurrentProfile source: title, tray tooltip, tray header all read it) ---
+    /// <summary>The editable Server Controls + Advanced Controls form.</summary>
+    public ServerFormViewModel Form { get; } = new();
+
+    // --- profile identity (single CurrentProfile source) ---
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(Title))]
     private ServerPreferences? _currentProfile;
@@ -85,19 +120,16 @@ public partial class MainWindowViewModel : ViewModelBase
         ? AppConstants.ProductName
         : $"{AppConstants.ProductName} — {CurrentProfile.ProfileName}";
 
-    /// <summary>Names of all saved profiles (behind Load/Remove submenus). Kept in sync with saves.</summary>
     public ObservableCollection<string> Profiles { get; } = new();
 
     public bool HasProfiles => Profiles.Count > 0;
 
-    // --- server status + the single Can*/AllowServerChanges gate ---
+    // --- server status + the single gate ---
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStart), nameof(CanStop), nameof(CanRestart), nameof(AllowServerChanges), nameof(StatusText))]
     [NotifyCanExecuteChangedFor(nameof(StartCommand), nameof(StopCommand), nameof(RestartCommand), nameof(NewProfileCommand), nameof(LoadProfileCommand))]
     private ServerStatus _serverStatus;
 
-    // Buttons AND tray items bind these (via the commands), and they derive from the one mirrored
-    // ServerStatus — the same shape as ValheimServer.Can*, but a single source so nothing drifts.
     public bool CanStart => ServerStatus == ServerStatus.Stopped;
     public bool CanStop => ServerStatus is ServerStatus.Starting or ServerStatus.Running;
     public bool CanRestart => ServerStatus == ServerStatus.Running;
@@ -107,7 +139,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     public string StatusText => ServerStatus.ToString();
 
-    // --- update-check status (status-bar right; link when actionable) ---
+    // --- update-check status ---
     [ObservableProperty]
     [NotifyCanExecuteChangedFor(nameof(UpdateLinkCommand))]
     private string _updateStatusText = string.Empty;
@@ -119,7 +151,7 @@ public partial class MainWindowViewModel : ViewModelBase
     // ===== commands =====
 
     [RelayCommand(CanExecute = nameof(CanStart))]
-    private void Start() => StartServerRequested?.Invoke(true);
+    private Task Start() => StartServerAsync(isManual: true);
 
     [RelayCommand(CanExecute = nameof(CanStop))]
     private void Stop() => _server.Stop();
@@ -159,9 +191,42 @@ public partial class MainWindowViewModel : ViewModelBase
     private void SetDirectories() => MenuActionRequested?.Invoke(MenuAction.SetDirectories);
 
     [RelayCommand]
+    private void WorldPreferences() => MenuActionRequested?.Invoke(MenuAction.WorldPreferences);
+
+    [RelayCommand]
+    private void RefreshWorlds() => RefreshWorldList();
+
+    [RelayCommand]
+    private void OpenSaveFolder()
+    {
+        try
+        {
+            _shell.OpenDirectory(BuildOptions().GetValidatedSaveDataFolder().FullName);
+        }
+        catch (Exception ex)
+        {
+            ErrorReported?.Invoke($"Unable to open the save folder: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
+    private void OpenServerExeFolder()
+    {
+        try
+        {
+            var exe = BuildOptions().GetValidatedServerExe().FullName;
+            _shell.OpenDirectory(exe);
+        }
+        catch (Exception ex)
+        {
+            ErrorReported?.Invoke($"Unable to open the server folder: {ex.Message}");
+        }
+    }
+
+    [RelayCommand]
     private void OpenSettingsDirectory()
     {
-        var dir = System.IO.Path.GetDirectoryName(_pathResolver.UserPrefsFilePath);
+        var dir = Path.GetDirectoryName(_pathResolver.UserPrefsFilePath);
         if (!string.IsNullOrEmpty(dir)) _shell.OpenDirectory(dir);
     }
 
@@ -175,8 +240,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void BugReport() => MenuActionRequested?.Invoke(MenuAction.BugReport);
 
     [RelayCommand]
-    private async System.Threading.Tasks.Task CheckForUpdates()
-        => await _updateProvider.CheckForUpdatesAsync(isManualCheck: true);
+    private async Task CheckForUpdates() => await _updateProvider.CheckForUpdatesAsync(isManualCheck: true);
 
     [RelayCommand]
     private void Discord() => _shell.OpenWebAddress(AppConstants.UrlDiscord);
@@ -191,9 +255,11 @@ public partial class MainWindowViewModel : ViewModelBase
             _shell.OpenWebAddress(_updateLinkTarget);
     }
 
+    // ===== profile / form loading =====
+
     /// <summary>
-    /// Binds a profile to this window and records it as the last-active profile (§16.2). Only writes when
-    /// the value actually changes, to avoid a save storm.
+    /// Binds a profile to this window: records it as last-active (§16.2), loads the form fields, and lists
+    /// the worlds for its save folder.
     /// </summary>
     public void LoadProfile(ServerPreferences profile)
     {
@@ -205,12 +271,233 @@ public partial class MainWindowViewModel : ViewModelBase
             userPrefs.LastActiveProfile = profile.ProfileName;
             _userPrefs.SavePreferences(userPrefs);
         }
+
+        Form.LoadFieldsFrom(profile);
+        RefreshWorldList();
+        SelectWorld(profile.WorldName);
+    }
+
+    // ===== StartServer flow (§10.3 / GetServerOptionsFromFormState + validation) =====
+
+    public async Task StartServerAsync(bool isManual)
+    {
+        void Error(string message)
+        {
+            if (isManual) ErrorReported?.Invoke(message);
+        }
+
+        // A selected cloud world must be imported into the local save folder before it can be hosted; the
+        // suffix never reaches options/prefs/validation.
+        if (Form.IsSelectedWorldCloud)
+        {
+            var cloudName = ServerFormViewModel.StripCloudSuffix(Form.ExistingWorld)!;
+            var choice = CloudImportPrompt is not null ? await CloudImportPrompt(cloudName) : CloudImportChoice.Cancel;
+            if (choice == CloudImportChoice.Cancel) return;
+
+            try
+            {
+                var cloudSaveFolder = BuildOptions().GetValidatedSaveDataFolder();
+                _cloudProvider.ImportCloudWorld(cloudName, cloudSaveFolder, move: choice == CloudImportChoice.Move);
+            }
+            catch (Exception ex)
+            {
+                Error($"Failed to import cloud world '{cloudName}': {ex.Message}");
+                return;
+            }
+
+            RefreshWorldList();
+            Form.UseNewWorld = false;
+            Form.ExistingWorld = cloudName;
+        }
+
+        var options = BuildOptions();
+
+        try
+        {
+            options.Validate();
+        }
+        catch (Exception ex)
+        {
+            Error(ex.Message);
+            return;
+        }
+
+        var port = options.Port;
+        if (!_ipProvider.IsLocalUdpPortAvailable(port, port + 1))
+        {
+            Error($"Port {port} or {port + 1} is already in use. Valheim requires two adjacent ports; " +
+                  "shut down any UDP applications using these ports, or choose a different port.");
+            return;
+        }
+
+        var worldName = options.WorldName ?? string.Empty;
+        var saveFolder = options.GetValidatedSaveDataFolder();
+        var newWorld = Form.UseNewWorld;
+
+        if (newWorld)
+        {
+            if (string.IsNullOrWhiteSpace(worldName))
+            {
+                Error("You must enter a world name, or choose an existing world.");
+                return;
+            }
+            if (worldName.Length < 5 || worldName.Length > 20)
+            {
+                Error("World name must be 5-20 characters long.");
+                return;
+            }
+            if (!saveFolder.IsWorldNameAvailable(worldName))
+            {
+                Error($"A world named '{worldName}' already exists.");
+                Form.UseNewWorld = false;
+                Form.ExistingWorld = worldName;
+                return;
+            }
+        }
+        else if (saveFolder.IsWorldNameAvailable(worldName))
+        {
+            Error($"No world exists with name '{worldName}'.");
+            return;
+        }
+
+        try
+        {
+            StartAction(options);
+        }
+        catch (Exception ex)
+        {
+            Error(ex.Message);
+            return;
+        }
+
+        // Remember a just-started new world so we can reselect it as "existing" once it comes up (§10.2).
+        _startedNewWorld = newWorld ? worldName : null;
+
+        if (_userPrefs.LoadPreferences().SaveProfileOnStart)
+            _serverPrefs.SavePreferences(BuildPreferences());
+    }
+
+    /// <summary>GetServerOptionsFromFormState.</summary>
+    public ValheimServerOptions BuildOptions()
+    {
+        var userPrefs = _userPrefs.LoadPreferences();
+        var serverPrefs = BuildPreferences();
+
+        var options = new ValheimServerOptions
+        {
+            Name = serverPrefs.Name,
+            Password = serverPrefs.Password,
+            PasswordValidation = userPrefs.EnablePasswordValidation,
+            WorldName = serverPrefs.WorldName,
+            Public = serverPrefs.Public,
+            Port = serverPrefs.Port,
+            Crossplay = serverPrefs.Crossplay,
+            SaveInterval = serverPrefs.SaveInterval,
+            Backups = serverPrefs.BackupCount,
+            BackupShort = serverPrefs.BackupIntervalShort,
+            BackupLong = serverPrefs.BackupIntervalLong,
+            AdditionalArgs = serverPrefs.AdditionalArgs,
+            ServerExePath = !string.IsNullOrWhiteSpace(serverPrefs.ServerExePath)
+                ? serverPrefs.ServerExePath
+                : userPrefs.ServerExePath,
+            SaveDataFolderPath = !string.IsNullOrWhiteSpace(serverPrefs.SaveDataFolderPath)
+                ? serverPrefs.SaveDataFolderPath
+                : userPrefs.SaveDataFolderPath,
+            LogToFile = serverPrefs.WriteServerLogsToFile,
+        };
+
+        var worldName = serverPrefs.WorldName;
+        if (!string.IsNullOrWhiteSpace(worldName))
+        {
+            var worldPrefs = _worldPrefs.LoadPreferences(worldName);
+            if (worldPrefs is not null)
+            {
+                if (!string.IsNullOrEmpty(worldPrefs.Preset))
+                    options.WorldPreset = worldPrefs.Preset;
+                else
+                    options.WorldModifiers = worldPrefs.Modifiers;
+
+                options.WorldKeys = worldPrefs.Keys;
+            }
+        }
+
+        return options;
+    }
+
+    /// <summary>GetPrefsFromFormState — merged onto the existing/new profile prefs.</summary>
+    public ServerPreferences BuildPreferences()
+    {
+        var profileName = CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName;
+        var prefs = _serverPrefs.LoadPreferences(profileName) ?? new ServerPreferences { ProfileName = profileName };
+        return Form.ToPreferences(prefs);
+    }
+
+    private void RefreshWorldList()
+    {
+        List<string> local;
+        try
+        {
+            local = BuildOptions().GetValidatedSaveDataFolder().GetWorldNames();
+        }
+        catch
+        {
+            // Save folder not configured/available yet — nothing to list.
+            Form.Worlds.Clear();
+            return;
+        }
+
+        // Also surface Steam Cloud worlds so they can be imported and hosted; local wins on a name clash.
+        var cloud = _cloudProvider.GetCloudWorldNames()
+            .Where(n => !local.Contains(n, StringComparer.OrdinalIgnoreCase))
+            .Select(n => n + AppConstants.CloudWorldSuffix);
+
+        Form.Worlds.Clear();
+        foreach (var world in local.Concat(cloud))
+            Form.Worlds.Add(world);
+    }
+
+    private void SelectWorld(string? worldName)
+    {
+        if (string.IsNullOrWhiteSpace(worldName))
+        {
+            Form.UseNewWorld = false;
+            Form.ExistingWorld = Form.Worlds.FirstOrDefault();
+            return;
+        }
+
+        var match = Form.Worlds.FirstOrDefault(w =>
+            string.Equals(ServerFormViewModel.StripCloudSuffix(w), worldName, StringComparison.OrdinalIgnoreCase));
+
+        if (match is not null)
+        {
+            Form.UseNewWorld = false;
+            Form.ExistingWorld = match;
+        }
+        else
+        {
+            Form.UseNewWorld = true;
+            Form.NewWorldName = worldName;
+        }
     }
 
     // ===== Core event handlers (marshalled + guarded) =====
 
-    private void OnServerStatusChanged(object? sender, ServerStatus status)
+    private void HandleServerStatusChanged(object? sender, ServerStatus status)
         => RunOnUi(() => ServerStatus = status);
+
+    // A just-started new world now exists; switch the picker back to Existing and select it (§10.2).
+    partial void OnServerStatusChanged(ServerStatus value)
+    {
+        if (value == ServerStatus.Running && _startedNewWorld is not null)
+        {
+            RefreshWorldList();
+            SelectWorld(_startedNewWorld);
+            _startedNewWorld = null;
+        }
+    }
+
+    private void OnServerStopTimedOut(object? sender, EventArgs e)
+        => RunOnUi(() => StopTimedOutWarning?.Invoke());
 
     private void OnUpdateCheckStarted(object? sender, EventArgs e)
         => RunOnUi(() =>
@@ -231,7 +518,6 @@ public partial class MainWindowViewModel : ViewModelBase
                 return;
             }
 
-            // Positive comparison → the fetched version is newer than the running app.
             if (AssemblyHelper.CompareVersion(e.LatestVersion!) > 0)
             {
                 UpdateStatusText = $"Update available: {e.LatestVersion}";
@@ -246,7 +532,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         });
 
-    private void OnServerPreferencesSaved(object? sender, System.Collections.Generic.List<ServerPreferences> profiles)
+    private void OnServerPreferencesSaved(object? sender, List<ServerPreferences> profiles)
         => RunOnUi(RefreshProfiles);
 
     private void RefreshProfiles()
@@ -265,7 +551,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     protected override void DisposeCore()
     {
-        _server.StatusChanged -= OnServerStatusChanged;
+        _server.StatusChanged -= HandleServerStatusChanged;
+        _server.StopTimedOut -= OnServerStopTimedOut;
         _updateProvider.UpdateCheckStarted -= OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished -= OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved -= OnServerPreferencesSaved;

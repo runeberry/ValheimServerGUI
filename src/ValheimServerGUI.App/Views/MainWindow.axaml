@@ -4,6 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels"
         xmlns:conv="using:ValheimServerGUI.App.Converters"
+        xmlns:tabs="using:ValheimServerGUI.App.Views.Tabs"
         mc:Ignorable="d"
         x:Class="ValheimServerGUI.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
@@ -101,10 +102,10 @@
         <!-- ===== Tabs (content filled in Waves 4–5) ===== -->
         <TabControl Margin="8,0,8,8">
             <TabItem Header="Server Controls">
-                <TextBlock Margin="8" Text="Server Controls — Wave 4" />
+                <tabs:ServerControlsView />
             </TabItem>
             <TabItem Header="Advanced Controls">
-                <TextBlock Margin="8" Text="Advanced Controls — Wave 4" />
+                <tabs:AdvancedControlsView />
             </TabItem>
             <TabItem Header="Server Details">
                 <TextBlock Margin="8" Text="Server Details — Wave 5" />

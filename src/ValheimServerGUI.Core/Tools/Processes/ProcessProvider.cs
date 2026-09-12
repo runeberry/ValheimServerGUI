@@ -66,5 +66,21 @@ namespace ValheimServerGUI.Tools.Processes
             // todo: Send output to application logs
             StartIO(killProcess);
         }
+
+        public void ForceKillProcess(string key)
+        {
+            var process = GetProcess(key);
+            if (process == null) return;
+
+            // Last resort after a graceful stop timed out: kill hard. No save flush.
+            try
+            {
+                process.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+                // Process already exited between GetProcess and Kill — nothing to do.
+            }
+        }
     }
 }

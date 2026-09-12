@@ -9,6 +9,7 @@ using ValheimServerGUI.App.Startup;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools;
 using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Startup;
@@ -34,6 +35,9 @@ public class ShellCoordinatorTests
         Func<MainWindowViewModel> factory = () =>
             new MainWindowViewModel(
                 Core.GetRequiredService<ValheimServer>(), userPrefsProvider, serverPrefs,
+                Core.GetRequiredService<IWorldPreferencesProvider>(),
+                Core.GetRequiredService<ISteamCloudWorldProvider>(),
+                Core.GetRequiredService<IIpAddressProvider>(),
                 new FakeSoftwareUpdateProvider(), shell, pathResolver);
         var startupService = new StartupService(new FakeSoftwareUpdateProvider(), new FakePlayerDataRepository(), TestLog.Silent);
 

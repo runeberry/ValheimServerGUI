@@ -1,0 +1,12 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             x:Class="ValheimServerGUI.App.Controls.CheckBoxFormField"
+             x:Name="Root" x:CompileBindings="False">
+    <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+        <CheckBox Content="{Binding #Root.LabelText}" IsChecked="{Binding #Root.Value, Mode=TwoWay}" />
+        <TextBlock Text="?" FontWeight="Bold" Foreground="#0066CC" Cursor="Hand" VerticalAlignment="Center"
+                   ToolTip.Tip="{Binding #Root.HelpText}"
+                   IsVisible="{Binding #Root.HelpText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+    </StackPanel>
+</UserControl>

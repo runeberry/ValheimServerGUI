@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             x:Class="ValheimServerGUI.App.Controls.TextFormField"
+             x:Name="Root" x:CompileBindings="False">
+    <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBox Grid.Column="0"
+                     Text="{Binding #Root.Value, Mode=TwoWay}"
+                     MaxLength="{Binding #Root.MaxLength}"
+                     PlaceholderText="{Binding #Root.Watermark}"
+                     PasswordChar="{Binding #Root.ShowValue, Converter={x:Static conv:PasswordCharConverter.Instance}}" />
+            <ContentControl Grid.Column="1" Content="{Binding #Root.TrailingContent}"
+                            IsVisible="{Binding #Root.TrailingContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+        </Grid>
+    </c:FormRow>
+</UserControl>

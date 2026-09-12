@@ -14,9 +14,7 @@
             <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Platform}" />
             <TextBlock Grid.Row="1" Grid.Column="0" Text="Player ID:" />
             <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PlayerId}" />
-            <Button Grid.Row="1" Grid.Column="2" Classes="icon" ToolTip.Tip="Copy" Click="CopyPlayerId" Margin="4,0,0,0">
-                <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
-            </Button>
+            <c:CopyButton Grid.Row="1" Grid.Column="2" Text="{Binding PlayerId}" Margin="4,0,0,0" />
             <TextBlock Grid.Row="2" Grid.Column="0" Text="ZDO ID:" />
             <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ZdoId}" />
             <TextBlock Grid.Row="3" Grid.Column="0" Text="Latest Character:" />

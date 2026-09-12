@@ -30,31 +30,23 @@
                         <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="External IP Address:" />
                         <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.ExternalIp}" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="0" Grid.Column="2" Classes="help" ToolTip.Tip="Your public IP — share this with friends on the internet." />
-                        <Button Grid.Row="0" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyExternal">
-                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
-                        </Button>
+                        <c:CopyButton Grid.Row="0" Grid.Column="3" Text="{Binding Details.ExternalIp}" />
 
                         <TextBlock Grid.Row="1" Grid.Column="0" Classes="caption" Text="Internal IP Address:" />
                         <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.InternalIp}" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="1" Grid.Column="2" Classes="help" ToolTip.Tip="Your IP on the local network." />
-                        <Button Grid.Row="1" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyInternal">
-                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
-                        </Button>
+                        <c:CopyButton Grid.Row="1" Grid.Column="3" Text="{Binding Details.InternalIp}" />
 
                         <TextBlock Grid.Row="2" Grid.Column="0" Classes="caption" Text="Local IP Address:" />
                         <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.LocalIp}" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="2" Grid.Column="2" Classes="help" ToolTip.Tip="The loopback address for connecting from this machine." />
-                        <Button Grid.Row="2" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyLocal">
-                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
-                        </Button>
+                        <c:CopyButton Grid.Row="2" Grid.Column="3" Text="{Binding Details.LocalIp}" />
 
                         <TextBlock Grid.Row="3" Grid.Column="0" Classes="caption" Text="Invite Code:" />
                         <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Details.InviteCode}" VerticalAlignment="Center" />
                         <TextBlock Grid.Row="3" Grid.Column="2" Classes="help" ToolTip.Tip="Crossplay invite code friends can use to join." />
-                        <Button Grid.Row="3" Grid.Column="3" Classes="icon" ToolTip.Tip="Copy" Click="CopyInvite"
-                                IsVisible="{Binding Details.InviteCodeCopyable}">
-                            <Image Source="{c:Icon Copy_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
-                        </Button>
+                        <c:CopyButton Grid.Row="3" Grid.Column="3" Text="{Binding Details.InviteCode}"
+                                      IsVisible="{Binding Details.InviteCodeCopyable}" />
                     </Grid>
                     <TextBlock Margin="0,4,0,0" FontStyle="Italic"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"

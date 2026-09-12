@@ -1,6 +1,5 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
-using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
@@ -21,9 +20,6 @@ public partial class PlayerDetailsWindow : Window
     }
 
     private PlayerDetailsViewModel Vm => (PlayerDetailsViewModel)DataContext!;
-
-    private async void CopyPlayerId(object? sender, RoutedEventArgs e)
-        => await ClipboardHelper.CopyTextAsync(this, Vm.PlayerId);
 
     private async void AddCharacter(object? sender, RoutedEventArgs e)
     {

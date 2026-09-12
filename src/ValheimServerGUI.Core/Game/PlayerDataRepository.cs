@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Data;
 using ValheimServerGUI.Tools.Models;
@@ -11,17 +10,17 @@ namespace ValheimServerGUI.Game
 {
     public class PlayerDataQuery
     {
-        public string Platform;
+        public string? Platform;
 
-        public string PlayerId;
+        public string? PlayerId;
 
-        public string PlayerName;
+        public string? PlayerName;
 
-        public string ZdoId;
+        public string? ZdoId;
 
-        public string CharacterName;
+        public string? CharacterName;
 
-        public PlayerDataQuery Or;
+        public PlayerDataQuery? Or;
 
         public override string ToString()
         {
@@ -56,9 +55,9 @@ namespace ValheimServerGUI.Game
 
         IEnumerable<PlayerInfo> FindPlayersByQuery(PlayerDataQuery query);
 
-        PlayerInfo SetPlayerJoining(PlayerDataQuery query);
+        PlayerInfo? SetPlayerJoining(PlayerDataQuery query);
 
-        PlayerInfo SetPlayerOnline(string characterName, string zdoId);
+        PlayerInfo? SetPlayerOnline(string characterName, string zdoId);
 
         void SetPlayerLeaving(PlayerDataQuery query);
 
@@ -69,7 +68,7 @@ namespace ValheimServerGUI.Game
 
     public class PlayerDataRepository : DataFileRepository<PlayerInfo>, IPlayerDataRepository
     {
-        public event EventHandler<PlayerInfo> PlayerStatusChanged;
+        public event EventHandler<PlayerInfo>? PlayerStatusChanged;
 
         private readonly IRuneberryApiClient RuneberryApiClient;
         private readonly Dictionary<string, PlayerStatus> PlayerStatusMap = new();
@@ -77,8 +76,9 @@ namespace ValheimServerGUI.Game
 
         public PlayerDataRepository(
             IDataFileRepositoryContext context,
-            IRuneberryApiClient runeberryApiClient)
-            : base(context, Resources.PlayerListFilePath)
+            IRuneberryApiClient runeberryApiClient,
+            IValheimPathResolver pathResolver)
+            : base(context, pathResolver.PlayerListFilePath)
         {
             EntityUpdated += OnEntityUpdated;
             RuneberryApiClient = runeberryApiClient;
@@ -128,7 +128,7 @@ namespace ValheimServerGUI.Game
             return results;
         }
 
-        public PlayerInfo SetPlayerJoining(PlayerDataQuery query)
+        public PlayerInfo? SetPlayerJoining(PlayerDataQuery query)
         {
             if (!query.HasParameters()) return null;
 
@@ -156,15 +156,15 @@ namespace ValheimServerGUI.Game
 
             if (string.IsNullOrWhiteSpace(player.PlayerName))
             {
-                RuneberryApiClient.RequestPlayerInfoAsync(player.Platform, player.PlayerId);
+                RuneberryApiClient.RequestPlayerInfoAsync(player.Platform ?? string.Empty, player.PlayerId ?? string.Empty);
             }
 
             return player;
         }
 
-        public PlayerInfo SetPlayerOnline(string characterName, string zdoId)
+        public PlayerInfo? SetPlayerOnline(string characterName, string zdoId)
         {
-            PlayerInfo player = null;
+            PlayerInfo? player = null;
             var playersToSave = new List<PlayerInfo>();
 
             var playersWithCharName = Enumerable.Empty<PlayerInfo>();
@@ -321,7 +321,7 @@ namespace ValheimServerGUI.Game
 
         #region Non-public methods
 
-        private static PlayerInfo CreatePlayerFromQuery(PlayerDataQuery query, PlayerInfo player = null)
+        private static PlayerInfo CreatePlayerFromQuery(PlayerDataQuery query, PlayerInfo? player = null)
         {
             player ??= new PlayerInfo();
 
@@ -358,7 +358,7 @@ namespace ValheimServerGUI.Game
             return player;
         }
 
-        private void OnEntityUpdated(object sender, PlayerInfo player)
+        private void OnEntityUpdated(object? sender, PlayerInfo player)
         {
             bool statusChanged;
 
@@ -388,7 +388,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private void OnPlayerInfoAvailable(object sender, PlayerInfoResponse response)
+        private void OnPlayerInfoAvailable(object? sender, PlayerInfoResponse response)
         {
             if (string.IsNullOrWhiteSpace(response.Id)
                 || string.IsNullOrWhiteSpace(response.Name)

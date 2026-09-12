@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Forms;
-using ValheimServerGUI.Forms;
+using System.Threading.Tasks;
 using ValheimServerGUI.Tools.Logging;
 using ValheimServerGUI.Tools.Models;
 
@@ -12,24 +11,30 @@ namespace ValheimServerGUI.Tools
     {
         event EventHandler ExceptionHandled;
 
-        void HandleException(Exception e, string contextMessage = null);
+        void HandleException(Exception e, string? contextMessage = null);
     }
 
+    /// <summary>
+    /// Builds a crash report from an exception and, with the user's consent, sends it to the Runeberry
+    /// backend. The consent prompt is the <see cref="IUserPrompt"/> seam (formerly a WinForms MessageBox);
+    /// the progress dialog that the WinForms shell showed while sending is a Phase 2 shell concern.
+    /// </summary>
     public class ExceptionHandler : IExceptionHandler
     {
         private readonly IRuneberryApiClient RuneberryApiClient;
-
         private readonly IApplicationLogger Logger;
+        private readonly IUserPrompt UserPrompt;
 
-        public ExceptionHandler(IRuneberryApiClient runeberryApiClient, IApplicationLogger logger)
+        public ExceptionHandler(IRuneberryApiClient runeberryApiClient, IApplicationLogger logger, IUserPrompt userPrompt)
         {
             RuneberryApiClient = runeberryApiClient;
             Logger = logger;
+            UserPrompt = userPrompt;
         }
 
-        public event EventHandler ExceptionHandled;
+        public event EventHandler? ExceptionHandled;
 
-        public void HandleException(Exception e, string contextMessage = null)
+        public void HandleException(Exception e, string? contextMessage = null)
         {
             if (e == null) return;
 
@@ -38,29 +43,25 @@ namespace ValheimServerGUI.Tools
             contextMessage ??= "Unknown Exception";
             var userMessage = $"A fatal error has occured: {e.Message}{Environment.NewLine}{Environment.NewLine}Would you like to send an automated crash report to the developer?";
 
-            var result = MessageBox.Show(
-                userMessage,
-                contextMessage,
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Error);
-
-            if (result == DialogResult.Yes)
+            if (UserPrompt.Confirm(userMessage, contextMessage))
             {
                 var crashReport = BuildCrashReport(e, contextMessage);
-                var task = RuneberryApiClient.SendCrashReportAsync(crashReport);
-
-                var asyncPopout = new AsyncPopout(task, o =>
-                {
-                    o.Title = "Crash Report";
-                    o.Text = "Sending crash report...";
-                    o.SuccessMessage = "Crash report received. Thank you!";
-                    o.FailureMessage = "Failed to send crash report.\r\nContact Runeberry Software for further support.";
-                });
-
-                asyncPopout.ShowDialog();
+                _ = SendCrashReportSafelyAsync(crashReport);
             }
 
             ExceptionHandled?.Invoke(this, EventArgs.Empty);
+        }
+
+        private async Task SendCrashReportSafelyAsync(CrashReport crashReport)
+        {
+            try
+            {
+                await RuneberryApiClient.SendCrashReportAsync(crashReport);
+            }
+            catch (Exception e)
+            {
+                Logger.Error(e, "Failed to send crash report");
+            }
         }
 
         private CrashReport BuildCrashReport(Exception e, string contextMessage)
@@ -72,9 +73,9 @@ namespace ValheimServerGUI.Tools
                 { "ExceptionType", e.GetType().Name },
                 { "Message", e.Message },
                 { "Context", contextMessage },
-                { "Source", e.Source },
-                { "TargetSite", e.TargetSite?.ToString() },
-                { "StackTrace", e.StackTrace },
+                { "Source", e.Source ?? string.Empty },
+                { "TargetSite", e.TargetSite?.ToString() ?? string.Empty },
+                { "StackTrace", e.StackTrace ?? string.Empty },
             };
 
             crashReport.Source = "CrashReport";

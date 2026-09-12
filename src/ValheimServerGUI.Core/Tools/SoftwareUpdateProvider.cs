@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Threading.Tasks;
 using ValheimServerGUI.Game;
-using ValheimServerGUI.Properties;
 
 namespace ValheimServerGUI.Tools
 {
@@ -16,13 +15,13 @@ namespace ValheimServerGUI.Tools
 
     public class SoftwareUpdateEventArgs
     {
-        public string LatestVersion { get; }
+        public string? LatestVersion { get; }
 
         public bool IsManualCheck { get; }
 
         public bool IsSuccessful { get; }
 
-        public Exception Exception { get; }
+        public Exception? Exception { get; }
 
         public SoftwareUpdateEventArgs(
             string latestVersion,
@@ -48,7 +47,7 @@ namespace ValheimServerGUI.Tools
         private readonly IGitHubClient GitHubClient;
         private readonly IUserPreferencesProvider UserPrefsProvider;
 
-        private readonly TimeSpan UpdateCheckInterval = TimeSpan.Parse(Resources.UpdateCheckInterval);
+        private readonly TimeSpan UpdateCheckInterval = CoreConstants.UpdateCheckInterval;
         private DateTime NextAutomaticUpdateCheck = DateTime.MinValue;
 
         public SoftwareUpdateProvider(IGitHubClient gitHubClient, IUserPreferencesProvider userPrefsProvider)
@@ -57,9 +56,9 @@ namespace ValheimServerGUI.Tools
             UserPrefsProvider = userPrefsProvider;
         }
 
-        public event EventHandler UpdateCheckStarted;
+        public event EventHandler? UpdateCheckStarted;
 
-        public event EventHandler<SoftwareUpdateEventArgs> UpdateCheckFinished;
+        public event EventHandler<SoftwareUpdateEventArgs>? UpdateCheckFinished;
 
         public async Task CheckForUpdatesAsync(bool isManualCheck)
         {
@@ -81,7 +80,6 @@ namespace ValheimServerGUI.Tools
 
             try
             {
-                var currentVersion = AssemblyHelper.GetApplicationVersion();
                 var release = await GitHubClient.GetLatestReleaseAsync();
 
                 // In case there was no response from GitHub, consider the current running version as the "latest version"

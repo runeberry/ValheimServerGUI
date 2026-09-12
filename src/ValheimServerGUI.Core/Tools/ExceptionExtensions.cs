@@ -8,7 +8,7 @@ namespace ValheimServerGUI.Tools
         {
             if (exception is AggregateException agg)
             {
-                return agg.InnerException.GetPrimaryException() ?? agg;
+                return agg.InnerException?.GetPrimaryException() ?? agg;
             }
 
             return exception;

@@ -1,29 +1,24 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Logging;
-using ValheimServerGUI.Tools.Models;
 using ValheimServerGUI.Tools.Processes;
 
 namespace ValheimServerGUI.Game
 {
     public class ValheimServer : IDisposable
     {
-        private delegate void LogEventHandler(string[] captures);
-
         /// <summary>
         /// Options for the currently running server.
-        /// </summary>        
+        /// </summary>
         public IValheimServerOptions Options { get; private set; } = new ValheimServerOptions();
 
         /// <summary>
         /// Exposed for testing.
         /// </summary>
-        public IValheimServerLogger Logger => ServerLogger;
+        public IValheimServerLogger? Logger => ServerLogger;
 
         public ServerStatus Status
         {
@@ -36,63 +31,49 @@ namespace ValheimServerGUI.Game
             }
         }
         private ServerStatus _status = ServerStatus.Stopped;
-        private string ProcessKey;
+        private string? ProcessKey;
         private bool IsRestarting;
-        private readonly Dictionary<string, LogEventHandler> LogBasedActions = new();
 
-        public event EventHandler<ServerStatus> StatusChanged;
-        public event EventHandler<decimal> WorldSaved;
-        public event EventHandler<string> InviteCodeReady;
+        public event EventHandler<ServerStatus>? StatusChanged;
+        public event EventHandler<decimal>? WorldSaved;
+        public event EventHandler<string>? InviteCodeReady;
 
         public bool CanStart => IsAnyStatus(ServerStatus.Stopped) && ProcessKey == null;
         public bool CanStop => IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && ProcessKey != null;
         public bool CanRestart => IsAnyStatus(ServerStatus.Running) && ProcessKey != null;
 
         private readonly IProcessProvider ProcessProvider;
-        private readonly IPlayerDataRepository PlayerDataRepository;
         private readonly IApplicationLogger ApplicationLogger;
+        private readonly IValheimPathResolver PathResolver;
+        private readonly ServerLogParser Parser;
 
         /// <summary>
         /// This logger is instantiated each time a new server is started.
         /// </summary>
-        private IValheimServerLogger ServerLogger;
+        private IValheimServerLogger? ServerLogger;
 
         public ValheimServer(
             IProcessProvider processProvider,
             IPlayerDataRepository playerDataRepository,
-            IApplicationLogger appLogger)
+            IApplicationLogger appLogger,
+            IValheimPathResolver pathResolver)
         {
             ProcessProvider = processProvider;
-            PlayerDataRepository = playerDataRepository;
             ApplicationLogger = appLogger;
+            PathResolver = pathResolver;
 
-            InitializeLogBasedActions();
+            // The parser owns the fragile log->event translation and the player correlation; this
+            // class keeps the one piece of state the parser deliberately does not: the stop-during-
+            // startup guard applied in OnServerConnected.
+            Parser = new ServerLogParser(playerDataRepository, appLogger);
+            Parser.ServerConnected += OnServerConnected;
+            Parser.WorldSaved += (_, timeMs) => WorldSaved?.Invoke(this, timeMs);
+            Parser.InviteCodeReady += (_, code) => InviteCodeReady?.Invoke(this, code);
+
             InitializeStatusBasedActions();
         }
 
         #region Initialization
-
-        private void InitializeLogBasedActions()
-        {
-            LogBasedActions.Add(@"Game server connected", OnServerConnected);
-            LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", OnWorldSaved);
-            LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", OnCrossplayJoinCodeAvailable);
-
-            // Connecting
-            LogBasedActions.Add(@"Got connection SteamID (\d+?)\D*?$", OnPlayerConnecting);
-            LogBasedActions.Add(@"PlayFab socket with remote ID .*? received local Platform ID (\w+?)_(\d+?)$", OnPlayerConnectingCrossplay); // Crossplay
-
-            // Connected - NOTE: ZDOID can be a negative number, account for that w/ regex!
-            LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", OnPlayerConnected);
-
-            // Disconnecting
-            LogBasedActions.Add(@"Peer (\d+?) has wrong password", OnPlayerDisconnecting);
-
-            // Disconnected
-            LogBasedActions.Add(@"Closing socket (\d+?)\D*?$", OnPlayerDisconnected); // This is technically "disconnecting" but it's the best terminator I can find
-            LogBasedActions.Add(@"Destroying abandoned non persistent zdo ([\d-]+?):.*$", OnPlayerDisconnected); // Crossplay
-            LogBasedActions.Add(@"Disconnect: The client \((\w+?)_(\d+?)\)", OnPlayerDisconnectedCrossplay); // Valheim Plus version mismatch
-        }
 
         private void InitializeStatusBasedActions()
         {
@@ -147,7 +128,7 @@ namespace ValheimServerGUI.Game
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
 
-            process.StartInfo.EnvironmentVariables.Add("SteamAppId", Resources.ValheimSteamAppId);
+            process.StartInfo.EnvironmentVariables.Add("SteamAppId", CoreConstants.ValheimSteamAppId);
             process.OutputDataReceived += Process_OnDataReceived;
             process.ErrorDataReceived += Process_OnErrorReceived;
             process.Exited += (obj, e) =>
@@ -156,7 +137,7 @@ namespace ValheimServerGUI.Game
                 Status = ServerStatus.Stopped;
             };
 
-            ServerLogger = new ValheimServerLogger(options);
+            ServerLogger = new ValheimServerLogger(options, PathResolver);
             ServerLogger.LogReceived += Logger_OnServerLogReceived;
             if (options.LogMessageHandler != null)
             {
@@ -180,7 +161,7 @@ namespace ValheimServerGUI.Game
 
             ApplicationLogger.Information("Stopping server: {name}", Options.Name);
 
-            ProcessProvider.SafelyKillProcess(ProcessKey);
+            ProcessProvider.SafelyKillProcess(ProcessKey!);
 
             IsRestarting = false;
             Status = ServerStatus.Stopping;
@@ -190,13 +171,13 @@ namespace ValheimServerGUI.Game
         /// Gracefully stops the Valheim server process, then starts it up again.
         /// If no options are provided, then the existing server options will be used.
         /// </summary>
-        public void Restart(IValheimServerOptions options = null)
+        public void Restart(IValheimServerOptions? options = null)
         {
             if (!CanRestart) return;
 
             ApplicationLogger.Information("Restarting server: {name}", Options.Name);
 
-            ProcessProvider.SafelyKillProcess(ProcessKey);
+            ProcessProvider.SafelyKillProcess(ProcessKey!);
 
             Options = options ?? Options;
             IsRestarting = true;
@@ -212,43 +193,9 @@ namespace ValheimServerGUI.Game
 
         #region Event handlers
 
-        private void Process_OnDataReceived(object obj, DataReceivedEventArgs e)
+        private void OnServerConnected(object? sender, EventArgs e)
         {
-            ServerLogger.Information(e.Data);
-        }
-
-        private void Process_OnErrorReceived(object obj, DataReceivedEventArgs e)
-        {
-            ServerLogger.Error(e.Data);
-        }
-
-        private void Logger_OnServerLogReceived(string message)
-        {
-            foreach (var kvp in LogBasedActions)
-            {
-                var match = Regex.Match(message, kvp.Key, RegexOptions.IgnoreCase);
-                if (!match.Success) continue;
-
-                try
-                {
-                    // The first capture group is the whole string, so skip that
-                    var captures = (match.Groups as IEnumerable<Group>).Skip(1).Select(g => g.ToString()).ToArray();
-                    kvp.Value(captures);
-                }
-                catch (Exception e)
-                {
-                    ApplicationLogger.Error(e, "Error parsing server log: {message}", message);
-                }
-            }
-        }
-
-        #endregion
-
-        #region Log Message handlers
-
-        private void OnServerConnected(params string[] captures)
-        {
-            // The server can reach a running state if you attempt to stop it late in the 
+            // The server can reach a running state if you attempt to stop it late in the
             // startup process, so avoid changing status from "Stopping" -> "Running".
             // It will still stop after it fully starts up.
             if (Status == ServerStatus.Stopping) return;
@@ -256,93 +203,21 @@ namespace ValheimServerGUI.Game
             Status = ServerStatus.Running;
         }
 
-        private void OnPlayerConnecting(params string[] captures)
+        private void Process_OnDataReceived(object obj, DataReceivedEventArgs e)
         {
-            var steamId = captures[0];
-            if (string.IsNullOrWhiteSpace(steamId)) return;
-
-            PlayerDataRepository.SetPlayerJoining(new() { Platform = PlayerPlatforms.Steam, PlayerId = steamId });
+            if (e.Data == null) return;
+            ServerLogger?.Information(e.Data);
         }
 
-        private void OnPlayerConnectingCrossplay(params string[] captures)
+        private void Process_OnErrorReceived(object obj, DataReceivedEventArgs e)
         {
-            var hasValidPlatform = PlayerPlatforms.TryGetValidPlatform(captures[0], out var platform);
-            var playerId = captures[1];
-            if (!hasValidPlatform || string.IsNullOrWhiteSpace(playerId)) return;
-
-            PlayerDataRepository.SetPlayerJoining(new() { Platform = platform, PlayerId = playerId });
+            if (e.Data == null) return;
+            ServerLogger?.Error(e.Data);
         }
 
-        private void OnPlayerConnected(params string[] captures)
+        private void Logger_OnServerLogReceived(string message)
         {
-            var playerName = captures[0];
-            var zdoid = captures[1]; // Seems to be a unique object id for the game session
-            //var otherNumber = captures[2]; // Not sure what this is for?
-
-            if (string.IsNullOrWhiteSpace(playerName)) return;
-
-            PlayerDataRepository.SetPlayerOnline(playerName, zdoid);
-        }
-
-        private void OnPlayerDisconnecting(params string[] captures)
-        {
-            var playerIdOrZdoId = captures[0];
-            if (string.IsNullOrWhiteSpace(playerIdOrZdoId)) return;
-
-            var query = new PlayerDataQuery
-            {
-                PlayerId = playerIdOrZdoId,
-                Or = new()
-                {
-                    ZdoId = playerIdOrZdoId,
-                }
-            };
-
-            PlayerDataRepository.SetPlayerLeaving(query);
-        }
-
-        private void OnPlayerDisconnected(params string[] captures)
-        {
-            var playerIdOrZdoId = captures[0];
-            if (string.IsNullOrWhiteSpace(playerIdOrZdoId)) return;
-
-            var query = new PlayerDataQuery
-            {
-                PlayerId = playerIdOrZdoId,
-                Or = new()
-                {
-                    ZdoId = playerIdOrZdoId,
-                }
-            };
-
-            PlayerDataRepository.SetPlayerOffline(query);
-        }
-
-        private void OnPlayerDisconnectedCrossplay(params string[] captures)
-        {
-            var hasValidPlatform = PlayerPlatforms.TryGetValidPlatform(captures[0], out var platform);
-            var playerId = captures[1];
-            if (!hasValidPlatform || string.IsNullOrWhiteSpace(playerId)) return;
-
-            PlayerDataRepository.SetPlayerOffline(new() { Platform = platform, PlayerId = playerId });
-        }
-
-        private void OnWorldSaved(params string[] captures)
-        {
-            if (!decimal.TryParse(captures[0], out var timeMs))
-            {
-                timeMs = 0;
-            }
-
-            WorldSaved?.Invoke(this, timeMs);
-        }
-
-        private void OnCrossplayJoinCodeAvailable(params string[] captures)
-        {
-            var inviteCode = captures[0];
-            if (string.IsNullOrWhiteSpace(inviteCode)) return;
-
-            InviteCodeReady?.Invoke(this, inviteCode);
+            Parser.ProcessLine(message);
         }
 
         #endregion

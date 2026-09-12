@@ -1,12 +1,8 @@
-using Microsoft.Win32;
-using Serilog;
+﻿using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security;
-using ValheimServerGUI.Properties;
-using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.Game
 {
@@ -20,7 +16,7 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// The Steam Cloud source folder for a world, or null if not found. Never throws.
         /// </summary>
-        DirectoryInfo GetCloudWorldFolder(string worldName);
+        DirectoryInfo? GetCloudWorldFolder(string worldName);
 
         /// <summary>
         /// Brings a Steam Cloud world into the server's local save folder. Throws on failure.
@@ -37,14 +33,16 @@ namespace ValheimServerGUI.Game
     public class SteamCloudWorldProvider : ISteamCloudWorldProvider
     {
         private readonly ILogger Logger;
+        private readonly ISteamPathResolver SteamPathResolver;
 
-        // Steam's install path is stable for the process lifetime, so probe the registry once.
+        // Steam's install path is stable for the process lifetime, so probe it once.
         private bool SteamPathResolved;
-        private string SteamPath;
+        private string? SteamPath;
 
-        public SteamCloudWorldProvider(ILogger logger)
+        public SteamCloudWorldProvider(ILogger logger, ISteamPathResolver steamPathResolver)
         {
             Logger = logger;
+            SteamPathResolver = steamPathResolver;
         }
 
         public IEnumerable<string> GetCloudWorldNames()
@@ -53,6 +51,9 @@ namespace ValheimServerGUI.Game
             {
                 return GetRemoteFolders()
                     .SelectMany(remote => remote.GetWorldNames())
+                    // §15 #10: only list worlds that GetCloudWorldFolder can actually resolve, so the
+                    // enumeration and the import path agree (a listed world never throws on import).
+                    .Where(name => GetCloudWorldFolder(name) != null)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();
             }
@@ -62,7 +63,7 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        public DirectoryInfo GetCloudWorldFolder(string worldName)
+        public DirectoryInfo? GetCloudWorldFolder(string worldName)
         {
             if (string.IsNullOrWhiteSpace(worldName)) return null;
 
@@ -141,7 +142,7 @@ namespace ValheimServerGUI.Game
             // Each Steam account has its own userdata subfolder; a world may live under any of them
             foreach (var account in Directory.GetDirectories(userdata))
             {
-                var remote = Path.Join(account, Resources.ValheimSteamAppId, "remote");
+                var remote = Path.Join(account, CoreConstants.ValheimSteamAppId, "remote");
                 if (Directory.Exists(remote))
                 {
                     yield return new DirectoryInfo(remote);
@@ -149,29 +150,12 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private string GetSteamPath()
+        private string? GetSteamPath()
         {
             if (SteamPathResolved) return SteamPath;
             SteamPathResolved = true;
 
-            try
-            {
-                using var key = Registry.CurrentUser.OpenSubKey(@"Software\Valve\Steam");
-                var value = key?.GetValue("SteamPath")?.ToString();
-                if (!string.IsNullOrWhiteSpace(value))
-                {
-                    SteamPath = Environment.ExpandEnvironmentVariables(value);
-                }
-            }
-            catch (SecurityException e)
-            {
-                Logger.Warning(e, "No registry access to locate the Steam install path");
-            }
-            catch (Exception e)
-            {
-                Logger.Error(e, "Failed to read the Steam install path from the registry");
-            }
-
+            SteamPath = SteamPathResolver.GetSteamInstallPath();
             return SteamPath;
         }
 

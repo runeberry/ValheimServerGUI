@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Valheim Server GUI
+GenericName=Game Server Manager
+Comment=Manage a Valheim dedicated server
+Exec=@INSTALL_DIR@/ValheimServerGUI.App
+Icon=@INSTALL_DIR@/valheim-server-gui.png
+Terminal=false
+Categories=Game;Utility;
+StartupWMClass=ValheimServerGUI.App
+StartupNotify=true

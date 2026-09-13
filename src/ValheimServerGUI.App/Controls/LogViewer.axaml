@@ -3,14 +3,22 @@
              x:Class="ValheimServerGUI.App.Controls.LogViewer"
              x:Name="Root" x:CompileBindings="False">
     <Border BorderThickness="1" BorderBrush="{DynamicResource AppBorderBrush}">
-        <ListBox ItemsSource="{Binding #Root.ItemsSource}"
-                 Background="{DynamicResource LayerBase}"
-                 FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12">
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <TextBlock Text="{Binding}" TextWrapping="NoWrap" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <ScrollViewer x:Name="Scroll" Background="{DynamicResource LayerBase}"
+                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <!-- A single contiguous, read-only text surface so logs copy-paste in bulk (select, Ctrl+C,
+                 or the context menu). The lines are capped upstream (LogsViewModel), so the text stays
+                 bounded rather than growing forever. -->
+            <SelectableTextBlock x:Name="TextView" Padding="6,4"
+                                 FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12"
+                                 TextWrapping="NoWrap"
+                                 Foreground="{DynamicResource TextControlForeground}">
+                <SelectableTextBlock.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Copy" Click="CopySelection" />
+                        <MenuItem Header="Select All" Click="SelectAllText" />
+                    </ContextMenu>
+                </SelectableTextBlock.ContextMenu>
+            </SelectableTextBlock>
+        </ScrollViewer>
     </Border>
 </UserControl>

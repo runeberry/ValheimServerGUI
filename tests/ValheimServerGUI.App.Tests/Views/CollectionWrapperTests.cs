@@ -36,8 +36,9 @@ public class CollectionWrapperTests
         var viewer = new LogViewer { ItemsSource = new ObservableCollection<string> { "line 1", "line 2" } };
         Realize(viewer);
 
-        var list = viewer.GetVisualDescendants().OfType<ListBox>().First();
-        Assert.Equal(2, list.ItemCount);
+        // The lines render as one contiguous, newline-joined block (see LogViewerTests for the full contract).
+        var text = viewer.GetVisualDescendants().OfType<SelectableTextBlock>().First();
+        Assert.Equal("line 1\nline 2", text.Text);
     }
 
     [AvaloniaFact]

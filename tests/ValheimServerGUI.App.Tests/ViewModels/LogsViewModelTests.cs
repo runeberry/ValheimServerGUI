@@ -60,6 +60,17 @@ public class LogsViewModelTests
     }
 
     [AvaloniaFact]
+    public void Lines_are_capped_so_the_buffer_stays_bounded()
+    {
+        var vm = Build();
+        for (var i = 0; i < 5100; i++) vm.AppendServerLine($"line {i}");
+
+        Assert.Equal(5000, vm.CurrentLines.Count);
+        Assert.DoesNotContain("line 0", vm.CurrentLines);      // oldest dropped off the top
+        Assert.Contains("line 5099", vm.CurrentLines);          // newest kept
+    }
+
+    [AvaloniaFact]
     public void Save_empty_view_warns()
     {
         var vm = Build();

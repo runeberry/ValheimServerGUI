@@ -23,14 +23,27 @@ public partial class LogsViewModel : ViewModelBase
     private readonly IShellLauncher _shell;
     private readonly IValheimPathResolver _pathResolver;
 
+    /// <summary>
+    /// Cap on the lines kept per view. Bounds memory and render cost — the log surface is a single contiguous
+    /// string, so without a cap it would grow forever. Older lines fall off the top; the full history is still
+    /// what "Write server logs to file" persists to disk, and Save Logs writes whatever is currently buffered.
+    /// </summary>
+    private const int MaxLines = 5000;
+
     public LogsViewModel(IApplicationLogger appLogger, IShellLauncher shell, IValheimPathResolver pathResolver)
     {
         _appLogger = appLogger;
         _shell = shell;
         _pathResolver = pathResolver;
 
-        foreach (var line in _appLogger.LogBuffer) AppLines.Add(line);
+        foreach (var line in _appLogger.LogBuffer) Append(AppLines, line);
         _appLogger.LogReceived += OnAppLogReceived;
+    }
+
+    private static void Append(ObservableCollection<string> lines, string line)
+    {
+        lines.Add(line);
+        while (lines.Count > MaxLines) lines.RemoveAt(0);
     }
 
     public IReadOnlyList<string> Views { get; } = new[] { LogViews.Server, LogViews.Application };
@@ -52,7 +65,7 @@ public partial class LogsViewModel : ViewModelBase
     public event Action<string>? Warning;
 
     /// <summary>The server log stream handler — passed as <c>ValheimServerOptions.LogMessageHandler</c>.</summary>
-    public void AppendServerLine(string line) => RunOnUi(() => ServerLines.Add(line));
+    public void AppendServerLine(string line) => RunOnUi(() => Append(ServerLines, line));
 
     [RelayCommand]
     private void ClearLogs() => CurrentLines.Clear();
@@ -73,7 +86,7 @@ public partial class LogsViewModel : ViewModelBase
     [RelayCommand]
     private void OpenLogsFolder() => _shell.OpenDirectory(_pathResolver.LogsFolderPath);
 
-    private void OnAppLogReceived(string line) => RunOnUi(() => AppLines.Add(line));
+    private void OnAppLogReceived(string line) => RunOnUi(() => Append(AppLines, line));
 
     protected override void DisposeCore()
     {

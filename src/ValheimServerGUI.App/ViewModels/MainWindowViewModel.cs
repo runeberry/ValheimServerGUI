@@ -130,6 +130,9 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>Surfaces a start-server error (manual start only). Wired by the window.</summary>
     public Action<string>? ErrorReported { get; set; }
 
+    /// <summary>After a MANUAL update check, asks "…go to the download page?" (returns true for yes). Wired by the window.</summary>
+    public Func<string, Task<bool>>? UpdateResultPrompt { get; set; }
+
     /// <summary>The actual "start the server" step; overridable in tests so the full flow runs without launching.</summary>
     internal Action<IValheimServerOptions> StartAction { get; set; }
 
@@ -569,7 +572,50 @@ public partial class MainWindowViewModel : ViewModelBase
         });
 
     private void OnUpdateCheckFinished(object? sender, SoftwareUpdateEventArgs e)
-        => RunOnUi(() => ApplyUpdateResult(e));
+        => RunOnUi(() =>
+        {
+            ApplyUpdateResult(e);
+            if (e.IsManualCheck) _ = PromptManualUpdateResultAsync(e);
+        });
+
+    // A manual "Check for Updates" reports its result in a dialog and offers to open the download page (parity).
+    private async Task PromptManualUpdateResultAsync(SoftwareUpdateEventArgs e)
+    {
+        if (UpdateResultPrompt is null) return;
+
+        var body = $"{BuildManualUpdateMessage(e)}\nWould you like to go to the download page?";
+        if (await UpdateResultPrompt(body))
+            _shell.OpenWebAddress(AppConstants.UrlReleases);
+    }
+
+    private static string BuildManualUpdateMessage(SoftwareUpdateEventArgs e)
+    {
+        if (!e.IsSuccessful)
+            return $"Update check failed: {e.Exception?.GetPrimaryException().Message}.";
+
+        return AssemblyHelper.CompareVersion(e.LatestVersion!) switch
+        {
+            > 0 => "A newer version of ValheimServerGUI is available.",
+            0 => "You are running the latest version of ValheimServerGUI.",
+            -1 => "You are currently running a pre-release version of ValheimServerGUI. " +
+                  $"The latest stable version is ({e.LatestVersion}).",
+            _ => $"Update check failed: Unable to parse version ({e.LatestVersion}).",
+        };
+    }
+
+    /// <summary>Startup check: the validation error if the configured server exe is missing, else null.</summary>
+    public string? GetMissingServerExeError()
+    {
+        try
+        {
+            BuildOptions().GetValidatedServerExe();
+            return null;
+        }
+        catch (Exception ex)
+        {
+            return ex.Message;
+        }
+    }
 
     // Mirror the WinForms status-bar logic: show the compared version in the text, and distinguish
     // up-to-date / update-available / pre-release / parse-failure (CompareVersion returns 1 / 0 / -1 / -2).

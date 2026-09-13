@@ -36,6 +36,7 @@ public partial class MainWindow : Window
         viewModel.CloseRequested += Close;
         viewModel.CloudImportPrompt = ShowCloudImportAsync;
         viewModel.ErrorReported = msg => _ = ShowMessageAsync("Error starting server", msg);
+        viewModel.UpdateResultPrompt = msg => new ConfirmWindow("Check for Updates", msg).ShowDialog<bool>(this);
         viewModel.StopTimedOutWarning += () =>
             _ = ShowMessageAsync("Server force-stopped",
                 "The server did not shut down in time and was force-stopped. Recent world changes may not have been saved.");
@@ -132,7 +133,27 @@ public partial class MainWindow : Window
     private async void OnOpened(object? sender, EventArgs e)
     {
         if (ViewModel is { AutoStartOnLoad: true })
+        {
             await ViewModel.StartServerAsync(isManual: false);
+            return;
+        }
+
+        await CheckServerExePathAsync();
+    }
+
+    // Startup parity: warn if the configured server exe is missing and offer to open the Directories dialog.
+    // Only under a real desktop lifetime — never prompt in a headless/test run.
+    private async Task CheckServerExePathAsync()
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime) return;
+        if (ViewModel?.GetMissingServerExeError() is not { } error) return;
+
+        var body = $"{error}\n\n" +
+            "This may occur if you do not have Valheim Dedicated Server installed, or if you have installed " +
+            "it in a different directory. See Help for more info.\n\n" +
+            "Would you like to change your directories now?";
+        if (await new ConfirmWindow("File Not Found", body).ShowDialog<bool>(this))
+            await HandleMenuActionAsync(MenuAction.SetDirectories);
     }
 
     // Tab-visible lazy refresh (§10.2): the Details/Players 1s timers run only while their tab is shown.

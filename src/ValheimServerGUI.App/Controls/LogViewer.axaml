@@ -1,0 +1,16 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ValheimServerGUI.App.Controls.LogViewer"
+             x:Name="Root" x:CompileBindings="False">
+    <Border BorderThickness="1" BorderBrush="{DynamicResource AppBorderBrush}">
+        <ListBox ItemsSource="{Binding #Root.ItemsSource}"
+                 Background="{DynamicResource LayerBase}"
+                 FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding}" TextWrapping="NoWrap" />
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+    </Border>
+</UserControl>

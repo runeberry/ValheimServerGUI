@@ -1,5 +1,7 @@
+using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
@@ -12,6 +14,11 @@ public partial class PlayerDetailsWindow : Window
     {
         InitializeComponent();
         Closing += OnClosingGuard;
+
+        // Add/Rename open a text prompt (owned by this window), so they live in the code-behind as commands
+        // the AddRemoveListField invokes; Remove is a plain VM command bound in XAML.
+        CharactersField.AddCommand = new AsyncRelayCommand(AddCharacterAsync);
+        CharactersField.EditCommand = new AsyncRelayCommand(RenameCharacterAsync);
     }
 
     public PlayerDetailsWindow(PlayerDetailsViewModel viewModel) : this()
@@ -21,13 +28,13 @@ public partial class PlayerDetailsWindow : Window
 
     private PlayerDetailsViewModel Vm => (PlayerDetailsViewModel)DataContext!;
 
-    private async void AddCharacter(object? sender, RoutedEventArgs e)
+    private async Task AddCharacterAsync()
     {
         var name = await new TextPromptWindow("Add Character", "Character name:", maxLength: 64).ShowDialog<string?>(this);
         if (!string.IsNullOrWhiteSpace(name)) Vm.AddCharacter(name);
     }
 
-    private async void RenameCharacter(object? sender, RoutedEventArgs e)
+    private async Task RenameCharacterAsync()
     {
         if (Vm.SelectedCharacter is not { } current) return;
         var name = await new TextPromptWindow("Rename Character", "Character name:", current, maxLength: 64)

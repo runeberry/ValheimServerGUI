@@ -9,29 +9,23 @@
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="8">
-        <Grid ColumnDefinitions="130,*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,Auto">
-            <TextBlock Grid.Row="0" Grid.Column="0" Text="Platform:" />
-            <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Platform}" />
-            <TextBlock Grid.Row="1" Grid.Column="0" Text="Player ID:" />
-            <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding PlayerId}" />
-            <c:CopyButton Grid.Row="1" Grid.Column="2" Text="{Binding PlayerId}" Margin="4,0,0,0" />
-            <TextBlock Grid.Row="2" Grid.Column="0" Text="ZDO ID:" />
-            <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding ZdoId}" />
-            <TextBlock Grid.Row="3" Grid.Column="0" Text="Latest Character:" />
-            <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding LatestCharacter}" />
-            <TextBlock Grid.Row="4" Grid.Column="0" Text="Status:" />
-            <SelectableTextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Status}" />
-        </Grid>
+        <StackPanel Spacing="2">
+            <c:LabelField LabelText="Platform:" Value="{Binding Platform}" />
+            <c:LabelField LabelText="Player ID:" Value="{Binding PlayerId}">
+                <c:LabelField.TrailingContent>
+                    <c:CopyButton Text="{Binding PlayerId}" />
+                </c:LabelField.TrailingContent>
+            </c:LabelField>
+            <c:LabelField LabelText="ZDO ID:" Value="{Binding ZdoId}" />
+            <c:LabelField LabelText="Latest Character:" Value="{Binding LatestCharacter}" />
+            <c:LabelField LabelText="Status:" Value="{Binding Status}" />
+        </StackPanel>
 
         <c:TextFormField LabelText="Display Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0" />
 
-        <TextBlock Text="Known Characters" FontWeight="SemiBold" Margin="0,6,0,0" />
-        <ListBox ItemsSource="{Binding Characters}" SelectedItem="{Binding SelectedCharacter}" Height="120" />
-        <StackPanel Orientation="Horizontal" Spacing="8">
-            <Button Content="Add" Click="AddCharacter" />
-            <Button Content="Rename" Click="RenameCharacter" />
-            <Button Content="Remove" Command="{Binding RemoveCharacterCommand}" />
-        </StackPanel>
+        <c:AddRemoveListField x:Name="CharactersField" LabelText="Known Characters" Margin="0,6,0,0"
+                              ItemsSource="{Binding Characters}" Value="{Binding SelectedCharacter, Mode=TwoWay}"
+                              ListHeight="120" RemoveCommand="{Binding RemoveCharacterCommand}" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
             <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />

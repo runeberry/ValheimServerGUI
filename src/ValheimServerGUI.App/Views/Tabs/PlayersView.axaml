@@ -15,18 +15,15 @@
                           Command="{Binding Players.RemoveCommand}" />
         </Grid>
 
-        <DataGrid ItemsSource="{Binding Players.Players}"
-                  SelectedItem="{Binding Players.SelectedPlayer}"
-                  Background="{DynamicResource LayerBase}"
-                  IsReadOnly="True" CanUserReorderColumns="False"
-                  GridLinesVisibility="Horizontal">
-            <DataGrid.Styles>
+        <c:DataListView ItemsSource="{Binding Players.Players}"
+                        SelectedItem="{Binding Players.SelectedPlayer}">
+            <c:DataListView.Styles>
                 <Style Selector="DataGridRow" x:DataType="vm:PlayerRowViewModel">
                     <Setter Property="Opacity"
                             Value="{Binding IsOffline, Converter={x:Static conv:OfflineOpacityConverter.Instance}}" />
                 </Style>
-            </DataGrid.Styles>
-            <DataGrid.Columns>
+            </c:DataListView.Styles>
+            <c:DataListView.Columns>
                 <DataGridTemplateColumn Header="" Width="Auto">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
@@ -39,7 +36,7 @@
                 <DataGridTextColumn Header="Player (Character)" Binding="{Binding DisplayName}" Width="*" />
                 <DataGridTextColumn Header="Status" Binding="{Binding StatusText}" Width="Auto" />
                 <DataGridTextColumn Header="Since" Binding="{Binding SinceText}" Width="Auto" />
-            </DataGrid.Columns>
-        </DataGrid>
+            </c:DataListView.Columns>
+        </c:DataListView>
     </DockPanel>
 </UserControl>

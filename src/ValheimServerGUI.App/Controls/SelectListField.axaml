@@ -1,0 +1,17 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             x:Class="ValheimServerGUI.App.Controls.SelectListField"
+             x:Name="Root" x:CompileBindings="False">
+    <StackPanel Spacing="4">
+        <StackPanel Orientation="Horizontal" Spacing="4"
+                    IsVisible="{Binding #Root.LabelText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}">
+            <TextBlock Text="{Binding #Root.LabelText}" FontWeight="SemiBold" VerticalAlignment="Center" />
+            <c:HelpLabel HelpText="{Binding #Root.HelpText}" />
+        </StackPanel>
+        <ListBox ItemsSource="{Binding #Root.ItemsSource}"
+                 SelectedItem="{Binding #Root.Value, Mode=TwoWay}"
+                 Height="{Binding #Root.ListHeight}" />
+    </StackPanel>
+</UserControl>

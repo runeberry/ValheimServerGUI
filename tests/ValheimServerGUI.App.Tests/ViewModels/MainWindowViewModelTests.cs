@@ -189,10 +189,10 @@ public class MainWindowViewModelTests
     public void Title_derives_from_current_profile()
     {
         var vm = Build(out _);
-        Assert.Equal("Valheim Server GUI", vm.Title);
+        Assert.Equal("(Unofficial) Valheim Dedicated Server GUI", vm.Title);
 
         vm.LoadProfile(new ServerPreferences { ProfileName = "Nightshade" });
-        Assert.Equal("Valheim Server GUI — Nightshade", vm.Title);
+        Assert.Equal("(Unofficial) Valheim Dedicated Server GUI — Nightshade", vm.Title);
     }
 
     [Fact]

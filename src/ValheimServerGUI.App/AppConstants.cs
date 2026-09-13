@@ -4,7 +4,7 @@ namespace ValheimServerGUI.App;
 internal static class AppConstants
 {
     /// <summary>Product name used for the window title, autostart entries, and the tray tooltip.</summary>
-    public const string ProductName = "Valheim Server GUI";
+    public const string ProductName = "(Unofficial) Valheim Dedicated Server GUI";
 
     /// <summary>Stable identifier used as the autostart registration key / <c>.desktop</c> file name.</summary>
     public const string StartupKey = "ValheimServerGUI";
@@ -22,6 +22,7 @@ internal static class AppConstants
     public const string UrlReleases = "https://github.com/runeberry/ValheimServerGUI/releases";
     public const string UrlDonate = "https://www.buymeacoffee.com/runeberry";
     public const string UrlGitHub = "https://github.com/runeberry/ValheimServerGUI";
+    public const string UrlValheimGameSite = "https://www.valheimgame.com/";
 
     /// <summary>FAQ entry explaining why character names may show wrong ("Character names wrong?" link).</summary>
     public const string UrlHelpCharacterNames = "https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions";

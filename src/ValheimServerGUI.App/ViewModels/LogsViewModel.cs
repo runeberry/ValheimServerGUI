@@ -63,7 +63,7 @@ public partial class LogsViewModel : ViewModelBase
         var lines = CurrentLines.ToList();
         if (lines.Count == 0)
         {
-            Warning?.Invoke("There are no logs to save in this view.");
+            Warning?.Invoke("No logs to save!");
             return;
         }
 

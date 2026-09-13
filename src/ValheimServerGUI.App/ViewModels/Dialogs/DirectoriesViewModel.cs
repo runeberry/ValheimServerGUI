@@ -25,9 +25,20 @@ public partial class DirectoriesViewModel : ModalEditViewModel
     [ObservableProperty] private string _saveDataFolderPath = string.Empty;
 
     /// <summary>True when either path is set but does not exist on disk (drives the "Save anyway?" prompt).</summary>
-    public bool HasMissingPath =>
-        (!string.IsNullOrWhiteSpace(ServerExePath) && !File.Exists(ServerExePath))
-        || (!string.IsNullOrWhiteSpace(SaveDataFolderPath) && !Directory.Exists(SaveDataFolderPath));
+    public bool HasMissingPath => MissingPathDescription is not null;
+
+    /// <summary>A message naming the first missing path (for the "Save anyway?" prompt), or null if all exist.</summary>
+    public string? MissingPathDescription
+    {
+        get
+        {
+            if (!string.IsNullOrWhiteSpace(ServerExePath) && !File.Exists(ServerExePath))
+                return $"The server executable does not exist:\n{ServerExePath}";
+            if (!string.IsNullOrWhiteSpace(SaveDataFolderPath) && !Directory.Exists(SaveDataFolderPath))
+                return $"The save data folder does not exist:\n{SaveDataFolderPath}";
+            return null;
+        }
+    }
 
     private void Load() => LoadClean(() =>
     {

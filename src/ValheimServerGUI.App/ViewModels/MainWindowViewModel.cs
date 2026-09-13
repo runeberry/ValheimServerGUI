@@ -377,8 +377,9 @@ public partial class MainWindowViewModel : ViewModelBase
         var port = options.Port;
         if (!_ipProvider.IsLocalUdpPortAvailable(port, port + 1))
         {
-            Error($"Port {port} or {port + 1} is already in use. Valheim requires two adjacent ports; " +
-                  "shut down any UDP applications using these ports, or choose a different port.");
+            Error($"Port {port} or {port + 1} is already in use.\n" +
+                  "Valheim requires two adjacent ports to run a dedicated server.\n" +
+                  "Please shut down any UDP applications using these ports, or choose a different port for your server.");
             return;
         }
 

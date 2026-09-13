@@ -21,7 +21,9 @@ public partial class BugReportWindow : Window
     private async void OnSubmit(object? sender, RoutedEventArgs e)
     {
         var op = new AsyncOperationViewModel(
-            "Submitting your report…", "Thanks! Your report was submitted.", "Failed to submit the report");
+            "Submitting bug report...",
+            "Bug report submitted. Thank you!",
+            "Failed to submit bug report.\nContact Runeberry Software for further support.");
         var dialog = new AsyncOperationWindow(op, Vm.SubmitAsync);
         await dialog.ShowDialog(this);
         Close();

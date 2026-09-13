@@ -34,14 +34,15 @@ public static class CloseDecider
         if (status == ServerStatus.Stopping)
         {
             return prompt.Confirm(
-                "The server is still shutting down. Close anyway? Unsaved world data may be lost.", title)
+                "The Valheim server is currently shutting down. Close anyway?\n" +
+                "This could result in a loss of save data!", title)
                 ? CloseDecision.Proceed
                 : CloseDecision.Cancel;
         }
 
         // Starting / Running.
         return prompt.Confirm(
-            "The server is still running. Stop the server and close this window?", title)
+            "The Valheim server is still running. Do you want to stop the server and close this window?", title)
             ? CloseDecision.StopThenClose
             : CloseDecision.Cancel;
     }

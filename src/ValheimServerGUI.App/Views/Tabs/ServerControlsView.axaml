@@ -50,7 +50,7 @@
                                           Command="{Binding OpenSaveFolderCommand}" />
                         </Grid>
 
-                        <c:DropdownFormField LabelText="Select World" PlaceholderText="-- No worlds --"
+                        <c:DropdownFormField LabelText="Select World" PlaceholderText="(no worlds)"
                                              IsVisible="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
                                              ItemsSource="{Binding Form.Worlds}" Value="{Binding Form.ExistingWorld}"
                                              IsEnabled="{Binding CanSelectExistingWorld}" />

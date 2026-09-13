@@ -4,15 +4,17 @@
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.DirectoriesWindow"
         x:DataType="vm:DirectoriesViewModel"
-        Title="Set Directories"
+        Title="Directories"
         SizeToContent="Height" Width="560" MinWidth="480"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="8">
-        <c:FilenameFormField LabelText="Default Server Executable" SelectMode="File"
+        <TextBlock TextWrapping="Wrap"
+                   Text="These paths are used for all profiles. You can override these paths for individual profiles in the Advanced Controls tab." />
+        <c:FilenameFormField LabelText="Valheim Dedicated Server .exe" SelectMode="File"
                              Value="{Binding ServerExePath}"
                              HelpText="The location of the Valheim Dedicated Server executable, usually &quot;valheim_server.exe&quot;.&#10;&#10;NOTE: You must have Valheim Dedicated Server installed in order to use this application. See Help for installation instructions." />
-        <c:FilenameFormField LabelText="Default Save Data Folder" SelectMode="Directory"
+        <c:FilenameFormField LabelText="Valheim Save Data Folder" SelectMode="Directory"
                              Value="{Binding SaveDataFolderPath}"
                              HelpText="The location of the save data for your Valheim server, including the &quot;worlds&quot; folder, admin lists, etc." />
 

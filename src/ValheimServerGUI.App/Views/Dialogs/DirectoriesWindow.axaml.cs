@@ -25,10 +25,10 @@ public partial class DirectoriesWindow : Window
 
     private async void OnOk(object? sender, RoutedEventArgs e)
     {
-        if (Vm.HasMissingPath)
+        if (Vm.MissingPathDescription is { } missing)
         {
             var proceed = await new ConfirmWindow("Path not found",
-                "One or more paths do not exist. Save anyway?").ShowDialog<bool>(this);
+                $"{missing}\n\nSave anyway?").ShowDialog<bool>(this);
             if (!proceed) return;
         }
 

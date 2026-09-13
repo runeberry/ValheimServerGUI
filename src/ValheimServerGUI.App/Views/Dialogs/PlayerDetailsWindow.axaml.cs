@@ -30,15 +30,16 @@ public partial class PlayerDetailsWindow : Window
 
     private async Task AddCharacterAsync()
     {
-        var name = await new TextPromptWindow("Add Character", "Character name:", maxLength: 64).ShowDialog<string?>(this);
+        var name = await new TextPromptWindow("Add Character", "Add a Valheim character name for this player:",
+            maxLength: 64).ShowDialog<string?>(this);
         if (!string.IsNullOrWhiteSpace(name)) Vm.AddCharacter(name);
     }
 
     private async Task RenameCharacterAsync()
     {
         if (Vm.SelectedCharacter is not { } current) return;
-        var name = await new TextPromptWindow("Rename Character", "Character name:", current, maxLength: 64)
-            .ShowDialog<string?>(this);
+        var name = await new TextPromptWindow("Edit Character", $"Edit the name for character '{current}'",
+            current, maxLength: 64).ShowDialog<string?>(this);
         if (!string.IsNullOrWhiteSpace(name)) Vm.RenameCharacter(current, name);
     }
 

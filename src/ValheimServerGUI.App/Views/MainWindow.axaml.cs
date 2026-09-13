@@ -58,13 +58,13 @@ public partial class MainWindow : Window
         switch (action)
         {
             case MenuAction.NewProfile:
-                await CreateProfileAsync("New Profile");
+                await CreateProfileAsync();
                 break;
             case MenuAction.SaveProfile:
                 Svc<IServerPreferencesProvider>().SavePreferences(ViewModel.BuildPreferences());
                 break;
             case MenuAction.SaveProfileAs:
-                await CreateProfileAsync("Save Profile As", fromForm: true);
+                await CreateProfileAsync(fromForm: true);
                 break;
             case MenuAction.Preferences:
                 await new PreferencesWindow(new PreferencesViewModel(
@@ -86,14 +86,16 @@ public partial class MainWindow : Window
         }
     }
 
-    private async Task CreateProfileAsync(string title, bool fromForm = false)
+    private async Task CreateProfileAsync(bool fromForm = false)
     {
         if (ViewModel is null) return;
 
         var serverPrefs = Svc<IServerPreferencesProvider>();
-        var name = await new TextPromptWindow(title, "Profile name:", maxLength: 64,
-            validator: n => string.IsNullOrWhiteSpace(n) ? "Enter a profile name."
-                : serverPrefs.LoadPreferences(n) is not null ? "A profile with that name already exists."
+        var prefill = fromForm ? $"Copy of {ViewModel.CurrentProfile?.ProfileName}" : null;
+        var name = await new TextPromptWindow("Server Profile Name", "Enter a server profile name:",
+            prefill, maxLength: 30,
+            validator: n => string.IsNullOrWhiteSpace(n) || n.Length > 30 || serverPrefs.LoadPreferences(n) is not null
+                ? "Profile name must be 1-30 characters, and must not match an existing profile name."
                 : null).ShowDialog<string?>(this);
 
         if (string.IsNullOrWhiteSpace(name)) return;
@@ -108,7 +110,7 @@ public partial class MainWindow : Window
     private async Task HandleRemoveProfileAsync(string profileName)
     {
         var confirm = await new ConfirmWindow("Remove Profile",
-            $"Remove the profile '{profileName}'? This cannot be undone.").ShowDialog<bool>(this);
+            $"Remove server profile '{profileName}'?").ShowDialog<bool>(this);
         if (confirm) Svc<IServerPreferencesProvider>().RemovePreferences(profileName);
     }
 
@@ -117,7 +119,10 @@ public partial class MainWindow : Window
         var worldName = ViewModel?.Form.SelectedWorldName;
         if (string.IsNullOrWhiteSpace(worldName))
         {
-            await ShowMessageAsync("World Preferences", "Select or name a world first.");
+            var message = ViewModel?.Form.UseNewWorld == true
+                ? "Please enter a new world name before changing modifier settings."
+                : "Unable to change modifier settings. No world is selected.";
+            await ShowMessageAsync("World Name Missing", message);
             return;
         }
 
@@ -184,7 +189,7 @@ public partial class MainWindow : Window
         var isOsShutdown = e.CloseReason is WindowCloseReason.OSShutdown or WindowCloseReason.ApplicationShutdown;
         var prompt = App.Instance.Services.GetRequiredService<IUserPrompt>();
 
-        switch (CloseDecider.Decide(ViewModel.Server.Status, isOsShutdown, prompt, ViewModel.Title))
+        switch (CloseDecider.Decide(ViewModel.Server.Status, isOsShutdown, prompt, "Warning"))
         {
             case CloseDecision.Proceed:
                 return;
@@ -220,6 +225,14 @@ public partial class MainWindow : Window
         ViewModel.Server.StatusChanged += OnStatusChanged;
     }
 
+    // Tray header + tooltip wording (WinForms parity): compact "ValheimServerGUI" tooltip, "Profile: {name}"
+    // header, distinct from the window title.
+    private static string TrayHeader(MainWindowViewModel vm)
+        => vm.CurrentProfile is { } p ? $"Profile: {p.ProfileName}" : "No Profile Selected";
+
+    private static string TrayTooltip(MainWindowViewModel vm)
+        => vm.CurrentProfile is { } p ? $"ValheimServerGUI - {p.ProfileName}" : "ValheimServerGUI";
+
     // Tray icon + native menu (§10.4). Both buttons and tray items bind the SAME VM commands, so their
     // enablement is derived, never duplicated. Only under a desktop lifetime (skipped headless / no tray).
     private void SetUpTrayIcon()
@@ -231,32 +244,32 @@ public partial class MainWindow : Window
         {
             var menu = new NativeMenu();
 
-            var header = new NativeMenuItem { Header = ViewModel.CurrentProfile?.ProfileName ?? "Server" };
+            var header = new NativeMenuItem { Header = TrayHeader(ViewModel) };
             header.Click += (_, _) => RestoreAndActivate();
             menu.Add(header);
             menu.Add(new NativeMenuItemSeparator());
-            menu.Add(new NativeMenuItem { Header = "Start", Command = ViewModel.StartCommand });
-            menu.Add(new NativeMenuItem { Header = "Restart", Command = ViewModel.RestartCommand });
-            menu.Add(new NativeMenuItem { Header = "Stop", Command = ViewModel.StopCommand });
+            menu.Add(new NativeMenuItem { Header = "Start Server", Command = ViewModel.StartCommand });
+            menu.Add(new NativeMenuItem { Header = "Restart Server", Command = ViewModel.RestartCommand });
+            menu.Add(new NativeMenuItem { Header = "Stop Server", Command = ViewModel.StopCommand });
             menu.Add(new NativeMenuItemSeparator());
             menu.Add(new NativeMenuItem { Header = "Close", Command = ViewModel.CloseCommand });
 
             _trayIcon = new TrayIcon
             {
                 Icon = AppIcon.Load(),
-                ToolTipText = ViewModel.Title,
+                ToolTipText = TrayTooltip(ViewModel),
                 Menu = menu,
                 IsVisible = true,
             };
             _trayIcon.Clicked += (_, _) => RestoreAndActivate();
 
-            // Keep tooltip + header on the single CurrentProfile/Title source.
+            // Keep tooltip + header on the single CurrentProfile source.
             ViewModel.PropertyChanged += (_, args) =>
             {
                 if (args.PropertyName is nameof(MainWindowViewModel.Title) or nameof(MainWindowViewModel.CurrentProfile))
                 {
-                    _trayIcon.ToolTipText = ViewModel.Title;
-                    header.Header = ViewModel.CurrentProfile?.ProfileName ?? "Server";
+                    _trayIcon.ToolTipText = TrayTooltip(ViewModel);
+                    header.Header = TrayHeader(ViewModel);
                 }
             };
 

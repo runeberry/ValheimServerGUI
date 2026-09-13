@@ -4,7 +4,7 @@
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.PlayerDetailsWindow"
         x:DataType="vm:PlayerDetailsViewModel"
-        Title="Player Details"
+        Title="Player Info"
         SizeToContent="Height" Width="460" MinWidth="420"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
@@ -13,7 +13,7 @@
                          Command="{Binding RefreshCommand}" />
         <StackPanel Spacing="2">
             <c:LabelField LabelText="Platform:" Value="{Binding Platform}" />
-            <c:LabelField LabelText="Player ID:" Value="{Binding PlayerId}"
+            <c:LabelField LabelText="Platform ID:" Value="{Binding PlayerId}"
                           HelpText="The ID associated with the player's Steam or Xbox account. You can use this ID to allow or ban players, or add players as admins.">
                 <c:LabelField.TrailingContent>
                     <c:CopyButton Text="{Binding PlayerId}" ToolTip.Tip="Copy Steam ID to clipboard" />
@@ -23,12 +23,12 @@
                           HelpText="The player's object ID in game. This changes with each game session." />
             <c:LabelField LabelText="Latest Character:" Value="{Binding LatestCharacter}"
                           HelpText="The character that this player is currently playing, or if they're offline, the last character they logged in as." />
-            <c:LabelField LabelText="Status:" Value="{Binding Status}"
+            <c:LabelField LabelText="Online Status:" Value="{Binding Status}"
                           HelpText="Possible statuses are: Online, Offline, Joining, or Leaving" />
             <c:LabelField LabelText="Status Changed:" Value="{Binding StatusChanged}" />
         </StackPanel>
 
-        <c:TextFormField LabelText="Display Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0"
+        <c:TextFormField LabelText="Player Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0"
                          HelpText="The player's Steam/Xbox username. This will be determined automatically, but in case it doesn't work, you may edit the player's name manually." />
 
         <c:AddRemoveListField x:Name="CharactersField" LabelText="Known Characters" Margin="0,6,0,0"

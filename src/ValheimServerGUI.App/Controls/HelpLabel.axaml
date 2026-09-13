@@ -5,7 +5,8 @@
     <!-- The bold accent "?" help glyph. Its tooltip is HelpText; the control's visibility (collapse when
          HelpText is empty) is driven from HelpLabel.cs. -->
     <ControlTheme x:Key="{x:Type c:HelpLabel}" TargetType="c:HelpLabel">
-        <Setter Property="Cursor" Value="Hand" />
+        <!-- The 'help' cursor (arrow + ?) is the semantically correct hover for a help hint. -->
+        <Setter Property="Cursor" Value="Help" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Template">
             <ControlTemplate>

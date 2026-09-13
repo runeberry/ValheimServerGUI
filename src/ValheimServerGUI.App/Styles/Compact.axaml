@@ -120,7 +120,7 @@
         <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
 
-    <!-- TabItem look lives in Controls/TabStyles.axaml (the custom bordered tab theme). -->
+    <!-- TabItem look lives in Styles/TabStyles.axaml (the custom bordered tab theme). -->
 
     <Style Selector="Menu">
         <Setter Property="MinHeight" Value="0" />

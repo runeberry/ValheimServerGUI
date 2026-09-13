@@ -8,7 +8,7 @@ namespace ValheimServerGUI.App.Controls;
 /// <summary>
 /// A real text hyperlink (the WinForms <c>LinkLabel</c> equivalent): a <see cref="TextBlock"/> — not a
 /// button — that reads as underlined accent text and invokes <see cref="Command"/> when clicked. The link
-/// appearance lives in <c>AppStyles.axaml</c> (type-targeted), so any <see cref="HyperlinkLabel"/> renders
+/// appearance lives in <c>Styles/AppStyles.axaml</c> (type-targeted), so any <see cref="HyperlinkLabel"/> renders
 /// as a link without opting into a style class.
 /// </summary>
 public class HyperlinkLabel : TextBlock

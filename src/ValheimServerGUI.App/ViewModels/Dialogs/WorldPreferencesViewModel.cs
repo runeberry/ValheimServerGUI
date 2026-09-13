@@ -29,12 +29,7 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
         _shell = shell;
         _worldName = worldName;
 
-        Presets = new ObservableCollection<string>
-        {
-            CustomPreset,
-            WorldGenPresets.Easy, WorldGenPresets.Normal, WorldGenPresets.Hard, WorldGenPresets.Hardcore,
-            WorldGenPresets.Casual, WorldGenPresets.Hammer, WorldGenPresets.Immersive,
-        };
+        Presets = new ObservableCollection<string>(WorldGenDisplay.PresetDisplays);
 
         Modifiers = new ObservableCollection<ModifierRow>(
             WorldGenModifiers.All.Select(key => new ModifierRow(key, OnModifierChanged)));
@@ -44,18 +39,29 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
         Load();
     }
 
+    /// <summary>Friendly preset names shown in the dropdown (see <see cref="SelectedPresetDisplay"/>).</summary>
     public ObservableCollection<string> Presets { get; }
     public ObservableCollection<ModifierRow> Modifiers { get; }
     public ObservableCollection<WorldKeyToggle> Keys { get; }
 
     public string WorldName => _worldName;
 
-    [ObservableProperty] private string _selectedPreset = CustomPreset;
+    /// <summary>The selected preset TOKEN (or <see cref="CustomPreset"/>); the dialog binds the friendly
+    /// <see cref="SelectedPresetDisplay"/> instead.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsPresetSelected))]
+    [NotifyPropertyChangedFor(nameof(SelectedPresetDisplay))]
+    private string _selectedPreset = CustomPreset;
+
+    /// <summary>Friendly preset name for the dropdown, mapped to/from the token in <see cref="SelectedPreset"/>.</summary>
+    public string SelectedPresetDisplay
+    {
+        get => WorldGenDisplay.PresetDisplay(SelectedPreset);
+        set => SelectedPreset = WorldGenDisplay.PresetToken(value);
+    }
 
     /// <summary>True when a real preset is selected (modifiers are then ignored on save).</summary>
     public bool IsPresetSelected => SelectedPreset != CustomPreset;
-
-    partial void OnSelectedPresetChanged(string value) => OnPropertyChanged(nameof(IsPresetSelected));
 
     // World Preferences wiki links (parity with the WinForms LinkLabels).
     [RelayCommand] private void OpenWorldModifiersWiki() => _shell.OpenWebAddress(AppConstants.UrlValheimWikiWorldModifiers);

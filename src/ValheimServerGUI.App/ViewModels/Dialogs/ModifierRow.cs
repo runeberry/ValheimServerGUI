@@ -1,37 +1,43 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
-using ValheimServerGUI.Game;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
-/// <summary>One world-gen modifier (§6.5). "Normal" is the empty/omitted sentinel value.</summary>
+/// <summary>One world-gen modifier (§6.5). The dropdown shows friendly names (via <see cref="WorldGenDisplay"/>);
+/// the persisted <see cref="Value"/> is the raw token, or null for the "Normal" (omitted) sentinel.</summary>
 public partial class ModifierRow : ObservableObject
 {
-    public const string Normal = "Normal";
-
     private readonly Action _onChanged;
 
     public ModifierRow(string key, Action onChanged)
     {
         Key = key;
         _onChanged = onChanged;
-        Options = new List<string> { Normal }
-            .Concat(WorldGenModifiers.AllowedValues[key])
-            .ToList();
+        DisplayName = WorldGenDisplay.ModifierName(key);
+        HelpText = WorldGenDisplay.ModifierHelp(key);
+        Options = WorldGenDisplay.ModifierValueDisplays(key);
     }
 
+    /// <summary>The raw modifier token (e.g. <c>combat</c>).</summary>
     public string Key { get; }
 
+    /// <summary>Friendly modifier name shown as the row label (e.g. "Combat").</summary>
+    public string DisplayName { get; }
+
+    /// <summary>Descriptive help shown by the row's "?" glyph.</summary>
+    public string HelpText { get; }
+
+    /// <summary>Friendly value names shown in the dropdown (includes "Normal").</summary>
     public IReadOnlyList<string> Options { get; }
 
-    [ObservableProperty] private string _selected = Normal;
+    /// <summary>The selected friendly value name (dropdown value).</summary>
+    [ObservableProperty] private string _selected = WorldGenDisplay.NormalModifier;
 
-    /// <summary>The persisted value, or null when "Normal" (omitted).</summary>
-    public string? Value => Selected == Normal ? null : Selected;
+    /// <summary>The persisted token, or null when "Normal" (omitted).</summary>
+    public string? Value => WorldGenDisplay.ModifierValueToken(Key, Selected);
 
-    public void SetSelectedQuiet(string? value) => Selected = value ?? Normal;
+    public void SetSelectedQuiet(string? token) => Selected = WorldGenDisplay.ModifierValueDisplay(Key, token);
 
     partial void OnSelectedChanged(string value) => _onChanged();
 }

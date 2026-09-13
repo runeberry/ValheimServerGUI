@@ -13,7 +13,7 @@
 
         <c:DropdownFormField LabelText="Preset" Width="240" HorizontalAlignment="Left"
                              HelpText="Presets are quick sets of options to help you get a server up and running quickly.&#10;&#10;If you select a preset and change any individual settings, then the preset will be deselected."
-                             ItemsSource="{Binding Presets}" Value="{Binding SelectedPreset}" />
+                             ItemsSource="{Binding Presets}" Value="{Binding SelectedPresetDisplay}" />
 
         <StackPanel Orientation="Horizontal" Spacing="4">
             <TextBlock Text="Read more about world modifiers on the"
@@ -26,8 +26,9 @@
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:ModifierRow">
                     <StackPanel Orientation="Horizontal" Spacing="8" Margin="12,2,0,2">
-                        <TextBlock Text="{Binding Key}" VerticalAlignment="Center" MinWidth="110" />
+                        <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" MinWidth="110" />
                         <c:DropdownFormField Width="160" ItemsSource="{Binding Options}" Value="{Binding Selected}" />
+                        <c:HelpLabel HelpText="{Binding HelpText}" VerticalAlignment="Center" />
                     </StackPanel>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -44,7 +45,8 @@
         <ItemsControl ItemsSource="{Binding Keys}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:WorldKeyToggle">
-                    <c:CheckBoxFormField LabelText="{Binding Key}" Value="{Binding IsSet}" Margin="12,0,0,0" />
+                    <c:CheckBoxFormField LabelText="{Binding DisplayName}" HelpText="{Binding HelpText}"
+                                         Value="{Binding IsSet}" Margin="12,0,0,0" />
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>

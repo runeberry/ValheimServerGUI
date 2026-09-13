@@ -115,13 +115,14 @@ public class DialogViewModelTests
         var provider = new FakeWorldPreferencesProvider();
         var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher());
         var combat = vm.Modifiers[0];
-        combat.Selected = combat.Options[1];
+        combat.Selected = combat.Options[1]; // a friendly display name
 
         vm.Save();
 
         var saved = provider.LoadPreferences("W")!;
         Assert.Null(saved.Preset);
-        Assert.Equal(combat.Options[1], saved.Modifiers[combat.Key]);
+        // The dropdown shows friendly names but the raw token is what persists.
+        Assert.Equal(combat.Value, saved.Modifiers[combat.Key]);
     }
 
     [Fact]
@@ -140,6 +141,25 @@ public class DialogViewModelTests
         Assert.Equal(WorldGenPresets.Casual, vm.SelectedPreset);
         Assert.False(vm.IsDirty); // loaded clean
         Assert.Contains(vm.Keys, k => k.Key == WorldGenKeys.NoMap && k.IsSet);
+    }
+
+    [Fact]
+    public void World_modifier_dropdowns_use_friendly_names_and_round_trip_tokens()
+    {
+        var provider = new FakeWorldPreferencesProvider();
+        provider.SavePreferences(new WorldPreferences
+        {
+            WorldName = "W",
+            Modifiers = new() { [WorldGenModifiers.Portals] = WorldGenModifiers.Values.PortalsVeryHard },
+        });
+        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher());
+        var portals = vm.Modifiers[4]; // Combat, DeathPenalty, Resources, Raids, Portals
+
+        Assert.Equal(WorldGenModifiers.Portals, portals.Key);
+        Assert.Equal("Portals", portals.DisplayName);
+        Assert.Contains("Very Hard (No portals)", portals.Options);   // friendly names, not raw tokens
+        Assert.Equal("Very Hard (No portals)", portals.Selected);     // loaded token -> friendly display
+        Assert.Equal(WorldGenModifiers.Values.PortalsVeryHard, portals.Value); // and maps back to the token
     }
 
     [Fact]

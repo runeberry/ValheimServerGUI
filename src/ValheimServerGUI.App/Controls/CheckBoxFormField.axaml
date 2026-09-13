@@ -3,6 +3,50 @@
              xmlns:c="using:ValheimServerGUI.App.Controls"
              x:Class="ValheimServerGUI.App.Controls.CheckBoxFormField"
              x:Name="Root" x:CompileBindings="False">
+    <UserControl.Resources>
+        <!-- This field fully owns its check box: a flat 12px box + checkmark using the app palette, scoped
+             here so nothing globally re-themes the stock CheckBox. Only the states we use (checked / hover /
+             disabled) — no Fluent state matrix, no three-state. -->
+        <StreamGeometry x:Key="VsgCheckMark">M5.5 10.586 1.707 6.793A1 1 0 0 0 .293 8.207l4.5 4.5a1 1 0 0 0 1.414 0l11-11A1 1 0 0 0 15.793.293L5.5 10.586Z</StreamGeometry>
+        <ControlTheme x:Key="{x:Type CheckBox}" TargetType="CheckBox">
+            <Setter Property="MinHeight" Value="18" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <!-- Transparent root so the whole row (box + gap + label) is one click target. -->
+                    <Border Background="Transparent">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Border x:Name="Box" Width="12" Height="12" VerticalAlignment="Center"
+                                    CornerRadius="2" BorderThickness="1"
+                                    BorderBrush="{DynamicResource AppBorderBrush}" Background="Transparent">
+                                <Path x:Name="Check" Margin="1.5" Stretch="Uniform" Opacity="0"
+                                      Fill="White" Data="{StaticResource VsgCheckMark}" />
+                            </Border>
+                            <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              RecognizesAccessKey="True" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Border#Box">
+                <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            </Style>
+            <Style Selector="^:checked /template/ Border#Box">
+                <Setter Property="Background" Value="{DynamicResource SystemAccentColor}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource SystemAccentColor}" />
+            </Style>
+            <Style Selector="^:checked /template/ Path#Check">
+                <Setter Property="Opacity" Value="1" />
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Opacity" Value="0.5" />
+            </Style>
+        </ControlTheme>
+    </UserControl.Resources>
+
     <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
         <CheckBox Content="{Binding #Root.LabelText}" IsChecked="{Binding #Root.Value, Mode=TwoWay}" />
         <c:HelpLabel HelpText="{Binding #Root.HelpText}" />

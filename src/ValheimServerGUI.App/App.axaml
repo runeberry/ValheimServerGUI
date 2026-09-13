@@ -8,15 +8,12 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- App-level styling (Styles/): the palette + retemplated STOCK controls, each named after
-                     the control it themes. Merged into Application.Resources so they override Fluent. -->
+                <!-- The layered surface palette (theme-variant aware; no pure black). -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/Palette.axaml" />
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/CheckBox.axaml" />
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/RadioButton.axaml" />
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/NumericUpDown.axaml" />
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/TabStyles.axaml" />
 
-                <!-- Custom-control themes (Controls/): each is the ControlTheme for the same-named control. -->
+                <!-- Custom-control themes (Controls/): each is the ControlTheme for the same-named control.
+                     Stock controls we restyle (CheckBox, RadioButton, NumericUpDown, TabControl) are NOT here
+                     — each is owned + scoped inside the single wrapper/window that uses it. -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormRow.axaml" />
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/HelpLabel.axaml" />

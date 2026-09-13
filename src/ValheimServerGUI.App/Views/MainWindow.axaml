@@ -14,6 +14,74 @@
         MinWidth="550" MinHeight="408"
         Title="{Binding Title}">
 
+    <Window.Resources>
+        <!-- WinForms-style tab strip: bordered folder tabs, used only by this window's TabControl so the
+             theme is owned here rather than a global stock override. Inactive tabs sit recessed on the app
+             background; the selected tab is raised, painted the content colour, and merges into the content
+             frame (no bottom border, overlapping the frame's top edge). Colours come from Palette.axaml. -->
+        <ControlTheme x:Key="{x:Type TabItem}" TargetType="TabItem">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Normal" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <Setter Property="Background" Value="{DynamicResource LayerBase}" />
+            <Setter Property="Padding" Value="12,4" />
+            <Setter Property="MinHeight" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border Name="PART_LayoutRoot"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="4,4,0,0"
+                            Margin="0,2,-1,0">
+                        <ContentPresenter Name="PART_ContentPresenter"
+                                          Content="{TemplateBinding Header}"
+                                          ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                          Padding="{TemplateBinding Padding}"
+                                          HorizontalAlignment="Center" VerticalAlignment="Center" />
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+
+            <!-- Selected: content-coloured + raised (no top push-down), no bottom border, overlapping the
+                 content frame by 1px so it blends into the content. Horizontal padding is unchanged, so the
+                 title never shifts sideways between states. -->
+            <Style Selector="^:selected /template/ Border#PART_LayoutRoot">
+                <Setter Property="Background" Value="{DynamicResource LayerContent}" />
+                <Setter Property="BorderThickness" Value="1,1,1,0" />
+                <Setter Property="Margin" Value="0,0,-1,-1" />
+            </Style>
+
+            <Style Selector="^:pointerover:not(:selected) /template/ Border#PART_LayoutRoot">
+                <Setter Property="Background" Value="{DynamicResource LayerBaseHover}" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="{x:Type TabControl}" TargetType="TabControl">
+            <Setter Property="Background" Value="{DynamicResource LayerContent}" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <DockPanel>
+                        <!-- Tab strip; pulled down 1px so the selected tab overlaps the content frame border. -->
+                        <ItemsPresenter Name="PART_ItemsPresenter" DockPanel.Dock="Top" ZIndex="1"
+                                        Margin="0,0,0,-1"
+                                        ItemsPanel="{TemplateBinding ItemsPanel}" />
+                        <Border Background="{DynamicResource LayerContent}"
+                                BorderBrush="{DynamicResource AppBorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="0,3,3,3">
+                            <ContentPresenter Name="PART_SelectedContentHost"
+                                              Content="{TemplateBinding SelectedContent}"
+                                              ContentTemplate="{TemplateBinding SelectedContentTemplate}"
+                                              Margin="{TemplateBinding Padding}" />
+                        </Border>
+                    </DockPanel>
+                </ControlTemplate>
+            </Setter>
+        </ControlTheme>
+    </Window.Resources>
+
     <DockPanel>
         <!-- ===== Menu ===== -->
         <!-- Bottom hairline mirrors the footer's top border so the menu bar reads as a banded strip. -->

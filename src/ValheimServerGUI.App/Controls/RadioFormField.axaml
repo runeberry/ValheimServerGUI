@@ -3,6 +3,47 @@
              xmlns:c="using:ValheimServerGUI.App.Controls"
              x:Class="ValheimServerGUI.App.Controls.RadioFormField"
              x:Name="Root" x:CompileBindings="False">
+    <UserControl.Resources>
+        <!-- This field fully owns its radio button: a flat 12px ring + 5px dot using the app palette, scoped
+             here so nothing globally re-themes the stock RadioButton. Only the states we use. -->
+        <ControlTheme x:Key="{x:Type RadioButton}" TargetType="RadioButton">
+            <Setter Property="MinHeight" Value="18" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}" />
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <!-- Transparent root so the whole row is one click target. -->
+                    <Border Background="Transparent">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <Grid Width="12" Height="12" VerticalAlignment="Center">
+                                <Ellipse x:Name="Ring" Width="12" Height="12" StrokeThickness="1"
+                                         Stroke="{DynamicResource AppBorderBrush}" Fill="Transparent" />
+                                <Ellipse x:Name="Dot" Width="5" Height="5" Opacity="0"
+                                         Fill="{DynamicResource SystemAccentColor}" />
+                            </Grid>
+                            <ContentPresenter Margin="4,0,0,0" VerticalAlignment="Center"
+                                              Content="{TemplateBinding Content}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              RecognizesAccessKey="True" />
+                        </StackPanel>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+            <Style Selector="^:pointerover /template/ Ellipse#Ring">
+                <Setter Property="Stroke" Value="{DynamicResource SystemAccentColor}" />
+            </Style>
+            <Style Selector="^:checked /template/ Ellipse#Ring">
+                <Setter Property="Stroke" Value="{DynamicResource SystemAccentColor}" />
+            </Style>
+            <Style Selector="^:checked /template/ Ellipse#Dot">
+                <Setter Property="Opacity" Value="1" />
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Opacity" Value="0.5" />
+            </Style>
+        </ControlTheme>
+    </UserControl.Resources>
+
     <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
         <RadioButton Content="{Binding #Root.LabelText}"
                      GroupName="{Binding #Root.GroupName}"

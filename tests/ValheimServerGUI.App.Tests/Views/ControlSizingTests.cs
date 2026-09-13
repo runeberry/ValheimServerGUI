@@ -5,13 +5,14 @@ using Avalonia.Controls.Shapes;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using ValheimServerGUI.App.Controls;
 using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// Guards the compact 12px check box / radio circle. Fluent hard-codes these parts' size as local values in
-// the template (which an app Style can't override), so they're clamped with Max/Min in Compact.axaml — this
-// pins that the clamp still bites (a regression would render Fluent's default 20px box).
+// Guards the compact 12px check box / radio circle owned by the CheckBoxFormField / RadioFormField wrappers.
+// The box/circle are our own scoped templates (parts named Box / Ring), so a regression would render at a
+// different size or drop the part entirely.
 public class ControlSizingTests
 {
     private static T Realize<T>(T control) where T : Control
@@ -28,8 +29,8 @@ public class ControlSizingTests
     [AvaloniaFact]
     public void CheckBox_box_is_12px()
     {
-        var cb = Realize(new CheckBox { Content = "x", IsChecked = true });
-        var box = cb.GetVisualDescendants().OfType<Border>().First(b => b.Name == "NormalRectangle");
+        var field = Realize(new CheckBoxFormField { LabelText = "x", Value = true });
+        var box = field.GetVisualDescendants().OfType<Border>().First(b => b.Name == "Box");
         Assert.Equal(12, box.Bounds.Width, 0);
         Assert.Equal(12, box.Bounds.Height, 0);
     }
@@ -37,9 +38,9 @@ public class ControlSizingTests
     [AvaloniaFact]
     public void RadioButton_circle_is_12px()
     {
-        var rb = Realize(new RadioButton { Content = "y", IsChecked = true });
-        var circle = rb.GetVisualDescendants().OfType<Ellipse>().First(e => e.Name == "OuterEllipse");
-        Assert.Equal(12, circle.Bounds.Width, 0);
-        Assert.Equal(12, circle.Bounds.Height, 0);
+        var field = Realize(new RadioFormField { LabelText = "y", Value = true });
+        var ring = field.GetVisualDescendants().OfType<Ellipse>().First(e => e.Name == "Ring");
+        Assert.Equal(12, ring.Bounds.Width, 0);
+        Assert.Equal(12, ring.Bounds.Height, 0);
     }
 }

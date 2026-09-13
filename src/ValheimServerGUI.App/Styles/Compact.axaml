@@ -88,6 +88,6 @@
         <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
     </Style>
     <Style Selector="Menu > MenuItem">
-        <Setter Property="Padding" Value="8,3" />
+        <Setter Property="Padding" Value="8,1.5" />
     </Style>
 </Styles>

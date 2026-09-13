@@ -17,6 +17,11 @@
             <SolidColorBrush x:Key="LayerContent" Color="#2D2D30" />
             <SolidColorBrush x:Key="LayerBaseHover" Color="#323233" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#3F3F46" />
+            <!-- High-contrast button outline (overrides Fluent's faint default) — kept for rest/hover/pressed
+                 so the border never fades; disabled stays Fluent's muted brush. -->
+            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#9A9A9A" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#9A9A9A" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#9A9A9A" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="LayerDarkest" Color="#D4D4D4" />
@@ -24,6 +29,11 @@
             <SolidColorBrush x:Key="LayerContent" Color="#FBFBFB" />
             <SolidColorBrush x:Key="LayerBaseHover" Color="#E0E0E0" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#BFBFBF" />
+            <!-- High-contrast button outline: a proper dark edge in light theme (Fluent's default nearly
+                 disappears). Rest/hover/pressed all use it; disabled stays Fluent's muted brush. -->
+            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#6B6B6B" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#6B6B6B" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#6B6B6B" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

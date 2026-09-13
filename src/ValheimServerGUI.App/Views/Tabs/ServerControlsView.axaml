@@ -46,7 +46,7 @@
                                               Command="{Binding WorldPreferencesCommand}" />
                             <c:RefreshButton Grid.Column="4" ToolTip.Tip="Refresh the worlds list"
                                              Command="{Binding RefreshWorldsCommand}" />
-                            <c:OpenButton Grid.Column="5" ToolTip.Tip="Open save folder"
+                            <c:OpenButton Grid.Column="5" ToolTip.Tip="Open the save data folder in your file manager"
                                           Command="{Binding OpenSaveFolderCommand}" />
                         </Grid>
 

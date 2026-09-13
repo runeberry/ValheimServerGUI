@@ -14,7 +14,7 @@
                                              HelpText="The location of the Valheim Dedicated Server executable, usually &quot;valheim_server.exe&quot;.&#10;&#10;This field sets the path just for this profile. Leave this field empty if you do not want a profile-specific override. To set this path for all profiles, see File &gt; Set Directories."
                                              Value="{Binding Form.ServerExePath}" IsEnabled="{Binding AllowServerChanges}">
                             <c:FilenameFormField.TrailingContent>
-                                <c:OpenButton Margin="4,0,0,0" ToolTip.Tip="Open server folder"
+                                <c:OpenButton Margin="4,0,0,0" ToolTip.Tip="Open this folder in your file manager"
                                               Command="{Binding OpenServerExeFolderCommand}" />
                             </c:FilenameFormField.TrailingContent>
                         </c:FilenameFormField>
@@ -22,7 +22,7 @@
                                              HelpText="The location of the save data for your Valheim server, including the &quot;worlds&quot; folder, admin lists, etc.&#10;&#10;This field sets the path just for this profile. Leave this field empty if you do not want a profile-specific override. To set this path for all profiles, see File &gt; Set Directories."
                                              Value="{Binding Form.SaveDataFolderPath}" IsEnabled="{Binding AllowServerChanges}">
                             <c:FilenameFormField.TrailingContent>
-                                <c:OpenButton Margin="4,0,0,0" ToolTip.Tip="Open save folder"
+                                <c:OpenButton Margin="4,0,0,0" ToolTip.Tip="Open this folder in your file manager"
                                               Command="{Binding OpenSaveFolderCommand}" />
                             </c:FilenameFormField.TrailingContent>
                         </c:FilenameFormField>
@@ -32,6 +32,7 @@
                 <c:GroupBox Header="Other Settings">
                     <StackPanel Spacing="4">
                         <c:CheckBoxFormField LabelText="Start this server when ValheimServerGUI starts"
+                                             HelpText="Automatically start up this server when you open ValheimServerGUI. If you want to restart your server whenever you restart your computer, enable this setting, along with the corresponding setting under File &gt; Preferences."
                                              Value="{Binding Form.AutoStart}" IsEnabled="{Binding AllowServerChanges}" />
                         <c:CheckBoxFormField LabelText="Write server logs to file"
                                              HelpText="If enabled, this server's logs will be written to a daily rolling log file on disk. Logs older than 30 days will be deleted automatically."

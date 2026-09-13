@@ -10,7 +10,7 @@
             <TextBlock Grid.Column="0" Text="View logs for:" VerticalAlignment="Center" Margin="0,0,6,0" />
             <c:DropdownFormField Grid.Column="1" MinWidth="140" VerticalAlignment="Center"
                                  ItemsSource="{Binding Logs.Views}" Value="{Binding Logs.SelectedView}" />
-            <c:OpenButton Grid.Column="2" Margin="4,0,0,0" ToolTip.Tip="Open logs folder"
+            <c:OpenButton Grid.Column="2" Margin="4,0,0,0" ToolTip.Tip="Open the logs folder in your file manager"
                           Command="{Binding Logs.OpenLogsFolderCommand}" />
             <Button Grid.Column="4" Content="Save Logs…" Command="{Binding Logs.SaveLogsCommand}" Margin="4,0,0,0" />
             <Button Grid.Column="5" Content="Clear Logs" Command="{Binding Logs.ClearLogsCommand}" Margin="4,0,0,0" />

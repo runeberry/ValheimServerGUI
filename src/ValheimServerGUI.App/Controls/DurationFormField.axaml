@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             x:Class="ValheimServerGUI.App.Controls.DurationFormField"
+             x:Name="Root" x:CompileBindings="False">
+    <UserControl.Resources>
+        <!-- Same scoped compact spinner skin NumericFormField uses, so the two fields match exactly. -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactNumericUpDown.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
+        <Grid ColumnDefinitions="*,4,Auto">
+            <NumericUpDown Grid.Column="0"
+                           Value="{Binding #Root.DisplayAmount, Mode=TwoWay}"
+                           Minimum="{Binding #Root.NumericMinimum}"
+                           Maximum="{Binding #Root.NumericMaximum}"
+                           Increment="1" FormatString="0" />
+            <ComboBox Grid.Column="2" MinWidth="84" VerticalAlignment="Stretch"
+                      ItemsSource="{Binding #Root.Units}"
+                      SelectedItem="{Binding #Root.SelectedUnit, Mode=TwoWay}" />
+        </Grid>
+    </c:FormRow>
+</UserControl>

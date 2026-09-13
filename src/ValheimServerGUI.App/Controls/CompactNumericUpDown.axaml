@@ -1,0 +1,146 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Shared compact NumericUpDown skin, merged (scoped) into the fields that own a spinner
+         (NumericFormField, DurationFormField) so nothing globally re-themes the stock NumericUpDown.
+         The two spin buttons are stacked VERTICALLY in a single narrow column (up on top, down on bottom)
+         instead of Fluent's wide side-by-side pair, so a numeric field doesn't eat horizontal space while
+         keeping click-to-step (and hold-to-repeat). -->
+
+    <ControlTheme x:Key="SpinnerRepeatButtonTheme" TargetType="RepeatButton">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Padding" Value="0" />
+        <!-- Keep the increment/decrement buttons out of the Tab order, so each numeric field is a single
+             tab stop. -->
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Border Background="{TemplateBinding Background}">
+                    <ContentPresenter Content="{TemplateBinding Content}"
+                                      HorizontalAlignment="Center" VerticalAlignment="Center" />
+                </Border>
+            </ControlTemplate>
+        </Setter>
+        <Style Selector="^:pointerover /template/ Border">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border">
+            <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+        </Style>
+    </ControlTheme>
+
+    <!-- Our own NumericUpDown template. Fluent's sets 10,6,6,5 padding on the inner PART_TextBox as a
+         template-local value (unreachable from an app Style), which overflows our 24px height and makes
+         Avalonia show the TextBox's vertical scrollbar — its line up/down buttons read as a "phantom"
+         spinner left of the real one. Here the inner box is chromeless (no border/background) with flush
+         8,0 padding and centered text, so nothing overflows and the number is vertically centered. The
+         spin buttons + border come from our ButtonSpinner theme below. -->
+    <ControlTheme x:Key="{x:Type NumericUpDown}" TargetType="NumericUpDown">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+        <Setter Property="FontSize" Value="{DynamicResource ControlContentThemeFontSize}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <ButtonSpinner Name="PART_Spinner"
+                               Background="{TemplateBinding Background}"
+                               BorderBrush="{TemplateBinding BorderBrush}"
+                               BorderThickness="{TemplateBinding BorderThickness}"
+                               CornerRadius="{TemplateBinding CornerRadius}"
+                               MinWidth="0"
+                               HorizontalContentAlignment="Stretch"
+                               VerticalContentAlignment="Center"
+                               AllowSpin="{TemplateBinding AllowSpin}"
+                               ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
+                               ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}">
+                    <TextBox Name="PART_TextBox"
+                             Background="Transparent"
+                             BorderThickness="0"
+                             MinWidth="0"
+                             MinHeight="0"
+                             Margin="0"
+                             Padding="{TemplateBinding Padding}"
+                             VerticalAlignment="Stretch"
+                             VerticalContentAlignment="Center"
+                             HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                             PlaceholderText="{TemplateBinding Watermark}"
+                             IsReadOnly="{TemplateBinding IsReadOnly}"
+                             AcceptsReturn="False"
+                             TextWrapping="NoWrap">
+                        <!-- Make the inner box FULLY chromeless in every state: its own pointerover/focus
+                             would otherwise darken only the text area (not the border/spinner). The single
+                             visible chrome + hover/focus feedback lives on the ButtonSpinner border below. -->
+                        <TextBox.Resources>
+                            <SolidColorBrush x:Key="TextControlBackground" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBorderBrush" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="Transparent" />
+                            <SolidColorBrush x:Key="TextControlBorderBrushFocused" Color="Transparent" />
+                        </TextBox.Resources>
+                    </TextBox>
+                </ButtonSpinner>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+    <ControlTheme x:Key="{x:Type ButtonSpinner}" TargetType="ButtonSpinner">
+        <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DataValidationErrors>
+                    <Border Name="PART_BorderElement"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="{TemplateBinding CornerRadius}"
+                            MinHeight="{TemplateBinding MinHeight}">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <ContentPresenter Name="PART_ContentPresenter" Grid.Column="0"
+                                              Content="{TemplateBinding Content}"
+                                              HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                              VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                              Padding="{TemplateBinding Padding}" />
+                            <Grid Grid.Column="1" Width="16" RowDefinitions="*,*"
+                                  IsVisible="{TemplateBinding ShowButtonSpinner}">
+                                <RepeatButton Name="PART_IncreaseButton" Grid.Row="0"
+                                              Theme="{StaticResource SpinnerRepeatButtonTheme}">
+                                    <Path Data="M 0 3 L 3.5 0 L 7 3"
+                                          Stroke="{DynamicResource TextControlForeground}"
+                                          StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round" />
+                                </RepeatButton>
+                                <RepeatButton Name="PART_DecreaseButton" Grid.Row="1"
+                                              Theme="{StaticResource SpinnerRepeatButtonTheme}">
+                                    <Path Data="M 0 0 L 3.5 3 L 7 0"
+                                          Stroke="{DynamicResource TextControlForeground}"
+                                          StrokeThickness="1.2" StrokeLineCap="Round" StrokeJoin="Round" />
+                                </RepeatButton>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                </DataValidationErrors>
+            </ControlTemplate>
+        </Setter>
+        <!-- Whole-control hover/focus feedback on the single outer border (the inner text box is inert),
+             so the numeric field reacts as one consolidated control. -->
+        <Style Selector="^:pointerover /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{DynamicResource TextControlBackgroundPointerOver}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushPointerOver}" />
+        </Style>
+        <Style Selector="^:focus-within /template/ Border#PART_BorderElement">
+            <Setter Property="Background" Value="{DynamicResource TextControlBackgroundFocused}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}" />
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>

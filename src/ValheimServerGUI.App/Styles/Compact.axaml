@@ -31,13 +31,32 @@
     </Style>
 
     <!-- Icon-only 16x16 button: no min width, fixed to the standard input height so a row of
-         [text box | icon button] stays a uniform height and the two align. -->
+         [text box | icon button] stays a uniform height and the two align. Reads as a slim floating icon —
+         no background or border at rest OR on hover/press, just a hand cursor. Fluent paints the button
+         chrome on PART_ContentPresenter per state, so each state is forced transparent here (app Style beats
+         the ControlTheme's state styles). -->
     <Style Selector="Button.icon">
         <Setter Property="MinWidth" Value="0" />
         <Setter Property="Height" Value="24" />
-        <Setter Property="Padding" Value="4" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.icon /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.icon:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
 
     <Style Selector="TextBox">
@@ -61,28 +80,39 @@
         <Setter Property="MinHeight" Value="20" />
         <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
-    <!-- Shrink the check box (Fluent's is a 20px square in a 32px row) to a 12px box. Resizes the existing
-         template parts so all Fluent states/animations are preserved. Part names verified against Avalonia 12. -->
+    <!-- Shrink the check box (Fluent's is a 20px square in a 32px row) to a 12px box. Fluent hard-codes the
+         box parts' Width/Height as *local* values in the template, which an application Style cannot override
+         (LocalValue outranks Style), so we clamp them with Max/Min instead — that DOES win, shrinking the box
+         while preserving all Fluent states/animations. The check glyph lives in a sibling Viewbox, so clamp
+         that too or the mark would overflow the smaller box. Part names verified against Avalonia 12.1. -->
     <Style Selector="CheckBox /template/ Border#PART_Border">
         <Setter Property="MinHeight" Value="16" />
     </Style>
     <Style Selector="CheckBox /template/ Border#NormalRectangle">
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
         <Setter Property="MinWidth" Value="12" />
+        <Setter Property="MinHeight" Value="12" />
+        <Setter Property="MaxWidth" Value="12" />
+        <Setter Property="MaxHeight" Value="12" />
+    </Style>
+    <Style Selector="CheckBox /template/ Viewbox">
+        <Setter Property="MaxWidth" Value="12" />
+        <Setter Property="MaxHeight" Value="12" />
     </Style>
 
-    <!-- Shrink the radio button's circle (20px -> 12px) and its centre dot, and the row height. -->
+    <!-- Shrink the radio button's circle (20px -> 12px) and its centre dot, and the row height. Same
+         LocalValue-vs-Style constraint as the check box, so clamp with Max/Min. -->
     <Style Selector="RadioButton /template/ Border#RootBorder">
         <Setter Property="MinHeight" Value="16" />
     </Style>
     <Style Selector="RadioButton /template/ Ellipse#OuterEllipse, RadioButton /template/ Ellipse#CheckOuterEllipse">
-        <Setter Property="Width" Value="12" />
-        <Setter Property="Height" Value="12" />
+        <Setter Property="MinWidth" Value="12" />
+        <Setter Property="MinHeight" Value="12" />
+        <Setter Property="MaxWidth" Value="12" />
+        <Setter Property="MaxHeight" Value="12" />
     </Style>
     <Style Selector="RadioButton /template/ Ellipse#CheckGlyph">
-        <Setter Property="Width" Value="5" />
-        <Setter Property="Height" Value="5" />
+        <Setter Property="MaxWidth" Value="5" />
+        <Setter Property="MaxHeight" Value="5" />
     </Style>
 
     <Style Selector="RadioButton">

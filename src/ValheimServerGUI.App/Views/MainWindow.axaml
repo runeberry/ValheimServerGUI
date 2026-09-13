@@ -10,8 +10,8 @@
         x:Class="ValheimServerGUI.App.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         x:Name="Root"
-        Width="500" Height="390"
-        MinWidth="500" MinHeight="371"
+        Width="550" Height="408"
+        MinWidth="550" MinHeight="408"
         Title="{Binding Title}">
 
     <DockPanel>

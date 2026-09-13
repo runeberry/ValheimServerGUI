@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels"
              x:Class="ValheimServerGUI.App.Views.Tabs.ServerDetailsView"
              x:DataType="vm:MainWindowViewModel">
@@ -33,8 +34,11 @@
                     <c:LabelField LabelText="Invite Code:" Value="{Binding Details.InviteCode}"
                                   HelpText="Crossplay invite code friends can use to join.">
                         <c:LabelField.TrailingContent>
+                            <!-- Keep the copy button's slot even when there's no invite code to copy, so the
+                                 help glyph doesn't shift between rows (hidden-but-reserved, not collapsed). -->
                             <c:CopyButton Text="{Binding Details.InviteCode}"
-                                          IsVisible="{Binding Details.InviteCodeCopyable}" />
+                                          Opacity="{Binding Details.InviteCodeCopyable, Converter={x:Static conv:BooleanToOpacityConverter.Instance}}"
+                                          IsHitTestVisible="{Binding Details.InviteCodeCopyable}" />
                         </c:LabelField.TrailingContent>
                     </c:LabelField>
 

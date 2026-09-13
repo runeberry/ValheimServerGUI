@@ -10,9 +10,11 @@
 
     <StackPanel Margin="20" Spacing="8">
         <c:FilenameFormField LabelText="Default Server Executable" SelectMode="File"
-                             Value="{Binding ServerExePath}" />
+                             Value="{Binding ServerExePath}"
+                             HelpText="The location of the Valheim Dedicated Server executable, usually &quot;valheim_server.exe&quot;.&#10;&#10;NOTE: You must have Valheim Dedicated Server installed in order to use this application. See Help for installation instructions." />
         <c:FilenameFormField LabelText="Default Save Data Folder" SelectMode="Directory"
-                             Value="{Binding SaveDataFolderPath}" />
+                             Value="{Binding SaveDataFolderPath}"
+                             HelpText="The location of the save data for your Valheim server, including the &quot;worlds&quot; folder, admin lists, etc." />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
             <Button Content="Restore Defaults" Click="OnRestoreDefaults" />

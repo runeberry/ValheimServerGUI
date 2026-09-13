@@ -11,7 +11,8 @@
     <StackPanel Margin="20" Spacing="10">
         <TextBlock TextWrapping="Wrap"
                    Text="Describe the problem. A crash report with your app/OS details and recent logs is included." />
-        <c:TextFormField LabelText="Description" Value="{Binding Description}" Multiline="True" InputHeight="160" />
+        <c:TextFormField LabelText="Description" Value="{Binding Description}" Multiline="True" InputHeight="160"
+                         HelpText="Describe the bug you're experiencing in detail, including:&#10;- A detailed description of the problem you're experiencing&#10;- Any steps required to reproduce the bug&#10;&#10;Your bug report will be submitted alongside some details about your computer, which version you're running, etc. to help us further troubleshoot the problem. No personal or identifying details about your computer will be collected." />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
             <Button Content="Submit" MinWidth="80" IsDefault="True"
                     IsEnabled="{Binding CanSubmit}" Click="OnSubmit" />

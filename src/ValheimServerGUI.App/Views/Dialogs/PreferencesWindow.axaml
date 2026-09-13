@@ -9,12 +9,16 @@
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="6">
-        <c:CheckBoxFormField LabelText="Check for updates on startup" Value="{Binding CheckForUpdates}" />
+        <c:CheckBoxFormField LabelText="Check for updates on startup" Value="{Binding CheckForUpdates}"
+                             HelpText="If enabled, ValheimServerGUI will check for updates automatically when the app starts up, and again every 24 hours.&#10;&#10;If disabled, you can check for updates anytime from Help &gt; Check for updates." />
         <c:CheckBoxFormField LabelText="Start with the operating system" Value="{Binding StartWithWindows}" />
         <c:CheckBoxFormField LabelText="Start minimized" Value="{Binding StartMinimized}" />
-        <c:CheckBoxFormField LabelText="Save the profile automatically when starting a server" Value="{Binding SaveProfileOnStart}" />
-        <c:CheckBoxFormField LabelText="Write application logs to file" Value="{Binding WriteApplicationLogsToFile}" />
-        <c:CheckBoxFormField LabelText="Enable password validation" Value="{Binding EnablePasswordValidation}" />
+        <c:CheckBoxFormField LabelText="Save the profile automatically when starting a server" Value="{Binding SaveProfileOnStart}"
+                             HelpText="If enabled, any changes you made to your server profile will be saved when you click Start Server. Otherwise, you must manually save changes with File &gt; Save." />
+        <c:CheckBoxFormField LabelText="Write application logs to file" Value="{Binding WriteApplicationLogsToFile}"
+                             HelpText="If enabled, any application logs from ValheimServerGUI will be written to a daily rolling log file on disk. Logs older than 30 days will be deleted automatically.&#10;&#10;Note: this setting does not affect your server's logs. You can toggle server logs under the Advanced Controls tab for each server profile." />
+        <c:CheckBoxFormField LabelText="Enable password validation" Value="{Binding EnablePasswordValidation}"
+                             HelpText="Valheim Dedicated Server will not start if certain password requirements aren't met, and VSG enforces these requirements.&#10;&#10;Only disable this setting if you are running a mod that bypasses server password requirements, and you would like VSG to stop validating passwords as well." />
 
         <c:DropdownFormField LabelText="Theme" Width="200" HorizontalAlignment="Left" Margin="0,4,0,0"
                              ItemsSource="{Binding Themes}" Value="{Binding Theme}" />

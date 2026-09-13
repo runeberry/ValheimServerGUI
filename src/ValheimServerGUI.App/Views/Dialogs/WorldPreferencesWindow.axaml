@@ -12,6 +12,7 @@
         <TextBlock Text="{Binding WorldName, StringFormat='World: {0}'}" FontWeight="SemiBold" />
 
         <c:DropdownFormField LabelText="Preset" Width="240" HorizontalAlignment="Left"
+                             HelpText="Presets are quick sets of options to help you get a server up and running quickly.&#10;&#10;If you select a preset and change any individual settings, then the preset will be deselected."
                              ItemsSource="{Binding Presets}" Value="{Binding SelectedPreset}" />
 
         <StackPanel Orientation="Horizontal" Spacing="4">

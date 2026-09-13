@@ -11,19 +11,25 @@
     <StackPanel Margin="20" Spacing="8">
         <StackPanel Spacing="2">
             <c:LabelField LabelText="Platform:" Value="{Binding Platform}" />
-            <c:LabelField LabelText="Player ID:" Value="{Binding PlayerId}">
+            <c:LabelField LabelText="Player ID:" Value="{Binding PlayerId}"
+                          HelpText="The ID associated with the player's Steam or Xbox account. You can use this ID to allow or ban players, or add players as admins.">
                 <c:LabelField.TrailingContent>
-                    <c:CopyButton Text="{Binding PlayerId}" />
+                    <c:CopyButton Text="{Binding PlayerId}" ToolTip.Tip="Copy Steam ID to clipboard" />
                 </c:LabelField.TrailingContent>
             </c:LabelField>
-            <c:LabelField LabelText="ZDO ID:" Value="{Binding ZdoId}" />
-            <c:LabelField LabelText="Latest Character:" Value="{Binding LatestCharacter}" />
-            <c:LabelField LabelText="Status:" Value="{Binding Status}" />
+            <c:LabelField LabelText="ZDO ID:" Value="{Binding ZdoId}"
+                          HelpText="The player's object ID in game. This changes with each game session." />
+            <c:LabelField LabelText="Latest Character:" Value="{Binding LatestCharacter}"
+                          HelpText="The character that this player is currently playing, or if they're offline, the last character they logged in as." />
+            <c:LabelField LabelText="Status:" Value="{Binding Status}"
+                          HelpText="Possible statuses are: Online, Offline, Joining, or Leaving" />
         </StackPanel>
 
-        <c:TextFormField LabelText="Display Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0" />
+        <c:TextFormField LabelText="Display Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0"
+                         HelpText="The player's Steam/Xbox username. This will be determined automatically, but in case it doesn't work, you may edit the player's name manually." />
 
         <c:AddRemoveListField x:Name="CharactersField" LabelText="Known Characters" Margin="0,6,0,0"
+                              HelpText="The Valheim character names that this player is known by. Names are automatically added to this list when a player joins the server, but you may modify them manually.&#10;&#10;If a name appears with a (!), it means that name may not be matched to the correct player (due to a Valheim server limitation). You may remove this name if it's incorrect, or select the name and click Confirm to remove the warning."
                               ItemsSource="{Binding Characters}" Value="{Binding SelectedCharacter, Mode=TwoWay}"
                               ListHeight="120" RemoveCommand="{Binding RemoveCharacterCommand}" />
 

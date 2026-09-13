@@ -37,11 +37,11 @@
                 <c:GroupBox Grid.Column="0" Header="World">
                     <StackPanel Spacing="4">
                         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
-                            <RadioButton Grid.Column="0" GroupName="World" Content="Existing"
-                                         IsChecked="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
-                                         IsEnabled="{Binding AllowServerChanges}" />
-                            <RadioButton Grid.Column="1" GroupName="World" Content="New" Margin="10,0,0,0"
-                                         IsChecked="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
+                            <c:RadioFormField Grid.Column="0" GroupName="World" LabelText="Existing"
+                                              Value="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
+                                              IsEnabled="{Binding AllowServerChanges}" />
+                            <c:RadioFormField Grid.Column="1" GroupName="World" LabelText="New" Margin="10,0,0,0"
+                                              Value="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
                             <c:SettingsButton Grid.Column="3" ToolTip.Tip="World settings"
                                               Command="{Binding WorldPreferencesCommand}" />
                             <c:RefreshButton Grid.Column="4" Margin="4,0,0,0" ToolTip.Tip="Refresh worlds"

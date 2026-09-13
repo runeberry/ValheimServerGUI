@@ -1,0 +1,21 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             x:Class="ValheimServerGUI.App.Controls.LabelField"
+             x:Name="Root" x:CompileBindings="False">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="{Binding #Root.LabelWidth}" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Column="0" Text="{Binding #Root.LabelText}"
+                   HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" />
+        <SelectableTextBlock Grid.Column="1" Text="{Binding #Root.Value}" VerticalAlignment="Center" />
+        <c:HelpLabel Grid.Column="2" HelpText="{Binding #Root.HelpText}" Margin="6,0" />
+        <ContentControl Grid.Column="3" Content="{Binding #Root.TrailingContent}"
+                        IsVisible="{Binding #Root.TrailingContent, Converter={x:Static ObjectConverters.IsNotNull}}" />
+    </Grid>
+</UserControl>

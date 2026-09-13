@@ -5,49 +5,39 @@
              x:Class="ValheimServerGUI.App.Views.Tabs.ServerDetailsView"
              x:DataType="vm:MainWindowViewModel">
 
-    <UserControl.Styles>
-        <!-- Right-aligned caption + blue "?" help glyph reused across the detail rows. -->
-        <Style Selector="TextBlock.caption">
-            <Setter Property="HorizontalAlignment" Value="Right" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Margin" Value="0,0,8,0" />
-        </Style>
-        <Style Selector="TextBlock.help">
-            <Setter Property="Text" Value="?" />
-            <Setter Property="FontWeight" Value="Bold" />
-            <Setter Property="Foreground" Value="{DynamicResource HelpGlyphBrush}" />
-            <Setter Property="Cursor" Value="Hand" />
-            <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Margin" Value="6,0" />
-        </Style>
-    </UserControl.Styles>
-
     <ScrollViewer>
         <StackPanel Margin="8" Spacing="4">
             <c:GroupBox Header="Connection Details">
                 <StackPanel Spacing="2">
-                    <Grid ColumnDefinitions="130,*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
-                        <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="External IP Address:" />
-                        <SelectableTextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Details.ExternalIp}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Row="0" Grid.Column="2" Classes="help" ToolTip.Tip="Your public IP — share this with friends on the internet." />
-                        <c:CopyButton Grid.Row="0" Grid.Column="3" Text="{Binding Details.ExternalIp}" />
+                    <c:LabelField LabelText="External IP Address:" Value="{Binding Details.ExternalIp}"
+                                  HelpText="Your public IP — share this with friends on the internet.">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.ExternalIp}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
 
-                        <TextBlock Grid.Row="1" Grid.Column="0" Classes="caption" Text="Internal IP Address:" />
-                        <SelectableTextBlock Grid.Row="1" Grid.Column="1" Text="{Binding Details.InternalIp}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Row="1" Grid.Column="2" Classes="help" ToolTip.Tip="Your IP on the local network." />
-                        <c:CopyButton Grid.Row="1" Grid.Column="3" Text="{Binding Details.InternalIp}" />
+                    <c:LabelField LabelText="Internal IP Address:" Value="{Binding Details.InternalIp}"
+                                  HelpText="Your IP on the local network.">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.InternalIp}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
 
-                        <TextBlock Grid.Row="2" Grid.Column="0" Classes="caption" Text="Local IP Address:" />
-                        <SelectableTextBlock Grid.Row="2" Grid.Column="1" Text="{Binding Details.LocalIp}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Row="2" Grid.Column="2" Classes="help" ToolTip.Tip="The loopback address for connecting from this machine." />
-                        <c:CopyButton Grid.Row="2" Grid.Column="3" Text="{Binding Details.LocalIp}" />
+                    <c:LabelField LabelText="Local IP Address:" Value="{Binding Details.LocalIp}"
+                                  HelpText="The loopback address for connecting from this machine.">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.LocalIp}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
 
-                        <TextBlock Grid.Row="3" Grid.Column="0" Classes="caption" Text="Invite Code:" />
-                        <SelectableTextBlock Grid.Row="3" Grid.Column="1" Text="{Binding Details.InviteCode}" VerticalAlignment="Center" />
-                        <TextBlock Grid.Row="3" Grid.Column="2" Classes="help" ToolTip.Tip="Crossplay invite code friends can use to join." />
-                        <c:CopyButton Grid.Row="3" Grid.Column="3" Text="{Binding Details.InviteCode}"
-                                      IsVisible="{Binding Details.InviteCodeCopyable}" />
-                    </Grid>
+                    <c:LabelField LabelText="Invite Code:" Value="{Binding Details.InviteCode}"
+                                  HelpText="Crossplay invite code friends can use to join.">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.InviteCode}"
+                                          IsVisible="{Binding Details.InviteCodeCopyable}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
+
                     <TextBlock Margin="0,4,0,0" FontStyle="Italic"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                Text="Trouble connecting? See Help &gt; Port Forwarding." />
@@ -55,17 +45,12 @@
             </c:GroupBox>
 
             <c:GroupBox Header="Statistics">
-                <Grid ColumnDefinitions="130,*,Auto" RowDefinitions="Auto,Auto,Auto">
-                    <TextBlock Grid.Row="0" Grid.Column="0" Classes="caption" Text="Server Uptime:" />
-                    <TextBlock Grid.Row="0" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Details.Uptime}" />
-
-                    <TextBlock Grid.Row="1" Grid.Column="0" Classes="caption" Text="Last World Save:" />
-                    <TextBlock Grid.Row="1" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Details.LastWorldSave}" />
-
-                    <TextBlock Grid.Row="2" Grid.Column="0" Classes="caption" Text="Avg. World Save:" />
-                    <TextBlock Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" Text="{Binding Details.AverageWorldSave}" />
-                    <TextBlock Grid.Row="2" Grid.Column="2" Classes="help" ToolTip.Tip="Average time taken to write a world save." />
-                </Grid>
+                <StackPanel Spacing="2">
+                    <c:LabelField LabelText="Server Uptime:" Value="{Binding Details.Uptime}" />
+                    <c:LabelField LabelText="Last World Save:" Value="{Binding Details.LastWorldSave}" />
+                    <c:LabelField LabelText="Avg. World Save:" Value="{Binding Details.AverageWorldSave}"
+                                  HelpText="Average time taken to write a world save." />
+                </StackPanel>
             </c:GroupBox>
         </StackPanel>
     </ScrollViewer>

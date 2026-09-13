@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -18,10 +19,11 @@ public enum FileSelectMode
 }
 
 /// <summary>
-/// The app's path field: a caption + help glyph over a text box with a built-in "…" browse button (a real
-/// file/folder picker via the window's storage provider) plus an optional trailing slot for an extra action
-/// such as an open-folder button. Mirrors the WinForms <c>FilenameFormField</c>, which likewise owned its
-/// browse button.
+/// The app's path field: a caption + help glyph over a text box whose action buttons live <em>inside</em> the
+/// box border as end-caps — a "Browse…" button (a real file/folder picker via the window's storage provider)
+/// and, when <see cref="ShowOpenFolder"/> is set, an open-folder button bound to <see cref="OpenFolderCommand"/>.
+/// Each end-cap is optional (<see cref="ShowBrowse"/>/<see cref="ShowOpenFolder"/>) so the whole field reads as
+/// a single outlined control. Mirrors the WinForms <c>FilenameFormField</c>, which likewise owned its buttons.
 /// </summary>
 public partial class FilenameFormField : FormFieldBase, IFormField<string?>
 {
@@ -31,8 +33,14 @@ public partial class FilenameFormField : FormFieldBase, IFormField<string?>
     public static readonly StyledProperty<FileSelectMode> SelectModeProperty =
         AvaloniaProperty.Register<FilenameFormField, FileSelectMode>(nameof(SelectMode));
 
-    public static readonly StyledProperty<object?> TrailingContentProperty =
-        AvaloniaProperty.Register<FilenameFormField, object?>(nameof(TrailingContent));
+    public static readonly StyledProperty<bool> ShowBrowseProperty =
+        AvaloniaProperty.Register<FilenameFormField, bool>(nameof(ShowBrowse), defaultValue: true);
+
+    public static readonly StyledProperty<bool> ShowOpenFolderProperty =
+        AvaloniaProperty.Register<FilenameFormField, bool>(nameof(ShowOpenFolder));
+
+    public static readonly StyledProperty<ICommand?> OpenFolderCommandProperty =
+        AvaloniaProperty.Register<FilenameFormField, ICommand?>(nameof(OpenFolderCommand));
 
     public FilenameFormField() => AvaloniaXamlLoader.Load(this);
 
@@ -48,11 +56,26 @@ public partial class FilenameFormField : FormFieldBase, IFormField<string?>
         set => SetValue(SelectModeProperty, value);
     }
 
-    /// <summary>Optional control rendered after the browse button (e.g. an open-folder button).</summary>
-    public object? TrailingContent
+    /// <summary>Whether the built-in "Browse…" end-cap is shown (default true).</summary>
+    public bool ShowBrowse
     {
-        get => GetValue(TrailingContentProperty);
-        set => SetValue(TrailingContentProperty, value);
+        get => GetValue(ShowBrowseProperty);
+        set => SetValue(ShowBrowseProperty, value);
+    }
+
+    /// <summary>Whether an open-folder end-cap is shown after Browse (default false). Wire
+    /// <see cref="OpenFolderCommand"/> to give it an action.</summary>
+    public bool ShowOpenFolder
+    {
+        get => GetValue(ShowOpenFolderProperty);
+        set => SetValue(ShowOpenFolderProperty, value);
+    }
+
+    /// <summary>Command invoked by the open-folder end-cap (the owner keeps the shell dependency).</summary>
+    public ICommand? OpenFolderCommand
+    {
+        get => GetValue(OpenFolderCommandProperty);
+        set => SetValue(OpenFolderCommandProperty, value);
     }
 
     /// <inheritdoc />

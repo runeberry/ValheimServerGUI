@@ -14,22 +14,16 @@
                                              HelpText="Leave blank to use the default from Preferences."
                                              Value="{Binding Form.ServerExePath}" IsEnabled="{Binding AllowServerChanges}">
                             <c:FilenameFormField.TrailingContent>
-                                <Button Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open server folder"
-                                        Command="{Binding OpenServerExeFolderCommand}">
-                                    <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"
-                                           RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                </Button>
+                                <c:OpenButton Margin="4,0,0,0" ToolTip.Tip="Open server folder"
+                                              Command="{Binding OpenServerExeFolderCommand}" />
                             </c:FilenameFormField.TrailingContent>
                         </c:FilenameFormField>
                         <c:FilenameFormField LabelText="Valheim Save Data Folder" SelectMode="Directory"
                                              HelpText="Leave blank to use the default from Preferences."
                                              Value="{Binding Form.SaveDataFolderPath}" IsEnabled="{Binding AllowServerChanges}">
                             <c:FilenameFormField.TrailingContent>
-                                <Button Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
-                                        Command="{Binding OpenSaveFolderCommand}">
-                                    <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"
-                                           RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                </Button>
+                                <c:OpenButton Margin="4,0,0,0" ToolTip.Tip="Open save folder"
+                                              Command="{Binding OpenSaveFolderCommand}" />
                             </c:FilenameFormField.TrailingContent>
                         </c:FilenameFormField>
                     </StackPanel>

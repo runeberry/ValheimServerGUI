@@ -42,21 +42,12 @@
                                          IsEnabled="{Binding AllowServerChanges}" />
                             <RadioButton Grid.Column="1" GroupName="World" Content="New" Margin="10,0,0,0"
                                          IsChecked="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
-                            <Button Grid.Column="3" Classes="icon" ToolTip.Tip="World settings"
-                                    Command="{Binding WorldPreferencesCommand}">
-                                <Image Source="{c:Icon Settings_16x}" Width="16" Height="16"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
-                            </Button>
-                            <Button Grid.Column="4" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Refresh worlds"
-                                    Command="{Binding RefreshWorldsCommand}">
-                                <Image Source="{c:Icon Restart_16x}" Width="16" Height="16"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
-                            </Button>
-                            <Button Grid.Column="5" Classes="icon" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
-                                    Command="{Binding OpenSaveFolderCommand}">
-                                <Image Source="{c:Icon OpenFolder_16x}" Width="16" Height="16"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
-                            </Button>
+                            <c:SettingsButton Grid.Column="3" ToolTip.Tip="World settings"
+                                              Command="{Binding WorldPreferencesCommand}" />
+                            <c:RefreshButton Grid.Column="4" Margin="4,0,0,0" ToolTip.Tip="Refresh worlds"
+                                             Command="{Binding RefreshWorldsCommand}" />
+                            <c:OpenButton Grid.Column="5" Margin="4,0,0,0" ToolTip.Tip="Open save folder"
+                                          Command="{Binding OpenSaveFolderCommand}" />
                         </Grid>
 
                         <c:DropdownFormField LabelText="Select World" PlaceholderText="-- No worlds --"

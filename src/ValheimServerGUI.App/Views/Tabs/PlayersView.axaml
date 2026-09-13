@@ -11,9 +11,8 @@
             <Button Grid.Column="0" Content="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
             <Button Grid.Column="2" Classes="link" Content="Character names wrong? Click here."
                     Command="{Binding OnlineManualCommand}" VerticalAlignment="Center" Margin="0,0,8,0" />
-            <Button Grid.Column="3" Classes="icon" ToolTip.Tip="Remove player" Command="{Binding Players.RemoveCommand}">
-                <Image Source="{c:Icon Cancel_16x}" Width="16" Height="16" RenderOptions.BitmapInterpolationMode="HighQuality" />
-            </Button>
+            <c:IconButton Grid.Column="3" IconName="Cancel_16x" ToolTip.Tip="Remove player"
+                          Command="{Binding Players.RemoveCommand}" />
         </Grid>
 
         <DataGrid ItemsSource="{Binding Players.Players}"

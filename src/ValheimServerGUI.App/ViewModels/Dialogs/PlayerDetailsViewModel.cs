@@ -44,12 +44,7 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
         var player = _repo.FindById(_key);
         if (player is null) return;
 
-        Platform = player.Platform ?? string.Empty;
-        PlayerId = player.PlayerId ?? string.Empty;
-        ZdoId = player.ZdoId ?? string.Empty;
-        LatestCharacter = player.LastStatusCharacter ?? string.Empty;
-        Status = player.PlayerStatus.ToString();
-        StatusChanged = player.LastStatusChange == default ? string.Empty : player.LastStatusChange.ToString("G");
+        LoadIdentity(player);
         DisplayName = player.PlayerName ?? string.Empty;
 
         Characters.Clear();
@@ -61,6 +56,26 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
             _originalConfidence[c.CharacterName] = c.MatchConfident;
         }
     });
+
+    // The read-only identity/status fields (everything except the editable display name + character list).
+    private void LoadIdentity(PlayerInfo player)
+    {
+        Platform = player.Platform ?? string.Empty;
+        PlayerId = player.PlayerId ?? string.Empty;
+        ZdoId = player.ZdoId ?? string.Empty;
+        LatestCharacter = player.LastStatusCharacter ?? string.Empty;
+        Status = player.PlayerStatus.ToString();
+        StatusChanged = player.LastStatusChange == default ? string.Empty : player.LastStatusChange.ToString("G");
+    }
+
+    /// <summary>Re-reads the current identity/status from the repo (status changes while the dialog is open).
+    /// Unlike the WinForms Refresh button, this leaves the editable display name + characters untouched, so it
+    /// can't discard unsaved edits.</summary>
+    [RelayCommand]
+    private void Refresh()
+    {
+        if (_repo.FindById(_key) is { } player) LoadIdentity(player);
+    }
 
     public override void ApplyDefaults() { /* Player Details has no defaults to restore. */ }
 

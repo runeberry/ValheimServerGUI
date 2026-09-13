@@ -16,13 +16,21 @@ public partial class BugReportViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(CanSubmit))]
     private string _description = string.Empty;
 
+    /// <summary>Optional contact details submitted with the report so we can follow up.</summary>
+    [ObservableProperty]
+    private string _contactInfo = string.Empty;
+
     public bool CanSubmit => !string.IsNullOrWhiteSpace(Description);
 
     public Task SubmitAsync()
     {
         var report = AssemblyHelper.BuildCrashReport();
         report.Source = "BugReport";
-        report.AdditionalInfo = new Dictionary<string, string> { ["Description"] = Description };
+        report.AdditionalInfo = new Dictionary<string, string>
+        {
+            ["Description"] = Description,
+            ["ContactInfo"] = ContactInfo,
+        };
         return _client.SendCrashReportAsync(report);
     }
 }

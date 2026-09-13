@@ -194,6 +194,24 @@ public class DialogViewModelTests
     }
 
     [Fact]
+    public void PlayerDetails_refresh_updates_readonly_fields_without_discarding_edits()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", LastStatusCharacter = "Odin" });
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1") { DisplayName = "Edited" };
+        vm.AddCharacter("Ragnar");
+        Assert.Equal("Odin", vm.LatestCharacter);
+
+        // Status/character change in the repo while the dialog is open.
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", LastStatusCharacter = "Thor" });
+        vm.RefreshCommand.Execute(null);
+
+        Assert.Equal("Thor", vm.LatestCharacter);  // read-only field refreshed
+        Assert.Equal("Edited", vm.DisplayName);     // unsaved edit preserved
+        Assert.Contains("Ragnar", vm.Characters);   // unsaved edit preserved
+    }
+
+    [Fact]
     public void PlayerDetails_display_name_override_saves()
     {
         var repo = new FakePlayerDataRepository();
@@ -209,7 +227,7 @@ public class DialogViewModelTests
     public async Task BugReport_submits_with_bugreport_source()
     {
         var client = new FakeRuneberryApiClient();
-        var vm = new BugReportViewModel(client) { Description = "It broke" };
+        var vm = new BugReportViewModel(client) { Description = "It broke", ContactInfo = "me@example.com" };
         Assert.True(vm.CanSubmit);
 
         await vm.SubmitAsync();
@@ -217,6 +235,7 @@ public class DialogViewModelTests
         var report = Assert.Single(client.Reports);
         Assert.Equal("BugReport", report.Source);
         Assert.Equal("It broke", report.AdditionalInfo!["Description"]);
+        Assert.Equal("me@example.com", report.AdditionalInfo!["ContactInfo"]);
     }
 
     [Fact]

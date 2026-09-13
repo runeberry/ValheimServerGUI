@@ -9,6 +9,8 @@
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="8">
+        <c:RefreshButton HorizontalAlignment="Right" ToolTip.Tip="Refresh player data"
+                         Command="{Binding RefreshCommand}" />
         <StackPanel Spacing="2">
             <c:LabelField LabelText="Platform:" Value="{Binding Platform}" />
             <c:LabelField LabelText="Player ID:" Value="{Binding PlayerId}"
@@ -23,6 +25,7 @@
                           HelpText="The character that this player is currently playing, or if they're offline, the last character they logged in as." />
             <c:LabelField LabelText="Status:" Value="{Binding Status}"
                           HelpText="Possible statuses are: Online, Offline, Joining, or Leaving" />
+            <c:LabelField LabelText="Status Changed:" Value="{Binding StatusChanged}" />
         </StackPanel>
 
         <c:TextFormField LabelText="Display Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0"

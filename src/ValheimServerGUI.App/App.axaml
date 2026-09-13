@@ -8,22 +8,18 @@
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <!-- Layered surface palette (theme-variant aware; no pure black). -->
+                <!-- App-level styling (Styles/): the palette + retemplated STOCK controls, each named after
+                     the control it themes. Merged into Application.Resources so they override Fluent. -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/Palette.axaml" />
-                <!-- Shared form-row template + input styling (§11.2). -->
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/FormControls.axaml" />
-                <!-- Etched group-box control theme. -->
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
-                <!-- Shared "?" help-glyph control theme. -->
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/HelpLabel.axaml" />
-                <!-- Compact retemplated CheckBox / RadioButton (12px box, tight margins). Merged into
-                     Application.Resources so they override Fluent's built-in themes. -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/CheckBox.axaml" />
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/RadioButton.axaml" />
-                <!-- Compact vertically-stacked NumericUpDown spinner (ported from mochi-paint). -->
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/NumericSpinner.axaml" />
-                <!-- WinForms-style bordered tab strip. -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/NumericUpDown.axaml" />
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/TabStyles.axaml" />
+
+                <!-- Custom-control themes (Controls/): each is the ControlTheme for the same-named control. -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormRow.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/HelpLabel.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Application.Resources>

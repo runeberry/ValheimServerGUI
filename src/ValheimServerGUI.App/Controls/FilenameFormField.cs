@@ -1,0 +1,107 @@
+using System;
+using System.Linq;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Data;
+using Avalonia.Interactivity;
+using Avalonia.Platform.Storage;
+
+namespace ValheimServerGUI.App.Controls;
+
+/// <summary>Functional code for <see cref="FilenameFormField"/> (properties, value change, and the browse
+/// picker), split from the XAML-paired code-behind in <c>FilenameFormField.axaml.cs</c>.</summary>
+public partial class FilenameFormField : IFormField<string?>
+{
+    public static readonly StyledProperty<string?> ValueProperty =
+        AvaloniaProperty.Register<FilenameFormField, string?>(nameof(Value), defaultBindingMode: BindingMode.TwoWay);
+
+    public static readonly StyledProperty<FileSelectMode> SelectModeProperty =
+        AvaloniaProperty.Register<FilenameFormField, FileSelectMode>(nameof(SelectMode));
+
+    public static readonly StyledProperty<object?> TrailingContentProperty =
+        AvaloniaProperty.Register<FilenameFormField, object?>(nameof(TrailingContent));
+
+    public string? Value
+    {
+        get => GetValue(ValueProperty);
+        set => SetValue(ValueProperty, value);
+    }
+
+    public FileSelectMode SelectMode
+    {
+        get => GetValue(SelectModeProperty);
+        set => SetValue(SelectModeProperty, value);
+    }
+
+    /// <summary>Optional control rendered after the browse button (e.g. an open-folder button).</summary>
+    public object? TrailingContent
+    {
+        get => GetValue(TrailingContentProperty);
+        set => SetValue(TrailingContentProperty, value);
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<string?>? ValueChanged;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ValueProperty) ValueChanged?.Invoke(this, Value);
+    }
+
+    private async void Browse(object? sender, RoutedEventArgs e) => await BrowseAsync();
+
+    private async Task BrowseAsync()
+    {
+        var storage = TopLevel.GetTopLevel(this)?.StorageProvider;
+        if (storage is null) return;
+
+        var start = await SuggestedStartLocation(storage);
+        string? picked;
+
+        if (SelectMode == FileSelectMode.Directory)
+        {
+            var folders = await storage.OpenFolderPickerAsync(new FolderPickerOpenOptions
+            {
+                Title = LabelText,
+                AllowMultiple = false,
+                SuggestedStartLocation = start,
+            });
+            picked = folders.FirstOrDefault()?.TryGetLocalPath();
+        }
+        else
+        {
+            var files = await storage.OpenFilePickerAsync(new FilePickerOpenOptions
+            {
+                Title = LabelText,
+                AllowMultiple = false,
+                SuggestedStartLocation = start,
+            });
+            picked = files.FirstOrDefault()?.TryGetLocalPath();
+        }
+
+        if (!string.IsNullOrEmpty(picked)) Value = picked;
+    }
+
+    // Open the picker at the current value's folder when it points at a real location.
+    private async Task<IStorageFolder?> SuggestedStartLocation(IStorageProvider storage)
+    {
+        if (string.IsNullOrWhiteSpace(Value)) return null;
+
+        var dir = SelectMode == FileSelectMode.Directory
+            ? Value
+            : System.IO.Path.GetDirectoryName(Value);
+
+        if (string.IsNullOrWhiteSpace(dir)) return null;
+
+        try
+        {
+            return await storage.TryGetFolderFromPathAsync(dir);
+        }
+        catch
+        {
+            return null;
+        }
+    }
+}

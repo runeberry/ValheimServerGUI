@@ -120,7 +120,8 @@ public partial class MainWindow : Window
             return;
         }
 
-        await new WorldPreferencesWindow(new WorldPreferencesViewModel(Svc<IWorldPreferencesProvider>(), worldName))
+        await new WorldPreferencesWindow(new WorldPreferencesViewModel(
+                Svc<IWorldPreferencesProvider>(), worldName, Svc<IShellLauncher>()))
             .ShowDialog(this);
     }
 

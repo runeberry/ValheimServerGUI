@@ -2,7 +2,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
@@ -17,12 +19,14 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
     public const string CustomPreset = "Custom";
 
     private readonly IWorldPreferencesProvider _provider;
+    private readonly IShellLauncher _shell;
     private readonly string _worldName;
     private bool _suppressRevert;
 
-    public WorldPreferencesViewModel(IWorldPreferencesProvider provider, string worldName)
+    public WorldPreferencesViewModel(IWorldPreferencesProvider provider, string worldName, IShellLauncher shell)
     {
         _provider = provider;
+        _shell = shell;
         _worldName = worldName;
 
         Presets = new ObservableCollection<string>
@@ -52,6 +56,10 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
     public bool IsPresetSelected => SelectedPreset != CustomPreset;
 
     partial void OnSelectedPresetChanged(string value) => OnPropertyChanged(nameof(IsPresetSelected));
+
+    // World Preferences wiki links (parity with the WinForms LinkLabels).
+    [RelayCommand] private void OpenWorldModifiersWiki() => _shell.OpenWebAddress(AppConstants.UrlValheimWikiWorldModifiers);
+    [RelayCommand] private void OpenWorldModifiersHelp() => _shell.OpenWebAddress(AppConstants.UrlHelpWorldModifiers);
 
     private void Load() => LoadClean(() =>
     {

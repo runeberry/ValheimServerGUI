@@ -14,6 +14,12 @@
         <c:DropdownFormField LabelText="Preset" Width="240" HorizontalAlignment="Left"
                              ItemsSource="{Binding Presets}" Value="{Binding SelectedPreset}" />
 
+        <StackPanel Orientation="Horizontal" Spacing="4">
+            <TextBlock Text="Read more about world modifiers on the"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <c:HyperlinkLabel Text="Valheim Wiki." Command="{Binding OpenWorldModifiersWikiCommand}" />
+        </StackPanel>
+
         <TextBlock Text="Modifiers" FontWeight="SemiBold" Margin="0,6,0,0" />
         <ItemsControl ItemsSource="{Binding Modifiers}">
             <ItemsControl.ItemTemplate>
@@ -25,6 +31,13 @@
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
+
+        <StackPanel Spacing="2" Margin="12,0,0,0">
+            <TextBlock Text="Modifiers not working like you expected? You may already have modifiers set in-game."
+                       TextWrapping="Wrap"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <c:HyperlinkLabel Text="Read more here." Command="{Binding OpenWorldModifiersHelpCommand}" />
+        </StackPanel>
 
         <TextBlock Text="Keys" FontWeight="SemiBold" Margin="0,6,0,0" />
         <ItemsControl ItemsSource="{Binding Keys}">

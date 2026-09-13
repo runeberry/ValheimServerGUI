@@ -42,7 +42,7 @@ public class DialogRenderTests
     [AvaloniaFact]
     public void WorldPreferencesWindow_realizes()
         => Realize(new WorldPreferencesWindow(new WorldPreferencesViewModel(
-            Core.GetRequiredService<IWorldPreferencesProvider>(), "TestWorld")));
+            Core.GetRequiredService<IWorldPreferencesProvider>(), "TestWorld", new RecordingShellLauncher())));
 
     [AvaloniaFact]
     public void PlayerDetailsWindow_realizes()

@@ -22,4 +22,13 @@ internal static class AppConstants
     public const string UrlReleases = "https://github.com/runeberry/ValheimServerGUI/releases";
     public const string UrlDonate = "https://www.buymeacoffee.com/runeberry";
     public const string UrlGitHub = "https://github.com/runeberry/ValheimServerGUI";
+
+    /// <summary>FAQ entry explaining why character names may show wrong ("Character names wrong?" link).</summary>
+    public const string UrlHelpCharacterNames = "https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions";
+
+    /// <summary>The Valheim wiki's World Modifiers page (World Preferences "Valheim Wiki." link).</summary>
+    public const string UrlValheimWikiWorldModifiers = "https://valheim.fandom.com/wiki/World_Modifiers";
+
+    /// <summary>FAQ entry about world modifiers set in-game (World Preferences "Read more here." link).</summary>
+    public const string UrlHelpWorldModifiers = "https://github.com/runeberry/ValheimServerGUI/wiki/Frequently-Asked-Questions";
 }

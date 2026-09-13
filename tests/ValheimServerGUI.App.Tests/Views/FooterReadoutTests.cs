@@ -6,6 +6,7 @@ using Avalonia.Media;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
 using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Controls;
 using ValheimServerGUI.App.Services;
 using ValheimServerGUI.App.Tests.Services;
 using ValheimServerGUI.App.Tests.Fakes;
@@ -50,5 +51,30 @@ public class FooterReadoutTests
             .First(t => t.Text != null && t.Text.StartsWith("Up to date") && t.IsVisible);
         var color = (readout.Foreground as ISolidColorBrush)!.Color;
         Assert.Equal(255, color.A); // fully opaque, not the dimmed disabled colour
+    }
+
+    [AvaloniaFact]
+    public void Update_available_readout_is_a_visible_hyperlink_label()
+    {
+        var update = new FakeSoftwareUpdateProvider();
+        var shell = new ShellLauncher(new RecordingSystemShell(), TestLog.Silent);
+        var vm = new MainWindowViewModel(
+            Core.GetRequiredService<ValheimServer>(), new FakeUserPreferencesProvider(),
+            new FakeServerPreferencesProvider(), Core.GetRequiredService<IWorldPreferencesProvider>(),
+            Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
+            Core.GetRequiredService<IPlayerDataRepository>(), Core.GetRequiredService<IApplicationLogger>(),
+            update, shell, Core.GetRequiredService<IValheimPathResolver>());
+
+        var window = new ValheimServerGUI.App.Views.MainWindow(vm);
+        window.Show();
+        update.RaiseFinished(new SoftwareUpdateEventArgs("999.0.0", isManualCheck: false));
+        Dispatcher.UIThread.RunJobs();
+        window.Measure(new Size(700, 500));
+        window.Arrange(new Rect(new Size(700, 500)));
+
+        Assert.True(vm.UpdateIsLink); // a newer version is a link
+        var link = window.GetVisualDescendants().OfType<HyperlinkLabel>()
+            .First(l => l.IsVisible);
+        Assert.StartsWith("Update available", link.Text!);
     }
 }

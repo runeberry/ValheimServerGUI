@@ -9,8 +9,8 @@
     <DockPanel Margin="8">
         <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,6">
             <Button Grid.Column="0" Content="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
-            <Button Grid.Column="2" Classes="link" Content="Character names wrong? Click here."
-                    Command="{Binding OnlineManualCommand}" VerticalAlignment="Center" Margin="0,0,8,0" />
+            <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
+                              Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" Margin="0,0,8,0" />
             <c:IconButton Grid.Column="3" IconName="Cancel_16x" ToolTip.Tip="Remove player"
                           Command="{Binding Players.RemoveCommand}" />
         </Grid>

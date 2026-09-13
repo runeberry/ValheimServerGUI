@@ -280,6 +280,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnlineManual() => _shell.OpenWebAddress(AppConstants.UrlHelp);
 
     [RelayCommand]
+    private void CharacterNamesHelp() => _shell.OpenWebAddress(AppConstants.UrlHelpCharacterNames);
+
+    [RelayCommand]
     private void PortForwarding() => _shell.OpenWebAddress(AppConstants.UrlPortForwarding);
 
     [RelayCommand]

@@ -106,8 +106,8 @@
                            Source="{Binding UpdateStatus, Converter={x:Static conv:UpdateStatusToIconConverter.Instance}}" />
                     <TextBlock Text="{Binding UpdateStatusText}" VerticalAlignment="Center"
                                IsVisible="{Binding UpdateIsLink, Converter={x:Static conv:InverseBooleanConverter.Instance}}" />
-                    <Button Classes="link" Padding="0" Content="{Binding UpdateStatusText}"
-                            Command="{Binding UpdateLinkCommand}" IsVisible="{Binding UpdateIsLink}" />
+                    <c:HyperlinkLabel Text="{Binding UpdateStatusText}" VerticalAlignment="Center"
+                                      Command="{Binding UpdateLinkCommand}" IsVisible="{Binding UpdateIsLink}" />
                 </StackPanel>
             </Grid>
         </Border>

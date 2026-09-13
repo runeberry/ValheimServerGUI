@@ -82,7 +82,8 @@ public class DialogViewModelTests
     [Fact]
     public void World_editing_a_modifier_reverts_preset_to_custom()
     {
-        var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "W") { SelectedPreset = WorldGenPresets.Hard };
+        var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "W", new RecordingShellLauncher())
+            { SelectedPreset = WorldGenPresets.Hard };
         Assert.True(vm.IsPresetSelected);
 
         vm.Modifiers[0].Selected = vm.Modifiers[0].Options[1]; // any non-Normal value
@@ -95,7 +96,8 @@ public class DialogViewModelTests
     public void World_preset_persists_as_preset_only_but_keys_still_persist()
     {
         var provider = new FakeWorldPreferencesProvider();
-        var vm = new WorldPreferencesViewModel(provider, "W") { SelectedPreset = WorldGenPresets.Hard };
+        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher())
+            { SelectedPreset = WorldGenPresets.Hard };
         vm.Keys[0].IsSet = true; // a key
         Assert.Equal(WorldGenPresets.Hard, vm.SelectedPreset); // toggling a key does NOT revert the preset
 
@@ -111,7 +113,7 @@ public class DialogViewModelTests
     public void World_custom_persists_modifiers()
     {
         var provider = new FakeWorldPreferencesProvider();
-        var vm = new WorldPreferencesViewModel(provider, "W");
+        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher());
         var combat = vm.Modifiers[0];
         combat.Selected = combat.Options[1];
 
@@ -133,11 +135,25 @@ public class DialogViewModelTests
             Keys = new() { WorldGenKeys.NoMap },
         });
 
-        var vm = new WorldPreferencesViewModel(provider, "W");
+        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher());
 
         Assert.Equal(WorldGenPresets.Casual, vm.SelectedPreset);
         Assert.False(vm.IsDirty); // loaded clean
         Assert.Contains(vm.Keys, k => k.Key == WorldGenKeys.NoMap && k.IsSet);
+    }
+
+    [Fact]
+    public void World_wiki_links_open_the_expected_urls()
+    {
+        var shell = new RecordingShellLauncher();
+        var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "W", shell);
+
+        vm.OpenWorldModifiersWikiCommand.Execute(null);
+        vm.OpenWorldModifiersHelpCommand.Execute(null);
+
+        Assert.Equal(
+            new[] { AppConstants.UrlValheimWikiWorldModifiers, AppConstants.UrlHelpWorldModifiers },
+            shell.OpenedWebAddresses);
     }
 
     // ----- PlayerDetails -----

@@ -11,32 +11,32 @@
             <c:GroupBox Header="Connection Details">
                 <StackPanel Spacing="2">
                     <c:LabelField LabelText="External IP Address:" Value="{Binding Details.ExternalIp}"
-                                  HelpText="Your public IP — share this with friends on the internet.">
+                                  HelpText="This is the address that players from outside your home network will use to connect to your server. Give this address to your friends for standard online play.">
                         <c:LabelField.TrailingContent>
-                            <c:CopyButton Text="{Binding Details.ExternalIp}" />
+                            <c:CopyButton Text="{Binding Details.ExternalIp}" ToolTip.Tip="Copy external IP address to clipboard" />
                         </c:LabelField.TrailingContent>
                     </c:LabelField>
 
                     <c:LabelField LabelText="Internal IP Address:" Value="{Binding Details.InternalIp}"
-                                  HelpText="Your IP on the local network.">
+                                  HelpText="This is the address that players on your home network (connected to your router) can use to join your server. Give this address to your friends for LAN setups, or use it yourself if you're hosting your server on another machine on your home network (different from the one you're playing on).">
                         <c:LabelField.TrailingContent>
-                            <c:CopyButton Text="{Binding Details.InternalIp}" />
+                            <c:CopyButton Text="{Binding Details.InternalIp}" ToolTip.Tip="Copy internal IP address to clipboard" />
                         </c:LabelField.TrailingContent>
                     </c:LabelField>
 
                     <c:LabelField LabelText="Local IP Address:" Value="{Binding Details.LocalIp}"
-                                  HelpText="The loopback address for connecting from this machine.">
+                                  HelpText="Use this IP address to connect to your server if you're playing on the host machine. This will give you the fastest possible connection! (i.e. &quot;the host advantage&quot;)&#10;&#10;TIP: You can also connect to &quot;localhost&quot;, which is a little easier than typing &quot;127.0.0.1&quot;">
                         <c:LabelField.TrailingContent>
-                            <c:CopyButton Text="{Binding Details.LocalIp}" />
+                            <c:CopyButton Text="{Binding Details.LocalIp}" ToolTip.Tip="Copy local IP address to clipboard" />
                         </c:LabelField.TrailingContent>
                     </c:LabelField>
 
                     <c:LabelField LabelText="Invite Code:" Value="{Binding Details.InviteCode}"
-                                  HelpText="Crossplay invite code friends can use to join.">
+                                  HelpText="Invite codes are only available when Crossplay is enabled and change each time the server is restarted. Players on any platform can connect to your server with an invite code instead of an IP address.">
                         <c:LabelField.TrailingContent>
                             <!-- Keep the copy button's slot even when there's no invite code to copy, so the
                                  help glyph doesn't shift between rows (hidden-but-reserved, not collapsed). -->
-                            <c:CopyButton Text="{Binding Details.InviteCode}"
+                            <c:CopyButton Text="{Binding Details.InviteCode}" ToolTip.Tip="Copy invite code to clipboard"
                                           Opacity="{Binding Details.InviteCodeCopyable, Converter={x:Static conv:BooleanToOpacityConverter.Instance}}"
                                           IsHitTestVisible="{Binding Details.InviteCodeCopyable}" />
                         </c:LabelField.TrailingContent>
@@ -53,7 +53,7 @@
                     <c:LabelField LabelText="Server Uptime:" Value="{Binding Details.Uptime}" />
                     <c:LabelField LabelText="Last World Save:" Value="{Binding Details.LastWorldSave}" />
                     <c:LabelField LabelText="Avg. World Save:" Value="{Binding Details.AverageWorldSave}"
-                                  HelpText="Average time taken to write a world save." />
+                                  HelpText="The average amount of time it has taken to save your game world, over the past 10 saves." />
                 </StackPanel>
             </c:GroupBox>
         </StackPanel>

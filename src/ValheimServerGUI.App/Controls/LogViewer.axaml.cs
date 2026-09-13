@@ -1,3 +1,5 @@
+using System.Collections;
+using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml;
 
@@ -8,8 +10,17 @@ namespace ValheimServerGUI.App.Controls;
 /// list bound to <see cref="ItemsSource"/>. The ViewModel owns the lines; this is a thin display wrapper so
 /// every log surface looks identical.
 /// </summary>
-/// <remarks>Design (markup) lives in <c>LogViewer.axaml</c>; functional code in <c>LogViewer.cs</c>.</remarks>
 public partial class LogViewer : UserControl
 {
+    public static readonly StyledProperty<IEnumerable?> ItemsSourceProperty =
+        AvaloniaProperty.Register<LogViewer, IEnumerable?>(nameof(ItemsSource));
+
     public LogViewer() => AvaloniaXamlLoader.Load(this);
+
+    /// <summary>The log lines to display (ViewModel-owned).</summary>
+    public IEnumerable? ItemsSource
+    {
+        get => GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
 }

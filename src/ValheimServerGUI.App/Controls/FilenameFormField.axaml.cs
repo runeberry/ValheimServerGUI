@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia;
@@ -22,7 +23,7 @@ public enum FileSelectMode
 /// such as an open-folder button. Mirrors the WinForms <c>FilenameFormField</c>, which likewise owned its
 /// browse button.
 /// </summary>
-public partial class FilenameFormField : FormFieldBase
+public partial class FilenameFormField : FormFieldBase, IFormField<string?>
 {
     public static readonly StyledProperty<string?> ValueProperty =
         AvaloniaProperty.Register<FilenameFormField, string?>(nameof(Value), defaultBindingMode: BindingMode.TwoWay);
@@ -52,6 +53,15 @@ public partial class FilenameFormField : FormFieldBase
     {
         get => GetValue(TrailingContentProperty);
         set => SetValue(TrailingContentProperty, value);
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<string?>? ValueChanged;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ValueProperty) ValueChanged?.Invoke(this, Value);
     }
 
     private async void Browse(object? sender, RoutedEventArgs e) => await BrowseAsync();

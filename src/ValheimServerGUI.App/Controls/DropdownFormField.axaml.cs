@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Avalonia;
 using Avalonia.Data;
@@ -9,7 +10,7 @@ namespace ValheimServerGUI.App.Controls;
 /// The app's dropdown field: a caption + help glyph over a combo box. Replaces raw
 /// <see cref="Avalonia.Controls.ComboBox"/> in the data-bound views.
 /// </summary>
-public partial class DropdownFormField : FormFieldBase
+public partial class DropdownFormField : FormFieldBase, IFormField<object?>
 {
     public static readonly StyledProperty<object?> ValueProperty =
         AvaloniaProperty.Register<DropdownFormField, object?>(nameof(Value), defaultBindingMode: BindingMode.TwoWay);
@@ -40,5 +41,14 @@ public partial class DropdownFormField : FormFieldBase
     {
         get => GetValue(ItemsSourceProperty);
         set => SetValue(ItemsSourceProperty, value);
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<object?>? ValueChanged;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ValueProperty) ValueChanged?.Invoke(this, Value);
     }
 }

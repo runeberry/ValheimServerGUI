@@ -1,5 +1,19 @@
 <Styles xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:c="using:ValheimServerGUI.App.Controls">
+
+    <!-- HyperlinkLabel: a real text label (TextBlock subclass) that reads as an underlined accent-coloured
+         hyperlink with a hand cursor. The click behaviour lives in the control; this is only its look. -->
+    <Style Selector="c|HyperlinkLabel">
+        <!-- Transparent (not null) background so the whole label rect is clickable, not just the glyphs. -->
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+        <Setter Property="TextDecorations" Value="Underline" />
+        <Setter Property="Cursor" Value="Hand" />
+    </Style>
+    <Style Selector="c|HyperlinkLabel:pointerover">
+        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight1}" />
+    </Style>
 
     <!-- Hyperlink-styled button: accent-coloured underlined text, no background at rest or on hover, hand
          cursor. Reads as a text hyperlink while still carrying a Command. -->

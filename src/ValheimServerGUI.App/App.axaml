@@ -14,6 +14,8 @@
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormControls.axaml" />
                 <!-- Etched group-box control theme. -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
+                <!-- Shared "?" help-glyph control theme. -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/HelpLabel.axaml" />
                 <!-- Compact vertically-stacked NumericUpDown spinner (ported from mochi-paint). -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/NumericSpinner.axaml" />
                 <!-- WinForms-style bordered tab strip. -->

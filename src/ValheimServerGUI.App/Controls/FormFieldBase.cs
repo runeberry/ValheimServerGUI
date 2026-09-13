@@ -12,7 +12,7 @@ namespace ValheimServerGUI.App.Controls;
 /// look and the binding API uniform, exactly as the WinForms UserControl fields did — no raw stock inputs
 /// in the views.
 /// </summary>
-public abstract class FormFieldBase : UserControl
+public abstract class FormFieldBase : UserControl, IFormField
 {
     public static readonly StyledProperty<string?> LabelTextProperty =
         AvaloniaProperty.Register<FormFieldBase, string?>(nameof(LabelText));

@@ -1,3 +1,4 @@
+using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Data;
@@ -10,7 +11,7 @@ namespace ValheimServerGUI.App.Controls;
 /// for adornments (e.g. the password copy button + show toggle). Replaces every raw <see cref="TextBox"/>
 /// in the data-bound views so text inputs are sized and styled identically everywhere.
 /// </summary>
-public partial class TextFormField : FormFieldBase
+public partial class TextFormField : FormFieldBase, IFormField<string?>
 {
     public static readonly StyledProperty<string?> ValueProperty =
         AvaloniaProperty.Register<TextFormField, string?>(nameof(Value), defaultBindingMode: BindingMode.TwoWay);
@@ -79,5 +80,14 @@ public partial class TextFormField : FormFieldBase
     {
         get => GetValue(InputHeightProperty);
         set => SetValue(InputHeightProperty, value);
+    }
+
+    /// <inheritdoc />
+    public event EventHandler<string?>? ValueChanged;
+
+    protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
+    {
+        base.OnPropertyChanged(change);
+        if (change.Property == ValueProperty) ValueChanged?.Invoke(this, Value);
     }
 }

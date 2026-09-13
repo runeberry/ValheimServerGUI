@@ -1,0 +1,21 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:ValheimServerGUI.App.Controls">
+
+    <!-- The bold accent "?" help glyph. Its tooltip is HelpText; the control's visibility (collapse when
+         HelpText is empty) is driven from HelpLabel.cs. -->
+    <ControlTheme x:Key="{x:Type c:HelpLabel}" TargetType="c:HelpLabel">
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <TextBlock Text="?"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource HelpGlyphBrush}"
+                           ToolTip.Tip="{TemplateBinding HelpText}" />
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

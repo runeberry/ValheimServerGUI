@@ -19,14 +19,7 @@
                                         Content="{TemplateBinding Header}"
                                         ContentTemplate="{TemplateBinding HeaderTemplate}"
                                         VerticalAlignment="Center" />
-                        <TextBlock Grid.Column="1"
-                                   Text="?"
-                                   FontWeight="Bold"
-                                   VerticalAlignment="Center"
-                                   Cursor="Hand"
-                                   Foreground="{DynamicResource HelpGlyphBrush}"
-                                   ToolTip.Tip="{TemplateBinding HelpText}"
-                                   IsVisible="{TemplateBinding HelpText, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+                        <c:HelpLabel Grid.Column="1" HelpText="{TemplateBinding HelpText}" />
                     </Grid>
                     <ContentPresenter Grid.Row="1"
                                       Content="{TemplateBinding Content}"

@@ -62,9 +62,21 @@
         <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
 
+    <!-- Text inputs use the same fill/border as the dropdowns (ComboBox* brushes) in every state, plus an
+         accent border on focus. Chromeless inner boxes opt out via their own class rules below. -->
     <Style Selector="TextBox">
         <Setter Property="MinHeight" Value="23" />
         <Setter Property="Padding" Value="6,2" />
+        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+    </Style>
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPointerOver}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPointerOver}" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}" />
     </Style>
 
     <Style Selector="ComboBox">
@@ -86,10 +98,11 @@
          FilenameFormField, the password field, and DurationFormField.
          ============================================================================================ -->
 
-    <!-- The outlined container. Clips affix corners to its radius; focus shows here, not on the child. -->
+    <!-- The outlined container. Clips affix corners to its radius; focus shows here, not on the child.
+         Fill/border match the dropdowns (ComboBox* brushes). -->
     <Style Selector="Border.fieldShell">
-        <Setter Property="Background" Value="{DynamicResource TextControlBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
         <Setter Property="MinHeight" Value="23" />
@@ -122,7 +135,7 @@
          theme), but square with only a LEFT divider so its other three edges are the field's own border.
          A class selector out-specifies the bare "Button" style above, so MinHeight/Padding win here. -->
     <Style Selector="Button.affix">
-        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="MinHeight" Value="0" />
@@ -131,11 +144,32 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
+    <!-- An icon button (e.g. CopyButton) used as an affix must render as a FULL button, not the borderless
+         icon style: undo the icon class's fixed height + transparent chrome so it looks like Browse/open.
+         The compound selector (.icon.affix) out-specifies the .icon rules above. -->
+    <Style Selector="Button.icon.affix">
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="Padding" Value="10,0" />
+    </Style>
+    <Style Selector="Button.icon.affix /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+    </Style>
+    <Style Selector="Button.icon.affix:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+    </Style>
+    <Style Selector="Button.icon.affix:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+    </Style>
+
     <!-- Connected unit dropdown (DurationFormField): transparent so the shell shows through, square, with
          a left divider like the button caps. Its state fills are neutralised locally in the field. -->
     <Style Selector="ComboBox.affix">
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
         <Setter Property="BorderThickness" Value="1,0,0,0" />
         <Setter Property="CornerRadius" Value="0" />
         <Setter Property="MinHeight" Value="0" />

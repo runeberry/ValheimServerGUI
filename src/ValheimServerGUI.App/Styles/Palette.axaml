@@ -22,14 +22,8 @@
             <SolidColorBrush x:Key="ButtonBorderBrush" Color="#9A9A9A" />
             <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#9A9A9A" />
             <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#9A9A9A" />
-            <!-- Text/number inputs read as solid, not Fluent's faint translucent fill, and do not shift on
-                 hover: rest = pointerover = focused for both fill and border. Focus still cues via the accent
-                 border (TextControlBorderBrushFocused, left to Fluent's accent). -->
-            <SolidColorBrush x:Key="TextControlBackground" Color="#3C3C3C" />
-            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#3C3C3C" />
-            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#3C3C3C" />
-            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#5A5A5F" />
-            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#5A5A5F" />
+            <!-- Disabled buttons keep the high-contrast outline too (was previously left to Fluent's muted brush). -->
+            <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#9A9A9A" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="LayerDarkest" Color="#D4D4D4" />
@@ -42,12 +36,7 @@
             <SolidColorBrush x:Key="ButtonBorderBrush" Color="#6B6B6B" />
             <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#6B6B6B" />
             <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#6B6B6B" />
-            <!-- See the dark variant: solid inputs, no hover shift; focus cues via the accent border. -->
-            <SolidColorBrush x:Key="TextControlBackground" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="TextControlBackgroundPointerOver" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="TextControlBackgroundFocused" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="TextControlBorderBrush" Color="#ADADAD" />
-            <SolidColorBrush x:Key="TextControlBorderBrushPointerOver" Color="#ADADAD" />
+            <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#6B6B6B" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

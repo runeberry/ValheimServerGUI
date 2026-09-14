@@ -212,6 +212,32 @@ public class DialogViewModelTests
     }
 
     [Fact]
+    public void PlayerDetails_selecting_a_character_does_not_mark_dirty()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo
+        {
+            Platform = "Steam",
+            PlayerId = "1",
+            Characters = new System.Collections.Generic.List<PlayerInfo.CharacterInfo>
+            {
+                new() { CharacterName = "Odin", MatchConfident = true },
+                new() { CharacterName = "Thor", MatchConfident = true },
+            },
+        });
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1");
+        Assert.False(vm.IsDirty);
+
+        // Selecting a name in the list is view state, not an edit (regression: this used to trip the guard).
+        vm.SelectedCharacter = "Thor";
+        Assert.False(vm.IsDirty);
+
+        // A real edit still marks dirty.
+        vm.RemoveCharacterCommand.Execute(null);
+        Assert.True(vm.IsDirty);
+    }
+
+    [Fact]
     public void PlayerDetails_display_name_override_saves()
     {
         var repo = new FakePlayerDataRepository();

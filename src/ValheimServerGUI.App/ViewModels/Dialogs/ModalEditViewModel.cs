@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
@@ -11,14 +12,26 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 public abstract partial class ModalEditViewModel : ObservableObject
 {
     private bool _suppressDirty;
+    private readonly HashSet<string> _viewStateProperties = new(StringComparer.Ordinal);
 
     protected ModalEditViewModel()
     {
         PropertyChanged += (_, e) =>
         {
-            if (!_suppressDirty && e.PropertyName != nameof(IsDirty))
+            if (!_suppressDirty && e.PropertyName != nameof(IsDirty)
+                && !_viewStateProperties.Contains(e.PropertyName ?? string.Empty))
                 IsDirty = true;
         };
+    }
+
+    /// <summary>
+    /// Marks properties as pure view state (e.g. a list's selected item) so changing them does <b>not</b>
+    /// trip the dirty flag. Without this every observable property — selection included — would count as an
+    /// edit, so merely selecting a row would falsely prompt "unsaved changes" on close.
+    /// </summary>
+    protected void IgnoreForDirty(params string[] propertyNames)
+    {
+        foreach (var name in propertyNames) _viewStateProperties.Add(name);
     }
 
     /// <summary>True once the user has changed any field since load (drives the unsaved-changes guard).</summary>

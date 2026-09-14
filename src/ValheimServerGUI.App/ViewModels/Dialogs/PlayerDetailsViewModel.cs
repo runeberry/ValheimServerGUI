@@ -22,6 +22,9 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     {
         _repo = repo;
         _key = playerKey;
+        // Selecting a character in the list is view state, not an edit — it must not trip the unsaved-changes
+        // guard (the actual edits are AddCharacter/RenameCharacter/RemoveCharacter and the display-name field).
+        IgnoreForDirty(nameof(SelectedCharacter));
         Load();
     }
 

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -52,10 +53,71 @@ public partial class App : Application
             // The app lives until the last window closes (multi-window: §2.2). The splash is shown first,
             // then closed once the main window(s) are up, so the count never hits zero mid-startup.
             desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
+            // Servers are shared app-wide and outlive individual windows, so the save-flush guard lives here
+            // (app shutdown) rather than per-window close.
+            desktop.ShutdownRequested += OnShutdownRequested;
             _ = StartShellAsync();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private bool _shutdownApproved;
+
+    // §2.4 "safe shutdowns", now aggregated over every running server. On the first request, decide via
+    // CloseDecider; if servers are running, cancel, stop them all with the graceful save-flush (blocking off
+    // the UI thread until each reports Stopped), then re-trigger — the second pass is pre-approved.
+    private void OnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
+    {
+        if (_shutdownApproved) return;
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
+
+        var manager = Services.GetRequiredService<IServerManager>();
+        var prompt = Services.GetRequiredService<IUserPrompt>();
+        var statuses = manager.All.Select(s => s.Status).ToList();
+
+        switch (CloseDecider.Decide(statuses, IsOsShutdown(e), prompt, "Warning"))
+        {
+            case CloseDecision.Proceed:
+                manager.StopAllAndDispose(); // all Stopped already → returns immediately
+                _shutdownApproved = true;
+                return;
+
+            case CloseDecision.Cancel:
+                e.Cancel = true;
+                return;
+
+            case CloseDecision.StopThenClose:
+                e.Cancel = true;
+                _ = StopAllThenShutdownAsync(desktop, manager);
+                return;
+        }
+    }
+
+    // ShutdownRequestedEventArgs.IsOSShutdown is internal in Avalonia 12.1, so read it reflectively: on an OS
+    // shutdown / logoff we flush saves silently rather than popping a modal nobody can answer. Any failure
+    // falls back to false → the normal prompt path, which is the safe default.
+    private static bool IsOsShutdown(ShutdownRequestedEventArgs e)
+    {
+        try
+        {
+            var prop = e.GetType().GetProperty(
+                "IsOSShutdown", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+            return prop?.GetValue(e) is true;
+        }
+        catch
+        {
+            return false;
+        }
+    }
+
+    private async Task StopAllThenShutdownAsync(IClassicDesktopStyleApplicationLifetime desktop, IServerManager manager)
+    {
+        // Off the UI thread: block until every server reports Stopped (the graceful world-save flush
+        // completes — do not return early or §16.2/E9 regresses), then approve and re-trigger the shutdown.
+        await Task.Run(manager.StopAllAndDispose);
+        _shutdownApproved = true;
+        Dispatcher.UIThread.Post(() => desktop.Shutdown());
     }
 
     // Splash → async startup tasks → main window(s) → hide splash → begin serving second-launch forwards.

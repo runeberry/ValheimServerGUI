@@ -17,8 +17,6 @@ namespace ValheimServerGUI.App.Views;
 
 public partial class MainWindow : Window
 {
-    private bool _forceClose;
-    private bool _awaitingStop;
     private TrayIcon? _trayIcon;
 
     public MainWindow()
@@ -44,7 +42,6 @@ public partial class MainWindow : Window
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
 
-        Closing += OnClosing;
         Opened += OnOpened;
         SetUpTrayIcon();
     }
@@ -111,7 +108,10 @@ public partial class MainWindow : Window
     {
         var confirm = await new ConfirmWindow("Remove Profile",
             $"Remove server profile '{profileName}'?").ShowDialog<bool>(this);
-        if (confirm) Svc<IServerPreferencesProvider>().RemovePreferences(profileName);
+        if (!confirm) return;
+
+        Svc<IServerPreferencesProvider>().RemovePreferences(profileName);
+        Svc<IServerManager>().Remove(profileName); // stop-then-dispose the profile's server, if any
     }
 
     private async Task ShowWorldPreferencesAsync()
@@ -181,49 +181,9 @@ public partial class MainWindow : Window
     private void OnNewWindowRequested()
         => App.Instance.Services.GetRequiredService<ShellCoordinator>().OpenNewWindow();
 
-    // §2.4 "safe shutdowns": decide via CloseDecider, then perform the Stop/defer/close here.
-    private void OnClosing(object? sender, WindowClosingEventArgs e)
-    {
-        if (_forceClose || ViewModel?.Server is not { } server) return;
-
-        var isOsShutdown = e.CloseReason is WindowCloseReason.OSShutdown or WindowCloseReason.ApplicationShutdown;
-        var prompt = App.Instance.Services.GetRequiredService<IUserPrompt>();
-
-        switch (CloseDecider.Decide(server.Status, isOsShutdown, prompt, "Warning"))
-        {
-            case CloseDecision.Proceed:
-                return;
-
-            case CloseDecision.Cancel:
-                e.Cancel = true;
-                return;
-
-            case CloseDecision.StopThenClose:
-                e.Cancel = true;
-                DeferCloseUntilStopped(server);
-                server.Stop();
-                return;
-        }
-    }
-
-    private void DeferCloseUntilStopped(ValheimServer server)
-    {
-        if (_awaitingStop) return;
-        _awaitingStop = true;
-
-        void OnStatusChanged(object? sender, ServerStatus status)
-        {
-            if (status != ServerStatus.Stopped) return;
-            server.StatusChanged -= OnStatusChanged;
-            Dispatcher.UIThread.Post(() =>
-            {
-                _forceClose = true;
-                Close();
-            });
-        }
-
-        server.StatusChanged += OnStatusChanged;
-    }
+    // A per-window close never stops the server — servers are shared app-wide and outlive their windows
+    // (WindowManager disposes this window's view-model on Closed, which only unsubscribes it). The graceful
+    // save-flush now happens once, at app shutdown (App.OnShutdownRequested), over every running server.
 
     // Tray header + tooltip wording (WinForms parity): compact "ValheimServerGUI" tooltip, "Profile: {name}"
     // header, distinct from the window title.

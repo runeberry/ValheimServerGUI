@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Controls;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Startup;
 using ValheimServerGUI.App.ViewModels;
@@ -244,9 +245,12 @@ public partial class MainWindow : Window
             header.Click += (_, _) => RestoreAndActivate();
             menu.Add(header);
             menu.Add(new NativeMenuItemSeparator());
-            menu.Add(new NativeMenuItem { Header = "Start Server", Command = ViewModel.StartCommand });
-            menu.Add(new NativeMenuItem { Header = "Restart Server", Command = ViewModel.RestartCommand });
-            menu.Add(new NativeMenuItem { Header = "Stop Server", Command = ViewModel.StopCommand });
+            // Restore the WinForms control icons (header + Close stay icon-less). NativeMenuItem.Icon is a
+            // Bitmap, which AppIcons.Get already returns; native disabled rendering is the OS's, so no
+            // grayscale hook here.
+            menu.Add(new NativeMenuItem { Header = "Start Server", Command = ViewModel.StartCommand, Icon = AppIcons.Get("Run_16x") });
+            menu.Add(new NativeMenuItem { Header = "Restart Server", Command = ViewModel.RestartCommand, Icon = AppIcons.Get("Restart_16x") });
+            menu.Add(new NativeMenuItem { Header = "Stop Server", Command = ViewModel.StopCommand, Icon = AppIcons.Get("Stop_16x") });
             menu.Add(new NativeMenuItemSeparator());
             menu.Add(new NativeMenuItem { Header = "Close", Command = ViewModel.CloseCommand });
 

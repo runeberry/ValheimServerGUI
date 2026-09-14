@@ -53,8 +53,8 @@
 
                             <Ellipse
                                 Name="CheckGlyph"
-                                Width="7"
-                                Height="7"
+                                Width="5"
+                                Height="5"
                                 Fill="{DynamicResource RadioButtonCheckGlyphFill}"
                                 Opacity="0"
                                 Stroke="{DynamicResource RadioButtonCheckGlyphStroke}"

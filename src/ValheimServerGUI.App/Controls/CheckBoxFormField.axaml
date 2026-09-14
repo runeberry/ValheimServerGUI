@@ -144,7 +144,7 @@
                 <Setter Property="Fill" Value="{DynamicResource CheckBoxCheckGlyphForegroundChecked}" />
                 <Setter Property="Data" Value="{StaticResource CheckMarkPathData}" />
                 <!-- Bolder + larger check that fills more of the box (was 9). -->
-                <Setter Property="Width" Value="13" />
+                <Setter Property="Width" Value="12" />
                 <Setter Property="Opacity" Value="1" />
             </Style>
 

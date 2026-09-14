@@ -72,7 +72,7 @@ public partial class MainWindow : Window
                 break;
             case MenuAction.SetDirectories:
                 await new DirectoriesWindow(new DirectoriesViewModel(
-                    Svc<IUserPreferencesProvider>(), Svc<IValheimPathResolver>())).ShowDialog(this);
+                    Svc<IUserPreferencesProvider>(), Svc<IValheimPathResolver>(), Svc<IShellLauncher>())).ShowDialog(this);
                 break;
             case MenuAction.BugReport:
                 await new BugReportWindow(new BugReportViewModel(Svc<IRuneberryApiClient>())).ShowDialog(this);

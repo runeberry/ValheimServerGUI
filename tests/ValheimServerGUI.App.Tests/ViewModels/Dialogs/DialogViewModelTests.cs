@@ -58,7 +58,7 @@ public class DialogViewModelTests
     [Fact]
     public void Directories_missing_path_is_detected()
     {
-        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>())
+        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher())
         {
             ServerExePath = "/definitely/not/here",
         };
@@ -69,7 +69,7 @@ public class DialogViewModelTests
     public void Directories_existing_paths_are_ok()
     {
         var dir = Directory.CreateTempSubdirectory().FullName;
-        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>())
+        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher())
         {
             ServerExePath = string.Empty,
             SaveDataFolderPath = dir,

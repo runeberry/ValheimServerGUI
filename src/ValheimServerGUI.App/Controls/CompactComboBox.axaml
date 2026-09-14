@@ -8,8 +8,8 @@
 
     <ControlTheme x:Key="{x:Type ComboBox}" TargetType="ComboBox">
         <Setter Property="Foreground" Value="{DynamicResource ComboBoxForeground}" />
-        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource ComboBoxBorderThemeThickness}" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
         <Setter Property="Padding" Value="8,2,0,2" />
@@ -92,16 +92,17 @@
         </Setter>
 
         <Style Selector="^:pointerover /template/ Border#Background">
-            <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPointerOver}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPointerOver}" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
         </Style>
         <Style Selector="^:pressed /template/ Border#Background">
-            <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPressed}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPressed}" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
         </Style>
-        <!-- Focus: accent border highlight (matches the text/number inputs). -->
+        <!-- Focus: accent border + focused fill (matches the text/number inputs). -->
         <Style Selector="^:focus /template/ Border#Background">
-            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundFocused}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushFocused}" />
         </Style>
         <Style Selector="^:disabled /template/ Border#Background">
             <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundDisabled}" />

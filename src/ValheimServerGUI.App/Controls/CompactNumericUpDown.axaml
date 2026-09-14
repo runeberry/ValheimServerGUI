@@ -36,8 +36,8 @@
          8,0 padding and centered text, so nothing overflows and the number is vertically centered. The
          spin buttons + border come from our ButtonSpinner theme below. -->
     <ControlTheme x:Key="{x:Type NumericUpDown}" TargetType="NumericUpDown">
-        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
         <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
@@ -89,8 +89,8 @@
     </ControlTheme>
 
     <ControlTheme x:Key="{x:Type ButtonSpinner}" TargetType="ButtonSpinner">
-        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
         <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
         <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
         <Setter Property="Foreground" Value="{DynamicResource TextControlForeground}" />
@@ -134,12 +134,12 @@
         <!-- Whole-control hover/focus feedback on the single outer border (the inner text box is inert),
              so the numeric field reacts as one consolidated control. -->
         <Style Selector="^:pointerover /template/ Border#PART_BorderElement">
-            <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPointerOver}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPointerOver}" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundHover}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
         </Style>
         <Style Selector="^:focus-within /template/ Border#PART_BorderElement">
-            <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}" />
+            <Setter Property="Background" Value="{DynamicResource InputBackgroundFocused}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushFocused}" />
         </Style>
     </ControlTheme>
 

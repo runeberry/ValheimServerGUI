@@ -1,0 +1,124 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- ================================================================================================
+         Shared input styling. Every typed-in input (text/number), the field shell that hosts connected
+         affixes, and the connected affixes themselves read the Input* brushes from Styles/Palette.axaml
+         (the single source of truth). The ComboBox, NumericUpDown, CheckBox and RadioButton ControlThemes
+         live with their controls but consume the SAME Input* tokens, so every input surface stays in
+         lockstep — change a colour in Palette, not here or on a control.
+         ================================================================================================ -->
+
+    <!-- Text box: rest / hover / focus fill + border from the shared tokens. -->
+    <Style Selector="TextBox">
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Padding" Value="6,2" />
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+    </Style>
+    <Style Selector="TextBox:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource InputBackgroundHover}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
+    </Style>
+    <Style Selector="TextBox:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="{DynamicResource InputBackgroundFocused}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushFocused}" />
+    </Style>
+
+    <!-- Sizing for the number/dropdown inputs (their colours come from their ControlThemes). -->
+    <Style Selector="NumericUpDown">
+        <Setter Property="MinHeight" Value="23" />
+        <!-- The spinner theme binds the inner box's padding to NumericUpDown.Padding; match the text inset. -->
+        <Setter Property="Padding" Value="6,2" />
+    </Style>
+    <Style Selector="ComboBox">
+        <Setter Property="MinHeight" Value="23" />
+    </Style>
+
+    <!-- ============================================================================================
+         Field shell + connected affixes: one outlined shell hosts a chromeless input plus end-cap
+         affixes rendered inside the same border (the InnerRightContent look, fully under our control).
+         ============================================================================================ -->
+
+    <!-- The outlined container; matches the inputs in every state. Clips affix corners; shows focus here. -->
+    <Style Selector="Border.fieldShell">
+        <Setter Property="Background" Value="{DynamicResource InputBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource TextControlBorderThemeThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="ClipToBounds" Value="True" />
+    </Style>
+    <Style Selector="Border.fieldShell:pointerover">
+        <Setter Property="Background" Value="{DynamicResource InputBackgroundHover}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
+    </Style>
+    <Style Selector="Border.fieldShell:focus-within">
+        <Setter Property="Background" Value="{DynamicResource InputBackgroundFocused}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushFocused}" />
+    </Style>
+
+    <!-- Chromeless text box: no border/background in any state, so it shows the shell behind it. -->
+    <Style Selector="TextBox.chromeless">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+    </Style>
+    <Style Selector="TextBox.chromeless /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="TextBox.chromeless:pointerover /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="TextBox.chromeless:focus /template/ Border#PART_BorderElement">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+
+    <!-- Connected end-cap button: normal button fill + hover/pressed (base Button theme), square, with only
+         a LEFT divider (the input border colour). A class selector out-specifies the bare "Button" style. -->
+    <Style Selector="Button.affix">
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="Padding" Value="10,0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- An icon button (e.g. CopyButton) used as an affix must render as a FULL button, not the borderless
+         icon style: undo the icon class's fixed height + transparent chrome. (.icon.affix out-specifies .icon.) -->
+    <Style Selector="Button.icon.affix">
+        <Setter Property="Height" Value="NaN" />
+        <Setter Property="Padding" Value="10,0" />
+    </Style>
+    <Style Selector="Button.icon.affix /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+    </Style>
+    <Style Selector="Button.icon.affix:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPointerOver}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+    </Style>
+    <Style Selector="Button.icon.affix:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="{DynamicResource ButtonBackgroundPressed}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+    </Style>
+
+    <!-- Connected unit dropdown (DurationFormField): transparent so the shell shows through, square, with a
+         left divider like the button caps. -->
+    <Style Selector="ComboBox.affix">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1,0,0,0" />
+        <Setter Property="CornerRadius" Value="0" />
+        <Setter Property="MinHeight" Value="0" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+</Styles>

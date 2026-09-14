@@ -36,8 +36,8 @@
                                 Name="OuterEllipse"
                                 Width="12"
                                 Height="12"
-                                Fill="{DynamicResource RadioButtonOuterEllipseFill}"
-                                Stroke="{DynamicResource RadioButtonOuterEllipseStroke}"
+                                Fill="{DynamicResource InputBackground}"
+                                Stroke="{DynamicResource InputBorderBrush}"
                                 StrokeThickness="{DynamicResource RadioButtonBorderThemeThickness}"
                                 UseLayoutRounding="False" />
 
@@ -88,8 +88,8 @@
             <Setter Property="BorderBrush" Value="{DynamicResource RadioButtonBorderBrushPointerOver}" />
         </Style>
         <Style Selector="^:pointerover /template/ Ellipse#OuterEllipse">
-            <Setter Property="Stroke" Value="{DynamicResource RadioButtonOuterEllipseStrokePointerOver}" />
-            <Setter Property="Fill" Value="{DynamicResource RadioButtonOuterEllipseFillPointerOver}" />
+            <Setter Property="Stroke" Value="{DynamicResource InputBorderBrushHover}" />
+            <Setter Property="Fill" Value="{DynamicResource InputBackgroundHover}" />
         </Style>
         <Style Selector="^:pointerover /template/ Ellipse#CheckOuterEllipse">
             <Setter Property="Stroke" Value="{DynamicResource RadioButtonOuterEllipseCheckedStrokePointerOver}" />

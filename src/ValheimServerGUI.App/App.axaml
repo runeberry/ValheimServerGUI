@@ -27,5 +27,7 @@
         <StyleInclude Source="avares://ValheimServerGUI.App/Styles/AppStyles.axaml" />
         <!-- Compact density pass — merged last so it overrides Fluent's touch-sized defaults. -->
         <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Compact.axaml" />
+        <!-- Shared input styling (text/number/shell/affixes); colours from Palette Input* tokens. -->
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Inputs.axaml" />
     </Application.Styles>
 </Application>

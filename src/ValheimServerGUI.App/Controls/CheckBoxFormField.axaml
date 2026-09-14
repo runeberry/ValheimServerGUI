@@ -37,8 +37,8 @@
 
                     <Grid VerticalAlignment="Top" Height="{DynamicResource CheckBoxMinHeight}">
                         <Border x:Name="NormalRectangle"
-                                BorderBrush="{DynamicResource CheckBoxCheckBackgroundStrokeUnchecked}"
-                                Background="{DynamicResource CheckBoxCheckBackgroundFillUnchecked}"
+                                BorderBrush="{DynamicResource InputBorderBrush}"
+                                Background="{DynamicResource InputBackground}"
                                 BorderThickness="{DynamicResource CheckBoxBorderThemeThickness}"
                                 CornerRadius="{TemplateBinding CornerRadius}"
                                 UseLayoutRounding="False"
@@ -85,8 +85,8 @@
                 <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxBorderBrushUncheckedPointerOver}" />
             </Style>
             <Style Selector="^ /template/ Border#NormalRectangle">
-                <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxCheckBackgroundStrokeUncheckedPointerOver}" />
-                <Setter Property="Background" Value="{DynamicResource CheckBoxCheckBackgroundFillUncheckedPointerOver}" />
+                <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
+                <Setter Property="Background" Value="{DynamicResource InputBackgroundHover}" />
             </Style>
             <Style Selector="^ /template/ Path#CheckGlyph">
                 <Setter Property="Fill" Value="{DynamicResource CheckBoxCheckGlyphForegroundUncheckedPointerOver}" />

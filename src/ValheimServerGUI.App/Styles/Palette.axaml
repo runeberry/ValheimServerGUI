@@ -10,6 +10,15 @@
          blue. Reusable token; tracks SystemAccentColor so it always matches the control highlight. -->
     <SolidColorBrush x:Key="HelpGlyphBrush" Color="{DynamicResource SystemAccentColor}" />
 
+    <!-- SINGLE SOURCE OF TRUTH for input styling. Every input surface — text/number boxes, dropdowns, the
+         field shell, checkbox/radio boxes — reads the Input* brushes below, so their fill/border stay in
+         lockstep. Buttons reuse the Input border brushes (they keep their own fill). Change an input colour
+         here, not on a control. See Styles/Inputs.axaml for the shared styles that consume these. -->
+
+    <!-- Keep the focused border a uniform 1px (Fluent's default thickens the bottom edge into a 2px accent
+         underline, which made plain text boxes look different from the shell/combo/numeric on focus). -->
+    <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
+
     <ResourceDictionary.ThemeDictionaries>
         <ResourceDictionary x:Key="Dark">
             <SolidColorBrush x:Key="LayerDarkest" Color="#1E1E1E" />
@@ -17,13 +26,20 @@
             <SolidColorBrush x:Key="LayerContent" Color="#2D2D30" />
             <SolidColorBrush x:Key="LayerBaseHover" Color="#323233" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#3F3F46" />
-            <!-- High-contrast button outline (overrides Fluent's faint default) — kept for rest/hover/pressed
-                 so the border never fades; disabled stays Fluent's muted brush. -->
-            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#9A9A9A" />
-            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#9A9A9A" />
-            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#9A9A9A" />
-            <!-- Disabled buttons keep the high-contrast outline too (was previously left to Fluent's muted brush). -->
-            <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#9A9A9A" />
+
+            <!-- Input surface tokens (rest / hover / focused). -->
+            <SolidColorBrush x:Key="InputBackground" Color="#1B1B1D" />
+            <SolidColorBrush x:Key="InputBackgroundHover" Color="#121213" />
+            <SolidColorBrush x:Key="InputBackgroundFocused" Color="#121213" />
+            <SolidColorBrush x:Key="InputBorderBrush" Color="#A7A7A8" />
+            <SolidColorBrush x:Key="InputBorderBrushHover" Color="#D2D2D3" />
+            <SolidColorBrush x:Key="InputBorderBrushFocused" Color="#199CA8" />
+
+            <!-- Buttons follow the same border colours as inputs (rest/hover); their fill is Fluent's own. -->
+            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#A7A7A8" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#D2D2D3" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#D2D2D3" />
+            <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#A7A7A8" />
         </ResourceDictionary>
         <ResourceDictionary x:Key="Light">
             <SolidColorBrush x:Key="LayerDarkest" Color="#D4D4D4" />
@@ -31,12 +47,19 @@
             <SolidColorBrush x:Key="LayerContent" Color="#FBFBFB" />
             <SolidColorBrush x:Key="LayerBaseHover" Color="#E0E0E0" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#BFBFBF" />
-            <!-- High-contrast button outline: a proper dark edge in light theme (Fluent's default nearly
-                 disappears). Rest/hover/pressed all use it; disabled stays Fluent's muted brush. -->
-            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#6B6B6B" />
-            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#6B6B6B" />
-            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#6B6B6B" />
-            <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#6B6B6B" />
+
+            <!-- Light mirror of the input tokens (rest border darker for contrast on white; hover deepens). -->
+            <SolidColorBrush x:Key="InputBackground" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="InputBackgroundHover" Color="#F2F2F3" />
+            <SolidColorBrush x:Key="InputBackgroundFocused" Color="#F2F2F3" />
+            <SolidColorBrush x:Key="InputBorderBrush" Color="#808081" />
+            <SolidColorBrush x:Key="InputBorderBrushHover" Color="#4D4D4E" />
+            <SolidColorBrush x:Key="InputBorderBrushFocused" Color="#199CA8" />
+
+            <SolidColorBrush x:Key="ButtonBorderBrush" Color="#808081" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPointerOver" Color="#4D4D4E" />
+            <SolidColorBrush x:Key="ButtonBorderBrushPressed" Color="#4D4D4E" />
+            <SolidColorBrush x:Key="ButtonBorderBrushDisabled" Color="#808081" />
         </ResourceDictionary>
     </ResourceDictionary.ThemeDictionaries>
 </ResourceDictionary>

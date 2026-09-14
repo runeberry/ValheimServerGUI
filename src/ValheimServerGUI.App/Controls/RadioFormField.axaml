@@ -53,8 +53,8 @@
 
                             <Ellipse
                                 Name="CheckGlyph"
-                                Width="5"
-                                Height="5"
+                                Width="7"
+                                Height="7"
                                 Fill="{DynamicResource RadioButtonCheckGlyphFill}"
                                 Opacity="0"
                                 Stroke="{DynamicResource RadioButtonCheckGlyphStroke}"
@@ -151,6 +151,16 @@
         </Style>
         <Style Selector="^:checked /template/ Ellipse#CheckOuterEllipse">
             <Setter Property="Opacity" Value="1" />
+        </Style>
+
+        <!-- Hover on a checked radio only highlights the ring's border; the accent fill + dot stay put. -->
+        <Style Selector="^:checked:pointerover /template/ Ellipse#CheckOuterEllipse">
+            <Setter Property="Fill" Value="{DynamicResource RadioButtonOuterEllipseCheckedFill}" />
+            <Setter Property="Stroke" Value="{DynamicResource InputBorderBrushHover}" />
+        </Style>
+        <Style Selector="^:checked:pointerover /template/ Ellipse#CheckGlyph">
+            <Setter Property="Fill" Value="{DynamicResource RadioButtonCheckGlyphFill}" />
+            <Setter Property="Stroke" Value="{DynamicResource RadioButtonCheckGlyphStroke}" />
         </Style>
     </ControlTheme>
     </UserControl.Resources>

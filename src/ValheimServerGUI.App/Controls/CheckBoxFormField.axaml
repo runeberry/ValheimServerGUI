@@ -54,6 +54,7 @@
                                       Opacity="0"
                                       Fill="{DynamicResource CheckBoxCheckGlyphForegroundUnchecked}"
                                       Stretch="Uniform"
+                                      HorizontalAlignment="Center"
                                       VerticalAlignment="Center"
                                       FlowDirection="LeftToRight" />
                             </Panel>
@@ -142,7 +143,8 @@
             <Style Selector="^ /template/ Path#CheckGlyph">
                 <Setter Property="Fill" Value="{DynamicResource CheckBoxCheckGlyphForegroundChecked}" />
                 <Setter Property="Data" Value="{StaticResource CheckMarkPathData}" />
-                <Setter Property="Width" Value="9" />
+                <!-- Bolder + larger check that fills more of the box (was 9). -->
+                <Setter Property="Width" Value="13" />
                 <Setter Property="Opacity" Value="1" />
             </Style>
 
@@ -155,9 +157,10 @@
                     <Setter Property="Background" Value="{DynamicResource CheckBoxBackgroundCheckedPointerOver}" />
                     <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxBorderBrushCheckedPointerOver}" />
                 </Style>
+                <!-- Hover on a checked box only highlights the border; the accent fill stays put. -->
                 <Style Selector="^ /template/ Border#NormalRectangle">
-                    <Setter Property="BorderBrush" Value="{DynamicResource CheckBoxCheckBackgroundStrokeCheckedPointerOver}" />
-                    <Setter Property="Background" Value="{DynamicResource CheckBoxCheckBackgroundFillCheckedPointerOver}" />
+                    <Setter Property="BorderBrush" Value="{DynamicResource InputBorderBrushHover}" />
+                    <Setter Property="Background" Value="{DynamicResource CheckBoxCheckBackgroundFillChecked}" />
                 </Style>
                 <Style Selector="^ /template/ Path#CheckGlyph">
                     <Setter Property="Fill" Value="{DynamicResource CheckBoxCheckGlyphForegroundCheckedPointerOver}" />

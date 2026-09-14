@@ -16,6 +16,7 @@
                      — each is owned + scoped inside the single wrapper/window that uses it. -->
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormRow.axaml" />
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/DataListView.axaml" />
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/HelpLabel.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
@@ -29,5 +30,7 @@
         <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Compact.axaml" />
         <!-- Shared input styling (text/number/shell/affixes); colours from Palette Input* tokens. -->
         <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Inputs.axaml" />
+        <!-- Compact density for the shared DataListView grid (cell/header font + halved padding). -->
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/DataGrid.axaml" />
     </Application.Styles>
 </Application>

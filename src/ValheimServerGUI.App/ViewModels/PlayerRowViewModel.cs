@@ -16,6 +16,7 @@ public partial class PlayerRowViewModel : ObservableObject
     public string Key => Player.Key;
 
     [ObservableProperty] private string _displayName = string.Empty;
+    [ObservableProperty] private PlayerStatus _status;
     [ObservableProperty] private string _statusText = string.Empty;
     [ObservableProperty] private string _sinceText = string.Empty;
     [ObservableProperty] private bool _isOffline;
@@ -30,6 +31,7 @@ public partial class PlayerRowViewModel : ObservableObject
             ? name
             : $"{name} ({player.LastStatusCharacter})";
 
+        Status = player.PlayerStatus;
         StatusText = player.PlayerStatus.ToString();
         IsOffline = player.PlayerStatus == PlayerStatus.Offline;
         PlatformIcon = PlatformToIconConverter.ForPlatform(player.Platform);

@@ -1,0 +1,31 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:ValheimServerGUI.App.Controls">
+
+    <!-- The shared data table: an inner DataGrid (PART_Grid) with an optional compact footer bar below it.
+         The footer hosts action icon buttons anchored left and/or right and only appears when a slot is
+         filled (HasFooter). Its horizontal inset (6px) and density match the (halved) column header, and a
+         1px top rule separates it from the grid like the header's gridline. -->
+    <ControlTheme x:Key="{x:Type c:DataListView}" TargetType="c:DataListView">
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DockPanel>
+                    <Border DockPanel.Dock="Bottom" IsVisible="{TemplateBinding HasFooter}"
+                            Background="{DynamicResource LayerBase}"
+                            BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="0,1,0,0"
+                            Padding="6,2">
+                        <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                            <ContentControl Grid.Column="0" Content="{TemplateBinding FooterLeft}"
+                                            HorizontalAlignment="Left" VerticalAlignment="Center" />
+                            <ContentControl Grid.Column="2" Content="{TemplateBinding FooterRight}"
+                                            HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
+                    </Border>
+
+                    <DataGrid Name="PART_Grid" />
+                </DockPanel>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

@@ -16,9 +16,9 @@ public partial class PlayerDetailsWindow : Window
         Closing += OnClosingGuard;
 
         // Add/Rename open a text prompt (owned by this window), so they live in the code-behind as commands
-        // the AddRemoveListField invokes; Remove is a plain VM command bound in XAML.
-        CharactersField.AddCommand = new AsyncRelayCommand(AddCharacterAsync);
-        CharactersField.EditCommand = new AsyncRelayCommand(RenameCharacterAsync);
+        // the footer buttons invoke; Remove is a plain VM command bound in XAML.
+        AddCharacterButton.Command = new AsyncRelayCommand(AddCharacterAsync);
+        EditCharacterButton.Command = new AsyncRelayCommand(RenameCharacterAsync);
     }
 
     public PlayerDetailsWindow(PlayerDetailsViewModel viewModel) : this()

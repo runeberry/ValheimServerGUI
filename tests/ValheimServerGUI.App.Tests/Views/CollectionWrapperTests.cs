@@ -19,15 +19,55 @@ public class CollectionWrapperTests
         Dispatcher.UIThread.RunJobs();
     }
 
+    private static DataGrid InnerGrid(DataListView view)
+        => view.GetVisualDescendants().OfType<DataGrid>().First();
+
     [AvaloniaFact]
     public void DataListView_applies_shared_defaults_and_binds_items()
     {
-        var grid = new DataListView { ItemsSource = new[] { "a", "b", "c" } };
-        Realize(grid);
+        var view = new DataListView { ItemsSource = new[] { "a", "b", "c" } };
+        view.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Avalonia.Data.Binding(".") });
+        Realize(view);
 
+        var grid = InnerGrid(view);
         Assert.True(grid.IsReadOnly);
         Assert.False(grid.CanUserReorderColumns);
         Assert.Equal(DataGridGridLinesVisibility.Horizontal, grid.GridLinesVisibility);
+        // The consumer-declared column is forwarded to the real grid.
+        Assert.Single(grid.Columns);
+        Assert.Equal("Name", grid.Columns[0].Header);
+    }
+
+    [AvaloniaFact]
+    public void DataListView_footer_hidden_until_a_slot_is_filled()
+    {
+        var bare = new DataListView { ItemsSource = new[] { "a" } };
+        Realize(bare);
+        Assert.False(bare.HasFooter);
+
+        var withFooter = new DataListView
+        {
+            ItemsSource = new[] { "a" },
+            FooterLeft = new IconButton { IconName = "Add_16x" },
+            FooterRight = new IconButton { IconName = "Cancel_16x" },
+        };
+        Realize(withFooter);
+
+        Assert.True(withFooter.HasFooter);
+        // Both footer buttons are realized under the control.
+        Assert.Equal(2, withFooter.GetVisualDescendants().OfType<IconButton>().Count());
+    }
+
+    [AvaloniaFact]
+    public void DataListView_selection_flows_back_to_bound_property()
+    {
+        var view = new DataListView { ItemsSource = new[] { "Ragnar", "Odin" } };
+        view.Columns.Add(new DataGridTextColumn { Header = "Name", Binding = new Avalonia.Data.Binding(".") });
+        Realize(view);
+
+        InnerGrid(view).SelectedItem = "Odin";
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal("Odin", view.SelectedItem);
     }
 
     [AvaloniaFact]
@@ -39,37 +79,5 @@ public class CollectionWrapperTests
         // The lines render as one contiguous, newline-joined block (see LogViewerTests for the full contract).
         var text = viewer.GetVisualDescendants().OfType<SelectableTextBlock>().First();
         Assert.Equal("line 1\nline 2", text.Text);
-    }
-
-    [AvaloniaFact]
-    public void SelectListField_binds_items_and_selection()
-    {
-        var field = new SelectListField
-        {
-            ItemsSource = new[] { "Ragnar", "Odin" },
-            Value = "Odin",
-        };
-        Realize(field);
-
-        var list = field.GetVisualDescendants().OfType<ListBox>().First();
-        Assert.Equal(2, list.ItemCount);
-        Assert.Equal("Odin", list.SelectedItem);
-
-        list.SelectedItem = "Ragnar";
-        Dispatcher.UIThread.RunJobs();
-        Assert.Equal("Ragnar", field.Value);
-    }
-
-    [AvaloniaFact]
-    public void AddRemoveListField_binds_items_through_inner_selectlist()
-    {
-        var field = new AddRemoveListField { ItemsSource = new[] { "Ragnar", "Odin", "Freya" } };
-        Realize(field);
-
-        var list = field.GetVisualDescendants().OfType<ListBox>().First();
-        Assert.Equal(3, list.ItemCount);
-
-        // Three icon buttons (Add/Edit/Remove) are present.
-        Assert.Equal(3, field.GetVisualDescendants().OfType<IconButton>().Count());
     }
 }

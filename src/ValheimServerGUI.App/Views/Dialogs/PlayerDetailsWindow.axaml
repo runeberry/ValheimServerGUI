@@ -31,10 +31,28 @@
         <c:TextFormField LabelText="Player Name" Value="{Binding DisplayName}" MaxLength="64" Margin="0,4,0,0"
                          HelpText="The player's Steam/Xbox username. This will be determined automatically, but in case it doesn't work, you may edit the player's name manually." />
 
-        <c:AddRemoveListField x:Name="CharactersField" LabelText="Known Characters" Margin="0,6,0,0"
-                              HelpText="The Valheim character names that this player is known by. Names are automatically added to this list when a player joins the server, but you may modify them manually.&#10;&#10;If a name appears with a (!), it means that name may not be matched to the correct player (due to a Valheim server limitation). You may remove this name if it's incorrect, or select the name and click Confirm to remove the warning."
-                              ItemsSource="{Binding Characters}" Value="{Binding SelectedCharacter, Mode=TwoWay}"
-                              ListHeight="120" RemoveCommand="{Binding RemoveCharacterCommand}" />
+        <StackPanel Spacing="4" Margin="0,6,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="Known Characters" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <c:HelpLabel HelpText="The Valheim character names that this player is known by. Names are automatically added to this list when a player joins the server, but you may modify them manually.&#10;&#10;If a name appears with a (!), it means that name may not be matched to the correct player (due to a Valheim server limitation). You may remove this name if it's incorrect, or select the name and click Confirm to remove the warning." />
+            </StackPanel>
+            <c:DataListView Height="140" ItemsSource="{Binding Characters}"
+                            SelectedItem="{Binding SelectedCharacter, Mode=TwoWay}">
+                <c:DataListView.Columns>
+                    <!-- Items are plain strings; a reflection binding resolves the row item itself (the
+                         inner grid isn't in this window's compiled-binding DataType scope). -->
+                    <DataGridTextColumn Header="Name" Binding="{ReflectionBinding}" Width="*" CanUserSort="False" />
+                </c:DataListView.Columns>
+                <c:DataListView.FooterLeft>
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <c:IconButton x:Name="AddCharacterButton" IconName="Add_16x" ToolTip.Tip="Add" />
+                        <c:IconButton x:Name="EditCharacterButton" IconName="Edit_16x" ToolTip.Tip="Rename" />
+                        <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove"
+                                      Command="{Binding RemoveCharacterCommand}" />
+                    </StackPanel>
+                </c:DataListView.FooterLeft>
+            </c:DataListView>
+        </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
             <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />

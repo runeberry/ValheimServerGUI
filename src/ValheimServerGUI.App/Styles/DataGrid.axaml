@@ -1,0 +1,27 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Compact density for the shared DataListView grid (§ V3 styling). Merged after the Fluent DataGrid
+         theme so these win. Fluent's defaults are touch-sized: 15px cell text, 32px row/header height, and a
+         12px cell/header inset. This restores the WinForms information-dense feel: the app's 12px body font
+         and half the padding on every cell and header — vertical (row/header height) and horizontal (the
+         cell text inset + header padding) alike. -->
+
+    <Style Selector="DataGridColumnHeader">
+        <!-- 12,0,0,0 -> 6,0,0,0 ; height 32 -> 16 -->
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="16" />
+        <Setter Property="Padding" Value="6,0,0,0" />
+    </Style>
+
+    <Style Selector="DataGridCell">
+        <!-- Fluent renders cell text at 15px; pin to the app body 12px. Height 32 -> 16. -->
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="16" />
+    </Style>
+
+    <!-- DataGridTextColumn bakes a 12,0,12,0 margin onto the generated cell TextBlock; halve it to 6,0,6,0
+         so data cells keep the same horizontal inset as the (halved) header. -->
+    <Style Selector="DataGridCell TextBlock">
+        <Setter Property="Margin" Value="6,0,6,0" />
+    </Style>
+</Styles>

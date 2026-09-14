@@ -70,6 +70,16 @@ public class ConverterTests
     }
 
     [Theory]
+    [InlineData(PlayerStatus.Online, "StatusOnline_16x")]
+    [InlineData(PlayerStatus.Joining, "UnsyncedCommits_16x_Horiz")]
+    [InlineData(PlayerStatus.Leaving, "UnsyncedCommits_16x_Horiz")]
+    [InlineData(PlayerStatus.Offline, "StatusNotStarted_16x")]
+    public void PlayerStatusToIcon_maps_every_status(PlayerStatus status, string expected)
+    {
+        Assert.Equal(expected, PlayerStatusToIconConverter.IconNameForStatus(status));
+    }
+
+    [Theory]
     [InlineData(UpdateCheckStatus.None, null)]
     [InlineData(UpdateCheckStatus.Checking, "Loading_Blue_16x")]
     [InlineData(UpdateCheckStatus.UpToDate, "StatusOK_16x")]

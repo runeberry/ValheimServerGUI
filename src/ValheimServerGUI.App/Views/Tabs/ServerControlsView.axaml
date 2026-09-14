@@ -24,14 +24,17 @@
                              Value="{Binding Form.Password}" ShowValue="{Binding Form.ShowPassword}"
                              IsEnabled="{Binding AllowServerChanges}">
                 <c:TextFormField.Affix>
-                    <c:CopyButton Classes="affix" Text="{Binding Form.Password}"
-                                  ToolTip.Tip="Copy password to clipboard" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
+                        <!-- Eye toggle (left of copy): open eye when shown, struck-through when hidden. -->
+                        <Button Classes="affix" Command="{Binding Form.ToggleShowPasswordCommand}"
+                                ToolTip.Tip="Show/hide password">
+                            <Image Width="16" Height="16"
+                                   Source="{Binding Form.ShowPassword, Converter={x:Static conv:ShowPasswordToIconConverter.Instance}}" />
+                        </Button>
+                        <c:CopyButton Classes="affix" Text="{Binding Form.Password}"
+                                      ToolTip.Tip="Copy password to clipboard" />
+                    </StackPanel>
                 </c:TextFormField.Affix>
-                <c:TextFormField.TrailingContent>
-                    <c:CheckBoxFormField LabelText="Show Password" Value="{Binding Form.ShowPassword}"
-                                         VerticalAlignment="Center" Margin="8,0,0,0"
-                                         IsEnabled="{Binding AllowServerChanges}" />
-                </c:TextFormField.TrailingContent>
             </c:TextFormField>
 
             <!-- World | Join Options -->

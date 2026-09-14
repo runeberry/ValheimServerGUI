@@ -1,5 +1,6 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
 
 namespace ValheimServerGUI.App.ViewModels;
@@ -34,6 +35,10 @@ public partial class ServerFormViewModel : ObservableObject
     [ObservableProperty] private int _backupCount = CoreConstants.DefaultBackupCount;
     [ObservableProperty] private int _backupIntervalShort = CoreConstants.DefaultBackupIntervalShort;
     [ObservableProperty] private int _backupIntervalLong = CoreConstants.DefaultBackupIntervalLong;
+
+    /// <summary>Toggles password visibility (the in-field eye button).</summary>
+    [RelayCommand]
+    private void ToggleShowPassword() => ShowPassword = !ShowPassword;
 
     /// <summary>Existing worlds to choose from (may include cloud entries with the <c>" (cloud)"</c> suffix).</summary>
     public ObservableCollection<string> Worlds { get; } = new();

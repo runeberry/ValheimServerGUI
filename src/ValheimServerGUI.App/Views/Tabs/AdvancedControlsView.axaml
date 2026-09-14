@@ -39,12 +39,12 @@
 
             <c:GroupBox Grid.Column="2" Header="Saving &amp; Backups" VerticalAlignment="Top">
                 <StackPanel Spacing="2" Width="190">
-                    <c:DurationFormField LabelText="Save Interval" Value="{Binding Form.SaveInterval}"
-                                         Minimum="60" Maximum="86400" IsEnabled="{Binding AllowServerChanges}"
-                                         HelpText="How often the world is saved." />
                     <c:NumericFormField LabelText="Backups" Value="{Binding Form.BackupCount}"
                                         Minimum="1" Maximum="1000" IsEnabled="{Binding AllowServerChanges}"
                                         HelpText="Number of world data backups to maintain. One rolling backup is created on the short backup interval, and subsequent backups are created on the long backup interval." />
+                    <c:DurationFormField LabelText="Save Interval" Value="{Binding Form.SaveInterval}"
+                                         Minimum="60" Maximum="86400" IsEnabled="{Binding AllowServerChanges}"
+                                         HelpText="How often the world is saved." />
                     <c:DurationFormField LabelText="Short Backup" Value="{Binding Form.BackupIntervalShort}"
                                          Minimum="300" Maximum="2592000" IsEnabled="{Binding AllowServerChanges}"
                                          HelpText="How often to create a rolling backup of the world save data." />

@@ -41,9 +41,43 @@ public partial class MainWindow : Window
         viewModel.MenuActionRequested += a => _ = HandleMenuActionAsync(a);
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
+        viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
 
         Opened += OnOpened;
         SetUpTrayIcon();
+        WireProfileDropdown(viewModel);
+    }
+
+    private bool _syncingProfileDropdown;
+
+    // The menu-bar dropdown mirrors CurrentProfile (single source of truth) two-way: the VM drives the shown
+    // value (derived, never mirrored), while a user pick routes through the same guarded switch as File > Load.
+    private void WireProfileDropdown(MainWindowViewModel viewModel)
+    {
+        SyncProfileDropdown();
+        ProfileDropdown.ValueChanged += OnProfileDropdownChanged;
+        viewModel.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(MainWindowViewModel.CurrentProfile))
+                SyncProfileDropdown();
+        };
+    }
+
+    private void SyncProfileDropdown()
+    {
+        if (ViewModel is null) return;
+        _syncingProfileDropdown = true;               // suppress the re-entrant ValueChanged for our own write
+        ProfileDropdown.Value = ViewModel.CurrentProfile?.ProfileName;
+        _syncingProfileDropdown = false;
+    }
+
+    private async void OnProfileDropdownChanged(object? sender, object? value)
+    {
+        if (_syncingProfileDropdown || ViewModel is null) return;
+        if (value is not string name) return;
+
+        if (!await ViewModel.RequestSwitchProfileAsync(name))
+            SyncProfileDropdown();                     // cancelled: revert to the unchanged current profile
     }
 
     private static T Svc<T>() where T : notnull => App.Instance.Services.GetRequiredService<T>();
@@ -86,6 +120,8 @@ public partial class MainWindow : Window
     private async Task CreateProfileAsync(bool fromForm = false)
     {
         if (ViewModel is null) return;
+        // Same unsaved-changes guard as a profile switch — creating a profile switches away from the current one.
+        if (!await ViewModel.ConfirmDiscardCurrentAsync()) return;
 
         var serverPrefs = Svc<IServerPreferencesProvider>();
         var prefill = fromForm ? $"Copy of {ViewModel.CurrentProfile?.ProfileName}" : null;

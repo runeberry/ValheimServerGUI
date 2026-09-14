@@ -1,3 +1,4 @@
+using System;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -14,6 +15,33 @@ namespace ValheimServerGUI.App.ViewModels;
 /// </summary>
 public partial class ServerFormViewModel : ObservableObject
 {
+    // Nesting-safe suppression counter for the dirty flag (mirrors Dialogs/ModalEditViewModel). Loads and
+    // app-driven mutations run under RunClean so only direct user edits via the field bindings set IsDirty.
+    private int _suppressDirty;
+
+    public ServerFormViewModel()
+    {
+        PropertyChanged += (_, e) =>
+        {
+            if (_suppressDirty > 0) return;
+            // IsDirty itself, and the view-only password-visibility toggle, never count as edits.
+            if (e.PropertyName is nameof(IsDirty) or nameof(ShowPassword)) return;
+            IsDirty = true;
+        };
+    }
+
+    /// <summary>True once the user has changed any field since the last load (backs the unsaved-changes guard).</summary>
+    [ObservableProperty]
+    private bool _isDirty;
+
+    /// <summary>Runs a form mutation without tripping <see cref="IsDirty"/> (loads, app-driven world refresh).</summary>
+    public void RunClean(Action mutate)
+    {
+        _suppressDirty++;
+        try { mutate(); }
+        finally { _suppressDirty--; }
+    }
+
     // ----- Server Controls -----
     [ObservableProperty] private string? _name;
     [ObservableProperty] private int _port = CoreConstants.DefaultServerPort;
@@ -60,21 +88,25 @@ public partial class ServerFormViewModel : ObservableObject
     /// <summary>SetFormStateFromPrefs (scalar fields only; the owner drives world listing + selection).</summary>
     public void LoadFieldsFrom(ServerPreferences prefs)
     {
-        Name = prefs.Name;
-        Port = prefs.Port;
-        Password = prefs.Password;
-        ShowPassword = false;
-        IsPublic = prefs.Public;
-        Crossplay = prefs.Crossplay;
-        SaveInterval = prefs.SaveInterval;
-        BackupCount = prefs.BackupCount;
-        BackupIntervalShort = prefs.BackupIntervalShort;
-        BackupIntervalLong = prefs.BackupIntervalLong;
-        AutoStart = prefs.AutoStart;
-        AdditionalArgs = prefs.AdditionalArgs;
-        ServerExePath = prefs.ServerExePath;
-        SaveDataFolderPath = prefs.SaveDataFolderPath;
-        WriteServerLogsToFile = prefs.WriteServerLogsToFile;
+        RunClean(() =>
+        {
+            Name = prefs.Name;
+            Port = prefs.Port;
+            Password = prefs.Password;
+            ShowPassword = false;
+            IsPublic = prefs.Public;
+            Crossplay = prefs.Crossplay;
+            SaveInterval = prefs.SaveInterval;
+            BackupCount = prefs.BackupCount;
+            BackupIntervalShort = prefs.BackupIntervalShort;
+            BackupIntervalLong = prefs.BackupIntervalLong;
+            AutoStart = prefs.AutoStart;
+            AdditionalArgs = prefs.AdditionalArgs;
+            ServerExePath = prefs.ServerExePath;
+            SaveDataFolderPath = prefs.SaveDataFolderPath;
+            WriteServerLogsToFile = prefs.WriteServerLogsToFile;
+        });
+        IsDirty = false; // a load leaves the form clean
     }
 
     /// <summary>GetPrefsFromFormState: merges the form into the (existing or new) profile prefs.</summary>

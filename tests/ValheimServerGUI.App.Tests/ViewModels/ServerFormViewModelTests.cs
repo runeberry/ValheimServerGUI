@@ -62,4 +62,45 @@ public class ServerFormViewModelTests
         Assert.Equal("Farlands", form.SelectedWorldName);
         Assert.False(form.IsSelectedWorldCloud);
     }
+
+    [Fact]
+    public void Editing_a_field_sets_dirty()
+    {
+        var form = new ServerFormViewModel();
+        Assert.False(form.IsDirty);
+
+        form.Name = "Changed";
+        Assert.True(form.IsDirty);
+    }
+
+    [Fact]
+    public void Load_clears_dirty()
+    {
+        var form = new ServerFormViewModel { Name = "typed" };
+        Assert.True(form.IsDirty);
+
+        form.LoadFieldsFrom(new ServerPreferences { ProfileName = "P", Name = "Loaded" });
+        Assert.False(form.IsDirty);
+    }
+
+    [Fact]
+    public void Show_password_toggle_is_not_a_dirtying_edit()
+    {
+        var form = new ServerFormViewModel();
+        form.ToggleShowPasswordCommand.Execute(null);
+
+        Assert.True(form.ShowPassword);
+        Assert.False(form.IsDirty); // view-only, never counts as an edit
+    }
+
+    [Fact]
+    public void RunClean_suppresses_dirty_but_direct_edits_still_trip_it()
+    {
+        var form = new ServerFormViewModel();
+        form.RunClean(() => form.ExistingWorld = "W"); // app-driven mutation
+        Assert.False(form.IsDirty);
+
+        form.ExistingWorld = "W2"; // direct user edit
+        Assert.True(form.IsDirty);
+    }
 }

@@ -86,6 +86,20 @@
         <!-- ===== Menu ===== -->
         <!-- Bottom hairline mirrors the footer's top border so the menu bar reads as a banded strip. -->
         <Border DockPanel.Dock="Top" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource AppBorderBrush}">
+        <DockPanel>
+        <!-- Right of the menu: a label-less profile picker + Start/Restart/Stop controls, turning the strip
+             into a single-window multi-profile control panel. The controls bind the same VM commands as the
+             Server Controls tab and the tray, so their enablement is derived from the selected server. -->
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="3"
+                    VerticalAlignment="Center" Margin="6,0,6,0">
+            <TextBlock Text="Profile" VerticalAlignment="Center" Margin="0,0,4,0"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <c:DropdownFormField x:Name="ProfileDropdown" Width="170" VerticalAlignment="Center"
+                                 ItemsSource="{Binding Profiles}" />
+            <c:IconButton IconName="Run_16x" ToolTip.Tip="Start Server" Command="{Binding StartCommand}" />
+            <c:IconButton IconName="Restart_16x" ToolTip.Tip="Restart Server" Command="{Binding RestartCommand}" />
+            <c:IconButton IconName="Stop_16x" ToolTip.Tip="Stop Server" Command="{Binding StopCommand}" />
+        </StackPanel>
         <Menu>
             <MenuItem Header="_File">
                 <MenuItem Header="New _Window" Command="{Binding NewWindowCommand}">
@@ -156,6 +170,7 @@
                 <MenuItem Header="_About…" Command="{Binding AboutCommand}" />
             </MenuItem>
         </Menu>
+        </DockPanel>
         </Border>
 
         <!-- ===== Status bar ===== -->

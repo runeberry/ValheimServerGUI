@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
@@ -133,6 +134,9 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>After a MANUAL update check, asks "…go to the download page?" (returns true for yes). Wired by the window.</summary>
     public Func<string, Task<bool>>? UpdateResultPrompt { get; set; }
 
+    /// <summary>Shows the Save / Don't Save / Cancel unsaved-changes prompt (§13.3). Wired by the window.</summary>
+    public Func<Task<UnsavedChangesChoice>>? UnsavedChangesPrompt { get; set; }
+
     /// <summary>The actual "start the server" step; overridable in tests so the full flow runs without launching.</summary>
     internal Action<IValheimServerOptions> StartAction { get; set; }
 
@@ -227,13 +231,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private void SaveProfileAs() => MenuActionRequested?.Invoke(MenuAction.SaveProfileAs);
 
     // Ungated: switching profiles is allowed even while a server is running (the switch re-targets the
-    // window; the previous profile's server keeps running in the background).
+    // window; the previous profile's server keeps running in the background). Routed through the same
+    // unsaved-changes guard as the dropdown so File > Load and the dropdown share one switch plumbing.
     [RelayCommand]
-    private void LoadProfile(string profileName)
-    {
-        var profile = _serverPrefs.LoadPreferences(profileName);
-        if (profile is not null) LoadProfile(profile);
-    }
+    private Task LoadProfile(string profileName) => RequestSwitchProfileAsync(profileName);
 
     [RelayCommand]
     private void RemoveProfile(string profileName) => RemoveProfileRequested?.Invoke(profileName);
@@ -313,6 +314,42 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     // ===== profile / form loading =====
+
+    /// <summary>
+    /// Switches this window to <paramref name="name"/>, honouring the unsaved-changes guard. The single switch
+    /// plumbing both File &gt; Load and the menu-bar dropdown call. Returns false only when the user cancels
+    /// (so the dropdown can revert); a no-op switch to the current profile returns true.
+    /// </summary>
+    public async Task<bool> RequestSwitchProfileAsync(string name)
+    {
+        if (name == CurrentProfile?.ProfileName) return true;
+        if (!await ResolveUnsavedChangesAsync()) return false;
+
+        var prefs = _serverPrefs.LoadPreferences(name);
+        if (prefs is not null) LoadProfile(prefs);
+        return true;
+    }
+
+    /// <summary>The unsaved-changes guard for New Profile / Save As (code-behind). False = the user cancelled.</summary>
+    public Task<bool> ConfirmDiscardCurrentAsync() => ResolveUnsavedChangesAsync();
+
+    // Shared guard: when the form is dirty, prompt Save / Discard / Cancel. Save persists the current
+    // profile then proceeds; Discard proceeds; Cancel aborts (returns false). No prompt when clean.
+    private async Task<bool> ResolveUnsavedChangesAsync()
+    {
+        if (!Form.IsDirty || UnsavedChangesPrompt is null) return true;
+
+        switch (await UnsavedChangesPrompt())
+        {
+            case UnsavedChangesChoice.Save:
+                _serverPrefs.SavePreferences(BuildPreferences());
+                return true;
+            case UnsavedChangesChoice.Discard:
+                return true;
+            default: // Cancel
+                return false;
+        }
+    }
 
     /// <summary>
     /// Binds a profile to this window: records it as last-active (§16.2), loads the form fields, and lists
@@ -543,9 +580,12 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch
         {
-            // Save folder not configured/available yet — nothing to list.
-            Form.Worlds.Clear();
-            Form.ExistingWorld = null;
+            // Save folder not configured/available yet — nothing to list. App-driven, so not a user edit.
+            Form.RunClean(() =>
+            {
+                Form.Worlds.Clear();
+                Form.ExistingWorld = null;
+            });
             return;
         }
 
@@ -554,18 +594,22 @@ public partial class MainWindowViewModel : ViewModelBase
             .Where(n => !local.Contains(n, StringComparer.OrdinalIgnoreCase))
             .Select(n => n + AppConstants.CloudWorldSuffix);
 
-        Form.Worlds.Clear();
-        foreach (var world in local.Concat(cloud))
-            Form.Worlds.Add(world);
+        // App-driven list maintenance must not trip the form's dirty flag — only direct user edits do.
+        Form.RunClean(() =>
+        {
+            Form.Worlds.Clear();
+            foreach (var world in local.Concat(cloud))
+                Form.Worlds.Add(world);
 
-        // Re-select the prior world if it survived the refresh; otherwise fall back to the first one so the
-        // dropdown never lands on an empty selection while worlds exist.
-        Form.ExistingWorld = previous is not null && Form.Worlds.Contains(previous)
-            ? previous
-            : Form.Worlds.FirstOrDefault();
+            // Re-select the prior world if it survived the refresh; otherwise fall back to the first one so
+            // the dropdown never lands on an empty selection while worlds exist.
+            Form.ExistingWorld = previous is not null && Form.Worlds.Contains(previous)
+                ? previous
+                : Form.Worlds.FirstOrDefault();
+        });
     }
 
-    private void SelectWorld(string? worldName)
+    private void SelectWorld(string? worldName) => Form.RunClean(() =>
     {
         if (string.IsNullOrWhiteSpace(worldName))
         {
@@ -587,7 +631,7 @@ public partial class MainWindowViewModel : ViewModelBase
             Form.UseNewWorld = true;
             Form.NewWorldName = worldName;
         }
-    }
+    });
 
     // ===== Core event handlers (marshalled + guarded) =====
 

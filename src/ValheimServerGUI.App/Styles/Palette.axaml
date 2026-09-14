@@ -48,10 +48,11 @@
             <SolidColorBrush x:Key="LayerBaseHover" Color="#E0E0E0" />
             <SolidColorBrush x:Key="AppBorderBrush" Color="#BFBFBF" />
 
-            <!-- Light mirror of the input tokens (rest border darker for contrast on white; hover deepens). -->
-            <SolidColorBrush x:Key="InputBackground" Color="#FFFFFF" />
-            <SolidColorBrush x:Key="InputBackgroundHover" Color="#F2F2F3" />
-            <SolidColorBrush x:Key="InputBackgroundFocused" Color="#F2F2F3" />
+            <!-- Light mirror of the input tokens: hover/focus brighten to white (inverse of dark, where they
+                 deepen); rest is a hair off-white so there is room to brighten. Border darkens for contrast. -->
+            <SolidColorBrush x:Key="InputBackground" Color="#F2F2F3" />
+            <SolidColorBrush x:Key="InputBackgroundHover" Color="#FFFFFF" />
+            <SolidColorBrush x:Key="InputBackgroundFocused" Color="#FFFFFF" />
             <SolidColorBrush x:Key="InputBorderBrush" Color="#808081" />
             <SolidColorBrush x:Key="InputBorderBrushHover" Color="#4D4D4E" />
             <SolidColorBrush x:Key="InputBorderBrushFocused" Color="#199CA8" />

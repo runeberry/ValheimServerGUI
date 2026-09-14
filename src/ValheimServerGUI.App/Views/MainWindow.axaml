@@ -119,9 +119,12 @@
                           IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
                     <MenuItem.Icon><c:IconImage IconName="OpenFile_16x" /></MenuItem.Icon>
                     <MenuItem.Styles>
+                        <!-- Tree=Logical: on desktop the submenu is a separate PopupRoot, so a default (visual)
+                             ancestor search never reaches the Window and the command binds to null (the items
+                             then render disabled). The logical tree survives the popup, so it resolves there. -->
                         <Style Selector="MenuItem > MenuItem">
                             <Setter Property="Command"
-                                    Value="{Binding DataContext.LoadProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                    Value="{Binding DataContext.LoadProfileCommand, RelativeSource={RelativeSource AncestorType=Window, Tree=Logical}}" />
                             <Setter Property="CommandParameter" Value="{Binding}" />
                         </Style>
                     </MenuItem.Styles>
@@ -130,9 +133,10 @@
                           IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
                     <MenuItem.Icon><c:IconImage IconName="Cancel_16x" /></MenuItem.Icon>
                     <MenuItem.Styles>
+                        <!-- Tree=Logical: see Load Profile above (desktop submenu popup breaks the visual search). -->
                         <Style Selector="MenuItem > MenuItem">
                             <Setter Property="Command"
-                                    Value="{Binding DataContext.RemoveProfileCommand, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                    Value="{Binding DataContext.RemoveProfileCommand, RelativeSource={RelativeSource AncestorType=Window, Tree=Logical}}" />
                             <Setter Property="CommandParameter" Value="{Binding}" />
                         </Style>
                     </MenuItem.Styles>

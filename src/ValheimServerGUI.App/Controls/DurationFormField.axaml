@@ -13,15 +13,19 @@
     </UserControl.Resources>
 
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
-        <Grid ColumnDefinitions="*,4,Auto">
-            <NumericUpDown Grid.Column="0"
-                           Value="{Binding #Root.DisplayAmount, Mode=TwoWay}"
-                           Minimum="{Binding #Root.NumericMinimum}"
-                           Maximum="{Binding #Root.NumericMaximum}"
-                           Increment="1" FormatString="0" />
-            <ComboBox Grid.Column="2" MinWidth="84" VerticalAlignment="Stretch"
-                      ItemsSource="{Binding #Root.Units}"
-                      SelectedItem="{Binding #Root.SelectedUnit, Mode=TwoWay}" />
-        </Grid>
+        <!-- One outlined shell: a borderless spinner (every state paints the shell colour via the palette,
+             BorderThickness 0 drops its own outline) plus the unit dropdown as a connected end-cap. -->
+        <Border Classes="fieldShell">
+            <Grid ColumnDefinitions="*,Auto">
+                <NumericUpDown Grid.Column="0" BorderThickness="0"
+                               Value="{Binding #Root.DisplayAmount, Mode=TwoWay}"
+                               Minimum="{Binding #Root.NumericMinimum}"
+                               Maximum="{Binding #Root.NumericMaximum}"
+                               Increment="1" FormatString="0" />
+                <ComboBox Grid.Column="1" Classes="affix" MinWidth="84"
+                          ItemsSource="{Binding #Root.Units}"
+                          SelectedItem="{Binding #Root.SelectedUnit, Mode=TwoWay}" />
+            </Grid>
+        </Border>
     </c:FormRow>
 </UserControl>

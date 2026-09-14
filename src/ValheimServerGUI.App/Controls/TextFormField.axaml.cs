@@ -30,6 +30,11 @@ public partial class TextFormField : FormFieldBase, IFormField<string?>
     public static readonly StyledProperty<object?> TrailingContentProperty =
         AvaloniaProperty.Register<TextFormField, object?>(nameof(TrailingContent));
 
+    /// <summary>Optional content rendered as a connected end-cap <em>inside</em> the field border (e.g. a
+    /// copy button). When set, the field uses the outlined shell layout; when null, it stays a plain box.</summary>
+    public static readonly StyledProperty<object?> AffixProperty =
+        AvaloniaProperty.Register<TextFormField, object?>(nameof(Affix));
+
     /// <summary>When true the box accepts newlines and wraps (a text area). Default false.</summary>
     public static readonly StyledProperty<bool> MultilineProperty =
         AvaloniaProperty.Register<TextFormField, bool>(nameof(Multiline));
@@ -68,6 +73,12 @@ public partial class TextFormField : FormFieldBase, IFormField<string?>
     {
         get => GetValue(TrailingContentProperty);
         set => SetValue(TrailingContentProperty, value);
+    }
+
+    public object? Affix
+    {
+        get => GetValue(AffixProperty);
+        set => SetValue(AffixProperty, value);
     }
 
     public bool Multiline

@@ -23,12 +23,14 @@
                              HelpText="Your server must be protected with a password. The password must be at least 5 characters and must not contain the name of the server or the world that you're hosting."
                              Value="{Binding Form.Password}" ShowValue="{Binding Form.ShowPassword}"
                              IsEnabled="{Binding AllowServerChanges}">
+                <c:TextFormField.Affix>
+                    <c:CopyButton Classes="affix" Text="{Binding Form.Password}"
+                                  ToolTip.Tip="Copy password to clipboard" />
+                </c:TextFormField.Affix>
                 <c:TextFormField.TrailingContent>
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center" Margin="4,0,0,0">
-                        <c:CopyButton Text="{Binding Form.Password}" ToolTip.Tip="Copy password to clipboard" />
-                        <c:CheckBoxFormField LabelText="Show Password" Value="{Binding Form.ShowPassword}"
-                                             IsEnabled="{Binding AllowServerChanges}" />
-                    </StackPanel>
+                    <c:CheckBoxFormField LabelText="Show Password" Value="{Binding Form.ShowPassword}"
+                                         VerticalAlignment="Center" Margin="8,0,0,0"
+                                         IsEnabled="{Binding AllowServerChanges}" />
                 </c:TextFormField.TrailingContent>
             </c:TextFormField>
 

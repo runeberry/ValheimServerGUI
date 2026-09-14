@@ -3,40 +3,25 @@
              xmlns:c="using:ValheimServerGUI.App.Controls"
              x:Class="ValheimServerGUI.App.Controls.FilenameFormField"
              x:Name="Root" x:CompileBindings="False">
-    <UserControl.Resources>
-        <!-- End-cap buttons that live inside the TextBox border: square, transparent, with only a left
-             divider so their other three edges read as the field's own outline. Hover/pressed feedback comes
-             from Fluent's own Button states (ButtonBackgroundPointerOver / …Pressed). -->
-        <ControlTheme x:Key="FieldEndcapTheme" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
-            <Setter Property="Background" Value="Transparent" />
-            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}" />
-            <Setter Property="BorderThickness" Value="1,0,0,0" />
-            <Setter Property="CornerRadius" Value="0" />
-            <Setter Property="VerticalAlignment" Value="Stretch" />
-            <Setter Property="VerticalContentAlignment" Value="Center" />
-        </ControlTheme>
-    </UserControl.Resources>
-
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
-        <TextBox VerticalAlignment="Center" VerticalContentAlignment="Center"
-                 Text="{Binding #Root.Value, Mode=TwoWay}">
-            <TextBox.InnerRightContent>
-                <!-- MinHeight/Padding set locally (a local value beats the global "Button" Style) so an
-                     end-cap fills the box height without ever making the field taller than a plain one. -->
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
-                    <Button Theme="{StaticResource FieldEndcapTheme}" Content="Browse…"
-                            MinHeight="0" Padding="8,0"
+        <!-- One outlined shell around a chromeless text box; the Browse / open-folder buttons are
+             connected end-caps inside the same border (left divider only). See Styles/Compact.axaml. -->
+        <Border Classes="fieldShell">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0" Classes="chromeless" VerticalAlignment="Stretch"
+                         VerticalContentAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
+                    <Button Classes="affix" Content="Browse…"
                             IsVisible="{Binding #Root.ShowBrowse}"
                             ToolTip.Tip="Browse for a location" Click="Browse" />
-                    <Button Theme="{StaticResource FieldEndcapTheme}"
-                            MinHeight="0" Padding="6,0"
+                    <Button Classes="affix"
                             IsVisible="{Binding #Root.ShowOpenFolder}"
                             Command="{Binding #Root.OpenFolderCommand}"
                             ToolTip.Tip="Open this folder in your file manager">
                         <Image Width="16" Height="16" Source="{c:Icon OpenFolder_16x}" />
                     </Button>
                 </StackPanel>
-            </TextBox.InnerRightContent>
-        </TextBox>
+            </Grid>
+        </Border>
     </c:FormRow>
 </UserControl>

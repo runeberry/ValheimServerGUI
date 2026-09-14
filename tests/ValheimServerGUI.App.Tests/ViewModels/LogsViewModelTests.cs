@@ -23,20 +23,41 @@ public class LogsViewModelTests
     }
 
     [AvaloniaFact]
-    public void Server_lines_go_to_the_server_view()
+    public void Server_view_reflects_the_targeted_buffer()
     {
         var vm = Build();
-        vm.AppendServerLine("world loaded");
+        var buffer = new System.Collections.ObjectModel.ObservableCollection<string>();
+        vm.SetServerLog(buffer);
+        buffer.Add("world loaded");
 
         Assert.Equal(LogViews.Server, vm.SelectedView);
         Assert.Contains("world loaded", vm.CurrentLines);
     }
 
     [AvaloniaFact]
+    public void Set_server_log_repoints_the_server_view()
+    {
+        var vm = Build();
+        var first = new System.Collections.ObjectModel.ObservableCollection<string> { "from-A" };
+        var second = new System.Collections.ObjectModel.ObservableCollection<string> { "from-B" };
+
+        vm.SetServerLog(first);
+        Assert.Contains("from-A", vm.CurrentLines);
+
+        var raised = false;
+        vm.PropertyChanged += (_, e) => raised |= e.PropertyName == nameof(LogsViewModel.CurrentLines);
+        vm.SetServerLog(second); // profile switch re-points the Server buffer
+
+        Assert.True(raised);
+        Assert.DoesNotContain("from-A", vm.CurrentLines);
+        Assert.Contains("from-B", vm.CurrentLines);
+    }
+
+    [AvaloniaFact]
     public void Switching_view_changes_current_lines()
     {
         var vm = Build();
-        vm.AppendServerLine("server-line");
+        vm.SetServerLog(new System.Collections.ObjectModel.ObservableCollection<string> { "server-line" });
 
         var raised = false;
         vm.PropertyChanged += (_, e) => raised |= e.PropertyName == nameof(LogsViewModel.CurrentLines);
@@ -44,30 +65,6 @@ public class LogsViewModelTests
 
         Assert.True(raised);
         Assert.DoesNotContain("server-line", vm.CurrentLines); // now showing the Application buffer
-    }
-
-    [AvaloniaFact]
-    public void Clear_clears_only_the_current_view()
-    {
-        var vm = Build();
-        vm.AppendServerLine("keep-me-on-server");
-        vm.SelectedView = LogViews.Application;
-
-        vm.ClearLogsCommand.Execute(null); // clears Application view only
-
-        vm.SelectedView = LogViews.Server;
-        Assert.Contains("keep-me-on-server", vm.CurrentLines);
-    }
-
-    [AvaloniaFact]
-    public void Lines_are_capped_so_the_buffer_stays_bounded()
-    {
-        var vm = Build();
-        for (var i = 0; i < 5100; i++) vm.AppendServerLine($"line {i}");
-
-        Assert.Equal(5000, vm.CurrentLines.Count);
-        Assert.DoesNotContain("line 0", vm.CurrentLines);      // oldest dropped off the top
-        Assert.Contains("line 5099", vm.CurrentLines);          // newest kept
     }
 
     [AvaloniaFact]

@@ -29,8 +29,12 @@ public class MainWindowViewModelTests
         IEnumerable<ServerPreferences>? profiles = null)
     {
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
+        // A fresh manager per VM keeps servers isolated between tests (the DI provider is shared/static).
+        var manager = new ServerManager(
+            () => Core.GetRequiredService<ValheimServer>(),
+            Core.GetRequiredService<Serilog.ILogger>());
         return new MainWindowViewModel(
-            Core.GetRequiredService<ValheimServer>(),
+            manager,
             new FakeUserPreferencesProvider(),
             new FakeServerPreferencesProvider(profiles),
             Core.GetRequiredService<IWorldPreferencesProvider>(),
@@ -55,7 +59,7 @@ public class MainWindowViewModelTests
         Assert.True(vm.AllowServerChanges);
         Assert.True(vm.StartCommand.CanExecute(null));
         Assert.False(vm.StopCommand.CanExecute(null));
-        Assert.True(vm.NewProfileCommand.CanExecute(null)); // Stopped-only menu item enabled
+        Assert.True(vm.NewProfileCommand.CanExecute(null)); // ungated (allowed regardless of state)
     }
 
     [Fact]
@@ -71,7 +75,7 @@ public class MainWindowViewModelTests
         Assert.False(vm.StartCommand.CanExecute(null));
         Assert.True(vm.StopCommand.CanExecute(null));
         Assert.True(vm.RestartCommand.CanExecute(null));
-        Assert.False(vm.NewProfileCommand.CanExecute(null)); // gated while running
+        Assert.True(vm.NewProfileCommand.CanExecute(null)); // ungated: profile mgmt allowed while running
     }
 
     [Theory]
@@ -103,15 +107,16 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
-    public void Load_profile_command_gated_by_stopped_state()
+    public void Load_profile_command_is_ungated_by_server_state()
     {
+        // Switching profiles must work while a server is running (the switch re-targets the window).
         var vm = Build(out _, profiles: new[] { new ServerPreferences { ProfileName = "A" } });
         vm.ServerStatus = ServerStatus.Stopped;
         Assert.True(vm.LoadProfileCommand.CanExecute("A"));
         Assert.True(vm.HasProfiles);
 
         vm.ServerStatus = ServerStatus.Running;
-        Assert.False(vm.LoadProfileCommand.CanExecute("A"));
+        Assert.True(vm.LoadProfileCommand.CanExecute("A"));
     }
 
     [Fact]

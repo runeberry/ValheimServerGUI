@@ -34,7 +34,7 @@ public class ShellCoordinatorTests
         var pathResolver = Core.GetRequiredService<IValheimPathResolver>();
         Func<MainWindowViewModel> factory = () =>
             new MainWindowViewModel(
-                Core.GetRequiredService<ValheimServer>(), userPrefsProvider, serverPrefs,
+                Core.GetRequiredService<IServerManager>(), userPrefsProvider, serverPrefs,
                 Core.GetRequiredService<IWorldPreferencesProvider>(),
                 Core.GetRequiredService<ISteamCloudWorldProvider>(),
                 Core.GetRequiredService<IIpAddressProvider>(),

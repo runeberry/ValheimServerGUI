@@ -53,8 +53,11 @@ public sealed class StartServerFlowTests : IDisposable
         var serverPrefs = new FakeServerPreferencesProvider();
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
 
+        var manager = new ServerManager(
+            () => Core.GetRequiredService<ValheimServer>(),
+            Core.GetRequiredService<Serilog.ILogger>());
         var vm = new MainWindowViewModel(
-            Core.GetRequiredService<ValheimServer>(),
+            manager,
             new FakeUserPreferencesProvider(),
             serverPrefs,
             Core.GetRequiredService<IWorldPreferencesProvider>(),

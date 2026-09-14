@@ -184,12 +184,12 @@ public partial class MainWindow : Window
     // §2.4 "safe shutdowns": decide via CloseDecider, then perform the Stop/defer/close here.
     private void OnClosing(object? sender, WindowClosingEventArgs e)
     {
-        if (_forceClose || ViewModel is null) return;
+        if (_forceClose || ViewModel?.Server is not { } server) return;
 
         var isOsShutdown = e.CloseReason is WindowCloseReason.OSShutdown or WindowCloseReason.ApplicationShutdown;
         var prompt = App.Instance.Services.GetRequiredService<IUserPrompt>();
 
-        switch (CloseDecider.Decide(ViewModel.Server.Status, isOsShutdown, prompt, "Warning"))
+        switch (CloseDecider.Decide(server.Status, isOsShutdown, prompt, "Warning"))
         {
             case CloseDecision.Proceed:
                 return;
@@ -200,21 +200,21 @@ public partial class MainWindow : Window
 
             case CloseDecision.StopThenClose:
                 e.Cancel = true;
-                DeferCloseUntilStopped();
-                ViewModel.Server.Stop();
+                DeferCloseUntilStopped(server);
+                server.Stop();
                 return;
         }
     }
 
-    private void DeferCloseUntilStopped()
+    private void DeferCloseUntilStopped(ValheimServer server)
     {
-        if (_awaitingStop || ViewModel is null) return;
+        if (_awaitingStop) return;
         _awaitingStop = true;
 
         void OnStatusChanged(object? sender, ServerStatus status)
         {
             if (status != ServerStatus.Stopped) return;
-            ViewModel.Server.StatusChanged -= OnStatusChanged;
+            server.StatusChanged -= OnStatusChanged;
             Dispatcher.UIThread.Post(() =>
             {
                 _forceClose = true;
@@ -222,7 +222,7 @@ public partial class MainWindow : Window
             });
         }
 
-        ViewModel.Server.StatusChanged += OnStatusChanged;
+        server.StatusChanged += OnStatusChanged;
     }
 
     // Tray header + tooltip wording (WinForms parity): compact "ValheimServerGUI" tooltip, "Profile: {name}"

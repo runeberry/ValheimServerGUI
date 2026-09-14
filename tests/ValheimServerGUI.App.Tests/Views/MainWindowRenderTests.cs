@@ -26,7 +26,7 @@ public class MainWindowRenderTests
     {
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
         var vm = new MainWindowViewModel(
-            Core.GetRequiredService<ValheimServer>(),
+            Core.GetRequiredService<IServerManager>(),
             new FakeUserPreferencesProvider(),
             new FakeServerPreferencesProvider(),
             Core.GetRequiredService<IWorldPreferencesProvider>(),

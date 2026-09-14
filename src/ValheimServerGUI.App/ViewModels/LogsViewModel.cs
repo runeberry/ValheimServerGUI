@@ -12,10 +12,10 @@ using ValheimServerGUI.Tools.Logging;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// Logs tab (§10.2): a view selector (Server / Application, default Server) over two per-view buffers.
-/// Server lines arrive through <see cref="AppendServerLine"/> (wired as the server's
-/// <c>options.LogMessageHandler</c>); application lines from the app logger's buffer + <c>LogReceived</c>.
-/// Clear/Save act on the current view only; Save warns when the view is empty.
+/// Logs tab (§10.2): a view selector (Server / Application, default Server) over two buffers. The Server
+/// buffer is owned by the selected profile's server entry (re-pointed on switch via <see cref="SetServerLog"/>),
+/// so server lines land there regardless of which window started the server; application lines come from the
+/// app logger's buffer + <c>LogReceived</c>. Clear/Save act on the current view only; Save warns when empty.
 /// </summary>
 public partial class LogsViewModel : ViewModelBase
 {
@@ -48,7 +48,9 @@ public partial class LogsViewModel : ViewModelBase
 
     public IReadOnlyList<string> Views { get; } = new[] { LogViews.Server, LogViews.Application };
 
-    public ObservableCollection<string> ServerLines { get; } = new();
+    // The Server buffer is owned by the selected profile's server entry (IServerManager); SetServerLog
+    // re-points it on a switch. Starts as an empty local buffer until the first re-target.
+    private ObservableCollection<string> _serverLines = new();
     public ObservableCollection<string> AppLines { get; } = new();
 
     [ObservableProperty]
@@ -56,7 +58,7 @@ public partial class LogsViewModel : ViewModelBase
     private string _selectedView = LogViews.Server;
 
     public ObservableCollection<string> CurrentLines =>
-        SelectedView == LogViews.Application ? AppLines : ServerLines;
+        SelectedView == LogViews.Application ? AppLines : _serverLines;
 
     /// <summary>Shows the save-file picker and writes the current view's lines (wired by the window).</summary>
     public event Func<string, IReadOnlyList<string>, Task>? SaveLogsRequested;
@@ -64,8 +66,12 @@ public partial class LogsViewModel : ViewModelBase
     /// <summary>Surfaces a warning (e.g. nothing to save).</summary>
     public event Action<string>? Warning;
 
-    /// <summary>The server log stream handler — passed as <c>ValheimServerOptions.LogMessageHandler</c>.</summary>
-    public void AppendServerLine(string line) => RunOnUi(() => Append(ServerLines, line));
+    /// <summary>Points the Server view at the selected profile's server-owned buffer (called on profile switch).</summary>
+    public void SetServerLog(ObservableCollection<string> buffer)
+    {
+        _serverLines = buffer;
+        OnPropertyChanged(nameof(CurrentLines));
+    }
 
     [RelayCommand]
     private void ClearLogs() => CurrentLines.Clear();

@@ -34,7 +34,7 @@ public class PaletteTests
     {
         var shell = new ShellLauncher(new RecordingSystemShell(), TestLog.Silent);
         var vm = new MainWindowViewModel(
-            Core.GetRequiredService<ValheimServer>(), new FakeUserPreferencesProvider(),
+            Core.GetRequiredService<IServerManager>(), new FakeUserPreferencesProvider(),
             new FakeServerPreferencesProvider(), Core.GetRequiredService<IWorldPreferencesProvider>(),
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             Core.GetRequiredService<IPlayerDataRepository>(), Core.GetRequiredService<IApplicationLogger>(),

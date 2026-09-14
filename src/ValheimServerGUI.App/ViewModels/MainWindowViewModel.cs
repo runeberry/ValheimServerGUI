@@ -57,7 +57,8 @@ public enum UpdateCheckStatus
 /// </summary>
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly ValheimServer _server;
+    private readonly IServerManager _serverManager;
+    private ValheimServer? _currentServer;
     private readonly IUserPreferencesProvider _userPrefs;
     private readonly IServerPreferencesProvider _serverPrefs;
     private readonly IWorldPreferencesProvider _worldPrefs;
@@ -71,7 +72,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private string? _startedNewWorld;
 
     public MainWindowViewModel(
-        ValheimServer server,
+        IServerManager serverManager,
         IUserPreferencesProvider userPrefs,
         IServerPreferencesProvider serverPrefs,
         IWorldPreferencesProvider worldPrefs,
@@ -83,7 +84,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IShellLauncher shell,
         IValheimPathResolver pathResolver)
     {
-        _server = server;
+        _serverManager = serverManager;
         _userPrefs = userPrefs;
         _serverPrefs = serverPrefs;
         _worldPrefs = worldPrefs;
@@ -93,15 +94,14 @@ public partial class MainWindowViewModel : ViewModelBase
         _shell = shell;
         _pathResolver = pathResolver;
 
-        _serverStatus = _server.Status;
-        StartAction = _server.Start;
+        // No server is bound until the first LoadProfile → RetargetTo (the window is always loaded with a
+        // profile immediately after construction). ServerStatus defaults to Stopped, which the gates expect.
+        StartAction = options => _currentServer!.Start(options);
 
-        Details = new ServerDetailsViewModel(server, ipProvider, () => Form.Port);
+        Details = new ServerDetailsViewModel(ipProvider, () => Form.Port);
         Players = new PlayersViewModel(playerRepo);
         Logs = new LogsViewModel(appLogger, shell, pathResolver);
 
-        _server.StatusChanged += HandleServerStatusChanged;
-        _server.StopTimedOut += OnServerStopTimedOut;
         _updateProvider.UpdateCheckStarted += OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished += OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved += OnServerPreferencesSaved;
@@ -136,7 +136,8 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>The actual "start the server" step; overridable in tests so the full flow runs without launching.</summary>
     internal Action<IValheimServerOptions> StartAction { get; set; }
 
-    public ValheimServer Server => _server;
+    /// <summary>The server currently targeted by this window (the selected profile's server).</summary>
+    public ValheimServer? Server => _currentServer;
 
     public bool AutoStartOnLoad { get; set; }
 
@@ -166,9 +167,11 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool HasProfiles => Profiles.Count > 0;
 
     // --- server status + the single gate ---
+    // Profile-management commands (New Profile / Load Profile) are intentionally NOT gated by server state —
+    // switching profiles is allowed while a server runs. Only Start/Stop/Restart re-raise on status change.
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanStart), nameof(CanStop), nameof(CanRestart), nameof(AllowServerChanges), nameof(CanSelectExistingWorld), nameof(StatusText))]
-    [NotifyCanExecuteChangedFor(nameof(StartCommand), nameof(StopCommand), nameof(RestartCommand), nameof(NewProfileCommand), nameof(LoadProfileCommand))]
+    [NotifyCanExecuteChangedFor(nameof(StartCommand), nameof(StopCommand), nameof(RestartCommand))]
     private ServerStatus _serverStatus;
 
     public bool CanStart => ServerStatus == ServerStatus.Stopped;
@@ -203,10 +206,10 @@ public partial class MainWindowViewModel : ViewModelBase
     private Task Start() => StartServerAsync(isManual: true);
 
     [RelayCommand(CanExecute = nameof(CanStop))]
-    private void Stop() => _server.Stop();
+    private void Stop() => _currentServer?.Stop();
 
     [RelayCommand(CanExecute = nameof(CanRestart))]
-    private void Restart() => _server.Restart();
+    private void Restart() => _currentServer?.Restart();
 
     [RelayCommand]
     private void NewWindow() => NewWindowRequested?.Invoke();
@@ -214,7 +217,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void Close() => CloseRequested?.Invoke();
 
-    [RelayCommand(CanExecute = nameof(AllowServerChanges))]
+    [RelayCommand]
     private void NewProfile() => MenuActionRequested?.Invoke(MenuAction.NewProfile);
 
     [RelayCommand]
@@ -223,7 +226,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void SaveProfileAs() => MenuActionRequested?.Invoke(MenuAction.SaveProfileAs);
 
-    [RelayCommand(CanExecute = nameof(AllowServerChanges))]
+    // Ungated: switching profiles is allowed even while a server is running (the switch re-targets the
+    // window; the previous profile's server keeps running in the background).
+    [RelayCommand]
     private void LoadProfile(string profileName)
     {
         var profile = _serverPrefs.LoadPreferences(profileName);
@@ -317,6 +322,9 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         CurrentProfile = profile;
 
+        // Re-target the window's server/status/tabs onto this profile's server before loading form fields.
+        RetargetTo(profile.ProfileName);
+
         var userPrefs = _userPrefs.LoadPreferences();
         if (userPrefs.LastActiveProfile != profile.ProfileName)
         {
@@ -327,6 +335,41 @@ public partial class MainWindowViewModel : ViewModelBase
         Form.LoadFieldsFrom(profile);
         RefreshWorldList();
         SelectWorld(profile.WorldName);
+    }
+
+    /// <summary>
+    /// Points this window at the selected profile's server (created on first ask, shared app-wide). Swaps the
+    /// event subscriptions, re-seeds every status-derived gate from the new server's status, and re-targets
+    /// the Details/Logs tabs. Runs on the UI thread (always called from a UI action via LoadProfile). Players
+    /// is deliberately not re-targeted — it is a global, merged player list (documented limitation).
+    /// </summary>
+    private void RetargetTo(string profileName)
+    {
+        var next = _serverManager.GetOrCreate(profileName);
+        if (ReferenceEquals(next, _currentServer)) return;
+
+        if (_currentServer is not null)
+        {
+            _currentServer.StatusChanged -= HandleServerStatusChanged;
+            _currentServer.StopTimedOut -= OnServerStopTimedOut;
+        }
+
+        _currentServer = next;
+
+        // Cleared before re-seeding the status: it belonged to the previous server's start flow, and the
+        // OnServerStatusChanged hook (which fires synchronously below if the new server is already Running)
+        // must not act on the stale flag.
+        _startedNewWorld = null;
+
+        _currentServer.StatusChanged += HandleServerStatusChanged;
+        _currentServer.StopTimedOut += OnServerStopTimedOut;
+
+        // Mandatory: re-seed the single status gate from the newly selected server so Can*/AllowServerChanges
+        // and the Start/Stop/Restart command CanExecute reflect that server immediately, with no event.
+        ServerStatus = _currentServer.Status;
+
+        Details.SetServer(_currentServer);
+        Logs.SetServerLog(_serverManager.GetServerLog(profileName));
     }
 
     // ===== StartServer flow (§10.3 / GetServerOptionsFromFormState + validation) =====
@@ -457,7 +500,9 @@ public partial class MainWindowViewModel : ViewModelBase
                 ? serverPrefs.SaveDataFolderPath
                 : userPrefs.SaveDataFolderPath,
             LogToFile = serverPrefs.WriteServerLogsToFile,
-            LogMessageHandler = Logs.AppendServerLine,
+            // Lines land in the profile's server-owned buffer regardless of which window started the server.
+            LogMessageHandler = _serverManager.GetLogAppender(
+                CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName),
         };
 
         var worldName = serverPrefs.WorldName;
@@ -674,19 +719,22 @@ public partial class MainWindowViewModel : ViewModelBase
         foreach (var name in names) Profiles.Add(name);
 
         OnPropertyChanged(nameof(HasProfiles));
-        LoadProfileCommand.NotifyCanExecuteChanged();
     }
 
     protected override void DisposeCore()
     {
-        _server.StatusChanged -= HandleServerStatusChanged;
-        _server.StopTimedOut -= OnServerStopTimedOut;
+        // Unsubscribe from the currently-targeted server, but do NOT dispose it — servers are owned by the
+        // IServerManager and outlive this window (a missed -= would leak the whole view-model).
+        if (_currentServer is not null)
+        {
+            _currentServer.StatusChanged -= HandleServerStatusChanged;
+            _currentServer.StopTimedOut -= OnServerStopTimedOut;
+        }
         _updateProvider.UpdateCheckStarted -= OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished -= OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved -= OnServerPreferencesSaved;
         Details.Dispose();
         Players.Dispose();
         Logs.Dispose();
-        _server.Dispose();
     }
 }

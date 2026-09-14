@@ -17,7 +17,7 @@ public partial class ServerDetailsViewModel : ViewModelBase
 {
     private const string LoadingText = "Loading…";
 
-    private readonly ValheimServer _server;
+    private ValheimServer? _server;
     private readonly IIpAddressProvider _ip;
     private readonly Func<int> _portProvider;
     private readonly Queue<decimal> _worldSaveTimes = new();
@@ -28,9 +28,8 @@ public partial class ServerDetailsViewModel : ViewModelBase
     private DateTimeOffset? _startedAt;
     private bool _isActive;
 
-    public ServerDetailsViewModel(ValheimServer server, IIpAddressProvider ip, Func<int> portProvider)
+    public ServerDetailsViewModel(IIpAddressProvider ip, Func<int> portProvider)
     {
-        _server = server;
         _ip = ip;
         _portProvider = portProvider;
 
@@ -40,13 +39,43 @@ public partial class ServerDetailsViewModel : ViewModelBase
         _rawExternalIp = _ip.ExternalIpAddress;
         _rawInternalIp = _ip.InternalIpAddress;
 
-        _server.StatusChanged += OnStatusChanged;
-        _server.WorldSaved += OnWorldSaved;
-        _server.InviteCodeReady += OnInviteCodeReady;
+        // IP subscriptions are on the shared singleton provider — wired once, never re-targeted.
         _ip.ExternalIpChanged += OnExternalIpChanged;
         _ip.InternalIpChanged += OnInternalIpChanged;
 
         RefreshIpLabels();
+    }
+
+    /// <summary>
+    /// Re-targets the tab onto <paramref name="next"/> (profile switch): unsubscribes the previous server's
+    /// events, subscribes the new one, and reseeds the derived readouts (invite code, world-save history,
+    /// uptime — seeded from the server's own <see cref="ValheimServer.StartedAt"/> so an already-running
+    /// server reports its true uptime). The timer and <c>_isActive</c> survive (preferred over recreate).
+    /// </summary>
+    public void SetServer(ValheimServer next)
+    {
+        if (ReferenceEquals(next, _server)) return;
+
+        if (_server is not null)
+        {
+            _server.StatusChanged -= OnStatusChanged;
+            _server.WorldSaved -= OnWorldSaved;
+            _server.InviteCodeReady -= OnInviteCodeReady;
+        }
+
+        _server = next;
+
+        _server.StatusChanged += OnStatusChanged;
+        _server.WorldSaved += OnWorldSaved;
+        _server.InviteCodeReady += OnInviteCodeReady;
+
+        // Reset the per-server derived state and reseed from the new server.
+        _worldSaveTimes.Clear();
+        LastWorldSave = "N/A";
+        AverageWorldSave = "N/A";
+        SetInviteCode(null); // the invite code only arrives via an event; a re-target has missed it
+        _startedAt = _server.StartedAt;
+        RefreshUptime();
     }
 
     [ObservableProperty] private string _externalIp = LoadingText;
@@ -83,7 +112,7 @@ public partial class ServerDetailsViewModel : ViewModelBase
 
     private void RefreshUptime()
     {
-        if (_server.Status != ServerStatus.Running || _startedAt is null) return;
+        if (_server is null || _server.Status != ServerStatus.Running || _startedAt is null) return;
 
         var elapsed = DateTimeOffset.Now - _startedAt.Value;
         var text = elapsed.ToServerElapsedFormat();
@@ -110,7 +139,7 @@ public partial class ServerDetailsViewModel : ViewModelBase
     {
         if (status == ServerStatus.Running)
         {
-            _startedAt = DateTimeOffset.Now;
+            _startedAt = _server?.StartedAt ?? DateTimeOffset.Now;
             RefreshUptime();
         }
         else
@@ -164,9 +193,12 @@ public partial class ServerDetailsViewModel : ViewModelBase
     protected override void DisposeCore()
     {
         _uptimeTimer.Stop();
-        _server.StatusChanged -= OnStatusChanged;
-        _server.WorldSaved -= OnWorldSaved;
-        _server.InviteCodeReady -= OnInviteCodeReady;
+        if (_server is not null)
+        {
+            _server.StatusChanged -= OnStatusChanged;
+            _server.WorldSaved -= OnWorldSaved;
+            _server.InviteCodeReady -= OnInviteCodeReady;
+        }
         _ip.ExternalIpChanged -= OnExternalIpChanged;
         _ip.InternalIpChanged -= OnInternalIpChanged;
     }

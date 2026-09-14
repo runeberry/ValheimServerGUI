@@ -13,7 +13,11 @@ public class ServerDetailsViewModelTests
         new ServiceCollection().AddValheimCore().BuildServiceProvider();
 
     private static ServerDetailsViewModel Build(int port)
-        => new(Core.GetRequiredService<ValheimServer>(), Core.GetRequiredService<IIpAddressProvider>(), () => port);
+    {
+        var vm = new ServerDetailsViewModel(Core.GetRequiredService<IIpAddressProvider>(), () => port);
+        vm.SetServer(Core.GetRequiredService<ValheimServer>());
+        return vm;
+    }
 
     [AvaloniaFact]
     public void Default_state_is_loading_and_local_loopback()

@@ -1,0 +1,115 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Compact ComboBox skin (scoped; merged into the wrappers that host combos). Based on Fluent's
+         ComboBox template, but the fat 32px chevron column is replaced with a small caret matching the
+         numeric spinner's decrement glyph, in an Auto-width column padded to the text inset — so dropdowns
+         are much narrower. Adds an accent border on focus. -->
+
+    <ControlTheme x:Key="{x:Type ComboBox}" TargetType="ComboBox">
+        <Setter Property="Foreground" Value="{DynamicResource ComboBoxForeground}" />
+        <Setter Property="Background" Value="{DynamicResource ComboBoxBackground}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource ComboBoxBorderThemeThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource ControlCornerRadius}" />
+        <Setter Property="Padding" Value="8,2,0,2" />
+        <Setter Property="FocusAdorner" Value="{x:Null}" />
+        <Setter Property="MaxDropDownHeight" Value="504" />
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="PlaceholderForeground" Value="{DynamicResource ComboBoxPlaceHolderForeground}" />
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled" />
+        <Setter Property="ScrollViewer.VerticalScrollBarVisibility" Value="Auto" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <DataValidationErrors>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Border x:Name="Background"
+                                Grid.Column="0" Grid.ColumnSpan="2"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                MinWidth="{DynamicResource ComboBoxThemeMinWidth}" />
+
+                        <TextBlock x:Name="PlaceholderTextBlock"
+                                   Grid.Column="0"
+                                   HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                   VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                   Margin="{TemplateBinding Padding}"
+                                   Text="{TemplateBinding PlaceholderText}"
+                                   Foreground="{TemplateBinding PlaceholderForeground}"
+                                   IsVisible="{TemplateBinding SelectionBoxItem, Converter={x:Static ObjectConverters.IsNull}}" />
+
+                        <ContentControl x:Name="ContentPresenter"
+                                        Grid.Column="0"
+                                        Content="{TemplateBinding SelectionBoxItem}"
+                                        ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"
+                                        Margin="{TemplateBinding Padding}"
+                                        HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                        VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" />
+
+                        <!-- Compact caret: same shape as the spinner's decrement glyph, vertically centered,
+                             with left/right padding equal to the text inset (8px). -->
+                        <Panel Grid.Column="1" Margin="8,0" VerticalAlignment="Stretch">
+                            <Path x:Name="DropDownGlyph"
+                                  Width="8" Height="4"
+                                  VerticalAlignment="Center" HorizontalAlignment="Center"
+                                  IsHitTestVisible="False"
+                                  Data="M 0 0 L 4 4 L 8 0"
+                                  Stroke="{DynamicResource ComboBoxDropDownGlyphForeground}"
+                                  StrokeThickness="1.3" StrokeLineCap="Round" StrokeJoin="Round" />
+                        </Panel>
+
+                        <Popup Name="PART_Popup"
+                               WindowManagerAddShadowHint="False"
+                               IsOpen="{TemplateBinding IsDropDownOpen, Mode=TwoWay}"
+                               MinWidth="{Binding Bounds.Width, RelativeSource={RelativeSource TemplatedParent}}"
+                               MaxHeight="{TemplateBinding MaxDropDownHeight}"
+                               PlacementTarget="Background"
+                               IsLightDismissEnabled="True"
+                               InheritsTransform="True">
+                            <Border x:Name="PopupBorder"
+                                    Background="{DynamicResource ComboBoxDropDownBackground}"
+                                    BorderBrush="{DynamicResource ComboBoxDropDownBorderBrush}"
+                                    BorderThickness="{DynamicResource ComboBoxDropdownBorderThickness}"
+                                    Padding="{DynamicResource ComboBoxDropdownBorderPadding}"
+                                    HorizontalAlignment="Stretch"
+                                    CornerRadius="{DynamicResource OverlayCornerRadius}">
+                                <ScrollViewer HorizontalScrollBarVisibility="{TemplateBinding ScrollViewer.HorizontalScrollBarVisibility}"
+                                              IsScrollChainingEnabled="False"
+                                              VerticalScrollBarVisibility="{TemplateBinding ScrollViewer.VerticalScrollBarVisibility}">
+                                    <ItemsPresenter Name="PART_ItemsPresenter"
+                                                    Margin="{DynamicResource ComboBoxDropdownContentMargin}"
+                                                    ItemsPanel="{TemplateBinding ItemsPanel}" />
+                                </ScrollViewer>
+                            </Border>
+                        </Popup>
+                    </Grid>
+                </DataValidationErrors>
+            </ControlTemplate>
+        </Setter>
+
+        <Style Selector="^:pointerover /template/ Border#Background">
+            <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPointerOver}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPointerOver}" />
+        </Style>
+        <Style Selector="^:pressed /template/ Border#Background">
+            <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundPressed}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushPressed}" />
+        </Style>
+        <!-- Focus: accent border highlight (matches the text/number inputs). -->
+        <Style Selector="^:focus /template/ Border#Background">
+            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrushFocused}" />
+        </Style>
+        <Style Selector="^:disabled /template/ Border#Background">
+            <Setter Property="Background" Value="{DynamicResource ComboBoxBackgroundDisabled}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource ComboBoxBorderBrushDisabled}" />
+        </Style>
+        <Style Selector="^:error /template/ Border#Background">
+            <Setter Property="BorderBrush" Value="{DynamicResource SystemControlErrorTextForegroundBrush}" />
+        </Style>
+    </ControlTheme>
+
+</ResourceDictionary>

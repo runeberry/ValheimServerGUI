@@ -8,6 +8,7 @@
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactNumericUpDown.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactComboBox.axaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -22,7 +23,9 @@
                                Minimum="{Binding #Root.NumericMinimum}"
                                Maximum="{Binding #Root.NumericMaximum}"
                                Increment="1" FormatString="0" />
-                <ComboBox Grid.Column="1" Classes="affix" MinWidth="84"
+                <!-- Fixed width sized for the longest unit ("Seconds") so it does not resize per selection. -->
+                <ComboBox Grid.Column="1" Classes="affix" Width="96"
+                          HorizontalContentAlignment="Left"
                           ItemsSource="{Binding #Root.Units}"
                           SelectedItem="{Binding #Root.SelectedUnit, Mode=TwoWay}" />
             </Grid>

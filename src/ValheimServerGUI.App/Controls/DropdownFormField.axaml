@@ -3,6 +3,13 @@
              xmlns:c="using:ValheimServerGUI.App.Controls"
              x:Class="ValheimServerGUI.App.Controls.DropdownFormField"
              x:Name="Root" x:CompileBindings="False">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactComboBox.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <ComboBox HorizontalAlignment="Stretch"
                   ItemsSource="{Binding #Root.ItemsSource}"

@@ -233,11 +233,21 @@ public partial class MainWindowViewModel : ViewModelBase
     // Ungated: switching profiles is allowed even while a server is running (the switch re-targets the
     // window; the previous profile's server keeps running in the background). Routed through the same
     // unsaved-changes guard as the dropdown so File > Load and the dropdown share one switch plumbing.
+    //
+    // Parameter is object? (not string): the dynamic Load/Remove Profile submenus bind CommandParameter via
+    // {Binding}, which transiently resolves to the inherited (VM) DataContext while a generated item's
+    // container is being set up — before its string DataContext lands. RelayCommand<string> throws on that
+    // wrong-typed argument in CanExecute and crashes the menu, so the commands accept any parameter and
+    // no-op on a non-string.
     [RelayCommand]
-    private Task LoadProfile(string profileName) => RequestSwitchProfileAsync(profileName);
+    private Task LoadProfile(object? profileName)
+        => profileName is string name ? RequestSwitchProfileAsync(name) : Task.CompletedTask;
 
     [RelayCommand]
-    private void RemoveProfile(string profileName) => RemoveProfileRequested?.Invoke(profileName);
+    private void RemoveProfile(object? profileName)
+    {
+        if (profileName is string name) RemoveProfileRequested?.Invoke(name);
+    }
 
     [RelayCommand]
     private void Preferences() => MenuActionRequested?.Invoke(MenuAction.Preferences);

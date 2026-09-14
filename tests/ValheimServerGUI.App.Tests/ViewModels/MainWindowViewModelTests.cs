@@ -120,6 +120,24 @@ public class MainWindowViewModelTests
     }
 
     [Fact]
+    public void Profile_commands_tolerate_a_non_string_parameter()
+    {
+        // The dynamic Load/Remove Profile submenus bind CommandParameter via {Binding}, which transiently
+        // resolves to the inherited (VM) DataContext while a generated item's container is set up. A
+        // string-typed RelayCommand would throw on that argument in CanExecute and crash the File menu on
+        // open — so the commands must accept any parameter type.
+        var vm = Build(out _);
+
+        Assert.Null(Record.Exception(() => vm.LoadProfileCommand.CanExecute(vm)));
+        Assert.Null(Record.Exception(() => vm.RemoveProfileCommand.CanExecute(vm)));
+        // A non-string execute is a harmless no-op (no switch, no removal request raised).
+        var removed = false;
+        vm.RemoveProfileRequested += _ => removed = true;
+        vm.RemoveProfileCommand.Execute(vm);
+        Assert.False(removed);
+    }
+
+    [Fact]
     public void Update_available_becomes_a_link()
     {
         var vm = Build(out var update);

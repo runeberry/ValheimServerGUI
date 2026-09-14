@@ -759,8 +759,22 @@ public partial class MainWindowViewModel : ViewModelBase
             .OrderBy(n => n, StringComparer.OrdinalIgnoreCase)
             .ToList();
 
-        Profiles.Clear();
-        foreach (var name in names) Profiles.Add(name);
+        // Reconcile in place rather than Clear()+Add(). A profile switch saves LastActiveProfile, which
+        // chains UserPrefs-saved → ServerPrefs.PreferencesSaved → here; a Clear() would momentarily drop the
+        // menu-bar dropdown's selected item out of the collection, blanking the ComboBox on every switch even
+        // though the name set is unchanged. So only remove names that are gone and insert genuinely new ones.
+        for (var i = Profiles.Count - 1; i >= 0; i--)
+            if (!names.Contains(Profiles[i], StringComparer.OrdinalIgnoreCase))
+                Profiles.RemoveAt(i);
+
+        foreach (var name in names)
+        {
+            if (Profiles.Contains(name, StringComparer.OrdinalIgnoreCase)) continue;
+            var index = 0;
+            while (index < Profiles.Count && StringComparer.OrdinalIgnoreCase.Compare(Profiles[index], name) < 0)
+                index++;
+            Profiles.Insert(index, name);
+        }
 
         OnPropertyChanged(nameof(HasProfiles));
     }

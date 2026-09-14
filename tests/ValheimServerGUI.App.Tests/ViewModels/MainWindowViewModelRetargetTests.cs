@@ -214,6 +214,45 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
     }
 
     [Fact]
+    public void Refreshing_profiles_with_an_unchanged_name_set_reconciles_in_place()
+    {
+        var (vm, _, serverPrefs) = Build("A", "B");
+        vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
+
+        var resets = 0;
+        vm.Profiles.CollectionChanged += (_, e) =>
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset) resets++;
+        };
+
+        // The real switch chain fires ServerPrefs.PreferencesSaved (saving LastActiveProfile → UserPrefs →
+        // ServerPrefs). With an unchanged name set, RefreshProfiles must NOT Clear()+rebuild — a reset drops
+        // the menu-bar dropdown's selected item out of the collection and blanks it on every switch.
+        serverPrefs.SavePreferences(new ServerPreferences { ProfileName = "A" });
+
+        Assert.Equal(0, resets);
+        Assert.Equal(new[] { "A", "B" }, vm.Profiles);
+    }
+
+    [Fact]
+    public void Refreshing_profiles_inserts_a_new_name_in_sorted_order_without_a_reset()
+    {
+        var (vm, _, serverPrefs) = Build("A", "C");
+        vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
+
+        var resets = 0;
+        vm.Profiles.CollectionChanged += (_, e) =>
+        {
+            if (e.Action == System.Collections.Specialized.NotifyCollectionChangedAction.Reset) resets++;
+        };
+
+        serverPrefs.SavePreferences(new ServerPreferences { ProfileName = "B" });
+
+        Assert.Equal(0, resets);
+        Assert.Equal(new[] { "A", "B", "C" }, vm.Profiles); // inserted between A and C
+    }
+
+    [Fact]
     public async Task Switch_to_the_current_profile_is_a_no_op_without_prompting()
     {
         var (vm, _, _) = Build("A");

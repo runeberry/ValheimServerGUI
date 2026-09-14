@@ -4,13 +4,15 @@
              x:Name="Root" x:CompileBindings="False">
     <Border BorderThickness="1" BorderBrush="{DynamicResource AppBorderBrush}">
         <ScrollViewer x:Name="Scroll" Background="{DynamicResource LayerBase}"
-                      HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
             <!-- A single contiguous, read-only text surface so logs copy-paste in bulk (select, Ctrl+C,
                  or the context menu). The lines are capped upstream (LogsViewModel), so the text stays
-                 bounded rather than growing forever. -->
+                 bounded rather than growing forever. Word-wrapped so long lines never need horizontal
+                 scrolling; the mono stack lists a concrete family per platform (Windows/mac/Linux) since
+                 Avalonia does not resolve the generic "monospace" keyword. -->
             <SelectableTextBlock x:Name="TextView" Padding="6,4"
-                                 FontFamily="Cascadia Mono,Consolas,Menlo,monospace" FontSize="12"
-                                 TextWrapping="NoWrap"
+                                 FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,monospace"
+                                 FontSize="12" TextWrapping="Wrap"
                                  Foreground="{DynamicResource TextControlForeground}">
                 <SelectableTextBlock.ContextMenu>
                     <ContextMenu>

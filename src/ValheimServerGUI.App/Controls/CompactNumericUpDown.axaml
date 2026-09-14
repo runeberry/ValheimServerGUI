@@ -57,7 +57,10 @@
                                AllowSpin="{TemplateBinding AllowSpin}"
                                ShowButtonSpinner="{TemplateBinding ShowButtonSpinner}"
                                ButtonSpinnerLocation="{TemplateBinding ButtonSpinnerLocation}">
+                    <!-- 'chromeless' so the shared TextBox focus/hover border styles (Styles/Inputs.axaml)
+                         don't paint an accent border on the inner box — only the ButtonSpinner border shows. -->
                     <TextBox Name="PART_TextBox"
+                             Classes="chromeless"
                              Background="Transparent"
                              BorderThickness="0"
                              MinWidth="0"

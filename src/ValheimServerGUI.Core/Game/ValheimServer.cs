@@ -28,10 +28,19 @@ namespace ValheimServerGUI.Game
             {
                 if (_status == value) return;
                 _status = value;
+                // Stamp the real start time on the Running transition (cleared once fully Stopped) so uptime
+                // derives from the server's own start, not a per-window capture — switching a window onto an
+                // already-running profile then reports the true uptime rather than resetting to zero.
+                if (value == ServerStatus.Running) StartedAt = DateTimeOffset.Now;
+                else if (value == ServerStatus.Stopped) StartedAt = null;
                 StatusChanged?.Invoke(this, value);
             }
         }
         private ServerStatus _status = ServerStatus.Stopped;
+
+        /// <summary>When the server last reached <see cref="ServerStatus.Running"/> (null until then / once Stopped).</summary>
+        public DateTimeOffset? StartedAt { get; private set; }
+
         private string? ProcessKey;
         private bool IsRestarting;
 

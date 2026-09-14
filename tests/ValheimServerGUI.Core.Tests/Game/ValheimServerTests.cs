@@ -249,6 +249,23 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(ServerStatus.Starting, _server.Status);
         }
 
+        // StartedAt derives uptime from the server's own Running transition (not a per-window capture), and
+        // clears once fully Stopped so a re-target onto a stopped profile reads no uptime.
+        [Fact]
+        public void StartedAt_IsStampedOnRunning_AndClearedOnStopped()
+        {
+            Assert.Null(_server.StartedAt);
+
+            _server.Start(Options());
+            Assert.Null(_server.StartedAt); // Starting, not yet Running
+
+            FeedLog("Game server connected");
+            Assert.NotNull(_server.StartedAt);
+
+            _processProvider.SimulateExit(); // → Stopped
+            Assert.Null(_server.StartedAt);
+        }
+
         [Fact]
         public void WorldSavedLogLine_ReRaisesWorldSavedEvent()
         {

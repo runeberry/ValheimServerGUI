@@ -61,6 +61,11 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderBrush" Value="Transparent" />
     </Style>
+    <!-- Keep the disabled icon at full opacity: the glyph itself is greyed by IconImage (its universal
+         disabled cue), so Fluent's extra content-dim would double up. Mirrors the Button.link:disabled fix. -->
+    <Style Selector="Button.icon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Opacity" Value="1" />
+    </Style>
 
     <!-- Text/number inputs, the field shell, and connected affixes now live in Styles/Inputs.axaml
          (colours from Styles/Palette.axaml Input* tokens). -->

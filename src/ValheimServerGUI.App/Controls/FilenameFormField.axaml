@@ -18,7 +18,7 @@
                             IsVisible="{Binding #Root.ShowOpenFolder}"
                             Command="{Binding #Root.OpenFolderCommand}"
                             ToolTip.Tip="Open this folder in your file manager">
-                        <Image Width="16" Height="16" Source="{c:Icon OpenFolder_16x}" />
+                        <c:IconImage IconName="OpenFolder_16x" />
                     </Button>
                 </StackPanel>
             </Grid>

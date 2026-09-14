@@ -82,22 +82,19 @@
             <StackPanel Orientation="Horizontal" Spacing="8" Margin="0,10,0,0" HorizontalAlignment="Left">
                 <Button x:Name="StartButton" Command="{Binding StartCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <Image Source="{c:Icon Run_16x}" Width="16" Height="16" VerticalAlignment="Center"
-                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <c:IconImage IconName="Run_16x" VerticalAlignment="Center" />
                         <TextBlock Text="Start Server" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="RestartButton" Command="{Binding RestartCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <Image Source="{c:Icon Restart_16x}" Width="16" Height="16" VerticalAlignment="Center"
-                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <c:IconImage IconName="Restart_16x" VerticalAlignment="Center" />
                         <TextBlock Text="Restart Server" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="StopButton" Command="{Binding StopCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
-                        <Image Source="{c:Icon Stop_16x}" Width="16" Height="16" VerticalAlignment="Center"
-                               RenderOptions.BitmapInterpolationMode="HighQuality" />
+                        <c:IconImage IconName="Stop_16x" VerticalAlignment="Center" />
                         <TextBlock Text="Stop Server" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>

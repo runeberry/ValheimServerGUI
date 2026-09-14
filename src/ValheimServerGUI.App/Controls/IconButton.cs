@@ -24,15 +24,14 @@ public class IconButton : Button
     public static readonly StyledProperty<string?> ConfirmIconNameProperty =
         AvaloniaProperty.Register<IconButton, string?>(nameof(ConfirmIconName));
 
-    private readonly Image _image = new() { Width = 16, Height = 16 };
+    private readonly IconImage _image = new();
     private DispatcherTimer? _timer;
     private bool _confirming;
 
     public IconButton()
     {
         Classes.Add("icon");
-        RenderOptions.SetBitmapInterpolationMode(_image, BitmapInterpolationMode.HighQuality);
-        Content = _image;
+        Content = _image; // IconImage owns its 16×16 size + interpolation, and greys itself when disabled
     }
 
     /// <summary>The <see cref="AppIcons"/> key of the button's glyph (e.g. <c>OpenFolder_16x</c>).</summary>
@@ -78,7 +77,7 @@ public class IconButton : Button
 
         _confirming = true;
         IsHitTestVisible = false;   // inert to the pointer, but not disabled (keeps its colour)
-        _image.Source = AppIcons.Get(ConfirmIconName);
+        _image.IconName = ConfirmIconName;
 
         _timer?.Stop();
         _timer = new DispatcherTimer { Interval = ConfirmDuration };
@@ -97,6 +96,6 @@ public class IconButton : Button
     private void UpdateBaseIcon()
     {
         if (_confirming) return;
-        _image.Source = string.IsNullOrEmpty(IconName) ? null : AppIcons.Get(IconName);
+        _image.IconName = IconName;
     }
 }

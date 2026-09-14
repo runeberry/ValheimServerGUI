@@ -12,8 +12,7 @@
             <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
                               Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" Margin="0,0,8,0" />
             <Button Grid.Column="3" ToolTip.Tip="Remove player" Command="{Binding Players.RemoveCommand}">
-                <Image Source="{c:Icon Cancel_16x}" Width="16" Height="16"
-                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                <c:IconImage IconName="Cancel_16x" />
             </Button>
         </Grid>
 

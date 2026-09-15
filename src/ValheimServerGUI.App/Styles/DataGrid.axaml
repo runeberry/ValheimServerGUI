@@ -6,11 +6,9 @@
          12px body font, half the padding on every cell and header, a dark header/footer to match the app
          chrome, no inter-row gridlines, and a consistent 2px gap between every element. -->
 
-    <!-- Header: dark bar (matches the footer), app body font, half the padding, and a 1px gap below it
-         (which pairs with the first row's 1px top gap for a consistent 2px). -->
+    <!-- Header: dark bar (matches the footer), app body font, half the padding. -->
     <Style Selector="DataGridColumnHeadersPresenter">
         <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
-        <Setter Property="Margin" Value="0,0,0,1" />
     </Style>
     <Style Selector="DataGridColumnHeader">
         <!-- 12,0,0,0 -> 6,0,0,0 ; height 32 -> 16 -->

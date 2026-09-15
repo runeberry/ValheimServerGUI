@@ -2,29 +2,29 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:c="using:ValheimServerGUI.App.Controls">
 
-    <!-- The shared data table: an inner DataGrid (PART_Grid) with an optional compact footer bar below it.
-         The footer hosts action icon buttons anchored left and/or right and only appears when a slot is
-         filled (HasFooter). Its horizontal inset (6px) and density match the (halved) column header, and a
-         1px top rule separates it from the grid like the header's gridline. -->
+    <!-- The shared data table: an inner DataGrid (PART_Grid) with an optional compact footer bar below it,
+         wrapped in a 1px frame that matches the other controls' borders. The footer hosts action icon
+         buttons anchored left and/or right and only appears when a slot is filled (HasFooter); its
+         horizontal inset (6px) and density match the (halved) dark column header. -->
     <ControlTheme x:Key="{x:Type c:DataListView}" TargetType="c:DataListView">
         <Setter Property="Template">
             <ControlTemplate>
-                <DockPanel>
-                    <!-- Footer: same dark bar as the header, offset from the last row by a 1px top margin
-                         (pairs with the row's 1px bottom gap for a consistent 2px). -->
-                    <Border DockPanel.Dock="Bottom" IsVisible="{TemplateBinding HasFooter}"
-                            Background="{DynamicResource LayerDarkest}" Margin="0,1,0,0"
-                            Padding="6,2">
-                        <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
-                            <ContentControl Grid.Column="0" Content="{TemplateBinding FooterLeft}"
-                                            HorizontalAlignment="Left" VerticalAlignment="Center" />
-                            <ContentControl Grid.Column="2" Content="{TemplateBinding FooterRight}"
-                                            HorizontalAlignment="Right" VerticalAlignment="Center" />
-                        </Grid>
-                    </Border>
+                <Border BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1">
+                    <DockPanel>
+                        <!-- Footer: same dark bar as the header. -->
+                        <Border DockPanel.Dock="Bottom" IsVisible="{TemplateBinding HasFooter}"
+                                Background="{DynamicResource LayerDarkest}" Padding="6,2">
+                            <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
+                                <ContentControl Grid.Column="0" Content="{TemplateBinding FooterLeft}"
+                                                HorizontalAlignment="Left" VerticalAlignment="Center" />
+                                <ContentControl Grid.Column="2" Content="{TemplateBinding FooterRight}"
+                                                HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
 
-                    <DataGrid Name="PART_Grid" />
-                </DockPanel>
+                        <DataGrid Name="PART_Grid" />
+                    </DockPanel>
+                </Border>
             </ControlTemplate>
         </Setter>
     </ControlTheme>

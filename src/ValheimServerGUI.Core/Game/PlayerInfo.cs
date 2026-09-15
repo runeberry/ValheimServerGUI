@@ -81,6 +81,19 @@ namespace ValheimServerGUI.Game
             return character != null;
         }
 
+        /// <summary>
+        /// Records the time a specific character was last active (login or session end). No-op if the
+        /// character isn't in the list. Backs the per-character "Since" column in Player Details.
+        /// </summary>
+        public void TouchCharacterLastSeen(string? characterName, DateTimeOffset timestamp)
+        {
+            if (!string.IsNullOrWhiteSpace(characterName)
+                && TryGetCharacter(characterName!, out var character) && character != null)
+            {
+                character.LastSeen = timestamp;
+            }
+        }
+
         public class CharacterInfo
         {
             /// <summary>
@@ -94,6 +107,13 @@ namespace ValheimServerGUI.Game
             /// </summary>
             [JsonProperty("matchConfident")]
             public bool MatchConfident { get; set; }
+
+            /// <summary>
+            /// The last time this character was active on the server (login or session end). Added in v3.0
+            /// and optional: characters recorded by earlier versions leave this null (a blank "Since").
+            /// </summary>
+            [JsonProperty("lastSeen", NullValueHandling = NullValueHandling.Ignore)]
+            public DateTimeOffset? LastSeen { get; set; }
         }
     }
 }

@@ -250,6 +250,7 @@ namespace ValheimServerGUI.Game
                 player.LastStatusCharacter = characterName;
                 player.ZdoId = zdoId;
                 player.AddCharacter(characterName, matchConfident);
+                player.TouchCharacterLastSeen(characterName, player.LastStatusChange);
                 playersToSave.Add(player);
             }
 
@@ -274,6 +275,7 @@ namespace ValheimServerGUI.Game
                 {
                     player.PlayerStatus = PlayerStatus.Leaving;
                     player.LastStatusChange = DateTime.UtcNow;
+                    player.TouchCharacterLastSeen(player.LastStatusCharacter, player.LastStatusChange);
                     player.ZdoId = null;
                 }
 
@@ -295,6 +297,7 @@ namespace ValheimServerGUI.Game
                 {
                     player.PlayerStatus = PlayerStatus.Offline;
                     player.LastStatusChange = DateTime.UtcNow;
+                    player.TouchCharacterLastSeen(player.LastStatusCharacter, player.LastStatusChange);
                     player.ZdoId = null;
                 }
 

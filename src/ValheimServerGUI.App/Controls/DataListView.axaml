@@ -10,9 +10,10 @@
         <Setter Property="Template">
             <ControlTemplate>
                 <DockPanel>
+                    <!-- Footer: same dark bar as the header, offset from the last row by a 1px top margin
+                         (pairs with the row's 1px bottom gap for a consistent 2px). -->
                     <Border DockPanel.Dock="Bottom" IsVisible="{TemplateBinding HasFooter}"
-                            Background="{DynamicResource LayerBase}"
-                            BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="0,1,0,0"
+                            Background="{DynamicResource LayerDarkest}" Margin="0,1,0,0"
                             Padding="6,2">
                         <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
                             <ContentControl Grid.Column="0" Content="{TemplateBinding FooterLeft}"

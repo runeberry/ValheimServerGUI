@@ -1,22 +1,39 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Compact density for the shared DataListView grid (§ V3 styling). Merged after the Fluent DataGrid
-         theme so these win. Fluent's defaults are touch-sized: 15px cell text, 32px row/header height, and a
-         12px cell/header inset. This restores the WinForms information-dense feel: the app's 12px body font
-         and half the padding on every cell and header — vertical (row/header height) and horizontal (the
-         cell text inset + header padding) alike. -->
+    <!-- Compact density + look for the shared DataListView grid (§ V3 styling). Merged after the Fluent
+         DataGrid theme so these win. Fluent's defaults are touch-sized: 15px cell text, 32px row/header
+         height, and a 12px cell/header inset. This restores the WinForms information-dense feel: the app's
+         12px body font, half the padding on every cell and header, a dark header/footer to match the app
+         chrome, no inter-row gridlines, and a consistent 2px gap between every element. -->
 
+    <!-- Header: dark bar (matches the footer), app body font, half the padding, and a 1px gap below it
+         (which pairs with the first row's 1px top gap for a consistent 2px). -->
+    <Style Selector="DataGridColumnHeadersPresenter">
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+        <Setter Property="Margin" Value="0,0,0,1" />
+    </Style>
     <Style Selector="DataGridColumnHeader">
         <!-- 12,0,0,0 -> 6,0,0,0 ; height 32 -> 16 -->
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="MinHeight" Value="16" />
         <Setter Property="Padding" Value="6,0,0,0" />
+    </Style>
+
+    <!-- Rows: 1px top+bottom gap so adjacent rows sit 2px apart (no gridline between them). -->
+    <Style Selector="DataGridRow">
+        <Setter Property="Margin" Value="0,1" />
     </Style>
 
     <Style Selector="DataGridCell">
         <!-- Fluent renders cell text at 15px; pin to the app body 12px. Height 32 -> 16. -->
         <Setter Property="FontSize" Value="12" />
         <Setter Property="MinHeight" Value="16" />
+    </Style>
+
+    <!-- No border/box around the focused-or-selected cell; the selected row's highlight is the only cue. -->
+    <Style Selector="DataGridCell /template/ Grid#FocusVisual">
+        <Setter Property="IsVisible" Value="False" />
     </Style>
 
     <!-- DataGridTextColumn bakes a 12,0,12,0 margin onto the generated cell TextBlock; halve it to 6,0,6,0

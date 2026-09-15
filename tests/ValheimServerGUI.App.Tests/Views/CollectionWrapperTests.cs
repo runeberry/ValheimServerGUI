@@ -32,7 +32,8 @@ public class CollectionWrapperTests
         var grid = InnerGrid(view);
         Assert.True(grid.IsReadOnly);
         Assert.False(grid.CanUserReorderColumns);
-        Assert.Equal(DataGridGridLinesVisibility.Horizontal, grid.GridLinesVisibility);
+        // No gridlines: rows are separated by spacing, not borders.
+        Assert.Equal(DataGridGridLinesVisibility.None, grid.GridLinesVisibility);
         // The consumer-declared column is forwarded to the real grid.
         Assert.Single(grid.Columns);
         Assert.Equal("Name", grid.Columns[0].Header);

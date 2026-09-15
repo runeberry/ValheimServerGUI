@@ -20,6 +20,11 @@
                     <Setter Property="Opacity"
                             Value="{Binding IsOffline, Converter={x:Static conv:OfflineOpacityConverter.Instance}}" />
                 </Style>
+                <!-- A selected row is shown at full strength even when offline (the dim is only a
+                     background cue, so the selection stays legible at the standard font colour). -->
+                <Style Selector="DataGridRow:selected" x:DataType="vm:PlayerRowViewModel">
+                    <Setter Property="Opacity" Value="1" />
+                </Style>
             </c:DataListView.Styles>
             <c:DataListView.Columns>
                 <!-- Platform icon is a prefix of the name (its own column was collapsed here); the column

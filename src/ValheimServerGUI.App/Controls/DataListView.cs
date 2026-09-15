@@ -89,7 +89,8 @@ public class DataListView : TemplatedControl
         // Shared defaults (previously set on the DataGrid subclass).
         _grid.IsReadOnly = true;
         _grid.CanUserReorderColumns = false;
-        _grid.GridLinesVisibility = DataGridGridLinesVisibility.Horizontal;
+        // No gridlines between rows; rows are separated only by the 2px inter-row spacing (see DataGrid.axaml).
+        _grid.GridLinesVisibility = DataGridGridLinesVisibility.None;
         _grid.Bind(BackgroundProperty, _grid.GetResourceObservable("LayerBase"));
 
         // Forward the consumer-declared columns into the real grid.

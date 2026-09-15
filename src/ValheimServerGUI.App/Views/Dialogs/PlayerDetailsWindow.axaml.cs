@@ -43,7 +43,7 @@ public partial class PlayerDetailsWindow : Window
 
     private async Task RenameCharacterAsync()
     {
-        if (Vm.SelectedCharacter is not { } current) return;
+        if (Vm.SelectedCharacter?.CharacterName is not { } current) return;
         var name = await new TextPromptWindow("Edit Character", $"Edit the name for character '{current}'",
             current, maxLength: 64).ShowDialog<string?>(this);
         if (!string.IsNullOrWhiteSpace(name)) Vm.RenameCharacter(current, name);

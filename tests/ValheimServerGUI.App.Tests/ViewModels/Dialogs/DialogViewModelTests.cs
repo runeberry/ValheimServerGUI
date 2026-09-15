@@ -194,21 +194,29 @@ public class DialogViewModelTests
     }
 
     [Fact]
-    public void PlayerDetails_refresh_updates_readonly_fields_without_discarding_edits()
+    public void PlayerDetails_refresh_rederives_status_without_discarding_edits()
     {
         var repo = new FakePlayerDataRepository();
-        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", LastStatusCharacter = "Odin" });
+        repo.PushUpdate(new PlayerInfo
+        {
+            Platform = "Steam", PlayerId = "1", LastStatusCharacter = "Odin", PlayerStatus = PlayerStatus.Online,
+            Characters = new System.Collections.Generic.List<PlayerInfo.CharacterInfo> { new() { CharacterName = "Odin" } },
+        });
         var vm = new PlayerDetailsViewModel(repo, "Steam:1") { DisplayName = "Edited" };
         vm.AddCharacter("Ragnar");
-        Assert.Equal("Odin", vm.LatestCharacter);
+        var odin = vm.Characters.First(c => c.CharacterName == "Odin");
+        Assert.Equal(PlayerStatus.Online, odin.Status);  // the active character is online
 
-        // Status/character change in the repo while the dialog is open.
-        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", LastStatusCharacter = "Thor" });
+        // The player goes offline while the dialog is open.
+        repo.PushUpdate(new PlayerInfo
+        {
+            Platform = "Steam", PlayerId = "1", LastStatusCharacter = "Odin", PlayerStatus = PlayerStatus.Offline,
+        });
         vm.RefreshCommand.Execute(null);
 
-        Assert.Equal("Thor", vm.LatestCharacter);  // read-only field refreshed
-        Assert.Equal("Edited", vm.DisplayName);     // unsaved edit preserved
-        Assert.Contains("Ragnar", vm.Characters);   // unsaved edit preserved
+        Assert.Equal(PlayerStatus.Offline, odin.Status);            // status re-derived
+        Assert.Equal("Edited", vm.DisplayName);                     // unsaved edit preserved
+        Assert.Contains(vm.Characters, c => c.CharacterName == "Ragnar"); // unsaved edit preserved
     }
 
     [Fact]
@@ -229,7 +237,7 @@ public class DialogViewModelTests
         Assert.False(vm.IsDirty);
 
         // Selecting a name in the list is view state, not an edit (regression: this used to trip the guard).
-        vm.SelectedCharacter = "Thor";
+        vm.SelectedCharacter = vm.Characters.First(c => c.CharacterName == "Thor");
         Assert.False(vm.IsDirty);
 
         // A real edit still marks dirty.

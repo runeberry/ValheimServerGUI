@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -9,45 +10,46 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
 /// Player Details dialog (§7.4): read-only identity + an editable display-name override (0–64) and
-/// known-characters list (added names are flagged <c>matchConfident=true</c>). Pulls fresh data from the
-/// repo by key; unsaved edits are guarded on close.
+/// known-characters table (name + derived Status/Since; added names are flagged <c>matchConfident=true</c>).
+/// Pulls fresh data from the repo by key; unsaved edits are guarded on close.
 /// </summary>
 public partial class PlayerDetailsViewModel : ModalEditViewModel
 {
     private readonly IPlayerDataRepository _repo;
     private readonly string _key;
-    private readonly Dictionary<string, bool> _originalConfidence = new();
 
     public PlayerDetailsViewModel(IPlayerDataRepository repo, string playerKey)
     {
         _repo = repo;
         _key = playerKey;
-        // Selecting a character in the list is view state, not an edit — it must not trip the unsaved-changes
+        // Selecting a character in the table is view state, not an edit — it must not trip the unsaved-changes
         // guard (the actual edits are AddCharacter/RenameCharacter/RemoveCharacter and the display-name field).
         IgnoreForDirty(nameof(SelectedCharacter));
         Load();
     }
 
     // Read-only identity.
-    [ObservableProperty] private string _platform = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PlatformIdLabel))]
+    private string _platform = string.Empty;
     [ObservableProperty] private string _playerId = string.Empty;
     [ObservableProperty] private string _zdoId = string.Empty;
-    [ObservableProperty] private string _latestCharacter = string.Empty;
-    [ObservableProperty] private string _status = string.Empty;
-    [ObservableProperty] private PlayerStatus _statusValue;
-    [ObservableProperty] private string _statusChanged = string.Empty;
 
     // Editable.
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayNameOrUnknown))]
     private string _displayName = string.Empty;
-    [ObservableProperty] private string? _selectedCharacter;
+    [ObservableProperty] private CharacterRowViewModel? _selectedCharacter;
 
     /// <summary>The display name for the read-only Player Name row; "(unknown)" when none is set.</summary>
     public string DisplayNameOrUnknown =>
         string.IsNullOrWhiteSpace(DisplayName) ? "(unknown)" : DisplayName;
 
-    public ObservableCollection<string> Characters { get; } = new();
+    /// <summary>Caption for the platform-id row — "Steam ID" or "Xbox ID" per the player's platform.</summary>
+    public string PlatformIdLabel =>
+        string.Equals(Platform, "Xbox", StringComparison.OrdinalIgnoreCase) ? "Xbox ID:" : "Steam ID:";
+
+    public ObservableCollection<CharacterRowViewModel> Characters { get; } = new();
 
     private void Load() => LoadClean(() =>
     {
@@ -58,57 +60,57 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
         DisplayName = player.PlayerName ?? string.Empty;
 
         Characters.Clear();
-        _originalConfidence.Clear();
+        var now = DateTimeOffset.Now;
         foreach (var c in player.Characters ?? new List<PlayerInfo.CharacterInfo>())
         {
             if (string.IsNullOrWhiteSpace(c.CharacterName)) continue;
-            Characters.Add(c.CharacterName);
-            _originalConfidence[c.CharacterName] = c.MatchConfident;
+            var row = new CharacterRowViewModel(c.CharacterName!, c.MatchConfident, c.LastSeen);
+            row.Refresh(player, now);
+            Characters.Add(row);
         }
     });
 
-    // The read-only identity/status fields (everything except the editable display name + character list).
+    // The read-only identity fields (everything except the editable display name + character table).
     private void LoadIdentity(PlayerInfo player)
     {
         Platform = player.Platform ?? string.Empty;
         PlayerId = player.PlayerId ?? string.Empty;
         ZdoId = player.ZdoId ?? string.Empty;
-        LatestCharacter = player.LastStatusCharacter ?? string.Empty;
-        Status = player.PlayerStatus.ToString();
-        StatusValue = player.PlayerStatus;
-        StatusChanged = player.LastStatusChange == default ? string.Empty : player.LastStatusChange.ToString("G");
     }
 
-    /// <summary>Re-reads the current identity/status from the repo (status changes while the dialog is open).
-    /// Unlike the WinForms Refresh button, this leaves the editable display name + characters untouched, so it
-    /// can't discard unsaved edits.</summary>
+    /// <summary>Re-reads the current identity from the repo and re-derives each character's Status/Since
+    /// (status changes while the dialog is open). Leaves the editable display name + character edits
+    /// untouched, so it can't discard unsaved changes.</summary>
     [RelayCommand]
     private void Refresh()
     {
-        if (_repo.FindById(_key) is { } player) LoadIdentity(player);
+        if (_repo.FindById(_key) is not { } player) return;
+        LoadIdentity(player);
+        var now = DateTimeOffset.Now;
+        foreach (var row in Characters) row.Refresh(player, now);
     }
 
     public override void ApplyDefaults() { /* Player Details has no defaults to restore. */ }
 
     public void AddCharacter(string name)
     {
-        if (string.IsNullOrWhiteSpace(name) || Characters.Contains(name)) return;
-        Characters.Add(name);
+        if (string.IsNullOrWhiteSpace(name) || Characters.Any(c => c.CharacterName == name)) return;
+        Characters.Add(new CharacterRowViewModel(name));
         IsDirty = true;
     }
 
     public void RenameCharacter(string oldName, string newName)
     {
-        var index = Characters.IndexOf(oldName);
-        if (index < 0 || string.IsNullOrWhiteSpace(newName)) return;
-        Characters[index] = newName;
+        var row = Characters.FirstOrDefault(c => c.CharacterName == oldName);
+        if (row is null || string.IsNullOrWhiteSpace(newName)) return;
+        row.CharacterName = newName;
         IsDirty = true;
     }
 
     [RelayCommand]
     private void RemoveCharacter()
     {
-        if (SelectedCharacter is not null && Characters.Remove(SelectedCharacter))
+        if (SelectedCharacter is { } row && Characters.Remove(row))
             IsDirty = true;
     }
 
@@ -119,11 +121,12 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
 
         player.PlayerName = string.IsNullOrWhiteSpace(DisplayName) ? null : DisplayName;
         player.Characters = Characters
-            .Select(name => new PlayerInfo.CharacterInfo
+            .Select(row => new PlayerInfo.CharacterInfo
             {
-                CharacterName = name,
-                // Added names are confident; loaded ones keep their original flag.
-                MatchConfident = _originalConfidence.TryGetValue(name, out var confident) ? confident : true,
+                CharacterName = row.CharacterName,
+                // Added names are confident; loaded ones keep their original flag and last-seen time.
+                MatchConfident = row.MatchConfident,
+                LastSeen = row.LastSeen,
             })
             .ToList();
 

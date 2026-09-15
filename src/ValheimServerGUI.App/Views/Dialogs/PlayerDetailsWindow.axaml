@@ -3,6 +3,7 @@
         xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:conv="using:ValheimServerGUI.App.Converters"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        xmlns:vmr="using:ValheimServerGUI.App.ViewModels"
         x:Class="ValheimServerGUI.App.Views.Dialogs.PlayerDetailsWindow"
         x:DataType="vm:PlayerDetailsViewModel"
         Title="Player Info"
@@ -14,43 +15,20 @@
              the rows are evenly spaced and the help glyphs line up down the column. -->
         <StackPanel Spacing="2">
             <c:LabelField LabelText="Player Name:" Value="{Binding DisplayNameOrUnknown}"
+                          ValueIcon="{Binding Platform, Converter={x:Static conv:PlatformToIconConverter.Instance}}"
                           HelpText="The player's Steam/Xbox username. This will be determined automatically, but in case it doesn't work, you may edit the player's name manually.">
                 <c:LabelField.TrailingContent>
                     <c:EditButton x:Name="EditNameButton" ToolTip.Tip="Edit player name" />
                 </c:LabelField.TrailingContent>
             </c:LabelField>
-            <c:LabelField LabelText="Platform:" Value="{Binding Platform}">
-                <c:LabelField.TrailingContent>
-                    <c:IconButton IsEnabled="False" />
-                </c:LabelField.TrailingContent>
-            </c:LabelField>
-            <c:LabelField LabelText="Platform ID:" Value="{Binding PlayerId}"
-                          ValueIcon="{Binding Platform, Converter={x:Static conv:PlatformToIconConverter.Instance}}"
+            <c:LabelField LabelText="{Binding PlatformIdLabel}" Value="{Binding PlayerId}"
                           HelpText="The ID associated with the player's Steam or Xbox account. You can use this ID to allow or ban players, or add players as admins.">
                 <c:LabelField.TrailingContent>
-                    <c:CopyButton Text="{Binding PlayerId}" ToolTip.Tip="Copy Steam ID to clipboard" />
+                    <c:CopyButton Text="{Binding PlayerId}" ToolTip.Tip="Copy ID to clipboard" />
                 </c:LabelField.TrailingContent>
             </c:LabelField>
             <c:LabelField LabelText="ZDO ID:" Value="{Binding ZdoId}"
                           HelpText="The player's object ID in game. This changes with each game session.">
-                <c:LabelField.TrailingContent>
-                    <c:IconButton IsEnabled="False" />
-                </c:LabelField.TrailingContent>
-            </c:LabelField>
-            <c:LabelField LabelText="Latest Character:" Value="{Binding LatestCharacter}"
-                          HelpText="The character that this player is currently playing, or if they're offline, the last character they logged in as.">
-                <c:LabelField.TrailingContent>
-                    <c:IconButton IsEnabled="False" />
-                </c:LabelField.TrailingContent>
-            </c:LabelField>
-            <c:LabelField LabelText="Online Status:" Value="{Binding Status}"
-                          ValueIcon="{Binding StatusValue, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}"
-                          HelpText="Possible statuses are: Online, Offline, Joining, or Leaving">
-                <c:LabelField.TrailingContent>
-                    <c:IconButton IsEnabled="False" />
-                </c:LabelField.TrailingContent>
-            </c:LabelField>
-            <c:LabelField LabelText="Status Changed:" Value="{Binding StatusChanged}">
                 <c:LabelField.TrailingContent>
                     <c:IconButton IsEnabled="False" />
                 </c:LabelField.TrailingContent>
@@ -72,9 +50,34 @@
                     </ContextMenu>
                 </c:DataListView.RowContextMenu>
                 <c:DataListView.Columns>
-                    <!-- Items are plain strings; a reflection binding resolves the row item itself (the
-                         inner grid isn't in this window's compiled-binding DataType scope). -->
-                    <DataGridTextColumn Header="Name" Binding="{ReflectionBinding}" Width="*" CanUserSort="False" />
+                    <DataGridTemplateColumn Header="Character Name" Width="*" SortMemberPath="CharacterName">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vmr:CharacterRowViewModel">
+                                <TextBlock Text="{Binding CharacterName}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!-- Status glyph + text; only the active character is ever non-Offline. -->
+                    <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="StatusText">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vmr:CharacterRowViewModel">
+                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                    <Image Width="16" Height="16" VerticalAlignment="Center"
+                                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                                           Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
+                                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!-- Blank for characters recorded before the last-seen field existed. -->
+                    <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate x:DataType="vmr:CharacterRowViewModel">
+                                <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                 </c:DataListView.Columns>
                 <c:DataListView.FooterLeft>
                     <StackPanel Orientation="Horizontal" Spacing="8">

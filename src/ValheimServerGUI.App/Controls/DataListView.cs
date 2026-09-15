@@ -1,22 +1,27 @@
 using System.Collections;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Windows.Input;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Primitives;
 using Avalonia.Data;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
 /// The app's one shared data table (the WinForms <c>DataListView</c> equivalent), used by both the Players
 /// grid and the Player Details name list. It wraps a <see cref="DataGrid"/> carrying the shared styling —
-/// LayerBase background, horizontal gridlines, read-only / no-column-reorder defaults — and adds an optional
-/// compact <b>footer</b> hosting action controls (icon buttons) anchored left and/or right, matching the
-/// header's density. The consumer declares its columns via <c>&lt;DataListView.Columns&gt;</c> and its
-/// footer via <see cref="FooterLeft"/>/<see cref="FooterRight"/>; the ViewModel owns the data
-/// (<see cref="ItemsSource"/>/<see cref="SelectedItem"/>). Any row styling the consumer sets through
-/// <c>&lt;DataListView.Styles&gt;</c> still cascades to the inner grid's rows.
+/// LayerBase background, dark header, no gridlines, read-only / no-column-reorder defaults, a 1px frame —
+/// and adds an optional compact <b>footer</b> hosting action controls (icon buttons) anchored left and/or
+/// right. It also offers row interactions: <see cref="RowInvokeCommand"/> on double-click and a
+/// <see cref="RowContextMenu"/> on right-click. The consumer declares its columns via
+/// <c>&lt;DataListView.Columns&gt;</c> and its footer via <see cref="FooterLeft"/>/<see cref="FooterRight"/>;
+/// the ViewModel owns the data (<see cref="ItemsSource"/>/<see cref="SelectedItem"/>). Any row styling the
+/// consumer sets through <c>&lt;DataListView.Styles&gt;</c> still cascades to the inner grid's rows.
 /// </summary>
 public class DataListView : TemplatedControl
 {
@@ -36,6 +41,16 @@ public class DataListView : TemplatedControl
 
     public static readonly DirectProperty<DataListView, bool> HasFooterProperty =
         AvaloniaProperty.RegisterDirect<DataListView, bool>(nameof(HasFooter), o => o.HasFooter);
+
+    /// <summary>Invoked when a row is double-clicked (e.g. View Details / Rename). The selected item is
+    /// passed as the command parameter.</summary>
+    public static readonly StyledProperty<ICommand?> RowInvokeCommandProperty =
+        AvaloniaProperty.Register<DataListView, ICommand?>(nameof(RowInvokeCommand));
+
+    /// <summary>Context menu shown when a row is right-clicked; right-clicking first selects that row so the
+    /// menu's commands act on it. Right-clicks off any row are ignored.</summary>
+    public static readonly StyledProperty<ContextMenu?> RowContextMenuProperty =
+        AvaloniaProperty.Register<DataListView, ContextMenu?>(nameof(RowContextMenu));
 
     private DataGrid? _grid;
     private bool _hasFooter;
@@ -76,6 +91,18 @@ public class DataListView : TemplatedControl
         private set => SetAndRaise(HasFooterProperty, ref _hasFooter, value);
     }
 
+    public ICommand? RowInvokeCommand
+    {
+        get => GetValue(RowInvokeCommandProperty);
+        set => SetValue(RowInvokeCommandProperty, value);
+    }
+
+    public ContextMenu? RowContextMenu
+    {
+        get => GetValue(RowContextMenuProperty);
+        set => SetValue(RowContextMenuProperty, value);
+    }
+
     /// <summary>The grid's columns, declared inline by the consumer and forwarded to the inner grid.</summary>
     public ObservableCollection<DataGridColumn> Columns { get; } = new();
 
@@ -101,6 +128,35 @@ public class DataListView : TemplatedControl
         _grid.Bind(DataGrid.ItemsSourceProperty, new Binding(nameof(ItemsSource)) { Source = this });
         _grid.Bind(DataGrid.SelectedItemProperty,
             new Binding(nameof(SelectedItem)) { Source = this, Mode = BindingMode.TwoWay });
+
+        // Row interactions: double-click invokes the row command; right-click selects the row and opens the
+        // context menu (suppressed off any row).
+        _grid.DoubleTapped += OnGridDoubleTapped;
+        _grid.AddHandler(ContextRequestedEvent, OnGridContextRequested, RoutingStrategies.Tunnel);
+        if (RowContextMenu is { } menu) _grid.ContextMenu = menu;
+    }
+
+    private void OnGridDoubleTapped(object? sender, TappedEventArgs e)
+    {
+        // Only a row (not the header/footer) activates; the click has already set SelectedItem.
+        if ((e.Source as Visual)?.FindAncestorOfType<DataGridRow>(includeSelf: true) is null) return;
+        if (RowInvokeCommand is { } cmd && cmd.CanExecute(SelectedItem)) cmd.Execute(SelectedItem);
+    }
+
+    private void OnGridContextRequested(object? sender, ContextRequestedEventArgs e)
+    {
+        if (_grid is null) return;
+
+        // Select the right-clicked row so the menu commands target it; ignore right-clicks off any row.
+        if (e.Source is Visual source &&
+            source.FindAncestorOfType<DataGridRow>(includeSelf: true) is { DataContext: { } item })
+        {
+            SelectedItem = item;
+        }
+        else
+        {
+            e.Handled = true;
+        }
     }
 
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
@@ -108,6 +164,8 @@ public class DataListView : TemplatedControl
         base.OnPropertyChanged(change);
         if (change.Property == FooterLeftProperty || change.Property == FooterRightProperty)
             HasFooter = FooterLeft is not null || FooterRight is not null;
+        else if (change.Property == RowContextMenuProperty && _grid is not null)
+            _grid.ContextMenu = RowContextMenu;
     }
 
     private void OnColumnsChanged(object? sender, NotifyCollectionChangedEventArgs e)

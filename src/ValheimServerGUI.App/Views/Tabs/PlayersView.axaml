@@ -14,7 +14,14 @@
         </Grid>
 
         <c:DataListView ItemsSource="{Binding Players.Players}"
-                        SelectedItem="{Binding Players.SelectedPlayer}">
+                        SelectedItem="{Binding Players.SelectedPlayer}"
+                        RowInvokeCommand="{Binding Players.ViewDetailsCommand}">
+            <c:DataListView.RowContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
+                    <MenuItem Header="Remove player" Command="{Binding Players.RemoveCommand}" />
+                </ContextMenu>
+            </c:DataListView.RowContextMenu>
             <c:DataListView.Styles>
                 <Style Selector="DataGridRow" x:DataType="vm:PlayerRowViewModel">
                     <Setter Property="Opacity"

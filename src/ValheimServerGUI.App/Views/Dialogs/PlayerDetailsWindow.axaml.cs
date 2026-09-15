@@ -18,8 +18,13 @@ public partial class PlayerDetailsWindow : Window
         // Add/Rename/Edit-name open a text prompt (owned by this window), so they live in the code-behind as
         // commands the buttons invoke; Remove is a plain VM command bound in XAML.
         AddCharacterButton.Command = new AsyncRelayCommand(AddCharacterAsync);
-        EditCharacterButton.Command = new AsyncRelayCommand(RenameCharacterAsync);
         EditNameButton.Command = new AsyncRelayCommand(EditNameAsync);
+
+        // Rename is shared by the Edit button, the row double-click, and the right-click menu.
+        var renameCharacter = new AsyncRelayCommand(RenameCharacterAsync);
+        EditCharacterButton.Command = renameCharacter;
+        CharactersListView.RowInvokeCommand = renameCharacter;
+        RenameCharacterMenuItem.Command = renameCharacter;
     }
 
     public PlayerDetailsWindow(PlayerDetailsViewModel viewModel) : this()

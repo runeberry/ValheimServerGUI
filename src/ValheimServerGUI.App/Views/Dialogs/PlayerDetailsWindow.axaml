@@ -62,8 +62,15 @@
                 <TextBlock Text="Known Characters" FontWeight="SemiBold" VerticalAlignment="Center" />
                 <c:HelpLabel HelpText="The Valheim character names that this player is known by. Names are automatically added to this list when a player joins the server, but you may modify them manually.&#10;&#10;If a name appears with a (!), it means that name may not be matched to the correct player (due to a Valheim server limitation). You may remove this name if it's incorrect, or select the name and click Confirm to remove the warning." />
             </StackPanel>
-            <c:DataListView Height="140" ItemsSource="{Binding Characters}"
+            <c:DataListView x:Name="CharactersListView" Height="140" ItemsSource="{Binding Characters}"
                             SelectedItem="{Binding SelectedCharacter, Mode=TwoWay}">
+                <c:DataListView.RowContextMenu>
+                    <ContextMenu>
+                        <!-- Rename opens a window-owned prompt, so its command is wired in code-behind. -->
+                        <MenuItem x:Name="RenameCharacterMenuItem" Header="Rename character" />
+                        <MenuItem Header="Remove character name" Command="{Binding RemoveCharacterCommand}" />
+                    </ContextMenu>
+                </c:DataListView.RowContextMenu>
                 <c:DataListView.Columns>
                     <!-- Items are plain strings; a reflection binding resolves the row item itself (the
                          inner grid isn't in this window's compiled-binding DataType scope). -->

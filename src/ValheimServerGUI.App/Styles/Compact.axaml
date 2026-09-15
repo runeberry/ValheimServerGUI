@@ -85,4 +85,16 @@
     <Style Selector="Menu > MenuItem">
         <Setter Property="Padding" Value="8,1.5" />
     </Style>
+
+    <!-- Right-click context menus: same app font + compact density as the rest of the chrome. The popup is a
+         separate visual root, so the Window font doesn't reach it — pin it here. -->
+    <Style Selector="ContextMenu">
+        <Setter Property="FontFamily" Value="Segoe UI, Inter" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="ContextMenu > MenuItem">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Padding" Value="4,2" />
+    </Style>
 </Styles>

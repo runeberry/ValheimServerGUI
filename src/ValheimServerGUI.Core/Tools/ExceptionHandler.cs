@@ -34,13 +34,32 @@ namespace ValheimServerGUI.Tools
 
         public event EventHandler? ExceptionHandled;
 
+        /// <summary>
+        /// A cancelled task/operation is benign — it reaches a global handler on teardown or a request
+        /// timeout, not from a real crash. We log it, but never surface the fatal crash-report prompt for it.
+        /// </summary>
+        internal static bool IsBenignCancellation(Exception e) => e is OperationCanceledException;
+
         public void HandleException(Exception e, string? contextMessage = null)
         {
             if (e == null) return;
 
             e = e.GetPrimaryException();
-
             contextMessage ??= "Unknown Exception";
+
+            if (IsBenignCancellation(e))
+            {
+                // Log-only: an operation was cancelled (e.g. on shutdown), which is not a crash.
+                TryLog(() => Logger.Debug("Operation cancelled ({context}): {message}", contextMessage, e.Message));
+                return;
+            }
+
+            // Always log the fault first (WinForms parity — SplashForm.HandleException), guarded so a logging
+            // failure can never take the process down on the global exception path.
+            TryLog(() => Logger.Error(
+                "Encountered exception ({context}) - {typeName}: {message}{newline}{stackTrace}",
+                contextMessage, e.GetType().Name, e.Message, Environment.NewLine, e.StackTrace ?? string.Empty));
+
             var userMessage = $"A fatal error has occured: {e.Message}{Environment.NewLine}{Environment.NewLine}Would you like to send an automated crash report to the developer?";
 
             if (UserPrompt.Confirm(userMessage, contextMessage))
@@ -50,6 +69,12 @@ namespace ValheimServerGUI.Tools
             }
 
             ExceptionHandled?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void TryLog(Action log)
+        {
+            try { log(); }
+            catch { /* never let logging itself fail the exception handler */ }
         }
 
         private async Task SendCrashReportSafelyAsync(CrashReport crashReport)

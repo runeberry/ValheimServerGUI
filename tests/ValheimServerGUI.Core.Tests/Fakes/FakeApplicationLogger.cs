@@ -5,17 +5,20 @@ using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.Core.Tests.Fakes
 {
-    /// <summary>No-op application logger for headless tests (drops everything).</summary>
+    /// <summary>Recording application logger for headless tests: keeps every rendered message.</summary>
     public class FakeApplicationLogger : IApplicationLogger
     {
         public event Action<string>? LogReceived;
 
-        public IEnumerable<string> LogBuffer => Array.Empty<string>();
+        public List<string> Messages { get; } = new();
+
+        public IEnumerable<string> LogBuffer => Messages;
 
         public void Write(LogEvent logEvent)
         {
-            // no-op; keep the compiler from warning about an unused event
-            LogReceived?.Invoke(logEvent.RenderMessage());
+            var message = logEvent.RenderMessage();
+            Messages.Add(message);
+            LogReceived?.Invoke(message);
         }
     }
 }

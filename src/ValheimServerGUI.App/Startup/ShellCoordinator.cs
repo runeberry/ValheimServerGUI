@@ -6,6 +6,7 @@ using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.App.Startup;
 
@@ -24,6 +25,7 @@ internal sealed class ShellCoordinator
     private readonly Func<MainWindowViewModel> _viewModelFactory;
     private readonly WindowManager _windowManager;
     private readonly StartupService _startupService;
+    private readonly IApplicationLogger _logger;
 
     public ShellCoordinator(
         IServerPreferencesProvider serverPrefs,
@@ -31,7 +33,8 @@ internal sealed class ShellCoordinator
         IStartupArgsProvider startupArgs,
         Func<MainWindowViewModel> viewModelFactory,
         WindowManager windowManager,
-        StartupService startupService)
+        StartupService startupService,
+        IApplicationLogger logger)
     {
         _serverPrefs = serverPrefs;
         _userPrefs = userPrefs;
@@ -39,6 +42,7 @@ internal sealed class ShellCoordinator
         _viewModelFactory = viewModelFactory;
         _windowManager = windowManager;
         _startupService = startupService;
+        _logger = logger;
     }
 
     public System.Threading.Tasks.Task RunStartupTasksAsync(IProgress<StartupProgress>? progress)
@@ -67,6 +71,7 @@ internal sealed class ShellCoordinator
     {
         var profile = _serverPrefs.LoadPreferences().OrderByDescending(p => p.LastSaved).FirstOrDefault()
                       ?? CreateDefaultProfile();
+        _logger.Information("Opening new window for profile '{profile}'", profile.ProfileName);
         ShowWindowFor(new StartupWindowPlan(profile, AutoStart: false), startMinimized: false);
     }
 

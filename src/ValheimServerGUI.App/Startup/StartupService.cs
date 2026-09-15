@@ -38,14 +38,17 @@ public sealed class StartupService
 
     private async Task RunSafelyAsync(string what, Func<Task> task)
     {
+        var sw = System.Diagnostics.Stopwatch.StartNew();
+        _logger.Debug("Starting startup task: {task}", what);
         try
         {
             await task();
+            _logger.Debug("Finished startup task: {task} ({ms}ms)", what, sw.ElapsedMilliseconds);
         }
         catch (Exception ex)
         {
             // A startup task failing must never block the app from opening.
-            _logger.Error(ex, "Startup task failed: {Task}", what);
+            _logger.Error("Startup task failed: {task} - {message}", what, ex.Message);
         }
     }
 }

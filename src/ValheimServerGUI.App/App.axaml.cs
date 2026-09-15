@@ -15,6 +15,7 @@ using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.App;
 
@@ -79,6 +80,7 @@ public partial class App : Application
         switch (CloseDecider.Decide(statuses, IsOsShutdown(e), prompt, "Warning"))
         {
             case CloseDecision.Proceed:
+                Services.GetRequiredService<IApplicationLogger>().Information("Shutting down application");
                 manager.StopAllAndDispose(); // all Stopped already → returns immediately
                 _shutdownApproved = true;
                 return;
@@ -136,6 +138,9 @@ public partial class App : Application
             coordinator.CreateAndShowStartupWindows();
 
             splash.Close();
+
+            Services.GetRequiredService<IApplicationLogger>().Information(
+                "ValheimServerGUI v{version} - Loaded OK", AssemblyHelper.GetApplicationVersion());
 
             var singleInstance = Services.GetRequiredService<SingleInstanceManager>();
             singleInstance.ArgsReceived += forwarded =>

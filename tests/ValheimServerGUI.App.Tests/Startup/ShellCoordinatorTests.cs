@@ -42,10 +42,11 @@ public class ShellCoordinatorTests
                 Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
                 new FakeSoftwareUpdateProvider(), shell, pathResolver);
         var startupService = new StartupService(new FakeSoftwareUpdateProvider(), new FakePlayerDataRepository(), TestLog.Silent);
+        var logger = Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>();
 
         var coordinator = new ShellCoordinator(
             serverPrefs, userPrefsProvider, new StartupArgsProvider(argProfile is null ? Array.Empty<string>() : new[] { argProfile }),
-            factory, new WindowManager(), startupService);
+            factory, new WindowManager(logger), startupService, logger);
 
         return (coordinator, serverPrefs, userPrefsProvider);
     }

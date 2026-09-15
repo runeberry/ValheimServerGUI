@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using ValheimServerGUI.App.Views;
+using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.App.Infrastructure;
 
@@ -12,6 +13,9 @@ namespace ValheimServerGUI.App.Infrastructure;
 internal sealed class WindowManager
 {
     private readonly List<MainWindow> _windows = new();
+    private readonly IApplicationLogger _logger;
+
+    public WindowManager(IApplicationLogger logger) => _logger = logger;
 
     public IReadOnlyList<MainWindow> Windows => _windows;
 
@@ -28,5 +32,7 @@ internal sealed class WindowManager
         window.Closed -= OnWindowClosed;
         _windows.Remove(window);
         window.ViewModel?.Dispose();
+        _logger.Debug("Window closed for profile '{profile}'; {count} window(s) still open",
+            window.ViewModel?.CurrentProfile?.ProfileName, _windows.Count);
     }
 }

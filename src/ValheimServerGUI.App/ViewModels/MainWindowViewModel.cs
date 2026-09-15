@@ -68,6 +68,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly ISoftwareUpdateProvider _updateProvider;
     private readonly IShellLauncher _shell;
     private readonly IValheimPathResolver _pathResolver;
+    private readonly IApplicationLogger _logger;
 
     private string? _updateLinkTarget;
     private string? _startedNewWorld;
@@ -94,6 +95,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _updateProvider = updateProvider;
         _shell = shell;
         _pathResolver = pathResolver;
+        _logger = appLogger;
 
         // No server is bound until the first LoadProfile → RetargetTo (the window is always loaded with a
         // profile immediately after construction). ServerStatus defaults to Stopped, which the gates expect.
@@ -210,13 +212,25 @@ public partial class MainWindowViewModel : ViewModelBase
     private Task Start() => StartServerAsync(isManual: true);
 
     [RelayCommand(CanExecute = nameof(CanStop))]
-    private void Stop() => _currentServer?.Stop();
+    private void Stop()
+    {
+        _logger.Information("Stopping server for profile '{profile}'", CurrentProfile?.ProfileName);
+        _currentServer?.Stop();
+    }
 
     [RelayCommand(CanExecute = nameof(CanRestart))]
-    private void Restart() => _currentServer?.Restart();
+    private void Restart()
+    {
+        _logger.Information("Restarting server for profile '{profile}'", CurrentProfile?.ProfileName);
+        _currentServer?.Restart();
+    }
 
     [RelayCommand]
-    private void NewWindow() => NewWindowRequested?.Invoke();
+    private void NewWindow()
+    {
+        _logger.Information("Opening a new window");
+        NewWindowRequested?.Invoke();
+    }
 
     [RelayCommand]
     private void Close() => CloseRequested?.Invoke();
@@ -367,6 +381,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// </summary>
     public void LoadProfile(ServerPreferences profile)
     {
+        _logger.Information("Loading server profile '{profile}'", profile.ProfileName);
         CurrentProfile = profile;
 
         // Re-target the window's server/status/tabs onto this profile's server before loading form fields.
@@ -425,6 +440,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         void Error(string message)
         {
+            _logger.Warning("Cannot start server for profile '{profile}': {message}", CurrentProfile?.ProfileName, message);
             if (isManual) ErrorReported?.Invoke(message);
         }
 
@@ -503,12 +519,16 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        _logger.Information("Starting {mode} server for profile '{profile}' on port {port} (world: {world})",
+            isManual ? "manual" : "auto-start", CurrentProfile?.ProfileName, port, worldName);
+
         try
         {
             StartAction(options);
         }
         catch (Exception ex)
         {
+            _logger.Error("Failed to start server for profile '{profile}': {message}", CurrentProfile?.ProfileName, ex.Message);
             Error(ex.Message);
             return;
         }

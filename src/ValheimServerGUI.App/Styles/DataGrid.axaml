@@ -20,20 +20,32 @@
         <Setter Property="Padding" Value="6,0,0,0" />
     </Style>
 
-    <!-- Rows: 1px top+bottom gap so adjacent rows sit 2px apart (no gridline between them). -->
-    <Style Selector="DataGridRow">
-        <Setter Property="Margin" Value="0,1" />
-    </Style>
-
     <Style Selector="DataGridCell">
-        <!-- Fluent renders cell text at 15px; pin to the app body 12px. Height 32 -> 16. -->
+        <!-- Fluent renders cell text at 15px; pin to the app body 12px. Height 32 -> 16.
+             1px top+bottom padding gives the 2px inter-row breathing room; because it is padding (inside
+             the row) rather than a row margin, the selected-row highlight still bleeds to the row edges. -->
         <Setter Property="FontSize" Value="12" />
         <Setter Property="MinHeight" Value="16" />
+        <Setter Property="Padding" Value="0,1" />
     </Style>
 
-    <!-- No border/box around the focused-or-selected cell; the selected row's highlight is the only cue. -->
+    <!-- No border/box around the focused-or-selected cell; the selected row's highlight is the only cue.
+         The box is the cell template's FocusVisual, made visible by the theme in the :current /
+         :selected / :focus states, so it is hidden in each of those (equal specificity, app style wins). -->
     <Style Selector="DataGridCell /template/ Grid#FocusVisual">
-        <Setter Property="IsVisible" Value="False" />
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:selected /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:focus-within /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
     </Style>
 
     <!-- DataGridTextColumn bakes a 12,0,12,0 margin onto the generated cell TextBlock; halve it to 6,0,6,0

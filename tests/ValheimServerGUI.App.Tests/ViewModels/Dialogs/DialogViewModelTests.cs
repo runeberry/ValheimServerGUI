@@ -238,6 +238,22 @@ public class DialogViewModelTests
     }
 
     [Fact]
+    public void PlayerDetails_display_name_shows_unknown_when_empty()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1" });
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1");
+
+        Assert.Equal("(unknown)", vm.DisplayNameOrUnknown);
+
+        vm.DisplayName = "Ragnar";
+        Assert.Equal("Ragnar", vm.DisplayNameOrUnknown);
+
+        vm.DisplayName = "   ";
+        Assert.Equal("(unknown)", vm.DisplayNameOrUnknown);
+    }
+
+    [Fact]
     public void PlayerDetails_display_name_override_saves()
     {
         var repo = new FakePlayerDataRepository();

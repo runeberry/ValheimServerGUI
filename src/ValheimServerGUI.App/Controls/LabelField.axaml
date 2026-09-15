@@ -13,7 +13,12 @@
 
         <TextBlock Grid.Column="0" Text="{Binding #Root.LabelText}"
                    HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" />
-        <SelectableTextBlock Grid.Column="1" Text="{Binding #Root.Value}" VerticalAlignment="Center" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+            <Image Source="{Binding #Root.ValueIcon}" Width="16" Height="16" VerticalAlignment="Center"
+                   RenderOptions.BitmapInterpolationMode="HighQuality"
+                   IsVisible="{Binding #Root.ValueIcon, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <SelectableTextBlock Text="{Binding #Root.Value}" VerticalAlignment="Center" />
+        </StackPanel>
         <c:HelpLabel Grid.Column="2" HelpText="{Binding #Root.HelpText}" Margin="6,0" />
         <ContentControl Grid.Column="3" Content="{Binding #Root.TrailingContent}"
                         IsVisible="{Binding #Root.TrailingContent, Converter={x:Static ObjectConverters.IsNotNull}}" />

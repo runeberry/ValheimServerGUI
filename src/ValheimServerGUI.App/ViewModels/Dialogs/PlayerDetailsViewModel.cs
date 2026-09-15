@@ -34,11 +34,18 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     [ObservableProperty] private string _zdoId = string.Empty;
     [ObservableProperty] private string _latestCharacter = string.Empty;
     [ObservableProperty] private string _status = string.Empty;
+    [ObservableProperty] private PlayerStatus _statusValue;
     [ObservableProperty] private string _statusChanged = string.Empty;
 
     // Editable.
-    [ObservableProperty] private string _displayName = string.Empty;
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayNameOrUnknown))]
+    private string _displayName = string.Empty;
     [ObservableProperty] private string? _selectedCharacter;
+
+    /// <summary>The display name for the read-only Player Name row; "(unknown)" when none is set.</summary>
+    public string DisplayNameOrUnknown =>
+        string.IsNullOrWhiteSpace(DisplayName) ? "(unknown)" : DisplayName;
 
     public ObservableCollection<string> Characters { get; } = new();
 
@@ -68,6 +75,7 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
         ZdoId = player.ZdoId ?? string.Empty;
         LatestCharacter = player.LastStatusCharacter ?? string.Empty;
         Status = player.PlayerStatus.ToString();
+        StatusValue = player.PlayerStatus;
         StatusChanged = player.LastStatusChange == default ? string.Empty : player.LastStatusChange.ToString("G");
     }
 

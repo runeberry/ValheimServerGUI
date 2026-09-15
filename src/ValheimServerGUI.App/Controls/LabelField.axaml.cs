@@ -26,6 +26,10 @@ public partial class LabelField : FormFieldBase, IFormField<string>
     public static readonly StyledProperty<object?> TrailingContentProperty =
         AvaloniaProperty.Register<LabelField, object?>(nameof(TrailingContent));
 
+    /// <summary>Optional 16×16 glyph rendered before the value (e.g. the platform or status icon).</summary>
+    public static readonly StyledProperty<Avalonia.Media.IImage?> ValueIconProperty =
+        AvaloniaProperty.Register<LabelField, Avalonia.Media.IImage?>(nameof(ValueIcon));
+
     public LabelField() => AvaloniaXamlLoader.Load(this);
 
     public string Value
@@ -44,6 +48,12 @@ public partial class LabelField : FormFieldBase, IFormField<string>
     {
         get => GetValue(TrailingContentProperty);
         set => SetValue(TrailingContentProperty, value);
+    }
+
+    public Avalonia.Media.IImage? ValueIcon
+    {
+        get => GetValue(ValueIconProperty);
+        set => SetValue(ValueIconProperty, value);
     }
 
     /// <inheritdoc />

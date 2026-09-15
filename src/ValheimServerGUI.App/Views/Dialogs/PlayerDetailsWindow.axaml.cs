@@ -15,10 +15,11 @@ public partial class PlayerDetailsWindow : Window
         InitializeComponent();
         Closing += OnClosingGuard;
 
-        // Add/Rename open a text prompt (owned by this window), so they live in the code-behind as commands
-        // the footer buttons invoke; Remove is a plain VM command bound in XAML.
+        // Add/Rename/Edit-name open a text prompt (owned by this window), so they live in the code-behind as
+        // commands the buttons invoke; Remove is a plain VM command bound in XAML.
         AddCharacterButton.Command = new AsyncRelayCommand(AddCharacterAsync);
         EditCharacterButton.Command = new AsyncRelayCommand(RenameCharacterAsync);
+        EditNameButton.Command = new AsyncRelayCommand(EditNameAsync);
     }
 
     public PlayerDetailsWindow(PlayerDetailsViewModel viewModel) : this()
@@ -41,6 +42,15 @@ public partial class PlayerDetailsWindow : Window
         var name = await new TextPromptWindow("Edit Character", $"Edit the name for character '{current}'",
             current, maxLength: 64).ShowDialog<string?>(this);
         if (!string.IsNullOrWhiteSpace(name)) Vm.RenameCharacter(current, name);
+    }
+
+    private async Task EditNameAsync()
+    {
+        var name = await new TextPromptWindow("Edit Player Name",
+            "Enter a display name for this player (leave blank to clear):",
+            Vm.DisplayName, maxLength: 64).ShowDialog<string?>(this);
+        // A null result is Cancel (leave unchanged); a blank result clears the override back to "(unknown)".
+        if (name is not null) Vm.DisplayName = name.Trim();
     }
 
     private void OnOk(object? sender, RoutedEventArgs e)

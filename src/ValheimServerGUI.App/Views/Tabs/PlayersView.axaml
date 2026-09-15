@@ -39,11 +39,11 @@
                 <DataGridTemplateColumn Header="Player (Character)" Width="*" SortMemberPath="DisplayName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
-                            <StackPanel Orientation="Horizontal" Spacing="6" Margin="6,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                 <Image Source="{Binding PlatformIcon}" Width="16" Height="16"
                                        VerticalAlignment="Center"
                                        RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                <TextBlock Text="{Binding DisplayName}" Margin="0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -52,11 +52,11 @@
                 <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="StatusText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
-                            <StackPanel Orientation="Horizontal" Spacing="4" Margin="6,0" VerticalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                                 <Image Width="16" Height="16" VerticalAlignment="Center"
                                        RenderOptions.BitmapInterpolationMode="HighQuality"
                                        Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
-                                <TextBlock Text="{Binding StatusText}" Margin="0" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
@@ -64,7 +64,7 @@
                 <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
-                            <TextBlock Text="{Binding SinceText}" Margin="6,0" VerticalAlignment="Center" />
+                            <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

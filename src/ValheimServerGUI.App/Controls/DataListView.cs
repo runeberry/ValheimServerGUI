@@ -52,6 +52,10 @@ public class DataListView : TemplatedControl
     public static readonly StyledProperty<ContextMenu?> RowContextMenuProperty =
         AvaloniaProperty.Register<DataListView, ContextMenu?>(nameof(RowContextMenu));
 
+    /// <summary>The uniform height of the header, footer, and every data row (px). Sized so a 16px icon
+    /// sits centred with a little breathing room.</summary>
+    public const double RowUnitHeight = 20;
+
     private DataGrid? _grid;
     private bool _hasFooter;
 
@@ -116,8 +120,11 @@ public class DataListView : TemplatedControl
         // Shared defaults (previously set on the DataGrid subclass).
         _grid.IsReadOnly = true;
         _grid.CanUserReorderColumns = false;
-        // No gridlines between rows; rows are separated only by the 2px inter-row spacing (see DataGrid.axaml).
         _grid.GridLinesVisibility = DataGridGridLinesVisibility.None;
+        // Fixed 20px header + rows (content vertically centred in DataGrid.axaml) so a 16px icon rests
+        // naturally and every row is the same height, with no per-cell padding needed to align content.
+        _grid.ColumnHeaderHeight = RowUnitHeight;
+        _grid.RowHeight = RowUnitHeight;
         _grid.Bind(BackgroundProperty, _grid.GetResourceObservable("LayerBase"));
 
         // Forward the consumer-declared columns into the real grid.

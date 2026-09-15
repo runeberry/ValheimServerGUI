@@ -9,11 +9,11 @@
     <ControlTheme x:Key="{x:Type c:DataListView}" TargetType="c:DataListView">
         <Setter Property="Template">
             <ControlTemplate>
-                <Border BorderBrush="{DynamicResource InputBorderBrush}" BorderThickness="1">
+                <Border BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1">
                     <DockPanel>
-                        <!-- Footer: same dark bar as the header. -->
+                        <!-- Footer: same dark bar and 20px height as the header. -->
                         <Border DockPanel.Dock="Bottom" IsVisible="{TemplateBinding HasFooter}"
-                                Background="{DynamicResource LayerDarkest}" Padding="6,2">
+                                Background="{DynamicResource LayerDarkest}" Height="20" Padding="6,0">
                             <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
                                 <ContentControl Grid.Column="0" Content="{TemplateBinding FooterLeft}"
                                                 HorizontalAlignment="Left" VerticalAlignment="Center" />

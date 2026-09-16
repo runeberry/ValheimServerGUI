@@ -30,6 +30,8 @@ public sealed class PlatformToIconConverter : IValueConverter
             {
                 PlayerPlatforms.Steam => "Steam_16x",
                 PlayerPlatforms.Xbox => "XboxLive_16x",
+                PlayerPlatforms.PlayStation => "PlayStation_16x",
+                PlayerPlatforms.Nintendo => "Nintendo_16x",
                 _ => null,
             };
         }

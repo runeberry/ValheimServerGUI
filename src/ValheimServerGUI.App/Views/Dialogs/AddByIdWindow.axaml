@@ -1,0 +1,48 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.AddByIdWindow"
+        x:DataType="vm:AddByIdViewModel"
+        Title="Add player by ID"
+        SizeToContent="WidthAndHeight"
+        MinWidth="440" MaxWidth="560"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="12">
+        <TextBlock TextWrapping="Wrap"
+                   Text="Grant access to a player by their platform ID — including friends who have never connected. The player will be added to the selected list(s) for the active profile's save folder." />
+
+        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="8">
+            <TextBlock Grid.Row="0" Grid.Column="0" Text="Platform:" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch"
+                      ItemsSource="{Binding Platforms}"
+                      SelectedItem="{Binding SelectedPlatform}" />
+
+            <TextBlock Grid.Row="1" Grid.Column="0" Text="Player ID:" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" x:Name="PlayerIdBox"
+                     Text="{Binding PlayerId}"
+                     PlaceholderText="e.g. 76561198000000000" />
+        </Grid>
+
+        <TextBlock Text="Add to:" FontWeight="SemiBold" Margin="0,4,0,0" />
+        <StackPanel Spacing="4">
+            <CheckBox Content="Admin" IsChecked="{Binding AddAdmin}" />
+            <CheckBox Content="Banned" IsChecked="{Binding AddBanned}" />
+            <CheckBox Content="Permitted (whitelist)" IsChecked="{Binding AddPermitted}" />
+        </StackPanel>
+
+        <TextBlock IsVisible="{Binding ShowBanWarning}" TextWrapping="Wrap"
+                   Foreground="#B00020"
+                   Text="A ban overrides the admin and permitted lists — this player will be kept out regardless." />
+
+        <TextBlock TextWrapping="Wrap" FontSize="11" Opacity="0.7"
+                   Text="Ban and permit changes apply within a few seconds while the server runs; admin changes take effect on the player's next reconnect or a server restart." />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+            <Button Content="Add" MinWidth="80" IsDefault="True" IsEnabled="{Binding CanSubmit}" Click="OnOk" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

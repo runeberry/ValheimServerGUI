@@ -1,6 +1,7 @@
 using System;
 using Avalonia.Media.Imaging;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ValheimServerGUI.App.Controls;
 using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.Game;
 
@@ -22,6 +23,24 @@ public partial class PlayerRowViewModel : ObservableObject
     [ObservableProperty] private bool _isOffline;
     [ObservableProperty] private Bitmap? _platformIcon;
 
+    // Access-list membership (profile-scoped), driven by PlayersViewModel from the list files. A glyph shows
+    // only when the player is a member; the column header supplies the meaning.
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(AdminIcon))]
+    private bool _isAdmin;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(BannedIcon))]
+    private bool _isBanned;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(PermittedIcon))]
+    private bool _isPermitted;
+
+    public Bitmap? AdminIcon => IsAdmin ? AppIcons.Get("StatusOK_16x") : null;
+    public Bitmap? BannedIcon => IsBanned ? AppIcons.Get("Cancel_16x") : null;
+    public Bitmap? PermittedIcon => IsPermitted ? AppIcons.Get("StatusOnline_16x") : null;
+
     public void Update(PlayerInfo player)
     {
         Player = player;
@@ -36,6 +55,14 @@ public partial class PlayerRowViewModel : ObservableObject
         IsOffline = player.PlayerStatus == PlayerStatus.Offline;
         PlatformIcon = PlatformToIconConverter.ForPlatform(player.Platform);
         RefreshSince();
+    }
+
+    /// <summary>Sets the three access-list flags together (called by <c>PlayersViewModel</c> on load/toggle).</summary>
+    public void SetMembership(bool isAdmin, bool isBanned, bool isPermitted)
+    {
+        IsAdmin = isAdmin;
+        IsBanned = isBanned;
+        IsPermitted = isPermitted;
     }
 
     public void RefreshSince()

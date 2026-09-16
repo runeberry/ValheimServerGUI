@@ -12,6 +12,13 @@ namespace ValheimServerGUI.Game
     {
         public string? Platform;
 
+        /// <summary>
+        /// The raw platform token from the game log, carried only as a creation/refresh seed for
+        /// <see cref="PlayerInfo.PlatformRaw"/> -- it is NOT a match filter (excluded from
+        /// <see cref="ToString"/>/<see cref="HasParameters"/> and the WHERE clauses).
+        /// </summary>
+        public string? PlatformRaw;
+
         public string? PlayerId;
 
         public string? PlayerName;
@@ -152,6 +159,11 @@ namespace ValheimServerGUI.Game
             player.PlayerStatus = PlayerStatus.Joining;
             player.LastStatusChange = DateTime.UtcNow;
             player.LastStatusCharacter = !string.IsNullOrWhiteSpace(query.CharacterName) ? query.CharacterName : null;
+
+            // Opportunistically capture/refresh the raw platform token so existing records created before
+            // this field existed pick it up on their next join (used for case-exact list-file writes).
+            if (!string.IsNullOrWhiteSpace(query.PlatformRaw)) player.PlatformRaw = query.PlatformRaw;
+
             Upsert(player);
 
             if (string.IsNullOrWhiteSpace(player.PlayerName))
@@ -336,6 +348,11 @@ namespace ValheimServerGUI.Game
             if (!string.IsNullOrWhiteSpace(query.Platform))
             {
                 player.Platform = query.Platform;
+            }
+
+            if (!string.IsNullOrWhiteSpace(query.PlatformRaw))
+            {
+                player.PlatformRaw = query.PlatformRaw;
             }
 
             if (!string.IsNullOrWhiteSpace(query.PlayerId))

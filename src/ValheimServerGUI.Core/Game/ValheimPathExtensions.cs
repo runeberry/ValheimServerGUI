@@ -28,6 +28,24 @@ namespace ValheimServerGUI.Game
             return PathExtensions.GetDirectoryInfo(options.SaveDataFolderPath ?? string.Empty, true);
         }
 
+        /// <summary>
+        /// The admin/ban/permit list files live directly in the save-data root (the <c>-savedir</c>),
+        /// alongside <c>worlds</c>/<c>worlds_local</c>, shared by every world in that savedir -- exactly
+        /// where <c>ZNet</c> reads them from (<c>Utils.GetSaveDataPath()/adminlist.txt</c> etc.). These
+        /// mirror the <see cref="GetWorldsFolders"/> savedir-root pattern.
+        /// </summary>
+        public static FileInfo GetAdminListFile(this DirectoryInfo saveDataFolder)
+            => GetSaveDataRootFile(saveDataFolder, "adminlist.txt");
+
+        public static FileInfo GetBannedListFile(this DirectoryInfo saveDataFolder)
+            => GetSaveDataRootFile(saveDataFolder, "bannedlist.txt");
+
+        public static FileInfo GetPermittedListFile(this DirectoryInfo saveDataFolder)
+            => GetSaveDataRootFile(saveDataFolder, "permittedlist.txt");
+
+        private static FileInfo GetSaveDataRootFile(DirectoryInfo saveDataFolder, string fileName)
+            => new(Path.Join(saveDataFolder.FullName, fileName));
+
         public static List<string> GetWorldNames(this DirectoryInfo saveDataFolder)
         {
             try

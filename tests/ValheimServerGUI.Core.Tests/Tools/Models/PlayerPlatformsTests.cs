@@ -4,8 +4,9 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Tools.Models
 {
     /// <summary>
-    /// Backs the crossplay player-correlation path (E21): only Steam/Xbox are valid platforms, input
-    /// is case-corrected and trimmed, and anything else (or null) is rejected so it is never recorded.
+    /// Backs the crossplay player-correlation path (E21) and list management: Steam/Xbox/PlayStation/Nintendo
+    /// are valid platforms (the game's "Switch" token normalizes to Nintendo), input is case-corrected and
+    /// trimmed, and anything else (or null) is rejected so it is never recorded.
     /// </summary>
     public class PlayerPlatformsTests
     {
@@ -15,6 +16,11 @@ namespace ValheimServerGUI.Core.Tests.Tools.Models
         [InlineData("  Steam  ", PlayerPlatforms.Steam)]
         [InlineData("xbox", PlayerPlatforms.Xbox)]
         [InlineData("Xbox", PlayerPlatforms.Xbox)]
+        [InlineData("playstation", PlayerPlatforms.PlayStation)]
+        [InlineData("PlayStation", PlayerPlatforms.PlayStation)]
+        [InlineData("nintendo", PlayerPlatforms.Nintendo)]
+        [InlineData("switch", PlayerPlatforms.Nintendo)]
+        [InlineData("  Switch  ", PlayerPlatforms.Nintendo)]
         public void TryGetValidPlatform_KnownPlatform_ReturnsCaseCorrectedName(string input, string expected)
         {
             var ok = PlayerPlatforms.TryGetValidPlatform(input, out var platform);
@@ -24,7 +30,8 @@ namespace ValheimServerGUI.Core.Tests.Tools.Models
         }
 
         [Theory]
-        [InlineData("playstation")]
+        [InlineData("Epic")]
+        [InlineData("GamePass")]
         [InlineData("")]
         [InlineData(null)]
         public void TryGetValidPlatform_UnknownOrNull_Fails(string? input)
@@ -33,6 +40,16 @@ namespace ValheimServerGUI.Core.Tests.Tools.Models
 
             Assert.False(ok);
             Assert.Null(platform);
+        }
+
+        [Fact]
+        public void All_ContainsTheFourSupportedPlatforms()
+        {
+            Assert.Equal(4, PlayerPlatforms.All.Count);
+            Assert.Contains(PlayerPlatforms.Steam, PlayerPlatforms.All);
+            Assert.Contains(PlayerPlatforms.Xbox, PlayerPlatforms.All);
+            Assert.Contains(PlayerPlatforms.PlayStation, PlayerPlatforms.All);
+            Assert.Contains(PlayerPlatforms.Nintendo, PlayerPlatforms.All);
         }
     }
 }

@@ -79,6 +79,8 @@ namespace ValheimServerGUI.Core.Tests.Game
         [Theory]
         [InlineData(PlayerPlatforms.Steam, "1234")]
         [InlineData(PlayerPlatforms.Xbox, "5678")]
+        [InlineData(PlayerPlatforms.PlayStation, "9012")]
+        [InlineData(PlayerPlatforms.Nintendo, "3456")]
         public void PlayerJoiningCrossplay_IsRecorded(string platform, string playerId)
         {
             PlayerInfo? eventPlayer = null;
@@ -94,8 +96,28 @@ namespace ValheimServerGUI.Core.Tests.Game
         public void UnknownCrossplayPlatform_IsNotRecorded()
         {
             // E21: a platform the app doesn't know is ignored.
-            Process(MessageJoiningCrossplay, "PlayStation", "9999");
+            Process(MessageJoiningCrossplay, "Epic", "9999");
             Assert.Empty(_repo.Data);
+        }
+
+        [Fact]
+        public void CrossplayJoin_PreservesRawPlatformToken()
+        {
+            // The raw log token is stored verbatim on PlatformRaw (for case-exact list-file writes) while
+            // Platform holds the normalized value. "Switch" normalizes to Nintendo but keeps its raw token.
+            Process(MessageJoiningCrossplay, "Switch", "42");
+
+            var player = Assert.Single(_repo.Data);
+            Assert.Equal(PlayerPlatforms.Nintendo, player.Platform);
+            Assert.Equal("Switch", player.PlatformRaw);
+        }
+
+        [Fact]
+        public void SteamJoin_SetsSteamPlatformRaw()
+        {
+            Process(MessageJoining, "1234");
+
+            Assert.Equal(PlayerPlatforms.Steam, Assert.Single(_repo.Data).PlatformRaw);
         }
 
         [Fact]

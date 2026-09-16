@@ -101,16 +101,18 @@ namespace ValheimServerGUI.Game
             var steamId = captures[0];
             if (string.IsNullOrWhiteSpace(steamId)) return;
 
-            PlayerDataRepository.SetPlayerJoining(new() { Platform = PlayerPlatforms.Steam, PlayerId = steamId });
+            PlayerDataRepository.SetPlayerJoining(new() { Platform = PlayerPlatforms.Steam, PlatformRaw = PlayerPlatforms.Steam, PlayerId = steamId });
         }
 
         private void OnPlayerConnectingCrossplay(params string[] captures)
         {
-            var hasValidPlatform = PlayerPlatforms.TryGetValidPlatform(captures[0], out var platform);
+            var rawPlatform = captures[0];
+            var hasValidPlatform = PlayerPlatforms.TryGetValidPlatform(rawPlatform, out var platform);
             var playerId = captures[1];
             if (!hasValidPlatform || string.IsNullOrWhiteSpace(playerId)) return;
 
-            PlayerDataRepository.SetPlayerJoining(new() { Platform = platform, PlayerId = playerId });
+            // Preserve the raw token verbatim (PlatformRaw) so list-file writes match the game's exact casing.
+            PlayerDataRepository.SetPlayerJoining(new() { Platform = platform, PlatformRaw = rawPlatform, PlayerId = playerId });
         }
 
         private void OnPlayerConnected(params string[] captures)

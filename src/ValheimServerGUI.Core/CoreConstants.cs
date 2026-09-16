@@ -49,7 +49,15 @@ namespace ValheimServerGUI
         public const string UrlExternalIpLookupFallback1 = "https://ifconfig.co/ip";
         public const string UrlExternalIpLookupFallback2 = "https://icanhazip.com";
 
-        /// <summary>Runeberry backend API base (player-info lookups, crash reports). (Resources: UrlRuneberryApi.)</summary>
+        /// <summary>
+        /// Name-lookup + crash-report backend base (player-info lookups, crash reports). The original
+        /// Runeberry AWS endpoint below is <b>dead</b>; its replacement is the Cloudflare Worker in
+        /// <c>backend/name-lookup-worker/</c>, which speaks the identical contract. Repoint this to the
+        /// deployed Worker URL (e.g. <c>https://vsg-name-lookup.&lt;subdomain&gt;.workers.dev</c>) once it is
+        /// live, and set the Worker's <c>CLIENT_API_KEY</c> secret to <c>ClientSecrets.RuneberryClientApiKey</c>.
+        /// This is the ONLY client-side wiring change; the client, RestClient, and lookup flow are unchanged.
+        /// (Resources: UrlRuneberryApi.)
+        /// </summary>
         public const string UrlRuneberryApi = "https://u312zw22d6.execute-api.us-east-1.amazonaws.com/Prod";
     }
 }

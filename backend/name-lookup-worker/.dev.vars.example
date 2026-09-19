@@ -1,6 +1,0 @@
-# Local secrets for `wrangler dev` (copy to .dev.vars, which is gitignored).
-# In production these are set with `wrangler secret put <NAME>` instead.
-STEAM_API_KEY=your-steam-web-api-key
-OPENXBL_API_KEY=your-openxbl-api-key
-# Must equal ClientSecrets.RuneberryClientApiKey in the app. Leave unset to run the Worker open.
-CLIENT_API_KEY=

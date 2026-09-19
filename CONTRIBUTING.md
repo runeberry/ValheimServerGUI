@@ -16,11 +16,14 @@ This project was developed using Visual Studio 2019 on Windows 10. The instructi
 * **ValheimServerGUI** - The main desktop client application
 * **ValheimServerGUI.Controls** - Common user controls used in the desktop client. These contain no Valheim-specific code.
 * **ValheimServerGUI.Tools** - Common utilities used in the desktop client. These contain no Valheim-specific code and no references to Windows Forms.
-* **ValheimServerGUI.Serverless** - A small REST API built specifically for the desktop client using the [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/).
+
+## Backend
+
+The server-side backend (player-name lookup and crash/bug report handling) lives in a **separate repository** and is **not needed** to build or run the client. The desktop client talks to it over HTTP through `CoreConstants.UrlRuneberryApi`; when the backend is unreachable the client stays fully functional (only name enrichment and report submission need connectivity).
 
 ## Solution Resources (Secrets)
 
-The **SolutionResources** folder contains code, configuration, and/or assets that are used in multiple projects in the Solution. Some files are considered "secret" and are not committed to source control. However, the solution is set up so that you **should not need any of these secret files** in order to do local development - only to publish the app or Serverless code.
+The **SolutionResources** folder contains code, configuration, and/or assets that are used in multiple projects in the Solution. Some files are considered "secret" and are not committed to source control. However, the solution is set up so that you **should not need any of these secret files** in order to do local development - only to publish the app.
 
 In some cases, however, you may want to supply your own mock secret values for testing. Read more about specific SolutionResources files [here](/SolutionResources/README.md).
 
@@ -71,36 +74,3 @@ The desktop client queries GitHub to find out if a new release is available. Fol
 5. Click **Publish release**.
 
 Users will be notified that an update is available the next time they open the desktop client, or within 24 hours. This timeframe is configured in the project's [Resource file](ValheimServerGUI/Properties/Resources.resx).
-
-## ValheimServerGUI.Serverless - REST API
-
-You only need to run the Serverless application locally if you're making changes to the REST API that you want to test. If you're just making changes to the desktop client, you can skip this section.
-
-To run the serverless application locally (Visual Studio 2022):
-
-1. Right-click the **ValheimServerGUI.Serverless** project in the Solution Explorer, and select "Set as Startup Project".
-2. Press **F5** or click the play button to start debugging the application in IIS Express. This will launch a new browser window.
-3. Using a REST client of your choice (such as [Postman](https://www.postman.com/downloads/) or just cURL), you can then query any API route using the base address shown in the console. For example:
-
-```bash
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{}' \
-  http://localhost:44385/crash-report
-```
-
-### Publishing the Serverless API
-
-_For project maintainers only._
-
-The API is published to AWS using the [Serverless Application Model](https://aws.amazon.com/serverless/sam/), which essentially means that the deployment instructions are contained within a CloudFormation template in this repo - namely, [serverless.template](/ValheimServerGUI.Serverless/serverless.template).
-
-Before publishing, ensure that the following Solution Resources are set up locally:
-* ServerSecrets.Values.cs
-
-The easiest way to publish the API is to install the [AWS Toolkit Extension](https://marketplace.visualstudio.com/items?itemName=AmazonWebServices.AWSToolkitforVisualStudio2017) for Visual Studio. After installing the extension, follow these steps:
-
-1. Open the **AWS Explorer** within Visual Studio.
-2. Click the button to "Add AWS Credentials File" and log in. You must have credentials with an IAM role that will allow you to publish to the Runeberry account.
-3. Right-click the **ValheimServerGUI.Serverless** project and click "Publish to AWS Lambda".
-4. Click **Publish**.

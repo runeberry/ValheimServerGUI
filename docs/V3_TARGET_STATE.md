@@ -43,8 +43,9 @@ start-on-login applies). SteamCMD / headless install flows are explicitly not a 
 Windows and Linux*. In this spec and the product UI: **"crossplay"** = the Steam/Xbox player
 feature; **"cross-platform"** = the app's OS support.
 
-**Branding & backend.** Keep the Runeberry identity/branding and the existing Runeberry backend
-(crash-report + player-name lookup Lambda) unchanged (see §8).
+**Branding & backend.** Keep the Runeberry identity/branding. The backend (crash-report + player-name
+lookup) now lives in the separate **`ValheimServerGUI.Api`** repo (a Cloudflare Worker) with the same
+app-facing contract; the client is unaffected (see §8).
 
 ---
 
@@ -61,9 +62,10 @@ src/
 tests/
   Valheim.Core.Tests/      The bulk of the safety net (xunit.v3). Pure logic, headless on Linux.
   ValheimServerGUI.App.Tests/  Avalonia.Headless.XUnit UI tests.
-ValheimServerGUI.Serverless/       Kept as-is (ASP.NET Lambda; already cross-platform). See §8.
-ValheimServerGUI.Serverless.Tests/ Kept as-is.
 ```
+
+The backend is **no longer in this solution** — it moved to the separate `ValheimServerGUI.Api` repo
+(a Cloudflare Worker). See §8.
 
 The v2.4 `ValheimServerGUI.Controls` project (custom WinForms controls) does **not** port —
 Avalonia built-ins + styles replace it (see §11). The v2.4 `ValheimServerGUI.Tools` project
@@ -581,10 +583,12 @@ only when a copyable code is present. Model it separately from player records.
 
 ---
 
-## 8. Runeberry backend (keep as-is)
+## 8. Runeberry backend (external repo, contract unchanged)
 
-`ValheimServerGUI.Serverless` (ASP.NET on AWS Lambda) is already cross-platform and stays
-unchanged. The Avalonia client must reproduce the two calls and their contracts:
+The backend moved out of this repo into **`ValheimServerGUI.Api`** (a Cloudflare Worker;
+`https://forge.nuffle.dev/arcanum/ValheimServerGUI.Api`, auto-deployed to Cloudflare on push to
+main). It replaced the old AWS Lambda but serves the **same app-facing contract**, so the Avalonia
+client is unchanged — it still reproduces the two calls exactly:
 
 - **`GET /player-info?platform=&playerId=`** → `{id,name,platform}`. Server resolves Steam
   (Steam Web API) / Xbox (OpenXBL) display names; 400 on missing/unsupported platform. Client
@@ -592,15 +596,17 @@ unchanged. The Avalonia client must reproduce the two calls and their contracts:
   empty field.
 - **`POST /crash-report`** ← `CrashReport` (`id, clientCorrelationId, source, timestamp,
   appVersion, osVersion, dotnetVersion, currentCulture, currentUiCulture, additionalInfo, logs`).
-  Stored to S3. Client calls it consent-gated (crash) or user-initiated (bug report); `source`
-  distinguishes the two.
+  Persisted to R2 (was S3). Client calls it consent-gated (crash) or user-initiated (bug report);
+  `source` distinguishes the two.
 
 Both require an API-key header from `ClientSecrets` (out-of-source-control partial class —
 preserve the build/config-time secret-injection pattern; do not hardcode). All HTTP failures are
 caught + logged + return null → the app is fully functional offline (only name enrichment and
 report submission need connectivity).
 
-**Privacy note (kept behavior):** the player-info call sends a platform ID (PII) to the Lambda for
+**Follow-up:** repoint `CoreConstants.UrlRuneberryApi` to the deployed Worker URL once it is live.
+
+**Privacy note (kept behavior):** the player-info call sends a platform ID (PII) to the backend for
 every unknown joiner, with no opt-out. Kept as-is per decision; an opt-out is roadmap (§17).
 
 ---
@@ -1019,7 +1025,7 @@ Documented so the parity spec stays clean; each is researched in prior sessions.
 |---|---|---|
 | Server process/state | `Game/ValheimServer.cs`, `ValheimServerOptions.cs`, `Tools/Processes/*` | `Valheim.Core` server controller + `IProcessProvider` (cross-platform stop) |
 | World detection/import | `Game/ValheimPathExtensions.cs`, `SteamCloudWorldProvider.cs`, `WorldGen*.cs` | `Valheim.Core` world services + `ISteamPathResolver` |
-| Players/backend | `Game/PlayerDataRepository.cs`, `PlayerInfo.cs`, `Tools/RuneberryApiClient.cs`, `Serverless/*` | `Valheim.Core` player repo + kept Serverless |
+| Players/backend | `Game/PlayerDataRepository.cs`, `PlayerInfo.cs`, `Tools/RuneberryApiClient.cs`, `Serverless/*` | `Valheim.Core` player repo + `RuneberryApiClient` (backend now the external `ValheimServerGUI.Api` Worker) |
 | Prefs/config | `Game/*Preferences*.cs`, `Tools/Data/*` | `Valheim.Core` prefs + `IAppPaths` + atomic file provider |
 | Logging/update/crash/IP/version | `Tools/Logging/*`, `SoftwareUpdateProvider.cs`, `GitHubClient.cs`, `ExceptionHandler.cs`, `IpAddressProvider.cs`, `AssemblyHelper.cs` | `Valheim.Core` (mostly verbatim) + `IShellLauncher`/`IStartupManager` |
 | Main window | `Forms/MainWindow.cs` (1528L) + `.Designer.cs` | `ValheimServerGUI.App` MainWindow view + view-model(s) |

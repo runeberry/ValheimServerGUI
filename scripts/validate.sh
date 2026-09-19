@@ -4,7 +4,7 @@
 #
 # Run with no arguments to validate the whole solution the way I (Mochi) always want it checked:
 #   1. Build the solution  — MUST be 0 warnings, 0 errors.
-#   2. Run every test       — Core + App + Serverless (fast: --no-build after step 1).
+#   2. Run every test       — Core + App (fast: --no-build after step 1).
 #   3. Headless boot smoke  — launch the Avalonia app under Xvfb; it must boot and STAY up
 #                             with no unhandled exceptions (skipped automatically if Xvfb is absent).
 #

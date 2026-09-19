@@ -1,12 +1,12 @@
 # Solution Resources
 
-This folder contains code, configuration, and/or assets that are used in multiple projects in the Solution. Some files are considered "secret" and are not committed to source control. However, the solution is set up so that you **should not need any of these secret files** in order to do local development - only to publish the app or Serverless code.
+This folder contains code, configuration, and/or assets that are used across the Solution. Some files are considered "secret" and are not committed to source control. However, the solution is set up so that you **should not need any of these secret files** in order to do local development - only to publish the app.
 
 In some cases, however, you may want to supply your own mock secret values for testing. Examples of these files are provided below for your reference.
 
 ### ClientSecrets.Values.cs
 
-This is a... "clever" way of providing secret information to both the client and Serverless applications at compile time. Use this partial static class to set the values of any properties in **ClientSecrets.cs**.
+This is a... "clever" way of providing secret information to the client application at compile time. Use this partial static class to set the values of any properties in **ClientSecrets.cs**.
 
 ```csharp
 namespace ValheimServerGUI.Properties
@@ -19,17 +19,5 @@ namespace ValheimServerGUI.Properties
       RuneberryApiKeyHeader = "some-header-key";
     }
   }
-}
-```
-
-### appsettings.local.json
-
-Configuration values for the Serverless application only when running locally. You can set AWS Lambda environment variables here to imitate running in a cloud environment.
-
-```jsonc
-{
-  // These are required to access other AWS services from within the API
-  "AWS_ACCESS_KEY_ID": "",
-  "AWS_SECRET_ACCESS_KEY": ""
 }
 ```

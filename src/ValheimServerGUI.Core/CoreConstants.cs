@@ -53,8 +53,10 @@ namespace ValheimServerGUI
         /// Name-lookup + crash-report backend base (player-info lookups, crash reports). Served by the
         /// Cloudflare Worker in the <c>ValheimServerGUI.Api</c> repo, which replaced the retired Runeberry
         /// AWS Lambda with the identical contract. The Worker enforces <c>CLIENT_API_KEY</c> against
-        /// <c>ClientSecrets.RuneberryClientApiKey</c>. (Resources: UrlRuneberryApi.)
+        /// <c>ClientSecrets.RuneberryClientApiKey</c>. Mounted under the <c>/vsg</c> prefix on the shared
+        /// <c>api.runeberry.com</c> host; the client appends <c>/player-info</c> / <c>/crash-report</c>.
+        /// (Resources: UrlRuneberryApi.)
         /// </summary>
-        public const string UrlRuneberryApi = "https://api.runeberry.com";
+        public const string UrlRuneberryApi = "https://api.runeberry.com/vsg";
     }
 }

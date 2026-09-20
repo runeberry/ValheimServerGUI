@@ -82,7 +82,7 @@ namespace ValheimServerGUI.Tools.Http
                     ResponseContent = JsonConvert.DeserializeObject(responseContentStr, ResponseContentType);
                 }
 
-                Context.Logger.Debug("HTTP request was successful ({0}): {1}", statusCode, logAddress);
+                Context.Logger.Information("HTTP request was successful ({0}): {1}", statusCode, logAddress);
 
                 foreach (var callback in Callbacks)
                 {

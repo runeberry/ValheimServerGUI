@@ -35,7 +35,7 @@ public partial class MainWindow : Window
         viewModel.CloseRequested += Close;
         viewModel.CloudImportPrompt = ShowCloudImportAsync;
         viewModel.ErrorReported = msg => _ = ShowMessageAsync("Error starting server", msg);
-        viewModel.UpdateResultPrompt = msg => new ConfirmWindow("Check for Updates", msg).ShowDialog<bool>(this);
+        viewModel.UpdateResultPrompt = msg => MessageBox.ConfirmAsync(this, "Check for Updates", msg);
         viewModel.StopTimedOutWarning += () =>
             _ = ShowMessageAsync("Server force-stopped",
                 "The server did not shut down in time and was force-stopped. Recent world changes may not have been saved.");
@@ -46,8 +46,12 @@ public partial class MainWindow : Window
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
         viewModel.MessagePrompt = ShowMessageAsync;
         viewModel.ImportConfirmPrompt = body =>
-            new ConfirmWindow(MainWindowViewModel.ImportDialogTitle, body, "Continue", "Cancel").ShowDialog<bool>(this);
-        viewModel.ConflictPrompt = body => new RoleConflictWindow(body).ShowDialog<RoleConflictChoice>(this);
+            MessageBox.ConfirmAsync(this, MainWindowViewModel.ImportDialogTitle, body, "Continue", "Cancel");
+        viewModel.ConflictPrompt = body => MessageBox.ChooseAsync<RoleConflictChoice>(
+            this, MainWindowViewModel.RoleConflictTitle, body,
+            new MessageBoxButton("Use server profile", RoleConflictChoice.UseServerProfile, isDefault: true),
+            new MessageBoxButton("Use roles from file", RoleConflictChoice.UseRolesFromFile),
+            new MessageBoxButton("Cancel", RoleConflictChoice.Cancel, isCancel: true));
 
         Opened += OnOpened;
         SetUpTrayIcon();
@@ -148,8 +152,8 @@ public partial class MainWindow : Window
 
     private async Task HandleRemoveProfileAsync(string profileName)
     {
-        var confirm = await new ConfirmWindow("Remove Profile",
-            $"Remove server profile '{profileName}'?").ShowDialog<bool>(this);
+        var confirm = await MessageBox.ConfirmAsync(this, "Remove Profile",
+            $"Remove server profile '{profileName}'?");
         if (!confirm) return;
 
         Svc<IServerPreferencesProvider>().RemovePreferences(profileName);
@@ -200,7 +204,7 @@ public partial class MainWindow : Window
             "This may occur if you do not have Valheim Dedicated Server installed, or if you have installed " +
             "it in a different directory. See Help for more info.\n\n" +
             "Would you like to change your directories now?";
-        if (await new ConfirmWindow("File Not Found", body).ShowDialog<bool>(this))
+        if (await MessageBox.ConfirmAsync(this, "File Not Found", body))
             await HandleMenuActionAsync(MenuAction.SetDirectories);
     }
 
@@ -212,11 +216,21 @@ public partial class MainWindow : Window
         ViewModel.Players.SetActive(PlayersTab.IsSelected);
     }
 
-    private async Task<CloudImportChoice> ShowCloudImportAsync(string worldName)
-        => await new CloudImportWindow(worldName).ShowDialog<CloudImportChoice>(this);
+    private Task<CloudImportChoice> ShowCloudImportAsync(string worldName)
+    {
+        var message =
+            $"Host the cloud world '{worldName}'?\n\n" +
+            "This world is saved to Steam Cloud and must be brought into the server's local save folder to be hosted.\n\n" +
+            "Move: bring the world over and remove the Steam Cloud copy.\n" +
+            "Copy: bring a copy over and leave the Steam Cloud copy in place.";
+        return MessageBox.ChooseAsync<CloudImportChoice>(this, "Import cloud world", message,
+            new MessageBoxButton("Move", CloudImportChoice.Move),
+            new MessageBoxButton("Copy", CloudImportChoice.Copy, isDefault: true),
+            new MessageBoxButton("Cancel", CloudImportChoice.Cancel, isCancel: true));
+    }
 
-    private async Task ShowMessageAsync(string title, string message)
-        => await new MessageWindow(title, message).ShowDialog(this);
+    private Task ShowMessageAsync(string title, string message)
+        => MessageBox.ShowAsync(this, title, message);
 
     /// <summary>The per-window view-model (each window owns its own).</summary>
     public MainWindowViewModel? ViewModel { get; }

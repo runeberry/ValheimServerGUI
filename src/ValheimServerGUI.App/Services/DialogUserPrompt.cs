@@ -38,7 +38,11 @@ internal sealed class DialogUserPrompt : IUserPrompt
     private static bool ShowConfirmSync(string message, string title)
     {
         var owner = WindowLocator.ActiveWindow;
-        var dialog = new ConfirmWindow(title, message);
+        var dialog = new MessageBoxWindow(title, message, new[]
+        {
+            new MessageBoxButton("Yes", true, isDefault: true),
+            new MessageBoxButton("No", false, isCancel: true),
+        });
 
         var frame = new DispatcherFrame();
         var result = false;
@@ -60,10 +64,10 @@ internal sealed class DialogUserPrompt : IUserPrompt
     }
 
     // No owner window yet (e.g. a startup crash): show it non-modally and complete when it closes.
-    private static Task<bool> ShowOwnerlessAsync(ConfirmWindow dialog)
+    private static Task<bool> ShowOwnerlessAsync(MessageBoxWindow dialog)
     {
         var tcs = new TaskCompletionSource<bool>();
-        dialog.Closed += (_, _) => tcs.TrySetResult(dialog.Result);
+        dialog.Closed += (_, _) => tcs.TrySetResult(dialog.Result is true);
         dialog.Show();
         return tcs.Task;
     }

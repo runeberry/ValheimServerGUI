@@ -59,7 +59,7 @@ public partial class LogsView : UserControl
     }
 
     private async void OnWarning(string message)
-        => await new MessageWindow("Save Logs", message).ShowDialog(GetWindow());
+        => await MessageBox.ShowAsync(GetWindow(), "Save Logs", message);
 
     private Window GetWindow() => (Window)TopLevel.GetTopLevel(this)!;
 }

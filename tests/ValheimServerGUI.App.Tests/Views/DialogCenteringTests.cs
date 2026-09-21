@@ -13,7 +13,7 @@ public class DialogCenteringTests
     [Fact]
     public void Every_dialog_window_derives_from_DialogWindow()
     {
-        var offenders = typeof(MessageWindow).Assembly.GetTypes()
+        var offenders = typeof(MessageBoxWindow).Assembly.GetTypes()
             .Where(t => t.Namespace == "ValheimServerGUI.App.Views.Dialogs")
             .Where(t => !t.IsAbstract && typeof(Window).IsAssignableFrom(t))
             .Where(t => t != typeof(DialogWindow))

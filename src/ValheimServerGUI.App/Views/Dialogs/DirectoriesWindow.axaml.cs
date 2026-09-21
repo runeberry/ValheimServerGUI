@@ -27,8 +27,7 @@ public partial class DirectoriesWindow : DialogWindow
     {
         if (Vm.MissingPathDescription is { } missing)
         {
-            var proceed = await new ConfirmWindow("Path not found",
-                $"{missing}\n\nSave anyway?").ShowDialog<bool>(this);
+            var proceed = await MessageBox.ConfirmAsync(this, "Path not found", $"{missing}\n\nSave anyway?");
             if (!proceed) return;
         }
 

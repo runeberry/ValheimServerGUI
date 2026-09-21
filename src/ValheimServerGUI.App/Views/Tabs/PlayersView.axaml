@@ -17,7 +17,7 @@
                                   Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
             </Grid>
             <c:CheckBoxFormField LabelText="Use permitted list"
-                                 HelpText="When on, only players you mark Permitted can join, and the ban list is ignored — an admin must also be permitted to get in. When off, anyone can join unless banned. The adminlist/bannedlist/permittedlist files are regenerated from these roles each time the server starts."
+                                 HelpText="If enabled, only players on the permitted list can join the server. Add players to the permitted list using the table below."
                                  Value="{Binding Form.UsePermittedList}" />
         </StackPanel>
 

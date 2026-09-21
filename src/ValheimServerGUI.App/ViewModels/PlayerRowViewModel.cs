@@ -23,23 +23,34 @@ public partial class PlayerRowViewModel : ObservableObject
     [ObservableProperty] private bool _isOffline;
     [ObservableProperty] private Bitmap? _platformIcon;
 
-    // Access-list membership (profile-scoped), driven by PlayersViewModel from the list files. A glyph shows
-    // only when the player is a member; the column header supplies the meaning.
+    // Access-list membership (profile-scoped), driven by PlayersViewModel from the list files. Surfaced as a
+    // single "Role" (see RoleText/RoleIcon); the three booleans remain the source of truth for the toggles.
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AdminIcon))]
+    [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
     private bool _isAdmin;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(BannedIcon))]
+    [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
     private bool _isBanned;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(PermittedIcon))]
+    [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
     private bool _isPermitted;
 
-    public Bitmap? AdminIcon => IsAdmin ? AppIcons.Get("StatusOK_16x") : null;
-    public Bitmap? BannedIcon => IsBanned ? AppIcons.Get("Cancel_16x") : null;
-    public Bitmap? PermittedIcon => IsPermitted ? AppIcons.Get("StatusOnline_16x") : null;
+    /// <summary>The player's single displayed role, highest-priority first: Admin &gt; Permitted &gt; Banned.
+    /// Null when the player is in none of the three profile access lists (blank cell).</summary>
+    public string? RoleText =>
+        IsAdmin ? "Admin" :
+        IsPermitted ? "Permitted" :
+        IsBanned ? "Banned" :
+        null;
+
+    /// <summary>Icon for <see cref="RoleText"/> (null when the player has no role).</summary>
+    public Bitmap? RoleIcon =>
+        IsAdmin ? AppIcons.Get("UserAdmin_16x") :
+        IsPermitted ? AppIcons.Get("UserOk_16x") :
+        IsBanned ? AppIcons.Get("InUseByOtherUser_16x") :
+        null;
 
     public void Update(PlayerInfo player)
     {

@@ -57,8 +57,23 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!-- Status text prefixed with a glyph representing the status. -->
-                <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="StatusText">
+                <!-- Access-list membership as a single role (profile-scoped), highest priority first:
+                     Admin > Permitted > Banned. Blank when the player is in none of the lists. Kept the same
+                     fixed width as Status (the column to its right) so the two read as a matched pair. -->
+                <DataGridTemplateColumn Header="Role" Width="100" SortMemberPath="RoleText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <Image Width="16" Height="16" VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                       Source="{Binding RoleIcon}" />
+                                <TextBlock Text="{Binding RoleText}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- Status text prefixed with a glyph representing the status. Width matches Role (its left neighbour). -->
+                <DataGridTemplateColumn Header="Status" Width="100" SortMemberPath="StatusText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
@@ -67,35 +82,6 @@
                                        Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
                                 <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
                             </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <!-- Access-list membership glyphs (profile-scoped). Icon shows only when the player is a
-                     member; the header supplies the meaning. Sort by the underlying boolean. -->
-                <DataGridTemplateColumn Header="Admin" Width="Auto" SortMemberPath="IsAdmin">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
-                            <Image Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   RenderOptions.BitmapInterpolationMode="HighQuality"
-                                   Source="{Binding AdminIcon}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Banned" Width="Auto" SortMemberPath="IsBanned">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
-                            <Image Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   RenderOptions.BitmapInterpolationMode="HighQuality"
-                                   Source="{Binding BannedIcon}" />
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Permitted" Width="Auto" SortMemberPath="IsPermitted">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
-                            <Image Width="16" Height="16" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                   RenderOptions.BitmapInterpolationMode="HighQuality"
-                                   Source="{Binding PermittedIcon}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

@@ -26,6 +26,23 @@ public class PlayersViewModelTests : IDisposable
 
     private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _accessLists);
 
+    // Role is a single value collapsed from the three membership flags, highest priority first.
+    [AvaloniaTheory]
+    [InlineData(true, true, true, "Admin")]        // in all three -> Admin
+    [InlineData(true, false, false, "Admin")]
+    [InlineData(false, true, true, "Permitted")]   // permitted + banned -> Permitted
+    [InlineData(false, true, false, "Permitted")]
+    [InlineData(false, false, true, "Banned")]     // banned only
+    [InlineData(false, false, false, null)]        // none -> blank
+    public void RoleText_takes_highest_priority(bool isAdmin, bool isPermitted, bool isBanned, string? expected)
+    {
+        var row = new PlayerRowViewModel(Player("1", PlayerStatus.Offline));
+        row.SetMembership(isAdmin, isBanned, isPermitted);
+
+        Assert.Equal(expected, row.RoleText);
+        Assert.Equal(expected is null, row.RoleIcon is null); // icon present iff there is a role
+    }
+
     private static PlayerInfo Player(string id, PlayerStatus status, string? name = null, string? character = null)
         => new()
         {
@@ -219,6 +236,7 @@ public class PlayersViewModelTests : IDisposable
         Assert.True(row.IsAdmin);
         Assert.True(row.IsPermitted);
         Assert.False(row.IsBanned);
+        Assert.Equal("Admin", row.RoleText); // Admin > Permitted > Banned when in multiple lists
         Assert.True(_accessLists.Contains(_savedir.FullName, PlayerAccessList.Admin, row.Player));
         Assert.True(_accessLists.Contains(_savedir.FullName, PlayerAccessList.Permitted, row.Player));
     }

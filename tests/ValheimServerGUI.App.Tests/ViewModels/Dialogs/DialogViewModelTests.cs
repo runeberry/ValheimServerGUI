@@ -220,6 +220,45 @@ public class DialogViewModelTests
     }
 
     [Fact]
+    public async Task PlayerDetails_refresh_fills_unknown_name_via_lookup_without_dirtying()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1" }); // no name yet
+        var api = new FakeRuneberryApiClient
+        {
+            // Simulate the resolved name reaching the repo, as the real client does via the repository.
+            OnRequestPlayerInfo = (platform, id) =>
+            {
+                repo.PushUpdate(new PlayerInfo { Platform = platform, PlayerId = id, PlayerName = "Rabscuttle" });
+                return Task.CompletedTask;
+            },
+        };
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1", api);
+        Assert.Equal("(unknown)", vm.DisplayNameOrUnknown);
+
+        await vm.RefreshCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, api.RequestPlayerInfoCallCount);
+        Assert.Equal("Rabscuttle", vm.DisplayName);   // filled from the lookup
+        Assert.False(vm.IsDirty);                       // reflects the repo, not a user edit
+    }
+
+    [Fact]
+    public async Task PlayerDetails_refresh_does_not_look_up_when_a_name_is_already_set()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", PlayerName = "Custom" });
+        var api = new FakeRuneberryApiClient();
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1", api);
+
+        await vm.RefreshCommand.ExecuteAsync(null);
+
+        Assert.Equal(0, api.RequestPlayerInfoCallCount); // never fires when a name is present
+        Assert.Equal("Custom", vm.DisplayName);          // custom name untouched
+        Assert.False(vm.IsDirty);
+    }
+
+    [Fact]
     public void PlayerDetails_selecting_a_character_does_not_mark_dirty()
     {
         var repo = new FakePlayerDataRepository();

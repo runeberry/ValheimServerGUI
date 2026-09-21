@@ -47,6 +47,20 @@ public abstract partial class ModalEditViewModel : ObservableObject
         IsDirty = false;
     }
 
+    /// <summary>
+    /// Applies a change that reflects the underlying data source (not a user edit), so it does not trip the
+    /// dirty flag. Unlike <see cref="LoadClean"/> the current dirty state is preserved, so a background update
+    /// (e.g. an async name lookup filling in a resolved value) won't clear the user's other pending edits.
+    /// </summary>
+    protected void ApplyWithoutDirtying(Action apply)
+    {
+        var wasDirty = IsDirty;
+        _suppressDirty = true;
+        try { apply(); }
+        finally { _suppressDirty = false; }
+        IsDirty = wasDirty;
+    }
+
     /// <summary>Restores default values (marks dirty — the user must still confirm with OK).</summary>
     public abstract void ApplyDefaults();
 }

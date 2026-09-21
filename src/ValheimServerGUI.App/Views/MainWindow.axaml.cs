@@ -171,7 +171,8 @@ public partial class MainWindow : Window
     }
 
     private async Task ShowPlayerDetailsAsync(ValheimServerGUI.Game.PlayerInfo player)
-        => await new PlayerDetailsWindow(new PlayerDetailsViewModel(Svc<IPlayerDataRepository>(), player.Key))
+        => await new PlayerDetailsWindow(
+                new PlayerDetailsViewModel(Svc<IPlayerDataRepository>(), player.Key, Svc<IRuneberryApiClient>()))
             .ShowDialog(this);
 
     private async void OnOpened(object? sender, EventArgs e)

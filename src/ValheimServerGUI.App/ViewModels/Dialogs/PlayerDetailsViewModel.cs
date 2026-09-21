@@ -2,9 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
@@ -16,11 +18,13 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 public partial class PlayerDetailsViewModel : ModalEditViewModel
 {
     private readonly IPlayerDataRepository _repo;
+    private readonly IRuneberryApiClient? _api;
     private readonly string _key;
 
-    public PlayerDetailsViewModel(IPlayerDataRepository repo, string playerKey)
+    public PlayerDetailsViewModel(IPlayerDataRepository repo, string playerKey, IRuneberryApiClient? api = null)
     {
         _repo = repo;
+        _api = api;
         _key = playerKey;
         // Selecting a character in the table is view state, not an edit — it must not trip the unsaved-changes
         // guard (the actual edits are AddCharacter/RenameCharacter/RemoveCharacter and the display-name field).
@@ -79,15 +83,33 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     }
 
     /// <summary>Re-reads the current identity from the repo and re-derives each character's Status/Since
-    /// (status changes while the dialog is open). Leaves the editable display name + character edits
-    /// untouched, so it can't discard unsaved changes.</summary>
+    /// (status changes while the dialog is open). When the player name is still unknown, it also fires a
+    /// fresh platform name lookup and fills the name in once it resolves — but only while the field is empty,
+    /// so it never overwrites a name the user typed. Leaves the editable display name (when set) + character
+    /// edits untouched, so it can't discard unsaved changes.</summary>
     [RelayCommand]
-    private void Refresh()
+    private async Task Refresh()
     {
         if (_repo.FindById(_key) is not { } player) return;
         LoadIdentity(player);
         var now = DateTimeOffset.Now;
         foreach (var row in Characters) row.Refresh(player, now);
+
+        // Only look the name up when it's currently unknown; a lookup writes to the same PlayerName field the
+        // user can override, so firing it unconditionally could clobber a custom name.
+        if (_api is null || !string.IsNullOrWhiteSpace(DisplayName)) return;
+
+        // The await resumes on the UI thread; the repo updates PlayerName synchronously inside the request, so
+        // it's populated by the time we return. Re-check the field is still empty in case the user typed while
+        // the lookup was in flight.
+        await _api.RequestPlayerInfoAsync(player.Platform ?? string.Empty, player.PlayerId ?? string.Empty);
+
+        if (string.IsNullOrWhiteSpace(DisplayName)
+            && _repo.FindById(_key)?.PlayerName is { } resolved
+            && !string.IsNullOrWhiteSpace(resolved))
+        {
+            ApplyWithoutDirtying(() => DisplayName = resolved);
+        }
     }
 
     public override void ApplyDefaults() { /* Player Details has no defaults to restore. */ }

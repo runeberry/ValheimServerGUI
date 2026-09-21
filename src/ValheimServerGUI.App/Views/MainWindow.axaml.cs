@@ -43,7 +43,6 @@ public partial class MainWindow : Window
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
         viewModel.Players.AddByIdPrompt = () => new AddByIdWindow().ShowDialog<AddByIdResult?>(this);
-        viewModel.Players.NoticeReported = msg => _ = ShowMessageAsync("Player access", msg);
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
 
         Opened += OnOpened;

@@ -222,27 +222,6 @@ public class PlayersViewModelTests
     }
 
     [AvaloniaFact]
-    public void Replacing_admin_with_ban_reports_the_override_notice()
-    {
-        var repo = new FakePlayerDataRepository();
-        var vm = NewVm(repo);
-        string? notice = null;
-        vm.NoticeReported = msg => notice = msg;
-
-        var player = Player("7", PlayerStatus.Offline);
-        repo.PushUpdate(player);
-        vm.SelectedPlayer = vm.Players[0];
-        _form.UsePermittedList = false;
-
-        vm.ToggleAdminCommand.Execute(null);
-        vm.ToggleBanCommand.Execute(null);
-
-        Assert.Equal(PlayerRole.Banned, _form.GetRole("Steam:7"));
-        Assert.NotNull(notice);
-        Assert.Contains("banned", notice);
-    }
-
-    [AvaloniaFact]
     public void Profile_load_re_renders_rows_for_the_new_roles()
     {
         var repo = new FakePlayerDataRepository();

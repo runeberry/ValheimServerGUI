@@ -91,9 +91,6 @@ public partial class PlayersViewModel : ViewModelBase
     /// <summary>Shows the "Add by ID" dialog; returns null on cancel. Wired by the window.</summary>
     public Func<Task<AddByIdResult?>>? AddByIdPrompt { get; set; }
 
-    /// <summary>Non-blocking notice (e.g. "ban overrides the other lists"). Wired by the window.</summary>
-    public Action<string>? NoticeReported { get; set; }
-
     public void SetActive(bool active)
     {
         if (active)
@@ -162,7 +159,6 @@ public partial class PlayersViewModel : ViewModelBase
             : (PlayerRole?)null;
 
         if (role is not null) _form.SetRole(player, role);
-        WarnIfBanOverrides(result.Banned, result.Admin, result.Permitted);
 
         _repo.Upsert(player); // OnEntityUpdated adds/updates the row; ApplyRole reads the role back from the form.
     }
@@ -173,27 +169,9 @@ public partial class PlayersViewModel : ViewModelBase
         if (SelectedPlayer is not { } row) return;
 
         var current = _form.GetRole(row.Key);
-        if (current == role)
-        {
-            _form.SetRole(row.Player, null); // negative verb → clear to none
-        }
-        else
-        {
-            _form.SetRole(row.Player, role); // positive verb → set (overwrites any prior role)
-            if (role == PlayerRole.Banned)
-                WarnIfBanOverrides(true, isAdmin: current == PlayerRole.Admin, isPermitted: current == PlayerRole.Permitted);
-        }
+        // Positive verb sets the role (overwriting any prior one); the negative verb clears it to none.
+        _form.SetRole(row.Player, current == role ? null : role);
         // Row re-render + label refresh happen on the form's RoleStateChanged callback.
-    }
-
-    private void WarnIfBanOverrides(bool banning, bool isAdmin, bool isPermitted)
-    {
-        if (banning && (isAdmin || isPermitted))
-        {
-            NoticeReported?.Invoke(
-                "This player is now banned, which replaces their previous admin/permitted role. A ban keeps " +
-                "them out whenever the ban list is in effect.");
-        }
     }
 
     private void RefreshSince()

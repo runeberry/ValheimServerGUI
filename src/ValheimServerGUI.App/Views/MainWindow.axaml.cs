@@ -44,6 +44,10 @@ public partial class MainWindow : Window
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
         viewModel.Players.AddByIdPrompt = () => new AddByIdWindow().ShowDialog<AddByIdResult?>(this);
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
+        viewModel.MessagePrompt = ShowMessageAsync;
+        viewModel.ImportConfirmPrompt = body =>
+            new ConfirmWindow(MainWindowViewModel.ImportDialogTitle, body, "Continue", "Cancel").ShowDialog<bool>(this);
+        viewModel.ConflictPrompt = body => new RoleConflictWindow(body).ShowDialog<RoleConflictChoice>(this);
 
         Opened += OnOpened;
         SetUpTrayIcon();

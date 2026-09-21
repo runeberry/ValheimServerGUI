@@ -67,7 +67,9 @@ public sealed class StartServerFlowTests : IDisposable
             Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(),
             shell,
-            Core.GetRequiredService<IValheimPathResolver>());
+            Core.GetRequiredService<IValheimPathResolver>(),
+            Core.GetRequiredService<IPlayerListImportService>(),
+            Core.GetRequiredService<IRuneberryApiClient>());
 
         vm.LoadProfile(new ServerPreferences { ProfileName = "Test" });
 

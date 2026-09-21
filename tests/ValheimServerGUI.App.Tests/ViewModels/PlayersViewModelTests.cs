@@ -13,8 +13,9 @@ namespace ValheimServerGUI.App.Tests.ViewModels;
 public class PlayersViewModelTests
 {
     private readonly ServerFormViewModel _form = new();
+    private readonly FakeRuneberryApiClient _api = new();
 
-    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form);
+    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form, _api);
 
     private static PlayerInfo Player(string id, PlayerStatus status, string? name = null, string? character = null)
         => new()
@@ -267,6 +268,19 @@ public class PlayersViewModelTests
         await vm.AddByIdCommand.ExecuteAsync(null);
 
         Assert.Equal(PlayerRole.Banned, _form.GetRole("Steam:42")); // ban wins over admin
+    }
+
+    [AvaloniaFact]
+    public async Task Add_by_id_new_record_triggers_a_name_lookup()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(
+            new AddByIdResult(PlayerPlatforms.Steam, "77", Admin: false, Banned: false, Permitted: false));
+
+        await vm.AddByIdCommand.ExecuteAsync(null);
+
+        Assert.Equal(1, _api.RequestPlayerInfoCallCount); // same lookup path a join uses
     }
 
     [AvaloniaFact]

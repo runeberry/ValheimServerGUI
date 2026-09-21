@@ -69,6 +69,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IShellLauncher _shell;
     private readonly IValheimPathResolver _pathResolver;
     private readonly IApplicationLogger _logger;
+    private readonly IPlayerListImportService _import;
+    private readonly IRuneberryApiClient _api;
 
     private string? _updateLinkTarget;
     private string? _startedNewWorld;
@@ -84,7 +86,9 @@ public partial class MainWindowViewModel : ViewModelBase
         IApplicationLogger appLogger,
         ISoftwareUpdateProvider updateProvider,
         IShellLauncher shell,
-        IValheimPathResolver pathResolver)
+        IValheimPathResolver pathResolver,
+        IPlayerListImportService import,
+        IRuneberryApiClient api)
     {
         _serverManager = serverManager;
         _userPrefs = userPrefs;
@@ -96,6 +100,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _shell = shell;
         _pathResolver = pathResolver;
         _logger = appLogger;
+        _import = import;
+        _api = api;
 
         // No server is bound until the first LoadProfile → RetargetTo (the window is always loaded with a
         // profile immediately after construction). ServerStatus defaults to Stopped, which the gates expect.
@@ -104,7 +110,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Details = new ServerDetailsViewModel(ipProvider, () => Form.Port);
         // The Players tab edits the active profile's roles/mode, which live on the form; the three list files
         // are generated from those at server start (in Core), so the tab needs no access-list service here.
-        Players = new PlayersViewModel(playerRepo, Form);
+        Players = new PlayersViewModel(playerRepo, Form, api);
         Logs = new LogsViewModel(appLogger, shell, pathResolver);
 
         _updateProvider.UpdateCheckStarted += OnUpdateCheckStarted;
@@ -144,6 +150,33 @@ public partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>Shows the Save / Don't Save / Cancel unsaved-changes prompt (§13.3). Wired by the window.</summary>
     public Func<Task<UnsavedChangesChoice>>? UnsavedChangesPrompt { get; set; }
+
+    // ===== Player-list import / conflict user copy (EXACT — do not paraphrase) =====
+    // These strings are user-facing and asserted verbatim by a test. {n}/{filepath} are literal placeholders
+    // substituted at display time. Substitutions and titles all live here so there is one source of truth.
+    public const string ImportDialogTitle = "Import player lists";
+    public const string ImportNoFilesMessage = "No files to import.";
+    public const string ImportNoRolesMessage = "No roles to update.";
+    public const string ImportConfirmMessage = "{n} role(s) will be updated from player list files.";
+    public const string ImportUpdatedMessage = "Updated {n} role(s).";
+    public const string ImportFailedMessage = "Failed to import player lists. See application logs for details.";
+
+    public const string PermittedFileErrorTitle = "Permitted List File Error";
+    public const string PermittedFileErrorMessage =
+        "The server is set to launch without a permitted players list, but {filepath} is present on disk, and could not be moved. Please move or delete this file, or change the server configuration to use the permitted list.";
+
+    public const string RoleConflictTitle = "Player Role Conflicts";
+    public const string RoleConflictMessage =
+        "{n} player(s) are present in player list files with conflicting roles. What would you like to do?\n\nSee application logs for more details.";
+
+    /// <summary>Shows a single-OK informational modal (title, body). Wired by the window; no-op if unset.</summary>
+    public Func<string, string, Task>? MessagePrompt { get; set; }
+
+    /// <summary>Shows the Continue/Cancel import confirmation (returns true for Continue). Wired by the window.</summary>
+    public Func<string, Task<bool>>? ImportConfirmPrompt { get; set; }
+
+    /// <summary>Shows the 3-way role-conflict prompt. Wired by the window; treated as UseServerProfile if unset.</summary>
+    public Func<string, Task<RoleConflictChoice>>? ConflictPrompt { get; set; }
 
     /// <summary>The actual "start the server" step; overridable in tests so the full flow runs without launching.</summary>
     internal Action<IValheimServerOptions> StartAction { get; set; }
@@ -321,6 +354,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand]
     private void CharacterNamesHelp() => _shell.OpenWebAddress(AppConstants.UrlHelpCharacterNames);
 
+    // Always enabled (imports touch only roles, which are editable regardless of server state).
+    [RelayCommand]
+    private Task ImportPlayerLists() => RunImportAsync(interactive: true);
+
     [RelayCommand]
     private void PortForwarding() => _shell.OpenWebAddress(AppConstants.UrlPortForwarding);
 
@@ -401,6 +438,16 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         Form.LoadFieldsFrom(profile);
+
+        // First-launch adoption: a profile that has never had roles set silently imports any existing list
+        // files (no modals, assume Continue, errors only logged) so upgrading users keep their setups. The
+        // silent path has no awaited steps, so this completes synchronously before the world refresh below.
+        if (profile.PlayerRoles.Count == 0)
+        {
+            _logger.Information("Profile '{profile}' has no player roles; attempting first-launch list import.", profile.ProfileName);
+            _ = RunImportAsync(interactive: false);
+        }
+
         RefreshWorldList();
         SelectWorld(profile.WorldName);
     }
@@ -526,6 +573,15 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
+        // List-file safety runs BEFORE Core generation: adopt/import files into roles, detect conflicts, and
+        // guard a stray permitted-list file. It may mutate the form (adopted roles) and set
+        // SkipAccessListGeneration, so rebuild options afterwards — preserving that skip flag — so both the
+        // launch and save-on-start reflect the merged config.
+        if (!await ResolveListSafetyBeforeStartAsync(options, isManual)) return;
+        var skipGeneration = options.SkipAccessListGeneration;
+        options = BuildOptions();
+        options.SkipAccessListGeneration = skipGeneration;
+
         _logger.Information("Starting {mode} server for profile '{profile}' on port {port} (world: {world})",
             isManual ? "manual" : "auto-start", CurrentProfile?.ProfileName, port, worldName);
 
@@ -611,6 +667,190 @@ public partial class MainWindowViewModel : ViewModelBase
             var playerId = separator >= 0 ? kvp.Key[(separator + 1)..] : kvp.Key;
             return new PlayerRoleAssignment(platform, kvp.Value.PlatformRaw ?? platform, playerId, kvp.Value.Role);
         }).ToList();
+
+    // ===== Player-list import / startup conflict detection =====
+
+    // Reuses the save-folder resolution BuildOptions performs (profile SaveDataFolderPath ?? user default).
+    // Returns null when no folder is configured/available yet.
+    private string? ResolveSaveDataFolder()
+    {
+        try
+        {
+            return BuildOptions().GetValidatedSaveDataFolder().FullName;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    private async Task ShowMessageAsync(string title, string body)
+    {
+        if (MessagePrompt is not null) await MessagePrompt(title, body);
+    }
+
+    /// <summary>
+    /// Imports the on-disk list files into the profile's roles wholesale (ad-hoc button, first-launch, and the
+    /// start-time "no roles yet" adoption). <paramref name="interactive"/> drives the modals: an interactive run
+    /// confirms and reports via dialogs; a silent run assumes Continue and only logs (no modals, no error box).
+    /// </summary>
+    public async Task RunImportAsync(bool interactive = true)
+    {
+        var savedir = ResolveSaveDataFolder();
+        if (savedir is null)
+        {
+            _logger.Warning("Player-list import skipped for profile '{profile}': no save folder configured.", CurrentProfile?.ProfileName);
+            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoFilesMessage);
+            return;
+        }
+
+        // Always log which files were examined, so a "no files"/failure result is traceable.
+        var dir = new DirectoryInfo(savedir);
+        _logger.Information("Player-list import: checking {admin}, {banned}, {permitted}.",
+            dir.GetAdminListFile().FullName, dir.GetBannedListFile().FullName, dir.GetPermittedListFile().FullName);
+
+        var plan = _import.BuildImport(savedir, Form.PlayerRoles, Form.UsePermittedList);
+
+        if (!plan.AnyFilesPresent)
+        {
+            _logger.Information("Player-list import: no list files present in {folder}.", savedir);
+            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoFilesMessage);
+            return;
+        }
+
+        if (!plan.Success)
+        {
+            _logger.Error("Player-list import failed: {reason}", plan.FailureReason);
+            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportFailedMessage);
+            return;
+        }
+
+        if (plan.UpdateCount == 0)
+        {
+            _logger.Information("Player-list import: files already match the profile; no role changes.");
+            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoRolesMessage);
+            return;
+        }
+
+        if (interactive)
+        {
+            var proceed = ImportConfirmPrompt is not null
+                && await ImportConfirmPrompt(ImportConfirmMessage.Replace("{n}", plan.UpdateCount.ToString()));
+            if (!proceed)
+            {
+                _logger.Information("Player-list import cancelled by user.");
+                return;
+            }
+        }
+
+        ApplyImportPlan(plan.Roles, plan.UsePermittedList, plan.NewPlayers);
+        _logger.Information("Player-list import applied: {count} role change(s), usePermittedList={mode}.",
+            plan.UpdateCount, plan.UsePermittedList);
+
+        if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportUpdatedMessage.Replace("{n}", plan.UpdateCount.ToString()));
+    }
+
+    // Applies a role map + flag to the form as one batched edit, then fires a name lookup for each new player
+    // (fire-and-forget, the same call the join/add-by-ID paths use).
+    private void ApplyImportPlan(
+        IReadOnlyDictionary<string, PlayerRoleEntry> roles,
+        bool usePermittedList,
+        IReadOnlyList<PlayerRoleAssignment> newPlayers)
+    {
+        Form.ApplyImport(roles, usePermittedList);
+        foreach (var np in newPlayers)
+            _ = _api.RequestPlayerInfoAsync(np.Platform ?? string.Empty, np.PlayerId ?? string.Empty);
+    }
+
+    /// <summary>
+    /// Guards the on-disk list files before Core generation overwrites them at start. Returns false to abort
+    /// the start. Three steps: (1) back up a stray non-empty permittedlist.txt in open mode (abort if it can't
+    /// be moved); (2) adopt files when the profile has no roles yet, else detect conflicts; (3) on a conflict,
+    /// let the user keep the profile (regenerate, backing up the files), keep the files (skip generation), or
+    /// cancel. Non-interactive (auto-start or an unwired prompt) defaults to keeping the profile.
+    /// </summary>
+    private async Task<bool> ResolveListSafetyBeforeStartAsync(ValheimServerOptions options, bool isManual)
+    {
+        var dir = options.GetValidatedSaveDataFolder();
+        var savedir = dir.FullName;
+
+        // (1) Open mode, but a non-empty permitted list on disk would silently gate everyone out — move it aside.
+        if (!options.UsePermittedList && _import.HasEntries(savedir, PlayerAccessList.Permitted))
+        {
+            var permittedFile = dir.GetPermittedListFile();
+            var backup = ValheimPathExtensions.BackupListFile(permittedFile);
+            if (backup is null)
+            {
+                _logger.Error("Cannot start: permitted list file {file} is present in open mode and could not be moved.", permittedFile.FullName);
+                await ShowMessageAsync(PermittedFileErrorTitle, PermittedFileErrorMessage.Replace("{filepath}", permittedFile.FullName));
+                return false;
+            }
+            _logger.Warning("Open-mode start: backed up existing permitted list {src} to {dst}.", permittedFile.FullName, backup.FullName);
+        }
+
+        // (2) No roles yet → adopt whatever the files say (silent). Otherwise reconcile one-directionally.
+        if (Form.PlayerRoles.Count == 0)
+        {
+            await RunImportAsync(interactive: false);
+            return true;
+        }
+
+        var report = _import.CheckConflicts(savedir, Form.PlayerRoles, Form.UsePermittedList);
+        if (!report.Success)
+        {
+            _logger.Error("Player-list conflict check failed: {reason}. Proceeding with the current profile config.", report.FailureReason);
+            return true;
+        }
+
+        // Fold in any roles the files require that the profile is missing (never unsets), then look them up.
+        if (report.Additions.Count > 0)
+        {
+            var merged = new Dictionary<string, PlayerRoleEntry>(Form.PlayerRoles);
+            foreach (var add in report.Additions) merged[add.Key] = add.Entry;
+            ApplyImportPlan(merged, Form.UsePermittedList, report.NewPlayers);
+            _logger.Information("Adopted {count} missing role(s) from player list files at start.", report.Additions.Count);
+        }
+
+        if (report.ConflictCount == 0) return true;
+
+        foreach (var line in report.LogLines) _logger.Warning("{line}", line);
+
+        var choice = (isManual && ConflictPrompt is not null)
+            ? await ConflictPrompt(RoleConflictMessage.Replace("{n}", report.ConflictCount.ToString()))
+            : RoleConflictChoice.UseServerProfile; // non-interactive / unwired: the profile wins
+
+        switch (choice)
+        {
+            case RoleConflictChoice.Cancel:
+                _logger.Information("Server start cancelled at the role-conflict prompt.");
+                return false;
+
+            case RoleConflictChoice.UseRolesFromFile:
+                options.SkipAccessListGeneration = true;
+                _logger.Information("Role conflict resolved: keeping the list files as-is (generation skipped).");
+                return true;
+
+            default: // UseServerProfile — back up each conflicting file, then let generation overwrite.
+                foreach (var list in report.ConflictingFiles)
+                {
+                    var file = ResolveListFile(dir, list);
+                    var backup = ValheimPathExtensions.BackupListFile(file);
+                    if (backup is not null)
+                        _logger.Warning("Role conflict resolved (profile wins): backed up {src} to {dst}.", file.FullName, backup.FullName);
+                    else
+                        _logger.Error("Role conflict: failed to back up {src}; it will be overwritten by generation.", file.FullName);
+                }
+                return true;
+        }
+    }
+
+    private static FileInfo ResolveListFile(DirectoryInfo savedir, PlayerAccessList list) => list switch
+    {
+        PlayerAccessList.Admin => savedir.GetAdminListFile(),
+        PlayerAccessList.Banned => savedir.GetBannedListFile(),
+        PlayerAccessList.Permitted => savedir.GetPermittedListFile(),
+        _ => throw new ArgumentOutOfRangeException(nameof(list), list, null),
+    };
 
     /// <summary>GetPrefsFromFormState — merged onto the existing/new profile prefs.</summary>
     public ServerPreferences BuildPreferences()

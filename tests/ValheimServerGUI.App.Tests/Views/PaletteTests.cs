@@ -38,7 +38,8 @@ public class PaletteTests
             new FakeServerPreferencesProvider(), Core.GetRequiredService<IWorldPreferencesProvider>(),
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             Core.GetRequiredService<IPlayerDataRepository>(), Core.GetRequiredService<IApplicationLogger>(),
-            new FakeSoftwareUpdateProvider(), shell, Core.GetRequiredService<IValheimPathResolver>());
+            new FakeSoftwareUpdateProvider(), shell, Core.GetRequiredService<IValheimPathResolver>(),
+            Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
         window.Show();
         Dispatcher.UIThread.RunJobs();

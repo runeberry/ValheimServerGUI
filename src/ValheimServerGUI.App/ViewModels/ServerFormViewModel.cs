@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
@@ -77,6 +78,36 @@ public partial class ServerFormViewModel : ObservableObject
     /// <summary>The stored role for a player key, or null when the player has no role.</summary>
     public PlayerRole? GetRole(string key)
         => _playerRoles.TryGetValue(key, out var entry) ? entry.Role : null;
+
+    /// <summary>The full role map (read-only view), keyed by <c>PlayerInfo.Key</c>. The owner reads this to
+    /// drive list-file import/conflict logic; mutation goes through <see cref="SetRole"/> / <see cref="ApplyImport"/>.</summary>
+    public IReadOnlyDictionary<string, PlayerRoleEntry> PlayerRoles => _playerRoles;
+
+    /// <summary>
+    /// Replaces the whole role map + permitted-list flag in one shot (a player-list import). Runs under
+    /// <see cref="RunClean"/> so no per-key churn is raised, then — only if anything actually changed — marks
+    /// the form dirty and raises exactly one <see cref="RoleStateChanged"/> and one <see cref="PlayerRolesEdited"/>.
+    /// That single edit signal makes a bulk import a single live-apply event while the server runs.
+    /// </summary>
+    public void ApplyImport(IReadOnlyDictionary<string, PlayerRoleEntry> roles, bool usePermittedList)
+    {
+        var changed = usePermittedList != UsePermittedList
+            || _playerRoles.Count != roles.Count
+            || !roles.All(kvp => _playerRoles.TryGetValue(kvp.Key, out var existing) && existing == kvp.Value);
+
+        if (!changed) return;
+
+        RunClean(() =>
+        {
+            _playerRoles.Clear();
+            foreach (var (key, entry) in roles) _playerRoles[key] = entry;
+            UsePermittedList = usePermittedList;
+        });
+
+        IsDirty = true;
+        RoleStateChanged?.Invoke(this, EventArgs.Empty);
+        PlayerRolesEdited?.Invoke(this, EventArgs.Empty);
+    }
 
     /// <summary>
     /// Sets (or clears, when <paramref name="role"/> is null) a player's single role. A real change trips

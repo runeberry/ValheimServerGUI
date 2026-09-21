@@ -85,7 +85,9 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
             Core.GetRequiredService<IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(),
             shell,
-            Core.GetRequiredService<IValheimPathResolver>());
+            Core.GetRequiredService<IValheimPathResolver>(),
+            Core.GetRequiredService<IPlayerListImportService>(),
+            Core.GetRequiredService<IRuneberryApiClient>());
 
         return (vm, manager, serverPrefs);
     }

@@ -8,6 +8,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.App.ViewModels;
@@ -30,13 +31,15 @@ public partial class PlayersViewModel : ViewModelBase
 {
     private readonly IPlayerDataRepository _repo;
     private readonly ServerFormViewModel _form;
+    private readonly IRuneberryApiClient _api;
     private readonly Dictionary<string, PlayerRowViewModel> _rows = new();
     private readonly DispatcherTimer _sinceTimer;
 
-    public PlayersViewModel(IPlayerDataRepository repo, ServerFormViewModel form)
+    public PlayersViewModel(IPlayerDataRepository repo, ServerFormViewModel form, IRuneberryApiClient api)
     {
         _repo = repo;
         _form = form;
+        _api = api;
 
         _sinceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _sinceTimer.Tick += (_, _) => RefreshSince();
@@ -141,7 +144,8 @@ public partial class PlayersViewModel : ViewModelBase
         // Create/annotate a repo record so the person appears in the table. For a manually-entered ID the
         // normalized platform name IS the canonical write token, so PlatformRaw = the platform name.
         var key = $"{platform}:{playerId}";
-        var player = _repo.FindById(key) ?? new PlayerInfo
+        var existing = _repo.FindById(key);
+        var player = existing ?? new PlayerInfo
         {
             Platform = platform,
             PlatformRaw = platform,
@@ -161,6 +165,10 @@ public partial class PlayersViewModel : ViewModelBase
         if (role is not null) _form.SetRole(player, role);
 
         _repo.Upsert(player); // OnEntityUpdated adds/updates the row; ApplyRole reads the role back from the form.
+
+        // A brand-new record has no name yet: look it up the same way the join path does (fire-and-forget).
+        if (existing is null)
+            _ = _api.RequestPlayerInfoAsync(platform, playerId);
     }
 
     // Flips the selected player's stored role for one verb: set it when absent, clear it when already set.

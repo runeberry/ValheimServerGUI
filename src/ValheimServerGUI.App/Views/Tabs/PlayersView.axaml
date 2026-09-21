@@ -102,6 +102,8 @@
             </c:DataListView.Columns>
             <c:DataListView.FooterRight>
                 <StackPanel Orientation="Horizontal" Spacing="4">
+                    <c:IconButton IconName="ImportFile_16x" ToolTip.Tip="Import player lists"
+                                  Command="{Binding ImportPlayerListsCommand}" />
                     <c:IconButton IconName="Add_16x" ToolTip.Tip="Add player by ID"
                                   Command="{Binding Players.AddByIdCommand}" />
                     <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove player"

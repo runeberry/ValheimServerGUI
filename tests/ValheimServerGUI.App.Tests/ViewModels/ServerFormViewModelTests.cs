@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
 using Xunit;
@@ -205,6 +206,56 @@ public class ServerFormViewModelTests
         Assert.Equal(PlayerRole.Permitted, prefs.PlayerRoles["Steam:1"].Role);
         Assert.Equal("kept", prefs.Name); // other fields untouched
     }
+
+    [Fact]
+    public void ApplyImport_swaps_roles_and_flag_with_one_edit_signal()
+    {
+        var form = new ServerFormViewModel();
+        form.SetRole(Player("1"), PlayerRole.Admin); // pre-existing role that the import replaces
+
+        var stateChanges = 0;
+        var edits = 0;
+        form.RoleStateChanged += (_, _) => stateChanges++;
+        form.PlayerRolesEdited += (_, _) => edits++;
+
+        var roles = new Dictionary<string, PlayerRoleEntry>
+        {
+            ["Steam:2"] = new PlayerRoleEntry(PlayerRole.Permitted, "Steam"),
+            ["Steam:3"] = new PlayerRoleEntry(PlayerRole.Banned, "Steam"),
+        };
+        form.ApplyImport(roles, usePermittedList: true);
+
+        Assert.True(form.IsDirty);
+        Assert.Equal(1, stateChanges);                 // exactly one, not one per key
+        Assert.Equal(1, edits);                        // one live-apply signal for the whole batch
+        Assert.True(form.UsePermittedList);
+        Assert.Null(form.GetRole("Steam:1"));          // the old role was unset (wholesale swap)
+        Assert.Equal(PlayerRole.Permitted, form.GetRole("Steam:2"));
+        Assert.Equal(PlayerRole.Banned, form.GetRole("Steam:3"));
+    }
+
+    [Fact]
+    public void ApplyImport_that_changes_nothing_raises_no_events()
+    {
+        var form = new ServerFormViewModel { UsePermittedList = true };
+        form.SetRole(Player("1"), PlayerRole.Admin);
+        form.LoadFieldsFrom(FormPrefs(form)); // settle to a clean, known state
+
+        var stateChanges = 0;
+        var edits = 0;
+        form.RoleStateChanged += (_, _) => stateChanges++;
+        form.PlayerRolesEdited += (_, _) => edits++;
+
+        var same = new Dictionary<string, PlayerRoleEntry> { ["Steam:1"] = new PlayerRoleEntry(PlayerRole.Admin, "Steam") };
+        form.ApplyImport(same, usePermittedList: true);
+
+        Assert.False(form.IsDirty);
+        Assert.Equal(0, stateChanges);
+        Assert.Equal(0, edits);
+    }
+
+    private static ServerPreferences FormPrefs(ServerFormViewModel form)
+        => form.ToPreferences(new ServerPreferences { ProfileName = "P" });
 
     [Fact]
     public void Load_leaves_the_form_clean()

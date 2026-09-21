@@ -36,7 +36,9 @@ public class MainWindowRenderTests
             Core.GetRequiredService<IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(),
             shell,
-            Core.GetRequiredService<IValheimPathResolver>());
+            Core.GetRequiredService<IValheimPathResolver>(),
+            Core.GetRequiredService<IPlayerListImportService>(),
+            Core.GetRequiredService<IRuneberryApiClient>());
         vm.LoadProfile(new ServerPreferences { ProfileName = profiles.FirstOrDefault() ?? "Render" });
         return vm;
     }

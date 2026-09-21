@@ -44,7 +44,9 @@ public class MainWindowViewModelTests
             Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
             update,
             shell,
-            Core.GetRequiredService<IValheimPathResolver>());
+            Core.GetRequiredService<IValheimPathResolver>(),
+            Core.GetRequiredService<IPlayerListImportService>(),
+            Core.GetRequiredService<IRuneberryApiClient>());
     }
 
     [Fact]

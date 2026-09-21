@@ -42,6 +42,7 @@ public class ControlsAndIconsTests
     [InlineData("Save_16x")]
     [InlineData("OpenFile_16x")]
     [InlineData("Cancel_16x")]
+    [InlineData("ImportFile_16x")]
     [InlineData("Settings_16x")]
     [InlineData("FolderInformation_16x")]
     [InlineData("OpenFolder_16x")]

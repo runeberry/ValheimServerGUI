@@ -97,10 +97,14 @@ namespace ValheimServerGUI.Tools
         }
 
         /// <summary>Fetches the external IP from one endpoint. ipify returns <c>{"ip":…}</c>; the others return the bare IP.</summary>
+        /// <remarks>Routed through <see cref="RestClient"/> (not a raw HttpClient) so the call is logged at the
+        /// shared HTTP chokepoint — Info on success, Error on failure — like every other external request.</remarks>
         protected virtual async Task<string?> FetchExternalIpAsync(string url)
         {
-            using var client = Context.HttpClientProvider.CreateClient();
-            var body = (await client.GetStringAsync(url)).Trim();
+            var response = await Get(url).SendAsync();
+            if (response is null || !response.IsSuccessStatusCode) return null;
+
+            var body = (await response.Content.ReadAsStringAsync()).Trim();
             if (body.StartsWith('{'))
                 return JsonConvert.DeserializeObject<ExternalIpResponse>(body)?.Ip;
             return body;

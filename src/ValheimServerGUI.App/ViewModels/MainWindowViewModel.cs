@@ -114,6 +114,10 @@ public partial class MainWindowViewModel : ViewModelBase
         // The "choose an existing world" gate depends on the world list being non-empty.
         Form.Worlds.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CanSelectExistingWorld));
 
+        // Player roles are the one carve-out from "changes only while stopped": apply them live to a running
+        // server. Only genuine user edits raise this (loads run under RunClean).
+        Form.PlayerRolesEdited += OnPlayerRolesEdited;
+
         // The startup update check runs before this window exists, so its live events are missed. Seed the
         // readout from the provider's last result; a still-running or future check updates it via the events.
         if (_updateProvider.LastResult is { } lastResult)
@@ -573,16 +577,10 @@ public partial class MainWindowViewModel : ViewModelBase
             // Lines land in the profile's server-owned buffer regardless of which window started the server.
             LogMessageHandler = _serverManager.GetLogAppender(
                 CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName),
-            // Access-list generation inputs: the mode flag + the profile's roles (recovered from the map key
-            // "{Platform}:{PlayerId}"). Core projects these onto the three gating files at start.
+            // Access-list generation inputs: the mode flag + the profile's roles. Core projects these onto the
+            // three gating files at start.
             UsePermittedList = serverPrefs.UsePermittedList,
-            PlayerRoles = serverPrefs.PlayerRoles.Select(kvp =>
-            {
-                var separator = kvp.Key.IndexOf(':');
-                var platform = separator >= 0 ? kvp.Key[..separator] : null;
-                var playerId = separator >= 0 ? kvp.Key[(separator + 1)..] : kvp.Key;
-                return new PlayerRoleAssignment(platform, kvp.Value.PlatformRaw ?? platform, playerId, kvp.Value.Role);
-            }).ToList(),
+            PlayerRoles = BuildRoleAssignments(serverPrefs),
         };
 
         var worldName = serverPrefs.WorldName;
@@ -602,6 +600,17 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return options;
     }
+
+    // Recovers PlayerRoleAssignment records (self-contained, no repo dependency) from a profile's role map,
+    // splitting the "{Platform}:{PlayerId}" key. Shared by the start-options build and the live-apply path.
+    private static List<PlayerRoleAssignment> BuildRoleAssignments(ServerPreferences prefs)
+        => prefs.PlayerRoles.Select(kvp =>
+        {
+            var separator = kvp.Key.IndexOf(':');
+            var platform = separator >= 0 ? kvp.Key[..separator] : null;
+            var playerId = separator >= 0 ? kvp.Key[(separator + 1)..] : kvp.Key;
+            return new PlayerRoleAssignment(platform, kvp.Value.PlatformRaw ?? platform, playerId, kvp.Value.Role);
+        }).ToList();
 
     /// <summary>GetPrefsFromFormState — merged onto the existing/new profile prefs.</summary>
     public ServerPreferences BuildPreferences()
@@ -675,6 +684,32 @@ public partial class MainWindowViewModel : ViewModelBase
             Form.NewWorldName = worldName;
         }
     });
+
+    // Live-apply carve-out: while the server is NOT stopped, a player-role/mode edit is committed immediately
+    // (the running server re-reads the list files within seconds) instead of waiting for Save. While stopped,
+    // role edits stay in the ordinary dirty/Save flow (Form.IsDirty → Save / save-on-start → generate at Start).
+    private void OnPlayerRolesEdited(object? sender, EventArgs e)
+    {
+        if (ServerStatus == ServerStatus.Stopped) return;
+
+        // Persist ONLY the roles + flag onto the on-disk profile, so any unsaved (stopped-only) field edits
+        // stay pending rather than being silently committed by a role change.
+        var profileName = CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName;
+        var prefs = _serverPrefs.LoadPreferences(profileName) ?? new ServerPreferences { ProfileName = profileName };
+        Form.ApplyRolesTo(prefs);
+        _serverPrefs.SavePreferences(prefs);
+
+        // Regenerate the running server's list files now (reusing the start-time generation path), and keep
+        // its live options in step so a later restart preserves the change.
+        try
+        {
+            _currentServer?.ApplyPlayerRoles(BuildRoleAssignments(prefs), prefs.UsePermittedList);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Player role saved, but regenerating the running server's access lists failed: {message}", ex.Message);
+        }
+    }
 
     // ===== Core event handlers (marshalled + guarded) =====
 
@@ -831,6 +866,7 @@ public partial class MainWindowViewModel : ViewModelBase
             _currentServer.StatusChanged -= HandleServerStatusChanged;
             _currentServer.StopTimedOut -= OnServerStopTimedOut;
         }
+        Form.PlayerRolesEdited -= OnPlayerRolesEdited;
         _updateProvider.UpdateCheckStarted -= OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished -= OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved -= OnServerPreferencesSaved;

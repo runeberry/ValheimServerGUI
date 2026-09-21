@@ -147,6 +147,38 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         Assert.True(vm.CanStart);
     }
 
+    // Live carve-out: a role change while the server runs is committed immediately — persisted to the profile
+    // and projected onto the running server's list files (which it re-reads within seconds).
+    [Fact]
+    public void Role_change_while_running_saves_immediately_and_regenerates_files()
+    {
+        var (vm, mgr, serverPrefs) = Build("A");
+        RunToRunning(mgr.GetOrCreate("A"), Options()); // Options() savedir = _saveDir
+        vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
+        Assert.Equal(ServerStatus.Running, vm.ServerStatus);
+
+        vm.Form.SetRole(new PlayerInfo { Platform = "Steam", PlatformRaw = "Steam", PlayerId = "500" }, PlayerRole.Admin);
+
+        // Persisted to the profile immediately (not left to Save).
+        Assert.Equal(PlayerRole.Admin, serverPrefs.LoadPreferences("A")!.PlayerRoles["Steam:500"].Role);
+        // And regenerated into the running server's savedir.
+        Assert.Contains("Steam_500", File.ReadAllLines(Path.Combine(_saveDir, "adminlist.txt")));
+    }
+
+    // While stopped, a role change stays in the ordinary dirty/Save flow — no immediate persist.
+    [Fact]
+    public void Role_change_while_stopped_is_deferred_to_save()
+    {
+        var (vm, _, serverPrefs) = Build("A");
+        vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
+        Assert.Equal(ServerStatus.Stopped, vm.ServerStatus);
+
+        vm.Form.SetRole(new PlayerInfo { Platform = "Steam", PlatformRaw = "Steam", PlayerId = "500" }, PlayerRole.Admin);
+
+        Assert.True(vm.Form.IsDirty);                                          // pending, awaiting Save
+        Assert.Empty(serverPrefs.LoadPreferences("A")!.PlayerRoles);           // not persisted yet
+    }
+
     [Fact]
     public void Switching_repoints_the_logs_buffer()
     {

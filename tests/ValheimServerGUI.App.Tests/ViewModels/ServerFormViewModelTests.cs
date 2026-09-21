@@ -176,6 +176,37 @@ public class ServerFormViewModelTests
     }
 
     [Fact]
+    public void PlayerRolesEdited_fires_for_user_edits_but_not_loads()
+    {
+        var form = new ServerFormViewModel();
+        var edits = 0;
+        form.PlayerRolesEdited += (_, _) => edits++;
+
+        form.SetRole(Player("1"), PlayerRole.Admin); // user edit
+        form.UsePermittedList = true;                // user edit
+        Assert.Equal(2, edits);
+
+        var prefs = new ServerPreferences { ProfileName = "P", UsePermittedList = true };
+        prefs.PlayerRoles["Steam:9"] = new PlayerRoleEntry(PlayerRole.Banned, "Steam");
+        form.LoadFieldsFrom(prefs); // a load must NOT count as a user edit
+        Assert.Equal(2, edits);
+    }
+
+    [Fact]
+    public void ApplyRolesTo_writes_only_roles_and_flag()
+    {
+        var form = new ServerFormViewModel { UsePermittedList = true, Name = "ignored-here" };
+        form.SetRole(Player("1"), PlayerRole.Permitted);
+
+        var prefs = new ServerPreferences { ProfileName = "P", Name = "kept" };
+        form.ApplyRolesTo(prefs);
+
+        Assert.True(prefs.UsePermittedList);
+        Assert.Equal(PlayerRole.Permitted, prefs.PlayerRoles["Steam:1"].Role);
+        Assert.Equal("kept", prefs.Name); // other fields untouched
+    }
+
+    [Fact]
     public void Load_leaves_the_form_clean()
     {
         var prefs = new ServerPreferences { ProfileName = "P", UsePermittedList = true };

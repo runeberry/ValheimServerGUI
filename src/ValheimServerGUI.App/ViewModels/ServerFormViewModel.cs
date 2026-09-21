@@ -67,6 +67,13 @@ public partial class ServerFormViewModel : ObservableObject
     /// can re-render. Not raised for the mode flag — that surfaces as an ordinary PropertyChanged.</summary>
     public event EventHandler? RoleStateChanged;
 
+    /// <summary>
+    /// Raised only for a genuine <b>user</b> edit to a role or the permitted-list mode (never during a load,
+    /// which runs under <see cref="RunClean"/>). The owner uses this to apply role changes live while the
+    /// server is running — the one carve-out from the "changes only while stopped" rule.
+    /// </summary>
+    public event EventHandler? PlayerRolesEdited;
+
     /// <summary>The stored role for a player key, or null when the player has no role.</summary>
     public PlayerRole? GetRole(string key)
         => _playerRoles.TryGetValue(key, out var entry) ? entry.Role : null;
@@ -91,8 +98,19 @@ public partial class ServerFormViewModel : ObservableObject
             _playerRoles[key] = entry;
         }
 
-        if (_suppressDirty == 0) IsDirty = true;
+        if (_suppressDirty == 0)
+        {
+            IsDirty = true;
+            PlayerRolesEdited?.Invoke(this, EventArgs.Empty);
+        }
         RoleStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    // The permitted-list flag is a role-affecting edit too: surface it on the same live-apply signal (only
+    // for real user edits, i.e. not while a load is suppressing the dirty flag).
+    partial void OnUsePermittedListChanged(bool value)
+    {
+        if (_suppressDirty == 0) PlayerRolesEdited?.Invoke(this, EventArgs.Empty);
     }
 
     // ----- Advanced Controls -----
@@ -174,8 +192,18 @@ public partial class ServerFormViewModel : ObservableObject
         prefs.ServerExePath = ServerExePath;
         prefs.SaveDataFolderPath = SaveDataFolderPath;
         prefs.WriteServerLogsToFile = WriteServerLogsToFile;
+        ApplyRolesTo(prefs);
+        return prefs;
+    }
+
+    /// <summary>
+    /// Writes <b>only</b> the player roles + permitted-list flag onto <paramref name="prefs"/>, leaving every
+    /// other field untouched. Used by the live-apply path to persist a role change to the profile while the
+    /// server runs without folding in any unsaved (stopped-only) field edits.
+    /// </summary>
+    public void ApplyRolesTo(ServerPreferences prefs)
+    {
         prefs.UsePermittedList = UsePermittedList;
         prefs.PlayerRoles = new Dictionary<string, PlayerRoleEntry>(_playerRoles);
-        return prefs;
     }
 }

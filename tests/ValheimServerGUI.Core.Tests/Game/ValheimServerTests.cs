@@ -293,6 +293,25 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Single(banned);                            // header only
         }
 
+        // The live carve-out: applying roles to an already-running server regenerates the files now AND
+        // updates the live options, so a restart (which reuses Options) keeps the change instead of reverting.
+        [Fact]
+        public void ApplyPlayerRoles_RegeneratesFiles_AndUpdatesLiveOptions()
+        {
+            _server.Start(Options()); // started with no roles -> header-only files
+            Assert.Single(File.ReadAllLines(Path.Join(_saveDir, "adminlist.txt")));
+
+            var roles = new[]
+            {
+                new PlayerRoleAssignment(PlayerPlatforms.Steam, PlayerPlatforms.Steam, "500", PlayerRole.Admin),
+            };
+            _server.ApplyPlayerRoles(roles, usePermittedList: false);
+
+            Assert.Contains("Steam_500", File.ReadAllLines(Path.Join(_saveDir, "adminlist.txt")));
+            // Options updated so a subsequent restart regenerates from the new roles, not the start-time ones.
+            Assert.Same(roles, _server.Options.PlayerRoles);
+        }
+
         [Fact]
         public void WorldSavedLogLine_ReRaisesWorldSavedEvent()
         {

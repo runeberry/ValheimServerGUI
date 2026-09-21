@@ -317,16 +317,45 @@ namespace ValheimServerGUI.Game
         private void GenerateAccessLists(IValheimServerOptions options)
         {
             var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;
-
-            var roles = options.PlayerRoles.Select(a => (
-                new PlayerInfo { Platform = a.Platform, PlatformRaw = a.PlatformRaw, PlayerId = a.PlayerId },
-                a.Role));
-
-            AccessLists.GenerateFiles(saveDataFolder, roles, options.UsePermittedList);
+            RegenerateAccessLists(saveDataFolder, options.PlayerRoles, options.UsePermittedList);
 
             ApplicationLogger.Information(
                 "Generated access lists in {folder}: {count} role(s), usePermittedList={mode}",
                 saveDataFolder, options.PlayerRoles.Count, options.UsePermittedList);
+        }
+
+        /// <summary>
+        /// Applies a player-role change to the <b>already-running</b> server (the carve-out from the
+        /// "changes only while stopped" rule): updates the live <see cref="Options"/> so a later restart keeps
+        /// the change, then regenerates the three list files, which the server re-reads within seconds. Only
+        /// the roles + flag change — every other launch option is left exactly as it was at start.
+        /// </summary>
+        public void ApplyPlayerRoles(IReadOnlyList<PlayerRoleAssignment> roles, bool usePermittedList)
+        {
+            // Keep the live options in step: Restart reuses Options, so without this a restart would regenerate
+            // from the stale start-time roles and revert the change.
+            if (Options is ValheimServerOptions options)
+            {
+                options.PlayerRoles = roles;
+                options.UsePermittedList = usePermittedList;
+            }
+
+            var saveDataFolder = Options.GetValidatedSaveDataFolder().FullName;
+            RegenerateAccessLists(saveDataFolder, roles, usePermittedList);
+
+            ApplicationLogger.Information(
+                "Applied live player-role change: regenerated access lists in {folder} ({count} role(s), usePermittedList={mode})",
+                saveDataFolder, roles.Count, usePermittedList);
+        }
+
+        private void RegenerateAccessLists(
+            string saveDataFolder, IReadOnlyList<PlayerRoleAssignment> roles, bool usePermittedList)
+        {
+            var players = roles.Select(a => (
+                new PlayerInfo { Platform = a.Platform, PlatformRaw = a.PlatformRaw, PlayerId = a.PlayerId },
+                a.Role));
+
+            AccessLists.GenerateFiles(saveDataFolder, players, usePermittedList);
         }
 
         private static string GenerateArgs(IValheimServerOptions options)

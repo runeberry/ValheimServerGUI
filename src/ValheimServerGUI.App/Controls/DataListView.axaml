@@ -11,9 +11,10 @@
             <ControlTemplate>
                 <Border BorderBrush="{DynamicResource AppBorderBrush}" BorderThickness="1">
                     <DockPanel>
-                        <!-- Footer: same dark bar and 20px height as the header. -->
+                        <!-- Footer: same dark bar and height as the header (HeaderFooterHeight), content centred. -->
                         <Border DockPanel.Dock="Bottom" IsVisible="{TemplateBinding HasFooter}"
-                                Background="{DynamicResource LayerDarkest}" Height="20" Padding="6,0">
+                                Background="{DynamicResource LayerDarkest}"
+                                Height="{x:Static c:DataListView.HeaderFooterHeight}" Padding="6,0">
                             <Grid ColumnDefinitions="Auto,*,Auto" VerticalAlignment="Center">
                                 <ContentControl Grid.Column="0" Content="{TemplateBinding FooterLeft}"
                                                 HorizontalAlignment="Left" VerticalAlignment="Center" />

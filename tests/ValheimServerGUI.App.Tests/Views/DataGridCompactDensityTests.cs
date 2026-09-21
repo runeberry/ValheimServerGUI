@@ -47,6 +47,7 @@ public class DataGridCompactDensityTests
             .First(h => h.Content is not null);
         Assert.Equal(12, header.FontSize);
         Assert.Equal(new Thickness(6, 0), header.Padding);
-        Assert.Equal(DataListView.RowUnitHeight, header.Bounds.Height);
+        // The header is fixed to HeaderFooterHeight (taller than a data row for extra padding).
+        Assert.Equal(DataListView.HeaderFooterHeight, header.Bounds.Height);
     }
 }

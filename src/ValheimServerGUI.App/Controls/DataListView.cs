@@ -52,9 +52,14 @@ public class DataListView : TemplatedControl
     public static readonly StyledProperty<ContextMenu?> RowContextMenuProperty =
         AvaloniaProperty.Register<DataListView, ContextMenu?>(nameof(RowContextMenu));
 
-    /// <summary>The uniform height of the header, footer, and every data row (px). Sized so a 16px icon
-    /// sits centred with a little breathing room.</summary>
+    /// <summary>The height of every data row (px). Sized so a 16px icon sits centred with a little
+    /// breathing room.</summary>
     public const double RowUnitHeight = 20;
+
+    /// <summary>The height of the header and footer bars (px) — taller than a data row for extra padding,
+    /// with their content still vertically centred. The template binds the footer to this via x:Static, and
+    /// the header uses it below, so the two stay a matched pair.</summary>
+    public const double HeaderFooterHeight = RowUnitHeight + 8;
 
     private DataGrid? _grid;
     private bool _hasFooter;
@@ -121,9 +126,10 @@ public class DataListView : TemplatedControl
         _grid.IsReadOnly = true;
         _grid.CanUserReorderColumns = false;
         _grid.GridLinesVisibility = DataGridGridLinesVisibility.None;
-        // Fixed 20px header + rows (content vertically centred in DataGrid.axaml) so a 16px icon rests
-        // naturally and every row is the same height, with no per-cell padding needed to align content.
-        _grid.ColumnHeaderHeight = RowUnitHeight;
+        // Fixed header + row heights (content vertically centred in DataGrid.axaml) so a 16px icon rests
+        // naturally and every row is the same height, with no per-cell padding needed to align content. The
+        // header is taller than a row (HeaderFooterHeight) to match the footer's extra padding.
+        _grid.ColumnHeaderHeight = HeaderFooterHeight;
         _grid.RowHeight = RowUnitHeight;
         _grid.Bind(BackgroundProperty, _grid.GetResourceObservable("LayerBase"));
 

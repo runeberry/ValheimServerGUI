@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ValheimServerGUI.Game
 {
@@ -38,6 +40,26 @@ namespace ValheimServerGUI.Game
 
         public bool WriteServerLogsToFile { get; set; } = true;
 
+        /// <summary>
+        /// When true, the server runs in permitted-list mode: only players on <c>permittedlist.txt</c> may
+        /// join and the ban list is ignored (see <see cref="PlayerAccessListRules"/>). When false, anyone
+        /// joins unless banned. The three gating files are generated from this flag + <see cref="PlayerRoles"/>
+        /// at server start.
+        /// </summary>
+        public bool UsePermittedList { get; set; }
+
+        /// <summary>
+        /// The profile's per-player roles, keyed by <see cref="PlayerInfo.Key"/> (<c>"{Platform}:{PlayerId}"</c>).
+        /// A player absent from the map has no role. This is VSG's source of truth for gating; the three
+        /// <c>*.txt</c> files are regenerated from it at server start.
+        /// </summary>
+        public Dictionary<string, PlayerRoleEntry> PlayerRoles { get; set; } = new();
+
+        // The lowercase string tokens persisted for each role in the JSON file (stable across enum reorders).
+        private const string RoleAdmin = "admin";
+        private const string RolePermitted = "permitted";
+        private const string RoleBanned = "banned";
+
         public static ServerPreferences FromFile(ServerPreferencesFile? file)
         {
             var prefs = new ServerPreferences();
@@ -61,6 +83,17 @@ namespace ValheimServerGUI.Game
             prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
             prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
             prefs.WriteServerLogsToFile = file.WriteServerLogsToFile ?? prefs.WriteServerLogsToFile;
+            prefs.UsePermittedList = file.UsePermittedList ?? prefs.UsePermittedList;
+
+            if (file.PlayerRoles != null)
+            {
+                foreach (var (key, entry) in file.PlayerRoles)
+                {
+                    if (string.IsNullOrWhiteSpace(key) || entry == null) continue;
+                    if (TryParseRole(entry.Role, out var role))
+                        prefs.PlayerRoles[key] = new PlayerRoleEntry(role, entry.PlatformRaw);
+                }
+            }
 
             return prefs;
         }
@@ -86,9 +119,41 @@ namespace ValheimServerGUI.Game
                 ServerExePath = ServerExePath,
                 SaveDataFolderPath = SaveDataFolderPath,
                 WriteServerLogsToFile = WriteServerLogsToFile,
+                UsePermittedList = UsePermittedList,
             };
 
+            // Written only when there are roles, so profiles that never used the feature stay byte-identical.
+            if (PlayerRoles.Count > 0)
+            {
+                file.PlayerRoles = PlayerRoles.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => new PlayerRoleFileEntry
+                    {
+                        Role = RoleToString(kvp.Value.Role),
+                        PlatformRaw = kvp.Value.PlatformRaw,
+                    });
+            }
+
             return file;
+        }
+
+        private static string RoleToString(PlayerRole role) => role switch
+        {
+            PlayerRole.Admin => RoleAdmin,
+            PlayerRole.Permitted => RolePermitted,
+            PlayerRole.Banned => RoleBanned,
+            _ => RoleBanned,
+        };
+
+        private static bool TryParseRole(string? value, out PlayerRole role)
+        {
+            switch (value?.Trim().ToLowerInvariant())
+            {
+                case RoleAdmin: role = PlayerRole.Admin; return true;
+                case RolePermitted: role = PlayerRole.Permitted; return true;
+                case RoleBanned: role = PlayerRole.Banned; return true;
+                default: role = default; return false;
+            }
         }
     }
 }

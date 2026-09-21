@@ -1,5 +1,4 @@
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Headless.XUnit;
@@ -11,48 +10,25 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.ViewModels;
 
-public class PlayersViewModelTests : IDisposable
+public class PlayersViewModelTests
 {
-    private readonly PlayerAccessListService _accessLists = new();
-    private readonly DirectoryInfo _savedir =
-        new(Path.Join(Path.GetTempPath(), "vsg_pvm_" + Guid.NewGuid().ToString("N")));
+    private readonly ServerFormViewModel _form = new();
 
-    public PlayersViewModelTests() => _savedir.Create();
-
-    public void Dispose()
-    {
-        if (_savedir.Exists) _savedir.Delete(true);
-    }
-
-    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _accessLists);
-
-    // Role is a single value collapsed from the three membership flags, highest priority first.
-    [AvaloniaTheory]
-    [InlineData(true, true, true, "Admin")]        // in all three -> Admin
-    [InlineData(true, false, false, "Admin")]
-    [InlineData(false, true, true, "Permitted")]   // permitted + banned -> Permitted
-    [InlineData(false, true, false, "Permitted")]
-    [InlineData(false, false, true, "Banned")]     // banned only
-    [InlineData(false, false, false, null)]        // none -> blank
-    public void RoleText_takes_highest_priority(bool isAdmin, bool isPermitted, bool isBanned, string? expected)
-    {
-        var row = new PlayerRowViewModel(Player("1", PlayerStatus.Offline));
-        row.SetMembership(isAdmin, isBanned, isPermitted);
-
-        Assert.Equal(expected, row.RoleText);
-        Assert.Equal(expected is null, row.RoleIcon is null); // icon present iff there is a role
-    }
+    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form);
 
     private static PlayerInfo Player(string id, PlayerStatus status, string? name = null, string? character = null)
         => new()
         {
             Platform = "Steam",
+            PlatformRaw = "Steam",
             PlayerId = id,
             PlayerName = name,
             LastStatusCharacter = character,
             PlayerStatus = status,
             LastStatusChange = DateTimeOffset.Now,
         };
+
+    // ---- live table ----
 
     [AvaloniaFact]
     public void Entity_updated_adds_a_live_row()
@@ -133,112 +109,185 @@ public class PlayersViewModelTests : IDisposable
         Assert.Empty(vm.Players);
     }
 
-    // ---- access-list management ----
+    // ---- mode-filtered role display ----
 
     [AvaloniaFact]
-    public void Access_toggles_gated_on_savedir_and_selection()
+    public void Displayed_role_is_mode_filtered()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        repo.PushUpdate(Player("1", PlayerStatus.Offline, name: "A"));
+        var admin = Player("1", PlayerStatus.Offline);
+        var permitted = Player("2", PlayerStatus.Offline);
+        var banned = Player("3", PlayerStatus.Offline);
+        _form.SetRole(admin, PlayerRole.Admin);
+        _form.SetRole(permitted, PlayerRole.Permitted);
+        _form.SetRole(banned, PlayerRole.Banned);
+        repo.PushUpdate(admin);
+        repo.PushUpdate(permitted);
+        repo.PushUpdate(banned);
 
-        Assert.False(vm.CanManageAccess);               // no selection, no savedir
-        vm.SelectedPlayer = vm.Players[0];
-        Assert.False(vm.CanManageAccess);               // selection but still no savedir
+        // Open mode: admin + banned show; permitted is blank (its list is unused).
+        _form.UsePermittedList = false;
+        Assert.Equal(PlayerRole.Admin, RowFor(vm, "Steam:1").DisplayRole);
+        Assert.Null(RowFor(vm, "Steam:2").DisplayRole);
+        Assert.Equal(PlayerRole.Banned, RowFor(vm, "Steam:3").DisplayRole);
 
-        vm.SetSaveDataFolder(_savedir.FullName);
-        Assert.True(vm.CanManageAccess);
-        Assert.True(vm.ToggleAdminCommand.CanExecute(null));
+        // Permitted mode: admin + permitted show; banned is blank (the ban list is ignored).
+        _form.UsePermittedList = true;
+        Assert.Equal(PlayerRole.Admin, RowFor(vm, "Steam:1").DisplayRole);
+        Assert.Equal(PlayerRole.Permitted, RowFor(vm, "Steam:2").DisplayRole);
+        Assert.Null(RowFor(vm, "Steam:3").DisplayRole);
     }
 
     [AvaloniaFact]
-    public void Toggle_admin_adds_then_removes_file_entry_and_flips_row()
+    public void Role_text_and_icon_derive_from_displayed_role()
+    {
+        var row = new PlayerRowViewModel(Player("1", PlayerStatus.Offline)) { DisplayRole = PlayerRole.Admin };
+        Assert.Equal("Admin", row.RoleText);
+        Assert.NotNull(row.RoleIcon);
+
+        row.DisplayRole = null;
+        Assert.Null(row.RoleText);
+        Assert.Null(row.RoleIcon);
+    }
+
+    // ---- menu labels + mode-gated visibility ----
+
+    [AvaloniaFact]
+    public void Menu_labels_reflect_stored_role_and_toggle_verbs()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        repo.PushUpdate(Player("55", PlayerStatus.Offline, name: "A"));
-        vm.SetSaveDataFolder(_savedir.FullName);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+        vm.SelectedPlayer = vm.Players[0];
+
+        Assert.Equal("Make admin", vm.AdminToggleLabel);
+        _form.SetRole(player, PlayerRole.Admin);
+        Assert.Equal("Remove admin", vm.AdminToggleLabel);
+    }
+
+    [AvaloniaFact]
+    public void Ban_and_permit_verbs_are_gated_on_mode()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+
+        _form.UsePermittedList = false;
+        Assert.True(vm.ShowBanToggle);
+        Assert.False(vm.ShowPermitToggle);
+
+        _form.UsePermittedList = true;
+        Assert.False(vm.ShowBanToggle);
+        Assert.True(vm.ShowPermitToggle);
+    }
+
+    // ---- role transitions via the toggle commands ----
+
+    [AvaloniaFact]
+    public void Toggle_admin_sets_then_clears_the_role()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        repo.PushUpdate(Player("55", PlayerStatus.Offline));
         var row = vm.Players[0];
         vm.SelectedPlayer = row;
 
         vm.ToggleAdminCommand.Execute(null);
-        Assert.True(row.IsAdmin);
-        Assert.True(_accessLists.Contains(_savedir.FullName, PlayerAccessList.Admin, row.Player));
+        Assert.Equal(PlayerRole.Admin, _form.GetRole(row.Key));
+        Assert.Equal(PlayerRole.Admin, row.DisplayRole);
         Assert.Equal("Remove admin", vm.AdminToggleLabel);
 
-        vm.ToggleAdminCommand.Execute(null);
-        Assert.False(row.IsAdmin);
-        Assert.False(_accessLists.Contains(_savedir.FullName, PlayerAccessList.Admin, row.Player));
+        vm.ToggleAdminCommand.Execute(null); // negative verb clears to none
+        Assert.Null(_form.GetRole(row.Key));
+        Assert.Null(row.DisplayRole);
         Assert.Equal("Make admin", vm.AdminToggleLabel);
     }
 
     [AvaloniaFact]
-    public void Banning_an_admin_reports_the_override_notice()
+    public void Setting_a_new_role_replaces_the_prior_one()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        var player = Player("7", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+        var row = vm.Players[0];
+        vm.SelectedPlayer = row;
+        _form.UsePermittedList = false;
+
+        vm.ToggleAdminCommand.Execute(null);
+        vm.ToggleBanCommand.Execute(null); // ban replaces admin (single role)
+
+        Assert.Equal(PlayerRole.Banned, _form.GetRole(row.Key));
+    }
+
+    [AvaloniaFact]
+    public void Replacing_admin_with_ban_reports_the_override_notice()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
         string? notice = null;
         vm.NoticeReported = msg => notice = msg;
 
-        repo.PushUpdate(Player("7", PlayerStatus.Offline, name: "A"));
-        vm.SetSaveDataFolder(_savedir.FullName);
-        var row = vm.Players[0];
-        vm.SelectedPlayer = row;
+        var player = Player("7", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+        vm.SelectedPlayer = vm.Players[0];
+        _form.UsePermittedList = false;
 
         vm.ToggleAdminCommand.Execute(null);
         vm.ToggleBanCommand.Execute(null);
 
-        Assert.True(row.IsBanned);
+        Assert.Equal(PlayerRole.Banned, _form.GetRole("Steam:7"));
         Assert.NotNull(notice);
-        Assert.Contains("overrides", notice);
+        Assert.Contains("banned", notice);
     }
 
     [AvaloniaFact]
-    public void Retarget_reloads_membership_for_the_new_savedir()
+    public void Profile_load_re_renders_rows_for_the_new_roles()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        var player = Player("321", PlayerStatus.Offline, name: "A");
-        repo.PushUpdate(player);
+        repo.PushUpdate(Player("321", PlayerStatus.Offline));
+        Assert.Null(vm.Players[0].DisplayRole);
 
-        // Pre-seed the admin list in the first savedir with this player.
-        _accessLists.Add(_savedir.FullName, PlayerAccessList.Admin, player);
-        vm.SetSaveDataFolder(_savedir.FullName);
-        Assert.True(vm.Players[0].IsAdmin);
+        // A profile load pushes new roles onto the form; the tab re-renders off RoleStateChanged.
+        var prefs = new ServerPreferences { ProfileName = "P" };
+        prefs.PlayerRoles["Steam:321"] = new PlayerRoleEntry(PlayerRole.Admin, "Steam");
+        _form.LoadFieldsFrom(prefs);
 
-        // Switching to an empty savedir clears the membership glyphs.
-        var other = new DirectoryInfo(Path.Join(Path.GetTempPath(), "vsg_pvm_" + Guid.NewGuid().ToString("N")));
-        other.Create();
-        try
-        {
-            vm.SetSaveDataFolder(other.FullName);
-            Assert.False(vm.Players[0].IsAdmin);
-        }
-        finally
-        {
-            other.Delete(true);
-        }
+        Assert.Equal(PlayerRole.Admin, vm.Players[0].DisplayRole);
     }
 
+    // ---- add by id ----
+
     [AvaloniaFact]
-    public async Task Add_by_id_creates_a_row_and_writes_the_selected_lists()
+    public async Task Add_by_id_creates_a_row_and_stores_a_role()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        vm.SetSaveDataFolder(_savedir.FullName);
+        _form.UsePermittedList = false;
         vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(
-            new AddByIdResult(PlayerPlatforms.Xbox, "XUID9", Admin: true, Banned: false, Permitted: true));
+            new AddByIdResult(PlayerPlatforms.Xbox, "XUID9", Admin: true, Banned: false, Permitted: false));
 
         await vm.AddByIdCommand.ExecuteAsync(null);
 
         var row = Assert.Single(vm.Players);
         Assert.Equal("Xbox:XUID9", row.Key);
-        Assert.True(row.IsAdmin);
-        Assert.True(row.IsPermitted);
-        Assert.False(row.IsBanned);
-        Assert.Equal("Admin", row.RoleText); // Admin > Permitted > Banned when in multiple lists
-        Assert.True(_accessLists.Contains(_savedir.FullName, PlayerAccessList.Admin, row.Player));
-        Assert.True(_accessLists.Contains(_savedir.FullName, PlayerAccessList.Permitted, row.Player));
+        Assert.Equal(PlayerRole.Admin, _form.GetRole(row.Key));
+        Assert.Equal(PlayerRole.Admin, row.DisplayRole);
+    }
+
+    [AvaloniaFact]
+    public async Task Add_by_id_collapses_multi_select_to_a_single_role_ban_wins()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(
+            new AddByIdResult(PlayerPlatforms.Steam, "42", Admin: true, Banned: true, Permitted: false));
+
+        await vm.AddByIdCommand.ExecuteAsync(null);
+
+        Assert.Equal(PlayerRole.Banned, _form.GetRole("Steam:42")); // ban wins over admin
     }
 
     [AvaloniaFact]
@@ -246,11 +295,13 @@ public class PlayersViewModelTests : IDisposable
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        vm.SetSaveDataFolder(_savedir.FullName);
         vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(null);
 
         await vm.AddByIdCommand.ExecuteAsync(null);
 
         Assert.Empty(vm.Players);
     }
+
+    private static PlayerRowViewModel RowFor(PlayersViewModel vm, string key)
+        => vm.Players.First(r => r.Key == key);
 }

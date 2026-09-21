@@ -7,14 +7,18 @@
              x:DataType="vm:MainWindowViewModel">
 
     <DockPanel Margin="8">
-        <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,6">
-            <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
-                <Button Content="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
-                <Button Content="Add by ID…" Command="{Binding Players.AddByIdCommand}" />
-            </StackPanel>
-            <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
-                              Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
-        </Grid>
+        <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,6">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <Button Content="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
+                    <Button Content="Add by ID…" Command="{Binding Players.AddByIdCommand}" />
+                </StackPanel>
+                <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
+                                  Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
+            </Grid>
+            <CheckBox Content="Use permitted list" IsChecked="{Binding Form.UsePermittedList}"
+                      ToolTip.Tip="When on, only players you mark Permitted can join, and the ban list is ignored — an admin must also be permitted to get in. When off, anyone can join unless banned. The adminlist/bannedlist/permittedlist files are regenerated from these roles each time the server starts." />
+        </StackPanel>
 
         <c:DataListView ItemsSource="{Binding Players.Players}"
                         SelectedItem="{Binding Players.SelectedPlayer}"
@@ -24,8 +28,10 @@
                     <MenuItem Header="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
                     <Separator />
                     <MenuItem Header="{Binding Players.AdminToggleLabel}" Command="{Binding Players.ToggleAdminCommand}" />
-                    <MenuItem Header="{Binding Players.BanToggleLabel}" Command="{Binding Players.ToggleBanCommand}" />
-                    <MenuItem Header="{Binding Players.PermitToggleLabel}" Command="{Binding Players.TogglePermitCommand}" />
+                    <MenuItem Header="{Binding Players.BanToggleLabel}" Command="{Binding Players.ToggleBanCommand}"
+                              IsVisible="{Binding Players.ShowBanToggle}" />
+                    <MenuItem Header="{Binding Players.PermitToggleLabel}" Command="{Binding Players.TogglePermitCommand}"
+                              IsVisible="{Binding Players.ShowPermitToggle}" />
                     <Separator />
                     <MenuItem Header="Add player by ID…" Command="{Binding Players.AddByIdCommand}" />
                     <MenuItem Header="Remove player" Command="{Binding Players.RemoveCommand}" />

@@ -77,7 +77,8 @@ namespace ValheimServerGUI.Integration.Tests
                 Processes,
                 _services.GetRequiredService<IPlayerDataRepository>(),
                 _services.GetRequiredService<IApplicationLogger>(),
-                _services.GetRequiredService<IValheimPathResolver>());
+                _services.GetRequiredService<IValheimPathResolver>(),
+                _services.GetRequiredService<IPlayerAccessListService>());
 
             Server.WorldSaved += (_, ms) => { lock (_lock) WorldSaves.Add(ms); };
             Server.StatusChanged += (_, s) => { if (s == ServerStatus.Running) _runningTcs?.TrySetResult(true); };

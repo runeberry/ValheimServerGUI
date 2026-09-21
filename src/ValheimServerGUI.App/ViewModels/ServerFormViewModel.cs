@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -53,6 +54,47 @@ public partial class ServerFormViewModel : ObservableObject
     [ObservableProperty] private bool _isPublic;
     [ObservableProperty] private bool _crossplay;
 
+    // ----- Players / access (profile working state) -----
+    // The single per-player role map (keyed by PlayerInfo.Key) + the permitted-list mode flag. These are
+    // profile working state edited via the Players tab; they trip IsDirty and are persisted with Save, then
+    // projected onto the three list files at server start.
+    private readonly Dictionary<string, PlayerRoleEntry> _playerRoles = new();
+
+    /// <summary>Permitted-list mode (a form field → trips <see cref="IsDirty"/>; cleared on load via RunClean).</summary>
+    [ObservableProperty] private bool _usePermittedList;
+
+    /// <summary>Raised whenever the role map changes (add/remove/replace, or a bulk load), so the Players tab
+    /// can re-render. Not raised for the mode flag — that surfaces as an ordinary PropertyChanged.</summary>
+    public event EventHandler? RoleStateChanged;
+
+    /// <summary>The stored role for a player key, or null when the player has no role.</summary>
+    public PlayerRole? GetRole(string key)
+        => _playerRoles.TryGetValue(key, out var entry) ? entry.Role : null;
+
+    /// <summary>
+    /// Sets (or clears, when <paramref name="role"/> is null) a player's single role. A real change trips
+    /// <see cref="IsDirty"/> (unless under <see cref="RunClean"/>) and raises <see cref="RoleStateChanged"/>.
+    /// </summary>
+    public void SetRole(PlayerInfo player, PlayerRole? role)
+    {
+        var key = player.Key;
+
+        if (role is null)
+        {
+            if (!_playerRoles.Remove(key)) return; // already had no role — no change
+        }
+        else
+        {
+            // Preserve the raw platform token so non-Steam file entries keep the game's exact casing.
+            var entry = new PlayerRoleEntry(role.Value, player.PlatformRaw ?? player.Platform);
+            if (_playerRoles.TryGetValue(key, out var existing) && existing == entry) return; // no change
+            _playerRoles[key] = entry;
+        }
+
+        if (_suppressDirty == 0) IsDirty = true;
+        RoleStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     // ----- Advanced Controls -----
     [ObservableProperty] private string? _serverExePath;
     [ObservableProperty] private string? _saveDataFolderPath;
@@ -105,8 +147,13 @@ public partial class ServerFormViewModel : ObservableObject
             ServerExePath = prefs.ServerExePath;
             SaveDataFolderPath = prefs.SaveDataFolderPath;
             WriteServerLogsToFile = prefs.WriteServerLogsToFile;
+            UsePermittedList = prefs.UsePermittedList;
+
+            _playerRoles.Clear();
+            foreach (var (key, entry) in prefs.PlayerRoles) _playerRoles[key] = entry;
         });
         IsDirty = false; // a load leaves the form clean
+        RoleStateChanged?.Invoke(this, EventArgs.Empty); // let the Players tab re-render for the new profile
     }
 
     /// <summary>GetPrefsFromFormState: merges the form into the (existing or new) profile prefs.</summary>
@@ -127,6 +174,8 @@ public partial class ServerFormViewModel : ObservableObject
         prefs.ServerExePath = ServerExePath;
         prefs.SaveDataFolderPath = SaveDataFolderPath;
         prefs.WriteServerLogsToFile = WriteServerLogsToFile;
+        prefs.UsePermittedList = UsePermittedList;
+        prefs.PlayerRoles = new Dictionary<string, PlayerRoleEntry>(_playerRoles);
         return prefs;
     }
 }

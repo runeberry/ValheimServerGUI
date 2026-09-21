@@ -49,6 +49,18 @@ namespace ValheimServerGUI.Game
         /// file changed; false if nothing matched (or the file did not exist).
         /// </summary>
         bool Remove(string saveDataFolder, PlayerAccessList list, PlayerInfo player);
+
+        /// <summary>
+        /// Regenerates all three list files in <paramref name="saveDataFolder"/> from the given player roles
+        /// and the <paramref name="usePermittedList"/> flag, per <see cref="PlayerAccessListRules"/>. Each file
+        /// is <b>overwritten</b> (header-only when it has no members). This is the profile→files projection run
+        /// at server start; it is the counterpart to the <see cref="ReadEntries"/>/<see cref="Add"/>/<see cref="Remove"/>
+        /// low-level API that a later import/conflict pass will build on.
+        /// </summary>
+        void GenerateFiles(
+            string saveDataFolder,
+            IEnumerable<(PlayerInfo player, PlayerRole role)> roles,
+            bool usePermittedList);
     }
 
     public class PlayerAccessListService : IPlayerAccessListService
@@ -114,6 +126,35 @@ namespace ValheimServerGUI.Game
 
             AtomicWrite(file, lines);
             return true;
+        }
+
+        public void GenerateFiles(
+            string saveDataFolder,
+            IEnumerable<(PlayerInfo player, PlayerRole role)> roles,
+            bool usePermittedList)
+        {
+            var assignments = roles.ToList();
+
+            foreach (var list in new[] { PlayerAccessList.Admin, PlayerAccessList.Banned, PlayerAccessList.Permitted })
+            {
+                // Canonical tokens of every player whose role routes into this file for the current mode.
+                // A HashSet dedupes players who happen to share a token (canonical form is deterministic).
+                var seen = new HashSet<string>(StringComparer.Ordinal);
+                var tokens = new List<string>();
+                foreach (var (player, role) in assignments)
+                {
+                    if (string.IsNullOrWhiteSpace(player.PlayerId)) continue;
+                    if (!PlayerAccessListRules.TargetLists(role, usePermittedList).Contains(list)) continue;
+
+                    var token = CanonicalEntry(player);
+                    if (seen.Add(token)) tokens.Add(token);
+                }
+
+                // Header + members, overwritten unconditionally (header-only when there are no members).
+                var lines = new List<string> { DefaultHeaders[list] };
+                lines.AddRange(tokens);
+                AtomicWrite(ResolveFile(saveDataFolder, list), lines);
+            }
         }
 
         #region Non-public

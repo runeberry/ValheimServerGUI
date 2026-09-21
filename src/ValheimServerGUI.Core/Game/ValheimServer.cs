@@ -67,6 +67,7 @@ namespace ValheimServerGUI.Game
         private readonly IProcessProvider ProcessProvider;
         private readonly IApplicationLogger ApplicationLogger;
         private readonly IValheimPathResolver PathResolver;
+        private readonly IPlayerAccessListService AccessLists;
         private readonly ServerLogParser Parser;
 
         /// <summary>
@@ -78,11 +79,13 @@ namespace ValheimServerGUI.Game
             IProcessProvider processProvider,
             IPlayerDataRepository playerDataRepository,
             IApplicationLogger appLogger,
-            IValheimPathResolver pathResolver)
+            IValheimPathResolver pathResolver,
+            IPlayerAccessListService accessLists)
         {
             ProcessProvider = processProvider;
             ApplicationLogger = appLogger;
             PathResolver = pathResolver;
+            AccessLists = accessLists;
 
             // The parser owns the fragile log->event translation and the player correlation; this
             // class keeps the one piece of state the parser deliberately does not: the stop-during-
@@ -146,6 +149,8 @@ namespace ValheimServerGUI.Game
                 @"Server run command: ""{exePath}"" {processArgs}",
                 exePath,
                 CleanArgsForLogging(processArgs));
+
+            GenerateAccessLists(options);
 
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
@@ -299,6 +304,30 @@ namespace ValheimServerGUI.Game
         #endregion
 
         #region Helper methods
+
+        // Projects the profile's player roles + usePermittedList flag onto the three gating files immediately
+        // before launch, so a manual start, an auto-start, and a restart (all of which re-enter Start) apply
+        // the same rules uniformly.
+        //
+        // DATA-LOSS CAVEAT (accepted for now — see the v3.0 plan): generation OVERWRITES the three files
+        // unconditionally, even when the profile has no roles (they become header-only). The first start after
+        // this feature shipped therefore wipes any pre-existing manual entries in adminlist/bannedlist/
+        // permittedlist.txt. Importing existing files into the role config (and conflict detection) is a
+        // deliberately separate pass that MUST land before v3.0 GA.
+        private void GenerateAccessLists(IValheimServerOptions options)
+        {
+            var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;
+
+            var roles = options.PlayerRoles.Select(a => (
+                new PlayerInfo { Platform = a.Platform, PlatformRaw = a.PlatformRaw, PlayerId = a.PlayerId },
+                a.Role));
+
+            AccessLists.GenerateFiles(saveDataFolder, roles, options.UsePermittedList);
+
+            ApplicationLogger.Information(
+                "Generated access lists in {folder}: {count} role(s), usePermittedList={mode}",
+                saveDataFolder, options.PlayerRoles.Count, options.UsePermittedList);
+        }
 
         private static string GenerateArgs(IValheimServerOptions options)
         {

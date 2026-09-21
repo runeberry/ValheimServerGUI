@@ -103,4 +103,87 @@ public class ServerFormViewModelTests
         form.ExistingWorld = "W2"; // direct user edit
         Assert.True(form.IsDirty);
     }
+
+    // ---- access roles + permitted-list flag ----
+
+    private static PlayerInfo Player(string id) => new()
+    {
+        Platform = "Steam",
+        PlatformRaw = "Steam",
+        PlayerId = id,
+    };
+
+    [Fact]
+    public void Setting_a_role_dirties_and_raises_RoleStateChanged()
+    {
+        var form = new ServerFormViewModel();
+        var raised = 0;
+        form.RoleStateChanged += (_, _) => raised++;
+
+        form.SetRole(Player("1"), PlayerRole.Admin);
+
+        Assert.True(form.IsDirty);
+        Assert.Equal(1, raised);
+        Assert.Equal(PlayerRole.Admin, form.GetRole("Steam:1"));
+    }
+
+    [Fact]
+    public void Clearing_a_role_removes_it_and_a_no_op_clear_does_nothing()
+    {
+        var form = new ServerFormViewModel();
+        form.SetRole(Player("1"), PlayerRole.Banned);
+
+        var reloaded = new ServerFormViewModel();
+        var raised = 0;
+        reloaded.RoleStateChanged += (_, _) => raised++;
+        reloaded.SetRole(Player("1"), null); // no role to clear -> no change, no dirty
+
+        Assert.False(reloaded.IsDirty);
+        Assert.Equal(0, raised);
+
+        form.SetRole(Player("1"), null); // had a role -> cleared
+        Assert.Null(form.GetRole("Steam:1"));
+    }
+
+    [Fact]
+    public void Toggling_permitted_flag_dirties()
+    {
+        var form = new ServerFormViewModel();
+        Assert.False(form.UsePermittedList);
+
+        form.UsePermittedList = true;
+        Assert.True(form.IsDirty);
+    }
+
+    [Fact]
+    public void Roles_and_flag_round_trip_through_prefs()
+    {
+        var form = new ServerFormViewModel { UsePermittedList = true };
+        form.SetRole(Player("1"), PlayerRole.Admin);
+        form.SetRole(Player("2"), PlayerRole.Banned);
+
+        var prefs = form.ToPreferences(new ServerPreferences { ProfileName = "P" });
+
+        Assert.True(prefs.UsePermittedList);
+        Assert.Equal(PlayerRole.Admin, prefs.PlayerRoles["Steam:1"].Role);
+        Assert.Equal(PlayerRole.Banned, prefs.PlayerRoles["Steam:2"].Role);
+
+        var loaded = new ServerFormViewModel();
+        loaded.LoadFieldsFrom(prefs);
+        Assert.True(loaded.UsePermittedList);
+        Assert.Equal(PlayerRole.Admin, loaded.GetRole("Steam:1"));
+        Assert.Equal(PlayerRole.Banned, loaded.GetRole("Steam:2"));
+    }
+
+    [Fact]
+    public void Load_leaves_the_form_clean()
+    {
+        var prefs = new ServerPreferences { ProfileName = "P", UsePermittedList = true };
+        prefs.PlayerRoles["Steam:1"] = new PlayerRoleEntry(PlayerRole.Admin, "Steam");
+
+        var form = new ServerFormViewModel();
+        form.LoadFieldsFrom(prefs);
+
+        Assert.False(form.IsDirty); // a load (roles + flag included) never dirties
+    }
 }

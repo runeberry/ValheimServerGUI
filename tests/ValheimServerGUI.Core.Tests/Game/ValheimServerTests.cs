@@ -6,6 +6,7 @@ using Serilog;
 using ValheimServerGUI.Core.Tests.Fakes;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Data;
+using ValheimServerGUI.Tools.Models;
 using Xunit;
 
 namespace ValheimServerGUI.Core.Tests.Game
@@ -39,7 +40,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             var repo = new PlayerDataRepository(context, new FakeRuneberryApiClient(), resolver);
 
             _processProvider = new MockProcessProvider();
-            _server = new ValheimServer(_processProvider, repo, new FakeApplicationLogger(), resolver);
+            _server = new ValheimServer(_processProvider, repo, new FakeApplicationLogger(), resolver, new PlayerAccessListService());
         }
 
         public void Dispose()
@@ -264,6 +265,32 @@ namespace ValheimServerGUI.Core.Tests.Game
 
             _processProvider.SimulateExit(); // → Stopped
             Assert.Null(_server.StartedAt);
+        }
+
+        // The start path projects the profile's roles onto the three gating files (one hook covers manual /
+        // auto / restart). Here: permitted-list mode puts the admin on both adminlist and permittedlist, and
+        // the ban list is regenerated header-only (ignored in this mode).
+        [Fact]
+        public void Start_GeneratesAccessListsFromOptions()
+        {
+            _server.Start(Options(o =>
+            {
+                o.UsePermittedList = true;
+                o.PlayerRoles = new[]
+                {
+                    new PlayerRoleAssignment(PlayerPlatforms.Steam, PlayerPlatforms.Steam, "111", PlayerRole.Admin),
+                    new PlayerRoleAssignment(PlayerPlatforms.Steam, PlayerPlatforms.Steam, "222", PlayerRole.Banned),
+                };
+            }));
+
+            var admin = File.ReadAllLines(Path.Join(_saveDir, "adminlist.txt"));
+            var permitted = File.ReadAllLines(Path.Join(_saveDir, "permittedlist.txt"));
+            var banned = File.ReadAllLines(Path.Join(_saveDir, "bannedlist.txt"));
+
+            Assert.Contains("Steam_111", admin);
+            Assert.Contains("Steam_111", permitted);          // admin must also be permitted to join
+            Assert.DoesNotContain("Steam_222", banned);       // ban list unused in permitted mode
+            Assert.Single(banned);                            // header only
         }
 
         [Fact]

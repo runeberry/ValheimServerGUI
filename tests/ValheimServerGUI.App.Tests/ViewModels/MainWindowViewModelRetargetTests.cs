@@ -70,7 +70,8 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
                 new FakeProcessProvider(),
                 Core.GetRequiredService<IPlayerDataRepository>(),
                 Core.GetRequiredService<IApplicationLogger>(),
-                Core.GetRequiredService<IValheimPathResolver>()),
+                Core.GetRequiredService<IValheimPathResolver>(),
+                Core.GetRequiredService<IPlayerAccessListService>()),
             Core.GetRequiredService<Serilog.ILogger>());
 
         var vm = new MainWindowViewModel(

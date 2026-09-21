@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
@@ -19,26 +20,23 @@ public record AddByIdResult(string Platform, string PlayerId, bool Admin, bool B
 /// <c>EntityUpdated</c>/<c>PlayerStatusChanged</c>; the relative "Since" column is recomputed every second
 /// while the tab is visible. View-Details is enabled when a row is selected; Remove only when it is Offline.
 ///
-/// Access-list management (admin/ban/permit) is <b>profile-scoped</b>: <see cref="SetSaveDataFolder"/> points
-/// the tab at the active profile's savedir (pushed by the window on retarget), and the three list files there
-/// drive each row's membership glyphs and the toggle commands.
+/// Access management is now a view/editor over the active profile's working state: each player has a single
+/// <see cref="PlayerRole"/> stored on <see cref="ServerFormViewModel"/> plus a per-profile
+/// <c>UsePermittedList</c> flag. The tab shows the <b>effective</b> role for the current mode and rewrites the
+/// stored role via the form (which trips the profile's dirty flag); the three list files are generated from
+/// those roles at server start, not edited here.
 /// </summary>
 public partial class PlayersViewModel : ViewModelBase
 {
     private readonly IPlayerDataRepository _repo;
-    private readonly IPlayerAccessListService _accessLists;
+    private readonly ServerFormViewModel _form;
     private readonly Dictionary<string, PlayerRowViewModel> _rows = new();
     private readonly DispatcherTimer _sinceTimer;
 
-    private string? _saveDataFolder;
-    private IReadOnlyList<string> _adminEntries = Array.Empty<string>();
-    private IReadOnlyList<string> _bannedEntries = Array.Empty<string>();
-    private IReadOnlyList<string> _permittedEntries = Array.Empty<string>();
-
-    public PlayersViewModel(IPlayerDataRepository repo, IPlayerAccessListService accessLists)
+    public PlayersViewModel(IPlayerDataRepository repo, ServerFormViewModel form)
     {
         _repo = repo;
-        _accessLists = accessLists;
+        _form = form;
 
         _sinceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _sinceTimer.Tick += (_, _) => RefreshSince();
@@ -48,6 +46,10 @@ public partial class PlayersViewModel : ViewModelBase
         _repo.EntityRemoved += OnEntityRemoved;
         _repo.DataUpdated += OnDataReloaded;
         _repo.DataReady += OnDataReloaded;
+
+        // Roles live on the profile form: re-render when they change or the permitted-list mode flips.
+        _form.RoleStateChanged += OnFormRolesChanged;
+        _form.PropertyChanged += OnFormPropertyChanged;
 
         ReloadAll();
     }
@@ -61,21 +63,27 @@ public partial class PlayersViewModel : ViewModelBase
         nameof(ToggleAdminCommand), nameof(ToggleBanCommand), nameof(TogglePermitCommand))]
     private PlayerRowViewModel? _selectedPlayer;
 
-    // Context-menu labels reflect the selected row's current membership (derived, never mirrored).
-    public string AdminToggleLabel => SelectedPlayer?.IsAdmin == true ? "Remove admin" : "Make admin";
-    public string BanToggleLabel => SelectedPlayer?.IsBanned == true ? "Unban player" : "Ban player";
-    public string PermitToggleLabel => SelectedPlayer?.IsPermitted == true ? "Remove from permitted" : "Add to permitted";
+    // Context-menu labels reflect the selected row's STORED role (derived, never mirrored). Positive verbs set
+    // the role; negative verbs clear it to none (single-role model).
+    public string AdminToggleLabel => SelectedRole == PlayerRole.Admin ? "Remove admin" : "Make admin";
+    public string BanToggleLabel => SelectedRole == PlayerRole.Banned ? "Unban player" : "Ban player";
+    public string PermitToggleLabel => SelectedRole == PlayerRole.Permitted ? "Revoke join permission" : "Add to permitted";
+
+    // The ban/permit verbs only apply to the mode that actually uses their list: ban when not using the
+    // permitted list, permit when using it. The admin pair is relevant in both modes.
+    public bool ShowBanToggle => !_form.UsePermittedList;
+    public bool ShowPermitToggle => _form.UsePermittedList;
 
     public bool CanViewDetails => SelectedPlayer is not null;
 
     /// <summary>Remove is only allowed for an Offline player (§7.4).</summary>
     public bool CanRemove => SelectedPlayer is { IsOffline: true };
 
-    /// <summary>Access-list toggles need a selected player and a configured (profile) savedir.</summary>
-    public bool CanManageAccess => SelectedPlayer is not null && !string.IsNullOrWhiteSpace(_saveDataFolder);
+    /// <summary>Role toggles need a selected player (roles are profile working state, always available).</summary>
+    public bool CanManageAccess => SelectedPlayer is not null;
 
-    /// <summary>True once a profile savedir is set, so "Add by ID…" can be offered.</summary>
-    public bool CanAddById => !string.IsNullOrWhiteSpace(_saveDataFolder);
+    // The selected player's stored role for the active profile (null when it has none).
+    private PlayerRole? SelectedRole => SelectedPlayer is { } row ? _form.GetRole(row.Key) : null;
 
     /// <summary>Raised for View Player Details.</summary>
     public event Action<PlayerInfo>? ViewDetailsRequested;
@@ -99,20 +107,6 @@ public partial class PlayersViewModel : ViewModelBase
         }
     }
 
-    /// <summary>
-    /// Points the tab at a profile's save-data folder (null when unconfigured). Re-reads the three list files
-    /// and refreshes every row's membership. Called by the window on profile retarget.
-    /// </summary>
-    public void SetSaveDataFolder(string? saveDataFolder)
-    {
-        _saveDataFolder = string.IsNullOrWhiteSpace(saveDataFolder) ? null : saveDataFolder;
-        ReloadListCache();
-        foreach (var row in Players) ApplyMembership(row);
-        OnPropertyChanged(nameof(CanManageAccess));
-        OnPropertyChanged(nameof(CanAddById));
-        AddByIdCommand.NotifyCanExecuteChanged();
-    }
-
     [RelayCommand(CanExecute = nameof(CanViewDetails))]
     private void ViewDetails()
     {
@@ -127,18 +121,18 @@ public partial class PlayersViewModel : ViewModelBase
     }
 
     [RelayCommand(CanExecute = nameof(CanManageAccess))]
-    private void ToggleAdmin() => Toggle(PlayerAccessList.Admin);
+    private void ToggleAdmin() => Toggle(PlayerRole.Admin);
 
     [RelayCommand(CanExecute = nameof(CanManageAccess))]
-    private void ToggleBan() => Toggle(PlayerAccessList.Banned);
+    private void ToggleBan() => Toggle(PlayerRole.Banned);
 
     [RelayCommand(CanExecute = nameof(CanManageAccess))]
-    private void TogglePermit() => Toggle(PlayerAccessList.Permitted);
+    private void TogglePermit() => Toggle(PlayerRole.Permitted);
 
-    [RelayCommand(CanExecute = nameof(CanAddById))]
+    [RelayCommand]
     private async Task AddById()
     {
-        if (AddByIdPrompt is null || _saveDataFolder is null) return;
+        if (AddByIdPrompt is null) return;
 
         var result = await AddByIdPrompt();
         if (result is null) return;
@@ -160,46 +154,36 @@ public partial class PlayersViewModel : ViewModelBase
         };
         if (string.IsNullOrWhiteSpace(player.PlatformRaw)) player.PlatformRaw = platform;
 
-        if (result.Admin) _accessLists.Add(_saveDataFolder, PlayerAccessList.Admin, player);
-        if (result.Banned) _accessLists.Add(_saveDataFolder, PlayerAccessList.Banned, player);
-        if (result.Permitted) _accessLists.Add(_saveDataFolder, PlayerAccessList.Permitted, player);
+        // The dialog still offers multiple checkboxes (its redesign is deferred with the import pass), but the
+        // model stores one role. Collapse by the dialog's own stated precedence — a ban wins over admin/permit.
+        var role = result.Banned ? PlayerRole.Banned
+            : result.Admin ? PlayerRole.Admin
+            : result.Permitted ? PlayerRole.Permitted
+            : (PlayerRole?)null;
 
+        if (role is not null) _form.SetRole(player, role);
         WarnIfBanOverrides(result.Banned, result.Admin, result.Permitted);
 
-        ReloadListCache();
-        _repo.Upsert(player); // OnEntityUpdated adds/updates the row and applies membership from the cache.
+        _repo.Upsert(player); // OnEntityUpdated adds/updates the row; ApplyRole reads the role back from the form.
     }
 
-    // Toggles the selected player's membership in one list, then refreshes the cache + that row.
-    private void Toggle(PlayerAccessList list)
+    // Flips the selected player's stored role for one verb: set it when absent, clear it when already set.
+    private void Toggle(PlayerRole role)
     {
-        if (SelectedPlayer is not { } row || _saveDataFolder is null) return;
+        if (SelectedPlayer is not { } row) return;
 
-        var isMember = list switch
+        var current = _form.GetRole(row.Key);
+        if (current == role)
         {
-            PlayerAccessList.Admin => row.IsAdmin,
-            PlayerAccessList.Banned => row.IsBanned,
-            _ => row.IsPermitted,
-        };
-
-        if (isMember)
-        {
-            _accessLists.Remove(_saveDataFolder, list, row.Player);
+            _form.SetRole(row.Player, null); // negative verb → clear to none
         }
         else
         {
-            _accessLists.Add(_saveDataFolder, list, row.Player);
-            if (list == PlayerAccessList.Banned)
-                WarnIfBanOverrides(true, row.IsAdmin, row.IsPermitted);
+            _form.SetRole(row.Player, role); // positive verb → set (overwrites any prior role)
+            if (role == PlayerRole.Banned)
+                WarnIfBanOverrides(true, isAdmin: current == PlayerRole.Admin, isPermitted: current == PlayerRole.Permitted);
         }
-
-        ReloadListCache();
-        ApplyMembership(row);
-
-        // The selected row's membership just changed, so refresh the context-menu verb labels.
-        OnPropertyChanged(nameof(AdminToggleLabel));
-        OnPropertyChanged(nameof(BanToggleLabel));
-        OnPropertyChanged(nameof(PermitToggleLabel));
+        // Row re-render + label refresh happen on the form's RoleStateChanged callback.
     }
 
     private void WarnIfBanOverrides(bool banning, bool isAdmin, bool isPermitted)
@@ -207,8 +191,8 @@ public partial class PlayersViewModel : ViewModelBase
         if (banning && (isAdmin || isPermitted))
         {
             NoticeReported?.Invoke(
-                "This player is banned. A ban overrides the admin and permitted lists — the player will be " +
-                "kicked and kept out regardless of those.");
+                "This player is now banned, which replaces their previous admin/permitted role. A ban keeps " +
+                "them out whenever the ban list is in effect.");
         }
     }
 
@@ -217,23 +201,36 @@ public partial class PlayersViewModel : ViewModelBase
         foreach (var row in Players) row.RefreshSince();
     }
 
-    private void ReloadListCache()
+    // The role shown for a player under the current mode (null = blank cell). Admin shows in both modes;
+    // permitted only in permitted-list mode; banned only when the ban list is in effect. Mirrors
+    // PlayerAccessListRules so the table reads the same rules the files are generated from.
+    private PlayerRole? DisplayRoleFor(string key) => _form.GetRole(key) switch
     {
-        if (_saveDataFolder is null)
-        {
-            _adminEntries = _bannedEntries = _permittedEntries = Array.Empty<string>();
-            return;
-        }
+        PlayerRole.Admin => PlayerRole.Admin,
+        PlayerRole.Permitted => _form.UsePermittedList ? PlayerRole.Permitted : null,
+        PlayerRole.Banned => _form.UsePermittedList ? null : PlayerRole.Banned,
+        _ => null,
+    };
 
-        _adminEntries = _accessLists.ReadEntries(_saveDataFolder, PlayerAccessList.Admin);
-        _bannedEntries = _accessLists.ReadEntries(_saveDataFolder, PlayerAccessList.Banned);
-        _permittedEntries = _accessLists.ReadEntries(_saveDataFolder, PlayerAccessList.Permitted);
+    private void ApplyRole(PlayerRowViewModel row) => row.DisplayRole = DisplayRoleFor(row.Key);
+
+    private void OnFormRolesChanged(object? sender, EventArgs e) => RunOnUi(RerenderAccess);
+
+    private void OnFormPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ServerFormViewModel.UsePermittedList)) RunOnUi(RerenderAccess);
     }
 
-    private void ApplyMembership(PlayerRowViewModel row) => row.SetMembership(
-        _accessLists.Contains(_adminEntries, row.Player),
-        _accessLists.Contains(_bannedEntries, row.Player),
-        _accessLists.Contains(_permittedEntries, row.Player));
+    // Re-derive every row's displayed role and refresh the mode-dependent menu labels/visibility.
+    private void RerenderAccess()
+    {
+        foreach (var row in Players) ApplyRole(row);
+        OnPropertyChanged(nameof(AdminToggleLabel));
+        OnPropertyChanged(nameof(BanToggleLabel));
+        OnPropertyChanged(nameof(PermitToggleLabel));
+        OnPropertyChanged(nameof(ShowBanToggle));
+        OnPropertyChanged(nameof(ShowPermitToggle));
+    }
 
     private void OnEntityUpdated(object? sender, PlayerInfo player) => RunOnUi(() => Upsert(player));
 
@@ -253,14 +250,14 @@ public partial class PlayersViewModel : ViewModelBase
         if (_rows.TryGetValue(player.Key, out var row))
         {
             row.Update(player);
-            ApplyMembership(row);
+            ApplyRole(row);
             if (ReferenceEquals(SelectedPlayer, row))
                 OnPropertyChanged(nameof(CanRemove)); // offline-ness may have changed
         }
         else
         {
             var newRow = new PlayerRowViewModel(player);
-            ApplyMembership(newRow);
+            ApplyRole(newRow);
             _rows[player.Key] = newRow;
             Players.Add(newRow);
         }
@@ -273,7 +270,7 @@ public partial class PlayersViewModel : ViewModelBase
         foreach (var player in _repo.Data)
         {
             var row = new PlayerRowViewModel(player);
-            ApplyMembership(row);
+            ApplyRole(row);
             _rows[player.Key] = row;
             Players.Add(row);
         }
@@ -287,5 +284,7 @@ public partial class PlayersViewModel : ViewModelBase
         _repo.EntityRemoved -= OnEntityRemoved;
         _repo.DataUpdated -= OnDataReloaded;
         _repo.DataReady -= OnDataReloaded;
+        _form.RoleStateChanged -= OnFormRolesChanged;
+        _form.PropertyChanged -= OnFormPropertyChanged;
     }
 }

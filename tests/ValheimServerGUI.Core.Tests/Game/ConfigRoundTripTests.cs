@@ -66,6 +66,37 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.False(restored.WriteServerLogsToFile);
         }
 
+        // Access-list feature: the permitted-list flag + per-player role map survive ToFile/FromFile, with
+        // the role encoded as a lowercase string token and PlatformRaw preserved for non-Steam entries.
+        [Fact]
+        public void ServerPreferences_RoundTrip_PreservesRolesAndPermittedFlag()
+        {
+            var original = new ServerPreferences { ProfileName = "P", UsePermittedList = true };
+            original.PlayerRoles["Steam:1"] = new PlayerRoleEntry(PlayerRole.Admin, null);
+            original.PlayerRoles["Xbox:XUID"] = new PlayerRoleEntry(PlayerRole.Banned, "Xbox");
+            original.PlayerRoles["Nintendo:N1"] = new PlayerRoleEntry(PlayerRole.Permitted, "Switch");
+
+            var restored = ServerPreferences.FromFile(original.ToFile());
+
+            Assert.True(restored.UsePermittedList);
+            Assert.Equal(3, restored.PlayerRoles.Count);
+            Assert.Equal(PlayerRole.Admin, restored.PlayerRoles["Steam:1"].Role);
+            Assert.Equal(PlayerRole.Banned, restored.PlayerRoles["Xbox:XUID"].Role);
+            Assert.Equal("Switch", restored.PlayerRoles["Nintendo:N1"].PlatformRaw);
+        }
+
+        // A profile that never touched the feature stays lean: no roles map serialized, flag defaults false.
+        [Fact]
+        public void ServerPreferences_EmptyRoles_AreOmittedFromFile_AndDefaultOnLoad()
+        {
+            var file = new ServerPreferences { ProfileName = "P" }.ToFile();
+            Assert.Null(file.PlayerRoles);
+
+            var restored = ServerPreferences.FromFile(new ServerPreferencesFile());
+            Assert.False(restored.UsePermittedList);
+            Assert.Empty(restored.PlayerRoles);
+        }
+
         // E38 / E39: ToFile drops blank-named profiles and de-dups by profile name.
         [Fact]
         public void UserPreferences_ToFile_DropsBlankNamesAndDedups()

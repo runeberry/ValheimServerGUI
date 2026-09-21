@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using System;
+using System.Collections.Generic;
 
 namespace ValheimServerGUI.Game
 {
@@ -55,5 +56,22 @@ namespace ValheimServerGUI.Game
 
         [JsonProperty("writeServerLogsToFile")]
         public bool? WriteServerLogsToFile { get; set; }
+
+        [JsonProperty("usePermittedList")]
+        public bool? UsePermittedList { get; set; }
+
+        /// <summary>Per-player roles keyed by <c>"{Platform}:{PlayerId}"</c>. Omitted when the profile has none.</summary>
+        [JsonProperty("playerRoles", NullValueHandling = NullValueHandling.Ignore)]
+        public Dictionary<string, PlayerRoleFileEntry>? PlayerRoles { get; set; }
+    }
+
+    /// <summary>The persisted form of one role assignment: a lowercase role token + optional raw platform.</summary>
+    public class PlayerRoleFileEntry
+    {
+        [JsonProperty("role")]
+        public string? Role { get; set; }
+
+        [JsonProperty("platformRaw", NullValueHandling = NullValueHandling.Ignore)]
+        public string? PlatformRaw { get; set; }
     }
 }

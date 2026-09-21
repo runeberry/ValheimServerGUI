@@ -84,10 +84,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IApplicationLogger appLogger,
         ISoftwareUpdateProvider updateProvider,
         IShellLauncher shell,
-        IValheimPathResolver pathResolver,
-        // Optional + last so the many test call sites need not change; DI still injects the registered
-        // singleton in production, and a null falls back to a real (no-op without a savedir) service.
-        IPlayerAccessListService? accessLists = null)
+        IValheimPathResolver pathResolver)
     {
         _serverManager = serverManager;
         _userPrefs = userPrefs;
@@ -105,7 +102,9 @@ public partial class MainWindowViewModel : ViewModelBase
         StartAction = options => _currentServer!.Start(options);
 
         Details = new ServerDetailsViewModel(ipProvider, () => Form.Port);
-        Players = new PlayersViewModel(playerRepo, accessLists ?? new PlayerAccessListService());
+        // The Players tab edits the active profile's roles/mode, which live on the form; the three list files
+        // are generated from those at server start (in Core), so the tab needs no access-list service here.
+        Players = new PlayersViewModel(playerRepo, Form);
         Logs = new LogsViewModel(appLogger, shell, pathResolver);
 
         _updateProvider.UpdateCheckStarted += OnUpdateCheckStarted;
@@ -405,8 +404,9 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>
     /// Points this window at the selected profile's server (created on first ask, shared app-wide). Swaps the
     /// event subscriptions, re-seeds every status-derived gate from the new server's status, and re-targets
-    /// the Details/Logs tabs. Runs on the UI thread (always called from a UI action via LoadProfile). Players
-    /// is deliberately not re-targeted — it is a global, merged player list (documented limitation).
+    /// the Details/Logs tabs. Runs on the UI thread (always called from a UI action via LoadProfile). The
+    /// Players tab follows the active profile automatically: its roles/mode live on the form, which
+    /// LoadProfile reloads (firing RoleStateChanged) right after this call.
     /// </summary>
     private void RetargetTo(string profileName)
     {
@@ -435,23 +435,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Details.SetServer(_currentServer);
         Logs.SetServerLog(_serverManager.GetServerLog(profileName));
-
-        // The Players table is global (a merged list), but admin/ban/permit management is per-profile: point
-        // it at this profile's savedir so the list files it reads/writes follow the active profile.
-        Players.SetSaveDataFolder(ResolveSaveDataFolderForProfile(profileName));
-    }
-
-    // The savedir a profile's list files live in: the profile's own SaveDataFolderPath, else the user-level
-    // default, with environment variables expanded to an absolute path (as the rest of the app resolves it).
-    private string? ResolveSaveDataFolderForProfile(string profileName)
-    {
-        var serverPrefs = _serverPrefs.LoadPreferences(profileName);
-        var userPrefs = _userPrefs.LoadPreferences();
-        var path = !string.IsNullOrWhiteSpace(serverPrefs?.SaveDataFolderPath)
-            ? serverPrefs!.SaveDataFolderPath
-            : userPrefs.SaveDataFolderPath;
-
-        return string.IsNullOrWhiteSpace(path) ? null : Environment.ExpandEnvironmentVariables(path);
     }
 
     // ===== StartServer flow (§10.3 / GetServerOptionsFromFormState + validation) =====
@@ -590,6 +573,16 @@ public partial class MainWindowViewModel : ViewModelBase
             // Lines land in the profile's server-owned buffer regardless of which window started the server.
             LogMessageHandler = _serverManager.GetLogAppender(
                 CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName),
+            // Access-list generation inputs: the mode flag + the profile's roles (recovered from the map key
+            // "{Platform}:{PlayerId}"). Core projects these onto the three gating files at start.
+            UsePermittedList = serverPrefs.UsePermittedList,
+            PlayerRoles = serverPrefs.PlayerRoles.Select(kvp =>
+            {
+                var separator = kvp.Key.IndexOf(':');
+                var platform = separator >= 0 ? kvp.Key[..separator] : null;
+                var playerId = separator >= 0 ? kvp.Key[(separator + 1)..] : kvp.Key;
+                return new PlayerRoleAssignment(platform, kvp.Value.PlatformRaw ?? platform, playerId, kvp.Value.Role);
+            }).ToList(),
         };
 
         var worldName = serverPrefs.WorldName;

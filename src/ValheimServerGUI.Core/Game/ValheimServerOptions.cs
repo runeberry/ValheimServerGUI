@@ -48,6 +48,10 @@ namespace ValheimServerGUI.Game
 
         public HashSet<string>? WorldKeys { get; set; }
 
+        public bool UsePermittedList { get; set; }
+
+        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; set; } = Array.Empty<PlayerRoleAssignment>();
+
         public void Validate()
         {
             // Ensure all required fields exist
@@ -155,5 +159,18 @@ namespace ValheimServerGUI.Game
         public Dictionary<string, string>? WorldModifiers { get; }
 
         public HashSet<string>? WorldKeys { get; }
+
+        /// <summary>Whether the server should run in permitted-list mode (drives access-list generation).</summary>
+        public bool UsePermittedList { get; }
+
+        /// <summary>The player roles the three gating files are generated from at <see cref="ValheimServer.Start"/>.</summary>
+        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; }
     }
+
+    /// <summary>
+    /// A self-contained (no repository dependency) role assignment carried into <see cref="ValheimServer.Start"/>
+    /// for access-list generation. <see cref="PlatformRaw"/> preserves the game's exact casing for non-Steam
+    /// list-file tokens; it falls back to <see cref="Platform"/> when null.
+    /// </summary>
+    public record PlayerRoleAssignment(string? Platform, string? PlatformRaw, string? PlayerId, PlayerRole Role);
 }

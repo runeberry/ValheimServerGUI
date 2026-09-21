@@ -191,5 +191,102 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.True(_svc.Remove(_savedir, PlayerAccessList.Permitted, player));
             Assert.False(_svc.Contains(_savedir, PlayerAccessList.Permitted, player));
         }
+
+        // ---- GenerateFiles (profile roles -> the three files) ----
+
+        private string[] Lines(PlayerAccessList list)
+        {
+            var name = list switch
+            {
+                PlayerAccessList.Admin => "adminlist.txt",
+                PlayerAccessList.Banned => "bannedlist.txt",
+                _ => "permittedlist.txt",
+            };
+            return File.ReadAllLines(Path.Join(_savedir, name));
+        }
+
+        [Fact]
+        public void Generate_OpenMode_RoutesRolesAndWritesCanonicalTokens()
+        {
+            var roles = new[]
+            {
+                (Steam("76561198000000001"), PlayerRole.Admin),
+                (NonSteam(PlayerPlatforms.PlayStation, "abc", raw: "Playstation"), PlayerRole.Banned),
+                (Steam("999"), PlayerRole.Permitted), // permitted is a no-op in open mode
+            };
+
+            _svc.GenerateFiles(_savedir, roles.Select(r => ((PlayerInfo)r.Item1, r.Item2)), usePermittedList: false);
+
+            // Admin: canonical Steam token; header preserved.
+            Assert.Equal("// List admin players ID  ONE per line", Lines(PlayerAccessList.Admin)[0]);
+            Assert.Contains("Steam_76561198000000001", Lines(PlayerAccessList.Admin));
+            // Banned: non-Steam raw token verbatim.
+            Assert.Contains("Playstation_abc", Lines(PlayerAccessList.Banned));
+            // Permitted list is unused in open mode -> header only.
+            Assert.Equal(new[] { "// List permitted players ID ONE per line" }, Lines(PlayerAccessList.Permitted));
+        }
+
+        [Fact]
+        public void Generate_PermittedMode_PutsAdminOnBothLists_AndBannedNowhere()
+        {
+            var roles = new[]
+            {
+                (Steam("1"), PlayerRole.Admin),
+                (Steam("2"), PlayerRole.Permitted),
+                (Steam("3"), PlayerRole.Banned),
+            };
+
+            _svc.GenerateFiles(_savedir, roles.Select(r => ((PlayerInfo)r.Item1, r.Item2)), usePermittedList: true);
+
+            Assert.Contains("Steam_1", Lines(PlayerAccessList.Admin));
+            // The admin must also be on the permitted list, alongside the permitted player.
+            Assert.Contains("Steam_1", Lines(PlayerAccessList.Permitted));
+            Assert.Contains("Steam_2", Lines(PlayerAccessList.Permitted));
+            // The ban list is ignored in permitted mode -> header only, no members.
+            Assert.Equal(new[] { "// List banned players ID  ONE per line" }, Lines(PlayerAccessList.Banned));
+        }
+
+        [Fact]
+        public void Generate_EmptyConfig_WritesHeaderOnlyFiles()
+        {
+            _svc.GenerateFiles(_savedir, System.Array.Empty<(PlayerInfo, PlayerRole)>(), usePermittedList: false);
+
+            Assert.Equal(new[] { "// List admin players ID  ONE per line" }, Lines(PlayerAccessList.Admin));
+            Assert.Equal(new[] { "// List banned players ID  ONE per line" }, Lines(PlayerAccessList.Banned));
+            Assert.Equal(new[] { "// List permitted players ID ONE per line" }, Lines(PlayerAccessList.Permitted));
+        }
+
+        // Flipping usePermittedList must move an admin in/out of permittedlist.txt and empty the now-unused
+        // list to header-only, purely from a regenerate (no manual file edits).
+        [Fact]
+        public void Generate_FlippingMode_MovesAdminAcrossPermittedList()
+        {
+            var roles = new[] { ((PlayerInfo)Steam("1"), PlayerRole.Admin) };
+
+            _svc.GenerateFiles(_savedir, roles, usePermittedList: false);
+            Assert.Single(Lines(PlayerAccessList.Permitted)); // header only — admin not on permitted list
+
+            _svc.GenerateFiles(_savedir, roles, usePermittedList: true);
+            Assert.Contains("Steam_1", Lines(PlayerAccessList.Permitted)); // now permitted too
+
+            _svc.GenerateFiles(_savedir, roles, usePermittedList: false);
+            Assert.Single(Lines(PlayerAccessList.Permitted)); // back to header only
+        }
+
+        [Fact]
+        public void Generate_OverwritesPriorContent()
+        {
+            // A stale file with hand-entered members.
+            File.WriteAllText(AdminPath, "// old header\nSteam_stale\n999\n");
+
+            _svc.GenerateFiles(_savedir,
+                new[] { ((PlayerInfo)Steam("1"), PlayerRole.Admin) }, usePermittedList: false);
+
+            var lines = Lines(PlayerAccessList.Admin);
+            Assert.Equal("// List admin players ID  ONE per line", lines[0]); // reset to the game header
+            Assert.DoesNotContain("Steam_stale", lines);
+            Assert.DoesNotContain("999", lines);
+            Assert.Contains("Steam_1", lines);
+        }
     }
 }

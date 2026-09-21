@@ -23,34 +23,30 @@ public partial class PlayerRowViewModel : ObservableObject
     [ObservableProperty] private bool _isOffline;
     [ObservableProperty] private Bitmap? _platformIcon;
 
-    // Access-list membership (profile-scoped), driven by PlayersViewModel from the list files. Surfaced as a
-    // single "Role" (see RoleText/RoleIcon); the three booleans remain the source of truth for the toggles.
+    // The role shown for the current profile + mode, computed by PlayersViewModel (mode-filtered from the
+    // stored role: admin shows in both modes; permitted only in permitted-list mode; banned only otherwise).
+    // Null renders a blank cell. The stored role itself lives on the profile (ServerFormViewModel), not here.
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
-    private bool _isAdmin;
+    private PlayerRole? _displayRole;
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
-    private bool _isBanned;
+    /// <summary>The displayed role's label, or null (blank cell) when the player has no role in this mode.</summary>
+    public string? RoleText => DisplayRole switch
+    {
+        PlayerRole.Admin => "Admin",
+        PlayerRole.Permitted => "Permitted",
+        PlayerRole.Banned => "Banned",
+        _ => null,
+    };
 
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
-    private bool _isPermitted;
-
-    /// <summary>The player's single displayed role, highest-priority first: Admin &gt; Permitted &gt; Banned.
-    /// Null when the player is in none of the three profile access lists (blank cell).</summary>
-    public string? RoleText =>
-        IsAdmin ? "Admin" :
-        IsPermitted ? "Permitted" :
-        IsBanned ? "Banned" :
-        null;
-
-    /// <summary>Icon for <see cref="RoleText"/> (null when the player has no role).</summary>
-    public Bitmap? RoleIcon =>
-        IsAdmin ? AppIcons.Get("UserAdmin_16x") :
-        IsPermitted ? AppIcons.Get("UserOk_16x") :
-        IsBanned ? AppIcons.Get("InUseByOtherUser_16x") :
-        null;
+    /// <summary>Icon for <see cref="RoleText"/> (null when the player has no role in this mode).</summary>
+    public Bitmap? RoleIcon => DisplayRole switch
+    {
+        PlayerRole.Admin => AppIcons.Get("UserAdmin_16x"),
+        PlayerRole.Permitted => AppIcons.Get("UserOk_16x"),
+        PlayerRole.Banned => AppIcons.Get("InUseByOtherUser_16x"),
+        _ => null,
+    };
 
     public void Update(PlayerInfo player)
     {
@@ -66,14 +62,6 @@ public partial class PlayerRowViewModel : ObservableObject
         IsOffline = player.PlayerStatus == PlayerStatus.Offline;
         PlatformIcon = PlatformToIconConverter.ForPlatform(player.Platform);
         RefreshSince();
-    }
-
-    /// <summary>Sets the three access-list flags together (called by <c>PlayersViewModel</c> on load/toggle).</summary>
-    public void SetMembership(bool isAdmin, bool isBanned, bool isPermitted)
-    {
-        IsAdmin = isAdmin;
-        IsBanned = isBanned;
-        IsPermitted = isPermitted;
     }
 
     public void RefreshSince()

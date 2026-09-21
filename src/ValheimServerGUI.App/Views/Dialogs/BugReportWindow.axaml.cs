@@ -4,7 +4,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class BugReportWindow : Window
+public partial class BugReportWindow : DialogWindow
 {
     public BugReportWindow()
     {

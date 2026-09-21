@@ -4,7 +4,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class DirectoriesWindow : Window
+public partial class DirectoriesWindow : DialogWindow
 {
     private bool _confirmedClose;
 

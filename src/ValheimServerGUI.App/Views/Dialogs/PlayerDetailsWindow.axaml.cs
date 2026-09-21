@@ -6,7 +6,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class PlayerDetailsWindow : Window
+public partial class PlayerDetailsWindow : DialogWindow
 {
     private bool _confirmedClose;
 

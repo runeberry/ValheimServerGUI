@@ -6,7 +6,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class AsyncOperationWindow : Window
+public partial class AsyncOperationWindow : DialogWindow
 {
     private Func<Task>? _operation;
 

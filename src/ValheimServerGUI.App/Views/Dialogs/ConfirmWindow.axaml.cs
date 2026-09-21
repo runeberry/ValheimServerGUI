@@ -4,7 +4,7 @@ using Avalonia.Interactivity;
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>A minimal modal yes/no confirmation. Closes with a <see cref="bool"/> result.</summary>
-public partial class ConfirmWindow : Window
+public partial class ConfirmWindow : DialogWindow
 {
     public ConfirmWindow()
     {

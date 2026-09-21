@@ -9,7 +9,7 @@
 
     <Grid RowDefinitions="*,Auto" Margin="20">
         <TextBlock Grid.Row="0" x:Name="MessageText" TextWrapping="Wrap" />
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right"
+        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center"
                     Spacing="8" Margin="0,20,0,0">
             <Button x:Name="YesButton" Content="Yes" MinWidth="80" IsDefault="True" Click="OnYes" />
             <Button x:Name="NoButton" Content="No" MinWidth="80" IsCancel="True" Click="OnNo" />

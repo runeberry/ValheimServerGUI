@@ -10,7 +10,7 @@
 
     <StackPanel Margin="20" Spacing="12">
         <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,8,0,0">
             <Button Content="Use server profile" MinWidth="80" IsDefault="True" Click="OnUseServerProfile" />
             <Button Content="Use roles from file" MinWidth="80" Click="OnUseRolesFromFile" />
             <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />

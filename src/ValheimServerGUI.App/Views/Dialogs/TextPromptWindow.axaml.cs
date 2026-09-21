@@ -6,7 +6,7 @@ using Avalonia.Interactivity;
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>Generic single-line text prompt (profile names, character names). Closes with the text, or null on cancel.</summary>
-public partial class TextPromptWindow : Window
+public partial class TextPromptWindow : DialogWindow
 {
     private Func<string, string?>? _validator;
 

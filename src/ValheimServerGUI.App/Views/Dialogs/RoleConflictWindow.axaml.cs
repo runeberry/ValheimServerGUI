@@ -11,7 +11,7 @@ public enum RoleConflictChoice { UseServerProfile, UseRolesFromFile, Cancel }
 /// <see cref="RoleConflictChoice"/>: keep the profile (regenerate, backing up the files), keep the files
 /// (skip generation), or cancel the start.
 /// </summary>
-public partial class RoleConflictWindow : Window
+public partial class RoleConflictWindow : DialogWindow
 {
     public RoleConflictWindow()
     {

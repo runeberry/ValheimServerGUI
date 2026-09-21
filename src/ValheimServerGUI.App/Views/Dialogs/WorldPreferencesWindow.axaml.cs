@@ -4,7 +4,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class WorldPreferencesWindow : Window
+public partial class WorldPreferencesWindow : DialogWindow
 {
     private bool _confirmedClose;
 

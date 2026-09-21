@@ -9,7 +9,7 @@ namespace ValheimServerGUI.App.Views.Dialogs;
 /// "Add player by ID" prompt (grant admin/ban/permit to a platform ID). Closes with an
 /// <see cref="AddByIdResult"/> on Add, or null on Cancel.
 /// </summary>
-public partial class AddByIdWindow : Window
+public partial class AddByIdWindow : DialogWindow
 {
     public AddByIdWindow()
     {

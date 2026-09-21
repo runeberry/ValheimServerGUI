@@ -5,7 +5,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class PreferencesWindow : Window
+public partial class PreferencesWindow : DialogWindow
 {
     private bool _confirmedClose;
 

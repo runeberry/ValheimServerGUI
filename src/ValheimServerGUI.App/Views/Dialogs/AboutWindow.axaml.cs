@@ -4,7 +4,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
-public partial class AboutWindow : Window
+public partial class AboutWindow : DialogWindow
 {
     public AboutWindow()
     {

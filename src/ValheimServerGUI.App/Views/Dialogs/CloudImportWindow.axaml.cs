@@ -5,7 +5,7 @@ using ValheimServerGUI.App.ViewModels;
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>Move / Copy / Cancel prompt for hosting a Steam Cloud world. Closes with a <see cref="CloudImportChoice"/>.</summary>
-public partial class CloudImportWindow : Window
+public partial class CloudImportWindow : DialogWindow
 {
     public CloudImportWindow()
     {

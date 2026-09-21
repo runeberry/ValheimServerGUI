@@ -11,7 +11,7 @@
         <TextBlock x:Name="PromptText" TextWrapping="Wrap" />
         <TextBox x:Name="InputBox" KeyDown="OnInputKeyDown" />
         <TextBlock x:Name="ErrorText" Foreground="#E53935" IsVisible="False" TextWrapping="Wrap" />
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
             <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
             <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>

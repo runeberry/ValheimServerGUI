@@ -6,7 +6,7 @@ namespace ValheimServerGUI.App.Views.Dialogs;
 /// <summary>The unsaved-changes choice for PlayerDetails / WorldPreferences (§13.3).</summary>
 public enum UnsavedChangesChoice { Save, Discard, Cancel }
 
-public partial class UnsavedChangesWindow : Window
+public partial class UnsavedChangesWindow : DialogWindow
 {
     public UnsavedChangesWindow()
     {

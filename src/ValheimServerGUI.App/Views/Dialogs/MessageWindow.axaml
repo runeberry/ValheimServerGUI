@@ -9,7 +9,7 @@
 
     <Grid RowDefinitions="*,Auto" Margin="20">
         <TextBlock Grid.Row="0" x:Name="MessageText" TextWrapping="Wrap" />
-        <Button Grid.Row="1" Content="OK" MinWidth="80" HorizontalAlignment="Right"
+        <Button Grid.Row="1" Content="OK" MinWidth="80" HorizontalAlignment="Center"
                 Margin="0,20,0,0" IsDefault="True" IsCancel="True" Click="OnOk" />
     </Grid>
 </Window>

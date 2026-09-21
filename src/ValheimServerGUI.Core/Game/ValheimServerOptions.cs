@@ -52,6 +52,8 @@ namespace ValheimServerGUI.Game
 
         public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; set; } = Array.Empty<PlayerRoleAssignment>();
 
+        public bool SkipAccessListGeneration { get; set; }
+
         public void Validate()
         {
             // Ensure all required fields exist
@@ -165,6 +167,13 @@ namespace ValheimServerGUI.Game
 
         /// <summary>The player roles the three gating files are generated from at <see cref="ValheimServer.Start"/>.</summary>
         public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; }
+
+        /// <summary>
+        /// When true, <see cref="ValheimServer.Start"/> does NOT regenerate the three access-list files, leaving
+        /// whatever is on disk untouched. Set by the start-time conflict flow's "use roles from file" choice so
+        /// the user's own list files win over the profile's roles for that launch.
+        /// </summary>
+        public bool SkipAccessListGeneration { get; }
     }
 
     /// <summary>

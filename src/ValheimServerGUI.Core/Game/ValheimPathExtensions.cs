@@ -46,6 +46,41 @@ namespace ValheimServerGUI.Game
         private static FileInfo GetSaveDataRootFile(DirectoryInfo saveDataFolder, string fileName)
             => new(Path.Join(saveDataFolder.FullName, fileName));
 
+        /// <summary>
+        /// Moves a list file aside to the first free increment, preserving any manual entries before generation
+        /// overwrites the original: <c>permittedlist.txt</c> → <c>permittedlist.bak.txt</c>, then
+        /// <c>permittedlist.bak.2.txt</c>, <c>permittedlist.bak.3.txt</c>, …. Returns the destination it moved
+        /// to, or <c>null</c> when the file does not exist or the move fails (an <see cref="IOException"/>, e.g.
+        /// the path is locked or occupied), leaving the caller to decide how to react. Generic over any of the
+        /// three list files.
+        /// </summary>
+        public static FileInfo? BackupListFile(FileInfo file)
+        {
+            if (!file.Exists) return null;
+
+            var dir = file.DirectoryName ?? string.Empty;
+            var name = Path.GetFileNameWithoutExtension(file.Name);
+            var ext = Path.GetExtension(file.Name);
+
+            for (var i = 1; ; i++)
+            {
+                // First increment is unnumbered (".bak"); subsequent ones carry the count (".bak.2", ".bak.3").
+                var candidate = i == 1 ? $"{name}.bak{ext}" : $"{name}.bak.{i}{ext}";
+                var dest = new FileInfo(Path.Combine(dir, candidate));
+                if (dest.Exists) continue;
+
+                try
+                {
+                    File.Move(file.FullName, dest.FullName);
+                    return dest;
+                }
+                catch (IOException)
+                {
+                    return null;
+                }
+            }
+        }
+
         public static List<string> GetWorldNames(this DirectoryInfo saveDataFolder)
         {
             try

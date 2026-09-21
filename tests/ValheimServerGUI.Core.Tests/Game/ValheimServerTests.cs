@@ -293,6 +293,31 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Single(banned);                            // header only
         }
 
+        // SkipAccessListGeneration (set by the start-time "use roles from file" choice) leaves whatever is on
+        // disk untouched, whereas the default regenerates. A/B over the same seeded file proves the flag gates
+        // generation rather than the probe never reaching the write.
+        [Fact]
+        public void Start_SkipAccessListGeneration_LeavesFilesUntouched()
+        {
+            var adminPath = Path.Join(_saveDir, "adminlist.txt");
+            File.WriteAllText(adminPath, "// header\nSteam_999\n"); // a manual entry not in any role
+
+            _server.Start(Options(o => o.SkipAccessListGeneration = true));
+
+            Assert.Contains("Steam_999", File.ReadAllLines(adminPath)); // preserved verbatim
+        }
+
+        [Fact]
+        public void Start_WithoutSkip_RegeneratesAndOverwritesFiles()
+        {
+            var adminPath = Path.Join(_saveDir, "adminlist.txt");
+            File.WriteAllText(adminPath, "// header\nSteam_999\n"); // manual entry, no matching role
+
+            _server.Start(Options()); // SkipAccessListGeneration defaults false → header-only regeneration
+
+            Assert.DoesNotContain("Steam_999", File.ReadAllLines(adminPath)); // overwritten
+        }
+
         // The live carve-out: applying roles to an already-running server regenerates the files now AND
         // updates the live options, so a restart (which reuses Options) keeps the change instead of reverting.
         [Fact]

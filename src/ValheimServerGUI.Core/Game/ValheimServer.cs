@@ -150,7 +150,8 @@ namespace ValheimServerGUI.Game
                 exePath,
                 CleanArgsForLogging(processArgs));
 
-            GenerateAccessLists(options);
+            // The conflict flow's "use roles from file" choice keeps the on-disk list files as-is for this launch.
+            if (!options.SkipAccessListGeneration) GenerateAccessLists(options);
 
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);

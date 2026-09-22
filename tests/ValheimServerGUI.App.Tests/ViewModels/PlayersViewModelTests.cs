@@ -246,8 +246,8 @@ public class PlayersViewModelTests
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
         _form.UsePermittedList = false;
-        vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(
-            new AddByIdResult(PlayerPlatforms.Xbox, "XUID9", Admin: true, Banned: false, Permitted: false));
+        vm.AddByIdPrompt = _ => Task.FromResult<AddByIdResult?>(
+            new AddByIdResult(PlayerPlatforms.Xbox, "XUID9", PlayerRole.Admin));
 
         await vm.AddByIdCommand.ExecuteAsync(null);
 
@@ -258,25 +258,12 @@ public class PlayersViewModelTests
     }
 
     [AvaloniaFact]
-    public async Task Add_by_id_collapses_multi_select_to_a_single_role_ban_wins()
-    {
-        var repo = new FakePlayerDataRepository();
-        var vm = NewVm(repo);
-        vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(
-            new AddByIdResult(PlayerPlatforms.Steam, "42", Admin: true, Banned: true, Permitted: false));
-
-        await vm.AddByIdCommand.ExecuteAsync(null);
-
-        Assert.Equal(PlayerRole.Banned, _form.GetRole("Steam:42")); // ban wins over admin
-    }
-
-    [AvaloniaFact]
     public async Task Add_by_id_new_record_triggers_a_name_lookup()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(
-            new AddByIdResult(PlayerPlatforms.Steam, "77", Admin: false, Banned: false, Permitted: false));
+        vm.AddByIdPrompt = _ => Task.FromResult<AddByIdResult?>(
+            new AddByIdResult(PlayerPlatforms.Steam, "77", PlayerRole.Admin));
 
         await vm.AddByIdCommand.ExecuteAsync(null);
 
@@ -288,7 +275,7 @@ public class PlayersViewModelTests
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        vm.AddByIdPrompt = () => Task.FromResult<AddByIdResult?>(null);
+        vm.AddByIdPrompt = _ => Task.FromResult<AddByIdResult?>(null);
 
         await vm.AddByIdCommand.ExecuteAsync(null);
 

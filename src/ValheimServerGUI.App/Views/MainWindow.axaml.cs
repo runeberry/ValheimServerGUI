@@ -42,7 +42,7 @@ public partial class MainWindow : Window
         viewModel.MenuActionRequested += a => _ = HandleMenuActionAsync(a);
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
-        viewModel.Players.AddByIdPrompt = () => new AddByIdWindow().ShowDialog<AddByIdResult?>(this);
+        viewModel.Players.AddByIdPrompt = usePermitted => new AddByIdWindow(usePermitted).ShowDialog<AddByIdResult?>(this);
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
         viewModel.MessagePrompt = ShowMessageAsync;
         viewModel.ImportConfirmPrompt = body =>

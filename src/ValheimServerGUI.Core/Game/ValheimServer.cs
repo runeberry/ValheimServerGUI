@@ -310,11 +310,11 @@ namespace ValheimServerGUI.Game
         // before launch, so a manual start, an auto-start, and a restart (all of which re-enter Start) apply
         // the same rules uniformly.
         //
-        // DATA-LOSS CAVEAT (accepted for now — see the v3.0 plan): generation OVERWRITES the three files
-        // unconditionally, even when the profile has no roles (they become header-only). The first start after
-        // this feature shipped therefore wipes any pre-existing manual entries in adminlist/bannedlist/
-        // permittedlist.txt. Importing existing files into the role config (and conflict detection) is a
-        // deliberately separate pass that MUST land before v3.0 GA.
+        // Generation OVERWRITES the three files unconditionally, even when the profile has no roles (they
+        // become header-only). That is safe because pre-existing manual entries are no longer at risk:
+        // MainWindowViewModel.ResolveListSafetyBeforeStartAsync runs before start, importing/adopting any
+        // existing adminlist/bannedlist/permittedlist.txt into the profile's role config, detecting conflicts,
+        // and backing up the files — so anything on disk has already been folded into the roles projected here.
         private void GenerateAccessLists(IValheimServerOptions options)
         {
             var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;

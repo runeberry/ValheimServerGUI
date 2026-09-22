@@ -1,4 +1,5 @@
 using ValheimServerGUI.App.ViewModels.Dialogs;
+using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
 
@@ -7,38 +8,55 @@ namespace ValheimServerGUI.App.Tests.ViewModels;
 public class AddByIdViewModelTests
 {
     [Fact]
-    public void CanSubmit_requires_an_id_and_at_least_one_list()
+    public void Role_options_follow_the_mode()
     {
-        var vm = new AddByIdViewModel();
+        var open = new AddByIdViewModel(usePermittedList: false);
+        Assert.True(open.ShowBanned);       // ban list is in effect
+        Assert.False(open.ShowPermitted);
+
+        var permitted = new AddByIdViewModel(usePermittedList: true);
+        Assert.False(permitted.ShowBanned);
+        Assert.True(permitted.ShowPermitted); // whitelist is in effect
+    }
+
+    [Fact]
+    public void CanSubmit_requires_an_id_and_a_role()
+    {
+        var vm = new AddByIdViewModel(usePermittedList: false);
         Assert.False(vm.CanSubmit);
 
         vm.PlayerId = "123";
-        Assert.False(vm.CanSubmit);           // id but no list
+        Assert.False(vm.CanSubmit);   // id but no role
 
-        vm.AddBanned = true;
+        vm.IsAdmin = true;
         Assert.True(vm.CanSubmit);
 
-        Assert.Null(new AddByIdViewModel().BuildResult()); // incomplete form -> null
+        Assert.Null(new AddByIdViewModel(usePermittedList: false).BuildResult()); // incomplete -> null
     }
 
     [Fact]
-    public void ShowBanWarning_only_when_ban_combined_with_admin_or_permit()
+    public void Selecting_a_role_clears_any_prior_selection()
     {
-        var vm = new AddByIdViewModel { PlayerId = "1", AddBanned = true };
-        Assert.False(vm.ShowBanWarning);
+        var vm = new AddByIdViewModel(usePermittedList: false) { PlayerId = "1", IsAdmin = true };
+        Assert.Equal(PlayerRole.Admin, vm.SelectedRole);
 
-        vm.AddAdmin = true;
-        Assert.True(vm.ShowBanWarning);
+        vm.IsBanned = true;
+        Assert.Equal(PlayerRole.Banned, vm.SelectedRole);
+        Assert.False(vm.IsAdmin);
+
+        // A grouping-driven false (RadioButton unchecking a sibling) does not clear the selection.
+        vm.IsAdmin = false;
+        Assert.Equal(PlayerRole.Banned, vm.SelectedRole);
     }
 
     [Fact]
-    public void BuildResult_carries_platform_id_and_list_choices_trimmed()
+    public void BuildResult_carries_platform_id_trimmed_and_role()
     {
-        var vm = new AddByIdViewModel
+        var vm = new AddByIdViewModel(usePermittedList: true)
         {
             SelectedPlatform = PlayerPlatforms.PlayStation,
             PlayerId = "  psid  ",
-            AddPermitted = true,
+            IsPermitted = true,
         };
 
         var result = vm.BuildResult();
@@ -46,13 +64,12 @@ public class AddByIdViewModelTests
         Assert.NotNull(result);
         Assert.Equal(PlayerPlatforms.PlayStation, result!.Platform);
         Assert.Equal("psid", result.PlayerId);
-        Assert.True(result.Permitted);
-        Assert.False(result.Admin);
+        Assert.Equal(PlayerRole.Permitted, result.Role);
     }
 
     [Fact]
     public void Platforms_lists_all_four_supported()
     {
-        Assert.Equal(PlayerPlatforms.All.Count, new AddByIdViewModel().Platforms.Count);
+        Assert.Equal(PlayerPlatforms.All.Count, new AddByIdViewModel(usePermittedList: false).Platforms.Count);
     }
 }

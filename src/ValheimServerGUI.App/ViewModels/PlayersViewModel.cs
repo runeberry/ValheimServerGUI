@@ -13,8 +13,8 @@ using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.App.ViewModels;
 
-/// <summary>The identity + list choices returned by the "Add by ID" dialog.</summary>
-public record AddByIdResult(string Platform, string PlayerId, bool Admin, bool Banned, bool Permitted);
+/// <summary>The identity + single role returned by the "Add by ID" dialog.</summary>
+public record AddByIdResult(string Platform, string PlayerId, PlayerRole Role);
 
 /// <summary>
 /// Players tab (§7.4): a live table fed by the shared player repository. Rows update from
@@ -91,8 +91,11 @@ public partial class PlayersViewModel : ViewModelBase
     /// <summary>Raised for View Player Details.</summary>
     public event Action<PlayerInfo>? ViewDetailsRequested;
 
-    /// <summary>Shows the "Add by ID" dialog; returns null on cancel. Wired by the window.</summary>
-    public Func<Task<AddByIdResult?>>? AddByIdPrompt { get; set; }
+    /// <summary>
+    /// Shows the "Add by ID" dialog for the given mode (<c>usePermittedList</c>); returns null on cancel. The
+    /// mode drives which role options the dialog offers. Wired by the window.
+    /// </summary>
+    public Func<bool, Task<AddByIdResult?>>? AddByIdPrompt { get; set; }
 
     public void SetActive(bool active)
     {
@@ -134,7 +137,7 @@ public partial class PlayersViewModel : ViewModelBase
     {
         if (AddByIdPrompt is null) return;
 
-        var result = await AddByIdPrompt();
+        var result = await AddByIdPrompt(_form.UsePermittedList);
         if (result is null) return;
         if (!PlayerPlatforms.TryGetValidPlatform(result.Platform, out var platform) || platform is null) return;
         if (string.IsNullOrWhiteSpace(result.PlayerId)) return;
@@ -155,14 +158,8 @@ public partial class PlayersViewModel : ViewModelBase
         };
         if (string.IsNullOrWhiteSpace(player.PlatformRaw)) player.PlatformRaw = platform;
 
-        // The dialog still offers multiple checkboxes (its redesign is deferred with the import pass), but the
-        // model stores one role. Collapse by the dialog's own stated precedence — a ban wins over admin/permit.
-        var role = result.Banned ? PlayerRole.Banned
-            : result.Admin ? PlayerRole.Admin
-            : result.Permitted ? PlayerRole.Permitted
-            : (PlayerRole?)null;
-
-        if (role is not null) _form.SetRole(player, role);
+        // The dialog picks exactly one role for the active mode; store it directly.
+        _form.SetRole(player, result.Role);
 
         _repo.Upsert(player); // OnEntityUpdated adds/updates the row; ApplyRole reads the role back from the form.
 

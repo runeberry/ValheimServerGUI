@@ -1,0 +1,24 @@
+name: mirror
+
+on:
+  push:
+    branches: ["**"]
+    tags: ["**"]
+
+concurrency:
+  group: mirror-${{ github.repository }}
+  cancel-in-progress: false
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+      - uses: https://forge.nuffle.dev/homelab/act-runner/actions/mirror@main
+        with:
+          targets: |
+            forge:runeberry/ValheimServerGUI
+            github:runeberry/ValheimServerGUI
+          forge-token: ${{ secrets.FORGE_MIRROR_TOKEN }}
+          github-token: ${{ secrets.GH_MIRROR_TOKEN }}

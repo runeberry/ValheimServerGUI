@@ -1,18 +1,10 @@
 name: mirror
 
-# ValheimServerGUI is home-forge-canonical (arcanum/ValheimServerGUI on forge.nuffle.dev).
-# It has NO homelab build/test — the app is built/released manually (and on GitHub's
-# Windows runners), which the Linux homelab runners can't reproduce — so this is a
-# MIRROR-ONLY pipeline: every push faithfully mirrors all branches + tags to the public
-# forge (runeberry) and GitHub (runeberry). A build/test gate can be added here later,
-# after which this job should `needs:` it (never mirror a broken build).
 on:
   push:
     branches: ["**"]
     tags: ["**"]
 
-# Serialize mirror runs (repo-wide, ref-independent) so concurrent pushes can't race
-# their mirror pushes. Never cancel an in-flight mirror.
 concurrency:
   group: mirror-${{ github.repository }}
   cancel-in-progress: false
@@ -22,7 +14,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with: { fetch-depth: 0 }   # full history + all refs for a complete mirror
+        with: { fetch-depth: 0 }
       - uses: https://forge.nuffle.dev/homelab/act-runner/actions/mirror@main
         with:
           targets: |

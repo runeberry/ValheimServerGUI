@@ -15,15 +15,6 @@
     <SourceRevisionId>build$([System.DateTime]::UtcNow.ToString("yyyy-MM-ddTHH:mm:ssZ"))</SourceRevisionId>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)'=='Release'">
-		<SignAssembly>true</SignAssembly>
-		<AssemblyOriginatorKeyFile>..\SolutionResources\ValheimServerGUI.snk</AssemblyOriginatorKeyFile>
-	</PropertyGroup>
-
-	<Target Name="PostPublish" AfterTargets="Publish" Condition="'$(Configuration)'=='Release'">
-		<Exec Command="post-publish.bat" />
-	</Target>
-
 	<ItemGroup>
 		<ProjectReference Include="..\ValheimServerGUI.Controls\ValheimServerGUI.Controls.csproj" />
 		<ProjectReference Include="..\ValheimServerGUI.Tools\ValheimServerGUI.Tools.csproj" />

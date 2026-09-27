@@ -25,6 +25,7 @@ jobs:
     outputs:
       tag: ${{ steps.check.outputs.tag }}
       version: ${{ steps.check.outputs.version }}
+      sha: ${{ steps.check.outputs.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -48,11 +49,15 @@ jobs:
     runs-on: ubuntu-latest
     env:
       TAG: ${{ needs.check.outputs.tag }}
+      SHA: ${{ needs.check.outputs.sha }}
       ZIP: ValheimServerGUI-${{ needs.check.outputs.version }}.zip
     steps:
       - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
         with:
           ref: refs/tags/${{ needs.check.outputs.tag }}
+          path: src
 
       - name: Install tools
         shell: bash
@@ -64,15 +69,16 @@ jobs:
 
       - name: Build
         shell: bash
+        working-directory: src
         env:
           RUNEBERRY_API_KEY_HEADER: ${{ secrets.RUNEBERRY_API_KEY_HEADER }}
           RUNEBERRY_CLIENT_API_KEY: ${{ secrets.RUNEBERRY_CLIENT_API_KEY }}
-        run: ci/release-build.sh
+        run: ../ci/release-build.sh
 
       - uses: https://forge.nuffle.dev/homelab/act-runner/actions/sign@main
         id: sign
         with:
-          files: publish/small-x64/ValheimServerGUI.exe
+          files: src/publish/small-x64/ValheimServerGUI.exe
           credentials: ${{ secrets.CS_SIGNER_KEY }}
 
       - name: Package

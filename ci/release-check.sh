@@ -3,7 +3,7 @@
 # version, and must not already have a release (draft or published) on any release host.
 #
 # Env: TAG, GITHUB_REPO + GH_TOKEN, FORGE_URL + FORGE_REPO + FORGE_TOKEN.
-# Writes tag= and version= to $GITHUB_OUTPUT.
+# Writes tag=, version=, and sha= (the tagged commit) to $GITHUB_OUTPUT.
 set -euo pipefail
 
 die() { echo "ERROR: $*" >&2; exit 1; }
@@ -48,5 +48,8 @@ grep -qxF "$TAG" <<<"$forge_tags" && conflicts+=("${FORGE_URL}/${FORGE_REPO}")
 [ "${#conflicts[@]}" -eq 0 ] || die "a release for ${TAG} already exists on: ${conflicts[*]}. Delete it first to re-release."
 
 echo "Releasing ${TAG} (version ${version}); no existing release on GitHub or ${FORGE_URL}."
-echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
-echo "version=${version}" >> "$GITHUB_OUTPUT"
+{
+  echo "tag=${TAG}"
+  echo "version=${version}"
+  echo "sha=$(git rev-list -n 1 "refs/tags/${TAG}")"
+} >> "$GITHUB_OUTPUT"

@@ -2,15 +2,14 @@
 # Create a DRAFT release for TAG on GitHub and on the public Forgejo, each with ZIP attached.
 # Drafts notify no one; a maintainer writes the notes and publishes them by hand.
 #
-# Env: TAG, ZIP, GITHUB_REPO + GH_TOKEN, FORGE_URL + FORGE_REPO + FORGE_TOKEN.
+# Env: TAG, SHA (the tagged commit), ZIP, GITHUB_REPO + GH_TOKEN, FORGE_URL + FORGE_REPO + FORGE_TOKEN.
 set -euo pipefail
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
 [ -f "$ZIP" ] || die "release asset ${ZIP} not found."
 name="$(basename "$ZIP")"
-sha="$(git rev-parse HEAD)"
-payload="$(jq -n --arg tag "$TAG" --arg sha "$sha" \
+payload="$(jq -n --arg tag "$TAG" --arg sha "$SHA" \
   '{tag_name: $tag, target_commitish: $sha, name: $tag, body: "Release notes for \($tag).", draft: true, prerelease: false}')"
 
 # GitHub: create the draft, then upload to the uploads host.

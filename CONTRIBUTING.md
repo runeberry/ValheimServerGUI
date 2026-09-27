@@ -45,14 +45,11 @@ This project uses a **Publish Profile** (.pubxml) file to store configuration fo
 
 _For projects maintainers only._
 
-In order to publish a code-signed release of the app, you must take the following additional steps:
-
-* You must add the **ValheimServerGUI.snk** file to the SolutionResources folder.
-* You must have the Runeberry Software code signing certificate (.pfx) installed on your machine.
-* You must have **SignTool.exe** in your system's PATH.
-  * With the Visual Studio Installer, this is installed along with the Windows 10/11 SDKs. The install path looks like: `C:\Program Files (x86)\Windows Kits\10\bin\{version}\x86`
-
-With all this in place, you should be able to run the **small-x64-release.pubxml** publish profile.
+Signed releases are built by CI, not locally. Pushing a version tag (e.g. `v2.4.0`, matching
+`<Version>` in `ValheimServerGUI.csproj`) builds the app, signs `ValheimServerGUI.exe` with the
+Runeberry Software code signing certificate, and creates **draft** releases with
+`ValheimServerGUI-<version>.zip` attached. A maintainer then edits the release notes and publishes
+the drafts. The workflow can also be run by hand for an existing tag.
 
 ### Creating a new release
 

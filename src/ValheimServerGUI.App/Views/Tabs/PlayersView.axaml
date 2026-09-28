@@ -15,11 +15,13 @@
                 <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
                                   Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
             </Grid>
-            <c:CheckBoxFormField LabelText="Use permitted list"
-                                 HelpText="If enabled, only players on the permitted list can join the server. Add players to the permitted list using the table below."
-                                 Value="{Binding Form.UsePermittedList}" />
-            <c:CheckBoxFormField LabelText="Show banned players"
-                                 Value="{Binding Players.ShowBannedPlayers}" />
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <c:CheckBoxFormField LabelText="Use permitted list"
+                                     HelpText="If enabled, only players on the permitted list can join the server. Add players to the permitted list using the table below."
+                                     Value="{Binding Form.UsePermittedList}" />
+                <c:CheckBoxFormField LabelText="Show banned players"
+                                     Value="{Binding Players.ShowBannedPlayers}" />
+            </StackPanel>
         </StackPanel>
 
         <c:DataListView ItemsSource="{Binding Players.Players}"

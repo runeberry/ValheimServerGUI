@@ -128,6 +128,7 @@ public class PlayersViewModelTests
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
+        vm.ShowBannedPlayers = true; // this test inspects the banned row
         var admin = Player("1", PlayerStatus.Offline);
         var permitted = Player("2", PlayerStatus.Offline);
         var banned = Player("3", PlayerStatus.Offline);
@@ -180,6 +181,65 @@ public class PlayersViewModelTests
         repo.PushUpdate(Player("1", PlayerStatus.Online));
 
         Assert.Null(vm.EmptyText);
+    }
+
+    // ---- banned-player view filter ----
+
+    [AvaloniaFact]
+    public void Players_banned_on_this_server_are_hidden_by_default_and_shown_on_request()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:2", PlayerCategory.Banned, PlayerRole.Banned)); // globally banned
+        var vm = NewVm(repo);
+        var serverBanned = Player("3", PlayerStatus.Offline);
+        _form.SetRole(serverBanned, PlayerRole.Banned);                      // banned on this server only
+        repo.PushUpdate(Player("1", PlayerStatus.Offline));
+        repo.PushUpdate(Player("2", PlayerStatus.Offline));
+        repo.PushUpdate(serverBanned);
+        repo.PushUpdate(Player("4", PlayerStatus.Offline));
+
+        Assert.False(vm.ShowBannedPlayers);
+        Assert.Equal(new[] { "Steam:1", "Steam:4" }, vm.Players.Select(r => r.Key));
+
+        vm.ShowBannedPlayers = true;
+        Assert.Equal(new[] { "Steam:1", "Steam:2", "Steam:3", "Steam:4" }, vm.Players.Select(r => r.Key)); // original order
+
+        vm.ShowBannedPlayers = false;
+        Assert.Equal(new[] { "Steam:1", "Steam:4" }, vm.Players.Select(r => r.Key));
+    }
+
+    [AvaloniaFact]
+    public void A_server_override_that_unbans_a_globally_banned_player_shows_them()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:1", PlayerCategory.Banned, PlayerRole.Banned));
+        var vm = NewVm(repo);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+        Assert.Empty(vm.Players);
+
+        _form.SetRole(player, PlayerRole.Permitted);
+
+        Assert.Equal("Steam:1", Assert.Single(vm.Players).Key);
+    }
+
+    [AvaloniaFact]
+    public void Banning_the_selected_player_hides_the_row_and_clears_the_selection()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        repo.PushUpdate(Player("1", PlayerStatus.Offline));
+        vm.SelectedPlayer = vm.Players[0];
+        _form.UsePermittedList = false;
+
+        vm.ToggleBanCommand.Execute(null);
+
+        Assert.Equal(PlayerRole.Banned, _form.GetOverride("Steam:1")); // still tracked
+        Assert.Empty(vm.Players);
+        Assert.Null(vm.SelectedPlayer);
+
+        vm.ShowBannedPlayers = true;
+        Assert.Equal("Banned", Assert.Single(vm.Players).RoleText);
     }
 
     // ---- menu labels + mode-gated visibility ----
@@ -342,6 +402,7 @@ public class PlayersViewModelTests
         var repo = new FakePlayerDataRepository();
         SaveDefaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
         var vm = NewVm(repo);
+        vm.ShowBannedPlayers = true; // the override below bans the selected row
         var player = Player("1", PlayerStatus.Offline);
         repo.PushUpdate(player);
         _form.UsePermittedList = true;

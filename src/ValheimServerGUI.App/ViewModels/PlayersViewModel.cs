@@ -32,7 +32,9 @@ public partial class PlayersViewModel : ViewModelBase
     private readonly ServerFormViewModel _form;
     private readonly IRuneberryApiClient _api;
     private readonly IUserPreferencesProvider _userPrefs;
+    // Every known player's row (keyed + in arrival order); Players is the visible, same-ordered subset.
     private readonly Dictionary<string, PlayerRowViewModel> _rows = new();
+    private readonly List<PlayerRowViewModel> _allRows = new();
     private readonly DispatcherTimer _sinceTimer;
 
     // The app-global player defaults, cached from user preferences and refreshed whenever they are saved.
@@ -68,7 +70,17 @@ public partial class PlayersViewModel : ViewModelBase
         ReloadAll();
     }
 
+    /// <summary>The rows shown: every known player, minus those banned on this server unless
+    /// <see cref="ShowBannedPlayers"/> is on.</summary>
     public ObservableCollection<PlayerRowViewModel> Players { get; } = new();
+
+    /// <summary>
+    /// View filter only (off by default, not persisted): players whose effective role on this server is Banned
+    /// are hidden unless this is on. The underlying data still covers every known player.
+    /// </summary>
+    [ObservableProperty] private bool _showBannedPlayers;
+
+    partial void OnShowBannedPlayersChanged(bool value) => SyncVisibleRows();
 
     // User copy (EXACT — do not paraphrase); asserted verbatim by a test.
     public const string NoPlayersText = "Players will appear here as they join your server.";
@@ -259,7 +271,8 @@ public partial class PlayersViewModel : ViewModelBase
     // Re-derive every row's displayed role and refresh the mode-dependent menu labels/visibility.
     private void RerenderAccess()
     {
-        foreach (var row in Players) ApplyRole(row);
+        foreach (var row in _allRows) ApplyRole(row);
+        SyncVisibleRows(); // a role change can ban or unban a player
         OnPropertyChanged(nameof(AdminToggleLabel));
         OnPropertyChanged(nameof(BanToggleLabel));
         OnPropertyChanged(nameof(PermitToggleLabel));
@@ -275,6 +288,7 @@ public partial class PlayersViewModel : ViewModelBase
     {
         if (_rows.Remove(player.Key, out var row))
         {
+            _allRows.Remove(row);
             Players.Remove(row);
             if (ReferenceEquals(SelectedPlayer, row)) SelectedPlayer = null;
         }
@@ -296,20 +310,47 @@ public partial class PlayersViewModel : ViewModelBase
             var newRow = new PlayerRowViewModel(player);
             ApplyRole(newRow);
             _rows[player.Key] = newRow;
-            Players.Add(newRow);
+            _allRows.Add(newRow);
         }
+        SyncVisibleRows();
     }
 
     private void ReloadAll()
     {
         _rows.Clear();
+        _allRows.Clear();
         Players.Clear();
         foreach (var player in _repo.Data)
         {
             var row = new PlayerRowViewModel(player);
             ApplyRole(row);
             _rows[player.Key] = row;
-            Players.Add(row);
+            _allRows.Add(row);
+        }
+        SyncVisibleRows();
+    }
+
+    private bool IsVisible(PlayerRowViewModel row)
+        => ShowBannedPlayers || Resolve(row.Key).Effective != PlayerRole.Banned;
+
+    // Brings Players in line with the filter by walking the master list: Players is always an ordered subsequence
+    // of _allRows, so each row is inserted/removed in place (no reset), keeping selection and sort intact.
+    private void SyncVisibleRows()
+    {
+        var i = 0;
+        foreach (var row in _allRows)
+        {
+            var present = i < Players.Count && ReferenceEquals(Players[i], row);
+            if (IsVisible(row))
+            {
+                if (!present) Players.Insert(i, row);
+                i++;
+            }
+            else if (present)
+            {
+                Players.RemoveAt(i);
+                if (ReferenceEquals(SelectedPlayer, row)) SelectedPlayer = null;
+            }
         }
     }
 

@@ -18,6 +18,8 @@
             <c:CheckBoxFormField LabelText="Use permitted list"
                                  HelpText="If enabled, only players on the permitted list can join the server. Add players to the permitted list using the table below."
                                  Value="{Binding Form.UsePermittedList}" />
+            <c:CheckBoxFormField LabelText="Show banned players"
+                                 Value="{Binding Players.ShowBannedPlayers}" />
         </StackPanel>
 
         <c:DataListView ItemsSource="{Binding Players.Players}"

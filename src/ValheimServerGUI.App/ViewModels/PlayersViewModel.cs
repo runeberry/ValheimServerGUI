@@ -19,25 +19,33 @@ namespace ValheimServerGUI.App.ViewModels;
 /// <c>EntityUpdated</c>/<c>PlayerStatusChanged</c>; the relative "Since" column is recomputed every second
 /// while the tab is visible. View-Details is enabled when a row is selected; Remove only when it is Offline.
 ///
-/// Access management is now a view/editor over the active profile's working state: each player has a single
-/// <see cref="PlayerRole"/> stored on <see cref="ServerFormViewModel"/> plus a per-profile
-/// <c>UsePermittedList</c> flag. The tab shows the <b>effective</b> role for the current mode and rewrites the
-/// stored role via the form (which trips the profile's dirty flag); the three list files are generated from
-/// those roles at server start, not edited here.
+/// Access management is a view/editor over the active profile's working state: each player's role on this
+/// server is its <b>override</b> (stored on <see cref="ServerFormViewModel"/>) layered over its app-global
+/// <b>default</b> (the Manage Players lists), resolved by <see cref="PlayerRoleResolver"/>. The tab shows the
+/// effective role for the current mode (with <c>(*)</c> when an override replaces a default) and edits only
+/// the override via the form (which trips the profile's dirty flag); the three list files are generated from
+/// the resolved roles at server start, not edited here.
 /// </summary>
 public partial class PlayersViewModel : ViewModelBase
 {
     private readonly IPlayerDataRepository _repo;
     private readonly ServerFormViewModel _form;
     private readonly IRuneberryApiClient _api;
+    private readonly IUserPreferencesProvider _userPrefs;
     private readonly Dictionary<string, PlayerRowViewModel> _rows = new();
     private readonly DispatcherTimer _sinceTimer;
 
-    public PlayersViewModel(IPlayerDataRepository repo, ServerFormViewModel form, IRuneberryApiClient api)
+    // The app-global player defaults, cached from user preferences and refreshed whenever they are saved.
+    private IReadOnlyDictionary<string, PlayerDefaultEntry> _defaults;
+
+    public PlayersViewModel(
+        IPlayerDataRepository repo, ServerFormViewModel form, IRuneberryApiClient api, IUserPreferencesProvider userPrefs)
     {
         _repo = repo;
         _form = form;
         _api = api;
+        _userPrefs = userPrefs;
+        _defaults = CopyDefaults(userPrefs.LoadPreferences());
 
         _sinceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
         _sinceTimer.Tick += (_, _) => RefreshSince();
@@ -52,6 +60,9 @@ public partial class PlayersViewModel : ViewModelBase
         _form.RoleStateChanged += OnFormRolesChanged;
         _form.PropertyChanged += OnFormPropertyChanged;
 
+        // Defaults change from the Manage Players dialog (any window): re-resolve every row.
+        _userPrefs.PreferencesSaved += OnUserPreferencesSaved;
+
         ReloadAll();
     }
 
@@ -59,13 +70,13 @@ public partial class PlayersViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanViewDetails), nameof(CanRemove), nameof(CanManageAccess),
-        nameof(AdminToggleLabel), nameof(BanToggleLabel), nameof(PermitToggleLabel))]
-    [NotifyCanExecuteChangedFor(nameof(ViewDetailsCommand), nameof(RemoveCommand),
+        nameof(CanClearOverride), nameof(AdminToggleLabel), nameof(BanToggleLabel), nameof(PermitToggleLabel))]
+    [NotifyCanExecuteChangedFor(nameof(ViewDetailsCommand), nameof(RemoveCommand), nameof(ClearOverrideCommand),
         nameof(ToggleAdminCommand), nameof(ToggleBanCommand), nameof(TogglePermitCommand))]
     private PlayerRowViewModel? _selectedPlayer;
 
-    // Context-menu labels reflect the selected row's STORED role (derived, never mirrored). Positive verbs set
-    // the role; negative verbs clear it to none (single-role model).
+    // Context-menu labels reflect the selected row's EFFECTIVE role (derived, never mirrored). Positive verbs
+    // write an override; negative verbs pin None for a listed player, or clear the override otherwise.
     public string AdminToggleLabel => SelectedRole == PlayerRole.Admin ? "Remove admin" : "Make admin";
     public string BanToggleLabel => SelectedRole == PlayerRole.Banned ? "Unban player" : "Ban player";
     public string PermitToggleLabel => SelectedRole == PlayerRole.Permitted ? "Revoke join permission" : "Add to permitted";
@@ -83,11 +94,17 @@ public partial class PlayersViewModel : ViewModelBase
     /// <summary>Role toggles need a selected player (roles are profile working state, always available).</summary>
     public bool CanManageAccess => SelectedPlayer is not null;
 
-    // The selected player's stored role for the active profile (null when it has none).
-    private PlayerRole? SelectedRole => SelectedPlayer is { } row ? _form.GetRole(row.Key) : null;
+    /// <summary>"Clear role override" needs a selected player whose role this server overrides.</summary>
+    public bool CanClearOverride => SelectedPlayer is { } row && _form.GetOverride(row.Key) is not null;
+
+    // The selected player's effective role on this server (None when it has none).
+    private PlayerRole? SelectedRole => SelectedPlayer is { } row ? Resolve(row.Key).Effective : null;
 
     /// <summary>Raised for View Player Details.</summary>
     public event Action<PlayerInfo>? ViewDetailsRequested;
+
+    /// <summary>Raised for Manage Players (the app-global player lists).</summary>
+    public event Action? ManagePlayersRequested;
 
     /// <summary>Shows the Add Player dialog with the given role options; returns null on cancel. Wired by the window.</summary>
     public Func<AddPlayerOptions, Task<AddPlayerResult?>>? AddPlayerPrompt { get; set; }
@@ -111,6 +128,9 @@ public partial class PlayersViewModel : ViewModelBase
         if (SelectedPlayer is not null) ViewDetailsRequested?.Invoke(SelectedPlayer.Player);
     }
 
+    [RelayCommand]
+    private void ManagePlayers() => ManagePlayersRequested?.Invoke();
+
     [RelayCommand(CanExecute = nameof(CanRemove))]
     private void Remove()
     {
@@ -126,6 +146,13 @@ public partial class PlayersViewModel : ViewModelBase
 
     [RelayCommand(CanExecute = nameof(CanManageAccess))]
     private void TogglePermit() => Toggle(PlayerRole.Permitted);
+
+    /// <summary>Drops this server's override so the player's global default applies again.</summary>
+    [RelayCommand(CanExecute = nameof(CanClearOverride))]
+    private void ClearOverride()
+    {
+        if (SelectedPlayer is { } row) _form.SetRole(row.Player, null);
+    }
 
     [RelayCommand]
     private async Task AddPlayer()
@@ -164,26 +191,35 @@ public partial class PlayersViewModel : ViewModelBase
             _ = _api.RequestPlayerInfoAsync(platform, playerId);
     }
 
-    // Flips the selected player's stored role for one verb: set it when absent, clear it when already set.
+    // Flips the selected player's effective role for one verb. The positive verb always writes an override.
+    // The negative verb must leave the player with no role: a listed player (has a default) gets an explicit
+    // None pin; an unlisted player just loses the override (no stray pins).
     private void Toggle(PlayerRole role)
     {
         if (SelectedPlayer is not { } row) return;
 
-        var current = _form.GetRole(row.Key);
-        // Positive verb sets the role (overwriting any prior one); the negative verb clears it to none.
-        _form.SetRole(row.Player, current == role ? null : role);
+        var resolved = Resolve(row.Key);
+        if (resolved.Effective != role)
+            _form.SetRole(row.Player, role);
+        else
+            _form.SetRole(row.Player, resolved.HasDefault ? PlayerRole.None : null);
         // Row re-render + label refresh happen on the form's RoleStateChanged callback.
     }
+
+    private ResolvedRole Resolve(string key) => PlayerRoleResolver.Resolve(key, _form.PlayerRoles, _defaults);
+
+    private static IReadOnlyDictionary<string, PlayerDefaultEntry> CopyDefaults(UserPreferences prefs)
+        => new Dictionary<string, PlayerDefaultEntry>(prefs.PlayerDefaults);
 
     private void RefreshSince()
     {
         foreach (var row in Players) row.RefreshSince();
     }
 
-    // The role shown for a player under the current mode (null = blank cell). Admin shows in both modes;
+    // The effective role shown under the current mode (null = blank cell). Admin shows in both modes;
     // permitted only in permitted-list mode; banned only when the ban list is in effect. Mirrors
     // PlayerAccessListRules so the table reads the same rules the files are generated from.
-    private PlayerRole? DisplayRoleFor(string key) => _form.GetRole(key) switch
+    private PlayerRole? ModeFiltered(PlayerRole role) => role switch
     {
         PlayerRole.Admin => PlayerRole.Admin,
         PlayerRole.Permitted => _form.UsePermittedList ? PlayerRole.Permitted : null,
@@ -191,9 +227,21 @@ public partial class PlayersViewModel : ViewModelBase
         _ => null,
     };
 
-    private void ApplyRole(PlayerRowViewModel row) => row.DisplayRole = DisplayRoleFor(row.Key);
+    // A role that has no effect in this mode reads as None, which only renders when overridden ("None (*)").
+    private void ApplyRole(PlayerRowViewModel row)
+    {
+        var resolved = Resolve(row.Key);
+        row.ShowsOverrideMarker = resolved.ShowsOverrideMarker;
+        row.DisplayRole = ModeFiltered(resolved.Effective) ?? (resolved.ShowsOverrideMarker ? PlayerRole.None : null);
+    }
 
     private void OnFormRolesChanged(object? sender, EventArgs e) => RunOnUi(RerenderAccess);
+
+    private void OnUserPreferencesSaved(object? sender, UserPreferences prefs) => RunOnUi(() =>
+    {
+        _defaults = CopyDefaults(prefs);
+        RerenderAccess();
+    });
 
     private void OnFormPropertyChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -209,6 +257,8 @@ public partial class PlayersViewModel : ViewModelBase
         OnPropertyChanged(nameof(PermitToggleLabel));
         OnPropertyChanged(nameof(ShowBanToggle));
         OnPropertyChanged(nameof(ShowPermitToggle));
+        OnPropertyChanged(nameof(CanClearOverride));
+        ClearOverrideCommand.NotifyCanExecuteChanged();
     }
 
     private void OnEntityUpdated(object? sender, PlayerInfo player) => RunOnUi(() => Upsert(player));
@@ -265,5 +315,6 @@ public partial class PlayersViewModel : ViewModelBase
         _repo.DataReady -= OnDataReloaded;
         _form.RoleStateChanged -= OnFormRolesChanged;
         _form.PropertyChanged -= OnFormPropertyChanged;
+        _userPrefs.PreferencesSaved -= OnUserPreferencesSaved;
     }
 }

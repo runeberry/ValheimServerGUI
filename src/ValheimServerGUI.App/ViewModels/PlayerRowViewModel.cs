@@ -23,21 +23,35 @@ public partial class PlayerRowViewModel : ObservableObject
     [ObservableProperty] private bool _isOffline;
     [ObservableProperty] private Bitmap? _platformIcon;
 
-    // The role shown for the current profile + mode, computed by PlayersViewModel (mode-filtered from the
-    // stored role: admin shows in both modes; permitted only in permitted-list mode; banned only otherwise).
-    // Null renders a blank cell. The stored role itself lives on the profile (ServerFormViewModel), not here.
+    // The role shown in this row, computed by the owning list: on the Players tab the effective role for the
+    // current profile + mode (admin shows in both modes; permitted only in permitted-list mode; banned only
+    // otherwise); on a Manage Players list the account's default role. Null renders a blank cell.
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(RoleText), nameof(RoleIcon))]
     private PlayerRole? _displayRole;
 
-    /// <summary>The displayed role's label, or null (blank cell) when the player has no role in this mode.</summary>
-    public string? RoleText => DisplayRole switch
+    /// <summary>True when a server override replaces the player's global default (appends <c>(*)</c>).</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(RoleText))]
+    private bool _showsOverrideMarker;
+
+    /// <summary>The displayed role's label (with <c>(*)</c> when overridden), or null for a blank cell. A plain
+    /// None is blank; an overridden None reads "None (*)" so a pinned no-role stays visible.</summary>
+    public string? RoleText
     {
-        PlayerRole.Admin => "Admin",
-        PlayerRole.Permitted => "Permitted",
-        PlayerRole.Banned => "Banned",
-        _ => null,
-    };
+        get
+        {
+            var label = DisplayRole switch
+            {
+                PlayerRole.Admin => "Admin",
+                PlayerRole.Permitted => "Permitted",
+                PlayerRole.Banned => "Banned",
+                PlayerRole.None when ShowsOverrideMarker => "None",
+                _ => null,
+            };
+            return label is not null && ShowsOverrideMarker ? $"{label} (*)" : label;
+        }
+    }
 
     /// <summary>Icon for <see cref="RoleText"/> (null when the player has no role in this mode).</summary>
     public Bitmap? RoleIcon => DisplayRole switch

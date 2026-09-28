@@ -10,7 +10,7 @@
         <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,6">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
-                    <Button Content="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
+                    <Button Content="Manage Players…" Command="{Binding Players.ManagePlayersCommand}" />
                     <Button Content="Add Player…" Command="{Binding Players.AddPlayerCommand}" />
                 </StackPanel>
                 <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
@@ -33,6 +33,7 @@
                               IsVisible="{Binding Players.ShowBanToggle}" />
                     <MenuItem Header="{Binding Players.PermitToggleLabel}" Command="{Binding Players.TogglePermitCommand}"
                               IsVisible="{Binding Players.ShowPermitToggle}" />
+                    <MenuItem Header="Clear role override" Command="{Binding Players.ClearOverrideCommand}" />
                     <Separator />
                     <MenuItem Header="Add player…" Command="{Binding Players.AddPlayerCommand}" />
                     <MenuItem Header="Remove player" Command="{Binding Players.RemoveCommand}" />
@@ -64,8 +65,8 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!-- Access-list membership as a single role (profile-scoped), highest priority first:
-                     Admin > Permitted > Banned. Blank when the player is in none of the lists. Kept the same
+                <!-- The effective role on this server (override ?? global default), mode-filtered; "(*)" marks a
+                     server override of a global default. Blank when the player has no role. Kept the same
                      fixed width as Status (the column to its right) so the two read as a matched pair. -->
                 <DataGridTemplateColumn Header="Role" Width="100" SortMemberPath="RoleText">
                     <DataGridTemplateColumn.CellTemplate>
@@ -100,6 +101,10 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
             </c:DataListView.Columns>
+            <c:DataListView.FooterLeft>
+                <c:IconButton IconName="User_16x" ToolTip.Tip="View player details"
+                              Command="{Binding Players.ViewDetailsCommand}" />
+            </c:DataListView.FooterLeft>
             <c:DataListView.FooterRight>
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <c:IconButton IconName="ImportFile_16x" ToolTip.Tip="Import player lists"

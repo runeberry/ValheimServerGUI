@@ -56,7 +56,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
     }
 
     // A VM over the temp savedir. `withConfig` seeds a valid, startable form (world created + selected).
-    private Harness Build(bool withConfig = false)
+    private Harness Build(bool withConfig = false, UserPreferences? userPrefs = null)
     {
         var shell = new ShellLauncher(new RecordingSystemShell(), TestLog.Silent);
         var manager = new ServerManager(
@@ -66,7 +66,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         var vm = new MainWindowViewModel(
             manager,
-            new FakeUserPreferencesProvider(),
+            new FakeUserPreferencesProvider(userPrefs),
             new FakeServerPreferencesProvider(),
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             new FakeSteamCloudWorldProvider(),
@@ -117,6 +117,27 @@ public sealed class PlayerListImportFlowTests : IDisposable
     private void Seed(string fileName, params string[] entries)
         => File.WriteAllText(Path.Combine(_saveDir, fileName), "// header\n" + string.Join('\n', entries) + "\n");
 
+    // ---- global defaults ----
+
+    // With global defaults configured, a start with zero overrides must NOT run the wholesale import: list files
+    // generated before a default was added would otherwise pin that player to None. The one-directional conflict
+    // check runs instead (it only adds what the files require).
+    [Fact]
+    public async Task Start_with_defaults_does_not_pin_None_for_a_defaulted_player_absent_from_files()
+    {
+        var prefs = new UserPreferences();
+        prefs.PlayerDefaults[$"Steam:{SteamB}"] = new PlayerDefaultEntry(PlayerCategory.MyAccount, PlayerRole.Admin, "Steam");
+        var h = Build(withConfig: true, userPrefs: prefs);
+        Seed("adminlist.txt", SteamA); // predates B's default
+
+        await h.Vm.StartServerAsync(isManual: true);
+
+        Assert.Null(h.Vm.Form.GetOverride($"Steam:{SteamB}"));                     // no None pin
+        Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetOverride($"Steam:{SteamA}")); // adopted as an addition
+        var started = Assert.Single(h.Started);
+        Assert.Contains(started.PlayerRoles, a => a.PlayerId == SteamB && a.Role == PlayerRole.Admin);
+    }
+
     // ---- ad-hoc import ----
 
     [Fact]
@@ -128,7 +149,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
         await h.Vm.RunImportAsync(interactive: true);
 
         Assert.Contains(MainWindowViewModel.ImportConfirmMessage.Replace("{n}", "1"), h.ConfirmBodies);
-        Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetRole($"Steam:{SteamA}"));
+        Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetOverride($"Steam:{SteamA}"));
         Assert.True(h.Vm.Form.IsDirty);
         Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportUpdatedMessage.Replace("{n}", "1"));
         Assert.Equal(1, h.Api.RequestPlayerInfoCallCount); // name lookup for the new player
@@ -179,7 +200,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         await h.Vm.RunImportAsync(interactive: true);
 
-        Assert.Null(h.Vm.Form.GetRole($"Steam:{SteamA}"));
+        Assert.Null(h.Vm.Form.GetOverride($"Steam:{SteamA}"));
         Assert.DoesNotContain(h.Messages, m => m.Body.StartsWith("Updated"));
     }
 
@@ -193,7 +214,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         h.Vm.LoadProfile(new ServerPreferences { ProfileName = "Fresh", SaveDataFolderPath = _saveDir });
 
-        Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetRole($"Steam:{SteamA}"));
+        Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetOverride($"Steam:{SteamA}"));
         Assert.Empty(h.Messages);       // silent — no modals
         Assert.Empty(h.ConfirmBodies);
     }
@@ -208,8 +229,8 @@ public sealed class PlayerListImportFlowTests : IDisposable
         profile.PlayerRoles[$"Steam:{SteamB}"] = new PlayerRoleEntry(PlayerRole.Permitted, "Steam");
         h.Vm.LoadProfile(profile);
 
-        Assert.Null(h.Vm.Form.GetRole($"Steam:{SteamA}"));                  // file NOT imported
-        Assert.Equal(PlayerRole.Permitted, h.Vm.Form.GetRole($"Steam:{SteamB}")); // only the profile role
+        Assert.Null(h.Vm.Form.GetOverride($"Steam:{SteamA}"));                  // file NOT imported
+        Assert.Equal(PlayerRole.Permitted, h.Vm.Form.GetOverride($"Steam:{SteamB}")); // only the profile role
     }
 
     // ---- start-time safety ----

@@ -15,8 +15,18 @@ public class PlayersViewModelTests
 {
     private readonly ServerFormViewModel _form = new();
     private readonly FakeRuneberryApiClient _api = new();
+    private readonly FakeUserPreferencesProvider _userPrefs = new();
 
-    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form, _api);
+    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form, _api, _userPrefs);
+
+    // Saves the app-global defaults the way the Manage Players dialog does (raises PreferencesSaved).
+    private void SaveDefaults(params (string key, PlayerCategory category, PlayerRole role)[] entries)
+    {
+        var prefs = new UserPreferences();
+        foreach (var (key, category, role) in entries)
+            prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, "Steam");
+        _userPrefs.SavePreferences(prefs);
+    }
 
     private static PlayerInfo Player(string id, PlayerStatus status, string? name = null, string? character = null)
         => new()
@@ -196,12 +206,12 @@ public class PlayersViewModelTests
         vm.SelectedPlayer = row;
 
         vm.ToggleAdminCommand.Execute(null);
-        Assert.Equal(PlayerRole.Admin, _form.GetRole(row.Key));
+        Assert.Equal(PlayerRole.Admin, _form.GetOverride(row.Key));
         Assert.Equal(PlayerRole.Admin, row.DisplayRole);
         Assert.Equal("Remove admin", vm.AdminToggleLabel);
 
         vm.ToggleAdminCommand.Execute(null); // negative verb clears to none
-        Assert.Null(_form.GetRole(row.Key));
+        Assert.Null(_form.GetOverride(row.Key));
         Assert.Null(row.DisplayRole);
         Assert.Equal("Make admin", vm.AdminToggleLabel);
     }
@@ -220,7 +230,138 @@ public class PlayersViewModelTests
         vm.ToggleAdminCommand.Execute(null);
         vm.ToggleBanCommand.Execute(null); // ban replaces admin (single role)
 
-        Assert.Equal(PlayerRole.Banned, _form.GetRole(row.Key));
+        Assert.Equal(PlayerRole.Banned, _form.GetOverride(row.Key));
+    }
+
+    // ---- global defaults + server overrides ----
+
+    [AvaloniaFact]
+    public void Default_role_shows_without_a_marker()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        var vm = NewVm(repo);
+        repo.PushUpdate(Player("1", PlayerStatus.Offline));
+
+        var row = RowFor(vm, "Steam:1");
+        Assert.Equal(PlayerRole.Admin, row.DisplayRole);
+        Assert.Equal("Admin", row.RoleText);
+    }
+
+    [AvaloniaFact]
+    public void Override_of_a_listed_player_is_marked_even_when_equal_to_the_default()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Admin));
+        var vm = NewVm(repo);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+
+        _form.SetRole(player, PlayerRole.Admin); // pins the current default
+        Assert.Equal("Admin (*)", RowFor(vm, "Steam:1").RoleText);
+    }
+
+    [AvaloniaFact]
+    public void Override_of_an_unlisted_player_is_never_marked()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+
+        _form.SetRole(player, PlayerRole.Admin);
+        Assert.Equal("Admin", RowFor(vm, "Steam:1").RoleText);
+    }
+
+    [AvaloniaFact]
+    public void Pinned_None_on_a_listed_player_reads_None_marker()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        var vm = NewVm(repo);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+
+        _form.SetRole(player, PlayerRole.None);
+        Assert.Equal("None (*)", RowFor(vm, "Steam:1").RoleText);
+    }
+
+    [AvaloniaFact]
+    public void Negative_verb_pins_None_for_a_listed_player()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        var vm = NewVm(repo);
+        repo.PushUpdate(Player("1", PlayerStatus.Offline));
+        vm.SelectedPlayer = vm.Players[0];
+        Assert.Equal("Remove admin", vm.AdminToggleLabel); // label follows the effective (default) role
+
+        vm.ToggleAdminCommand.Execute(null);
+
+        Assert.Equal(PlayerRole.None, _form.GetOverride("Steam:1"));
+        Assert.Equal("Make admin", vm.AdminToggleLabel);
+    }
+
+    [AvaloniaFact]
+    public void Negative_verb_clears_the_override_for_an_unlisted_player()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+        _form.SetRole(player, PlayerRole.Admin);
+        vm.SelectedPlayer = vm.Players[0];
+
+        vm.ToggleAdminCommand.Execute(null);
+
+        Assert.Null(_form.GetOverride("Steam:1")); // no stray None pin
+    }
+
+    [AvaloniaFact]
+    public void Clear_role_override_restores_the_default_and_is_gated_on_an_override()
+    {
+        var repo = new FakePlayerDataRepository();
+        SaveDefaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
+        var vm = NewVm(repo);
+        var player = Player("1", PlayerStatus.Offline);
+        repo.PushUpdate(player);
+        _form.UsePermittedList = true;
+        vm.SelectedPlayer = vm.Players[0];
+        Assert.False(vm.ClearOverrideCommand.CanExecute(null));
+
+        _form.SetRole(player, PlayerRole.Banned);
+        Assert.True(vm.ClearOverrideCommand.CanExecute(null));
+
+        vm.ClearOverrideCommand.Execute(null);
+
+        Assert.Null(_form.GetOverride("Steam:1"));
+        Assert.Equal("Permitted", RowFor(vm, "Steam:1").RoleText);
+        Assert.False(vm.ClearOverrideCommand.CanExecute(null));
+    }
+
+    [AvaloniaFact]
+    public void Saving_defaults_re_renders_rows()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        repo.PushUpdate(Player("1", PlayerStatus.Offline));
+        Assert.Null(RowFor(vm, "Steam:1").RoleText);
+
+        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+
+        Assert.Equal("Admin", RowFor(vm, "Steam:1").RoleText);
+    }
+
+    [AvaloniaFact]
+    public void Manage_players_command_raises_the_request()
+    {
+        var vm = NewVm(new FakePlayerDataRepository());
+        var raised = false;
+        vm.ManagePlayersRequested += () => raised = true;
+
+        vm.ManagePlayersCommand.Execute(null);
+
+        Assert.True(raised);
     }
 
     [AvaloniaFact]
@@ -260,7 +401,7 @@ public class PlayersViewModelTests
         var row = Assert.Single(vm.Players);
         Assert.Equal("Xbox:XUID9", row.Key);
         Assert.Equal("Thor", row.Player.PlayerName);
-        Assert.Equal(PlayerRole.Admin, _form.GetRole(row.Key));
+        Assert.Equal(PlayerRole.Admin, _form.GetOverride(row.Key));
         Assert.Equal(PlayerRole.Admin, row.DisplayRole);
         Assert.Equal(0, _api.RequestPlayerInfoCallCount); // name given, no lookup needed
     }
@@ -278,7 +419,7 @@ public class PlayersViewModelTests
 
         await vm.AddPlayerCommand.ExecuteAsync(null);
 
-        Assert.Null(_form.GetRole("Steam:5"));
+        Assert.Null(_form.GetOverride("Steam:5"));
         Assert.Equal("A", RowFor(vm, "Steam:5").Player.PlayerName); // blank name keeps the cached one
     }
 

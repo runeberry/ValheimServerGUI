@@ -108,14 +108,18 @@ public partial class MainWindowViewModel : ViewModelBase
         StartAction = options => _currentServer!.Start(options);
 
         Details = new ServerDetailsViewModel(ipProvider, () => Form.Port);
-        // The Players tab edits the active profile's roles/mode, which live on the form; the three list files
-        // are generated from those at server start (in Core), so the tab needs no access-list service here.
-        Players = new PlayersViewModel(playerRepo, Form, api);
+        // The Players tab edits the active profile's role overrides/mode, which live on the form, and reads the
+        // app-global player defaults from user preferences; the three list files are generated from the resolved
+        // roles at server start (in Core), so the tab needs no access-list service here.
+        Players = new PlayersViewModel(playerRepo, Form, api, userPrefs);
         Logs = new LogsViewModel(appLogger, shell, pathResolver);
 
         _updateProvider.UpdateCheckStarted += OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished += OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved += OnServerPreferencesSaved;
+
+        // Saving the Manage Players defaults re-resolves every running server's roles (live-apply).
+        _userPrefs.PreferencesSaved += OnUserPreferencesSaved;
 
         // The "choose an existing world" gate depends on the world list being non-empty.
         Form.Worlds.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CanSelectExistingWorld));
@@ -439,10 +443,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
         Form.LoadFieldsFrom(profile);
 
-        // First-launch adoption: a profile that has never had roles set silently imports any existing list
-        // files (no modals, assume Continue, errors only logged) so upgrading users keep their setups. The
-        // silent path has no awaited steps, so this completes synchronously before the world refresh below.
-        if (profile.PlayerRoles.Count == 0)
+        // First-launch adoption: when no roles are configured at all (no overrides on this profile and no global
+        // defaults) silently import any existing list files (no modals, assume Continue, errors only logged) so
+        // upgrading users keep their setups. Once defaults exist this must not run: files generated before a
+        // default was added would pin that player to None. The silent path has no awaited steps, so this
+        // completes synchronously before the world refresh below.
+        if (profile.PlayerRoles.Count == 0 && LoadPlayerDefaults().Count == 0)
         {
             _logger.Information("Profile '{profile}' has no player roles; attempting first-launch list import.", profile.ProfileName);
             _ = RunImportAsync(interactive: false);
@@ -636,7 +642,7 @@ public partial class MainWindowViewModel : ViewModelBase
             // Access-list generation inputs: the mode flag + the profile's roles. Core projects these onto the
             // three gating files at start.
             UsePermittedList = serverPrefs.UsePermittedList,
-            PlayerRoles = BuildRoleAssignments(serverPrefs),
+            PlayerRoles = BuildRoleAssignments(serverPrefs, userPrefs.PlayerDefaults),
         };
 
         var worldName = serverPrefs.WorldName;
@@ -657,16 +663,14 @@ public partial class MainWindowViewModel : ViewModelBase
         return options;
     }
 
-    // Recovers PlayerRoleAssignment records (self-contained, no repo dependency) from a profile's role map,
-    // splitting the "{Platform}:{PlayerId}" key. Shared by the start-options build and the live-apply path.
-    private static List<PlayerRoleAssignment> BuildRoleAssignments(ServerPreferences prefs)
-        => prefs.PlayerRoles.Select(kvp =>
-        {
-            var separator = kvp.Key.IndexOf(':');
-            var platform = separator >= 0 ? kvp.Key[..separator] : null;
-            var playerId = separator >= 0 ? kvp.Key[(separator + 1)..] : kvp.Key;
-            return new PlayerRoleAssignment(platform, kvp.Value.PlatformRaw ?? platform, playerId, kvp.Value.Role);
-        }).ToList();
+    // The resolved role assignments (profile overrides over the app-global defaults) the list files are
+    // generated from. Shared by the start-options build and both live-apply paths.
+    private static IReadOnlyList<PlayerRoleAssignment> BuildRoleAssignments(
+        ServerPreferences prefs, IReadOnlyDictionary<string, PlayerDefaultEntry> defaults)
+        => PlayerRoleResolver.BuildAssignments(prefs.PlayerRoles, defaults);
+
+    private IReadOnlyDictionary<string, PlayerDefaultEntry> LoadPlayerDefaults()
+        => _userPrefs.LoadPreferences().PlayerDefaults;
 
     // ===== Player-list import / startup conflict detection =====
 
@@ -709,7 +713,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _logger.Information("Player-list import: checking {admin}, {banned}, {permitted}.",
             dir.GetAdminListFile().FullName, dir.GetBannedListFile().FullName, dir.GetPermittedListFile().FullName);
 
-        var plan = _import.BuildImport(savedir, Form.PlayerRoles, Form.UsePermittedList);
+        var plan = _import.BuildImport(savedir, Form.PlayerRoles, Form.UsePermittedList, LoadPlayerDefaults());
 
         if (!plan.AnyFilesPresent)
         {
@@ -788,14 +792,16 @@ public partial class MainWindowViewModel : ViewModelBase
             _logger.Warning("Open-mode start: backed up existing permitted list {src} to {dst}.", permittedFile.FullName, backup.FullName);
         }
 
-        // (2) No roles yet → adopt whatever the files say (silent). Otherwise reconcile one-directionally.
-        if (Form.PlayerRoles.Count == 0)
+        // (2) No roles configured at all (no overrides, no global defaults) → adopt whatever the files say
+        // (silent). Otherwise reconcile one-directionally against the effective roles.
+        var defaults = LoadPlayerDefaults();
+        if (Form.PlayerRoles.Count == 0 && defaults.Count == 0)
         {
             await RunImportAsync(interactive: false);
             return true;
         }
 
-        var report = _import.CheckConflicts(savedir, Form.PlayerRoles, Form.UsePermittedList);
+        var report = _import.CheckConflicts(savedir, Form.PlayerRoles, Form.UsePermittedList, defaults);
         if (!report.Success)
         {
             _logger.Error("Player-list conflict check failed: {reason}. Proceeding with the current profile config.", report.FailureReason);
@@ -943,7 +949,7 @@ public partial class MainWindowViewModel : ViewModelBase
         // its live options in step so a later restart preserves the change.
         try
         {
-            _currentServer?.ApplyPlayerRoles(BuildRoleAssignments(prefs), prefs.UsePermittedList);
+            _currentServer?.ApplyPlayerRoles(BuildRoleAssignments(prefs, LoadPlayerDefaults()), prefs.UsePermittedList);
         }
         catch (Exception ex)
         {
@@ -1070,6 +1076,35 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnServerPreferencesSaved(object? sender, List<ServerPreferences> profiles)
         => RunOnUi(RefreshProfiles);
 
+    // Global player defaults changed (Manage Players Save): re-resolve every RUNNING server's roles from its saved
+    // profile + the new defaults and regenerate its list files — but only when the resolved assignments actually
+    // differ from what it runs with, so unrelated user-preference saves (e.g. LastActiveProfile) are no-ops and
+    // a second window reacting to the same save finds nothing left to do.
+    private void OnUserPreferencesSaved(object? sender, UserPreferences userPrefs)
+        => RunOnUi(() => ApplyDefaultsToRunningServers(userPrefs));
+
+    private void ApplyDefaultsToRunningServers(UserPreferences userPrefs)
+    {
+        foreach (var profile in _serverPrefs.LoadPreferences())
+        {
+            if (!_serverManager.TryGet(profile.ProfileName, out var server)) continue;
+            if (server.Status == ServerStatus.Stopped) continue;
+
+            var assignments = BuildRoleAssignments(profile, userPrefs.PlayerDefaults);
+            if (assignments.SequenceEqual(server.Options.PlayerRoles)) continue;
+
+            try
+            {
+                server.ApplyPlayerRoles(assignments, server.Options.UsePermittedList);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error("Player defaults saved, but regenerating access lists for profile '{profile}' failed: {message}",
+                    profile.ProfileName, ex.Message);
+            }
+        }
+    }
+
     private void RefreshProfiles()
     {
         var names = _serverPrefs.LoadPreferences()
@@ -1110,6 +1145,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _updateProvider.UpdateCheckStarted -= OnUpdateCheckStarted;
         _updateProvider.UpdateCheckFinished -= OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved -= OnServerPreferencesSaved;
+        _userPrefs.PreferencesSaved -= OnUserPreferencesSaved;
         Details.Dispose();
         Players.Dispose();
         Logs.Dispose();

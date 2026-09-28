@@ -56,8 +56,9 @@ public partial class ServerFormViewModel : ObservableObject
     [ObservableProperty] private bool _crossplay;
 
     // ----- Players / access (profile working state) -----
-    // The single per-player role map (keyed by PlayerInfo.Key) + the permitted-list mode flag. These are
-    // profile working state edited via the Players tab; they trip IsDirty and are persisted with Save, then
+    // The per-player role OVERRIDE map (keyed by PlayerInfo.Key) + the permitted-list mode flag. Overrides
+    // layer over the app-global player defaults (PlayerRoleResolver). These are profile working state edited
+    // via the Players tab; they trip IsDirty and are persisted with Save, then (resolved against the defaults)
     // projected onto the three list files at server start.
     private readonly Dictionary<string, PlayerRoleEntry> _playerRoles = new();
 
@@ -75,11 +76,12 @@ public partial class ServerFormViewModel : ObservableObject
     /// </summary>
     public event EventHandler? PlayerRolesEdited;
 
-    /// <summary>The stored role for a player key, or null when the player has no role.</summary>
-    public PlayerRole? GetRole(string key)
+    /// <summary>This server's role override for a player key, or null when it has none (the global default
+    /// applies). <see cref="PlayerRole.None"/> is an explicit "no role" pin.</summary>
+    public PlayerRole? GetOverride(string key)
         => _playerRoles.TryGetValue(key, out var entry) ? entry.Role : null;
 
-    /// <summary>The full role map (read-only view), keyed by <c>PlayerInfo.Key</c>. The owner reads this to
+    /// <summary>The full override map (read-only view), keyed by <c>PlayerInfo.Key</c>. The owner reads this to
     /// drive list-file import/conflict logic; mutation goes through <see cref="SetRole"/> / <see cref="ApplyImport"/>.</summary>
     public IReadOnlyDictionary<string, PlayerRoleEntry> PlayerRoles => _playerRoles;
 
@@ -110,7 +112,7 @@ public partial class ServerFormViewModel : ObservableObject
     }
 
     /// <summary>
-    /// Sets (or clears, when <paramref name="role"/> is null) a player's single role. A real change trips
+    /// Sets (or clears, when <paramref name="role"/> is null) a player's override on this server. A real change trips
     /// <see cref="IsDirty"/> (unless under <see cref="RunClean"/>) and raises <see cref="RoleStateChanged"/>.
     /// </summary>
     public void SetRole(PlayerInfo player, PlayerRole? role)

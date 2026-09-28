@@ -125,7 +125,7 @@ public class ServerFormViewModelTests
 
         Assert.True(form.IsDirty);
         Assert.Equal(1, raised);
-        Assert.Equal(PlayerRole.Admin, form.GetRole("Steam:1"));
+        Assert.Equal(PlayerRole.Admin, form.GetOverride("Steam:1"));
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class ServerFormViewModelTests
         Assert.Equal(0, raised);
 
         form.SetRole(Player("1"), null); // had a role -> cleared
-        Assert.Null(form.GetRole("Steam:1"));
+        Assert.Null(form.GetOverride("Steam:1"));
     }
 
     [Fact]
@@ -172,8 +172,8 @@ public class ServerFormViewModelTests
         var loaded = new ServerFormViewModel();
         loaded.LoadFieldsFrom(prefs);
         Assert.True(loaded.UsePermittedList);
-        Assert.Equal(PlayerRole.Admin, loaded.GetRole("Steam:1"));
-        Assert.Equal(PlayerRole.Banned, loaded.GetRole("Steam:2"));
+        Assert.Equal(PlayerRole.Admin, loaded.GetOverride("Steam:1"));
+        Assert.Equal(PlayerRole.Banned, loaded.GetOverride("Steam:2"));
     }
 
     [Fact]
@@ -229,9 +229,9 @@ public class ServerFormViewModelTests
         Assert.Equal(1, stateChanges);                 // exactly one, not one per key
         Assert.Equal(1, edits);                        // one live-apply signal for the whole batch
         Assert.True(form.UsePermittedList);
-        Assert.Null(form.GetRole("Steam:1"));          // the old role was unset (wholesale swap)
-        Assert.Equal(PlayerRole.Permitted, form.GetRole("Steam:2"));
-        Assert.Equal(PlayerRole.Banned, form.GetRole("Steam:3"));
+        Assert.Null(form.GetOverride("Steam:1"));          // the old role was unset (wholesale swap)
+        Assert.Equal(PlayerRole.Permitted, form.GetOverride("Steam:2"));
+        Assert.Equal(PlayerRole.Banned, form.GetOverride("Steam:3"));
     }
 
     [Fact]

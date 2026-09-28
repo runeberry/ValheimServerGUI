@@ -27,6 +27,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
     private readonly string _dir;
     private readonly string _exe;
     private readonly string _saveDir;
+    private readonly FakeUserPreferencesProvider _userPrefs = new();
 
     public MainWindowViewModelRetargetTests()
     {
@@ -76,7 +77,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
 
         var vm = new MainWindowViewModel(
             manager,
-            new FakeUserPreferencesProvider(),
+            _userPrefs,
             serverPrefs,
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             new FakeSteamCloudWorldProvider(),
@@ -165,6 +166,63 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         Assert.Equal(PlayerRole.Admin, serverPrefs.LoadPreferences("A")!.PlayerRoles["Steam:500"].Role);
         // And regenerated into the running server's savedir.
         Assert.Contains("Steam_500", File.ReadAllLines(Path.Combine(_saveDir, "adminlist.txt")));
+    }
+
+    // Saving the global player defaults (Manage Players) re-resolves a RUNNING server's roles and regenerates its
+    // list files, with no profile edit involved.
+    [Fact]
+    public void Saving_player_defaults_live_applies_to_a_running_server()
+    {
+        var (vm, mgr, _) = Build("A");
+        var server = mgr.GetOrCreate("A");
+        RunToRunning(server, Options());
+        vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
+
+        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin));
+
+        Assert.Contains("Steam_600", File.ReadAllLines(Path.Combine(_saveDir, "adminlist.txt")));
+        Assert.Contains(server.Options.PlayerRoles, a => a.PlayerId == "600" && a.Role == PlayerRole.Admin);
+    }
+
+    // The override still wins on the running server: a banned override beats an admin default.
+    [Fact]
+    public void Live_applied_defaults_respect_the_profile_overrides()
+    {
+        var (vm, mgr, serverPrefs) = Build("A");
+        var profile = new ServerPreferences { ProfileName = "A" };
+        profile.PlayerRoles["Steam:600"] = new PlayerRoleEntry(PlayerRole.None, "Steam");
+        serverPrefs.SavePreferences(profile);
+        RunToRunning(mgr.GetOrCreate("A"), Options());
+        vm.LoadProfile(profile);
+
+        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin));
+
+        Assert.DoesNotContain("Steam_600", File.ReadAllLines(Path.Combine(_saveDir, "adminlist.txt")));
+    }
+
+    // Unrelated user-preference saves (e.g. LastActiveProfile) must not regenerate a running server's files.
+    [Fact]
+    public void Unchanged_defaults_do_not_regenerate_the_files()
+    {
+        var (vm, mgr, _) = Build("A");
+        RunToRunning(mgr.GetOrCreate("A"), Options());
+        vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
+        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin));
+        var adminList = Path.Combine(_saveDir, "adminlist.txt");
+        File.Delete(adminList);
+
+        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin)); // same resolved roles
+
+        Assert.False(File.Exists(adminList));
+    }
+
+    private void SaveDefaults(params (string key, PlayerCategory category, PlayerRole role)[] entries)
+    {
+        var prefs = _userPrefs.LoadPreferences();
+        prefs.PlayerDefaults.Clear();
+        foreach (var (key, category, role) in entries)
+            prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, "Steam");
+        _userPrefs.SavePreferences(prefs);
     }
 
     // While stopped, a role change stays in the ordinary dirty/Save flow — no immediate persist.

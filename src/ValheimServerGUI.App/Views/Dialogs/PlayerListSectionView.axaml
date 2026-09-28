@@ -1,0 +1,98 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             xmlns:v="using:ValheimServerGUI.App.Views"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+             xmlns:vmr="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Dialogs.PlayerListSectionView"
+             x:DataType="vm:PlayerListSectionViewModel">
+
+    <!-- One Manage Players tab. The accounts table fills whatever the Known Characters table (absent on
+         Banned) leaves, so every tab is the same height and the window never resizes on a tab switch. -->
+    <DockPanel Margin="8">
+        <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,6">
+            <TextBlock Text="{Binding Caption}" TextWrapping="Wrap"
+                       IsVisible="{Binding Caption, Converter={x:Static ObjectConverters.IsNotNull}}" />
+            <TextBlock Text="{Binding Header}" FontWeight="SemiBold" />
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0" IsVisible="{Binding HasKnownCharacters}">
+            <TextBlock Text="Known Characters" FontWeight="SemiBold" />
+            <v:KnownCharactersView DataContext="{Binding KnownCharacters}" Height="120" />
+        </StackPanel>
+
+        <c:DataListView ItemsSource="{Binding Accounts}"
+                        SelectedItem="{Binding SelectedAccount}"
+                        RowInvokeCommand="{Binding ViewDetailsCommand}">
+            <c:DataListView.RowContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="View Player Details…" Command="{Binding ViewDetailsCommand}" />
+                    <Separator IsVisible="{Binding HasRoleCommands}" />
+                    <MenuItem Header="{Binding AdminToggleLabel}" Command="{Binding ToggleAdminCommand}"
+                              IsVisible="{Binding HasRoleCommands}" />
+                    <MenuItem Header="{Binding PermitToggleLabel}" Command="{Binding TogglePermitCommand}"
+                              IsVisible="{Binding HasRoleCommands}" />
+                    <Separator />
+                    <MenuItem Header="Add player…" Command="{Binding AddCommand}" />
+                    <MenuItem Header="Remove player" Command="{Binding RemoveCommand}" />
+                </ContextMenu>
+            </c:DataListView.RowContextMenu>
+            <c:DataListView.Columns>
+                <DataGridTemplateColumn Header="Player (Character)" Width="*" SortMemberPath="DisplayName">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Image Source="{Binding PlatformIcon}" Width="16" Height="16"
+                                       VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Default Role" Width="120" SortMemberPath="RoleText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <Image Width="16" Height="16" VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                       Source="{Binding RoleIcon}" />
+                                <TextBlock Text="{Binding RoleText}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Status" Width="100" SortMemberPath="StatusText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <Image Width="16" Height="16" VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                       Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
+                                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
+                            <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </c:DataListView.Columns>
+            <c:DataListView.FooterLeft>
+                <c:IconButton IconName="User_16x" ToolTip.Tip="View player details"
+                              Command="{Binding ViewDetailsCommand}" />
+            </c:DataListView.FooterLeft>
+            <c:DataListView.FooterRight>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <c:IconButton IconName="Add_16x" ToolTip.Tip="Add player" Command="{Binding AddCommand}" />
+                    <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove player" Command="{Binding RemoveCommand}" />
+                </StackPanel>
+            </c:DataListView.FooterRight>
+        </c:DataListView>
+    </DockPanel>
+</UserControl>

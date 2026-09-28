@@ -42,6 +42,7 @@ public partial class MainWindow : Window
         viewModel.MenuActionRequested += a => _ = HandleMenuActionAsync(a);
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
+        viewModel.Players.ManagePlayersRequested += () => _ = ShowManagePlayersAsync();
         viewModel.Players.AddPlayerPrompt = options => new AddPlayerWindow(options).ShowDialog<AddPlayerResult?>(this);
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
         viewModel.MessagePrompt = ShowMessageAsync;
@@ -181,6 +182,14 @@ public partial class MainWindow : Window
         => await new PlayerDetailsWindow(
                 new PlayerDetailsViewModel(Svc<IPlayerDataRepository>(), player.Key, Svc<IRuneberryApiClient>()))
             .ShowDialog(this);
+
+    private async Task ShowManagePlayersAsync()
+    {
+        var repo = Svc<IPlayerDataRepository>();
+        var api = Svc<IRuneberryApiClient>();
+        await new ManagePlayersWindow(new ManagePlayersViewModel(Svc<IUserPreferencesProvider>(), repo, api), repo, api)
+            .ShowDialog(this);
+    }
 
     private async void OnOpened(object? sender, EventArgs e)
     {

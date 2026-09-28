@@ -163,6 +163,13 @@ public class PlayersViewModelTests
         Assert.Null(row.RoleIcon);
     }
 
+    [AvaloniaFact]
+    public void Since_is_blank_when_no_status_was_ever_recorded()
+    {
+        var row = new PlayerRowViewModel(new PlayerInfo { Platform = "Steam", PlayerId = "1" });
+        Assert.Equal(string.Empty, row.SinceText);
+    }
+
     // ---- menu labels + mode-gated visibility ----
 
     [AvaloniaFact]

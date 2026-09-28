@@ -78,10 +78,14 @@ public partial class PlayerRowViewModel : ObservableObject
         RefreshSince();
     }
 
+    // Blank when the status was never recorded (e.g. a Manage Players account that has never joined).
     public void RefreshSince()
-        => SinceText = RelativeTimeConverter.Format(Player.LastStatusChange, DateTimeOffset.Now);
+        => SinceText = Player.LastStatusChange == default
+            ? string.Empty
+            : RelativeTimeConverter.Format(Player.LastStatusChange, DateTimeOffset.Now);
 
-    private static string FallbackName(string? playerId)
+    /// <summary>The placeholder shown for a player with no known name: the last four ID characters.</summary>
+    public static string FallbackName(string? playerId)
     {
         if (string.IsNullOrEmpty(playerId)) return "[unknown]";
         var last4 = playerId.Length <= 4 ? playerId : playerId[^4..];

@@ -1,0 +1,38 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="using:ValheimServerGUI.App.Views.Dialogs"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.ManagePlayersWindow"
+        x:DataType="vm:ManagePlayersViewModel"
+        Title="Manage Players"
+        SizeToContent="Height" Width="560"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- The shared WinForms-style tab theme (window-scoped, same as the main window). -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/Tabs.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <StackPanel Margin="12" Spacing="12">
+        <TabControl>
+            <TabItem Header="My Accounts">
+                <local:PlayerListSectionView DataContext="{Binding MyAccounts}" Height="420" />
+            </TabItem>
+            <TabItem Header="Friends">
+                <local:PlayerListSectionView DataContext="{Binding Friends}" Height="420" />
+            </TabItem>
+            <TabItem Header="Banned">
+                <local:PlayerListSectionView DataContext="{Binding Banned}" Height="420" />
+            </TabItem>
+        </TabControl>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="Save" MinWidth="80" IsDefault="True" Click="OnSave" />
+            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

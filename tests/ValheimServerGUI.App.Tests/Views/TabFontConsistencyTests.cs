@@ -49,4 +49,24 @@ public class TabFontConsistencyTests
             Assert.Equal(FontWeight.Normal, tab.FontWeight);
         }
     }
+
+    // Manage Players merges the same shared tab theme (Styles/Tabs.axaml), so its tabs match too.
+    [AvaloniaFact]
+    public void Manage_players_tabs_use_the_app_body_font()
+    {
+        var repo = Core.GetRequiredService<IPlayerDataRepository>();
+        var window = new ValheimServerGUI.App.Views.Dialogs.ManagePlayersWindow(
+            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null),
+            repo, null);
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        var tabs = window.GetVisualDescendants().OfType<TabItem>().ToList();
+        Assert.Equal(3, tabs.Count);
+        foreach (var tab in tabs)
+        {
+            Assert.Equal(12, tab.FontSize);
+            Assert.Equal(FontWeight.Normal, tab.FontWeight);
+        }
+    }
 }

@@ -54,6 +54,15 @@ public class DialogRenderTests
         => Realize(new AddPlayerWindow(ValheimServerGUI.App.ViewModels.Dialogs.AddPlayerOptions.ForMyAccounts));
 
     [AvaloniaFact]
+    public void ManagePlayersWindow_realizes()
+    {
+        var repo = Core.GetRequiredService<IPlayerDataRepository>();
+        Realize(new ManagePlayersWindow(
+            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null),
+            repo, null));
+    }
+
+    [AvaloniaFact]
     public void BugReportWindow_realizes()
         => Realize(new BugReportWindow(new BugReportViewModel(new FakeRuneberryApiClient())));
 }

@@ -49,16 +49,13 @@ namespace ValheimServerGUI.Game
         public bool UsePermittedList { get; set; }
 
         /// <summary>
-        /// The profile's per-player roles, keyed by <see cref="PlayerInfo.Key"/> (<c>"{Platform}:{PlayerId}"</c>).
-        /// A player absent from the map has no role. This is VSG's source of truth for gating; the three
-        /// <c>*.txt</c> files are regenerated from it at server start.
+        /// The profile's per-player role <b>overrides</b>, keyed by <see cref="PlayerInfo.Key"/>
+        /// (<c>"{Platform}:{PlayerId}"</c>). An override wins over the player's global default
+        /// (<see cref="UserPreferences.PlayerDefaults"/>); a player absent from the map falls back to that default
+        /// (see <see cref="PlayerRoleResolver"/>). The three <c>*.txt</c> files are regenerated from the resolved
+        /// roles at server start.
         /// </summary>
         public Dictionary<string, PlayerRoleEntry> PlayerRoles { get; set; } = new();
-
-        // The lowercase string tokens persisted for each role in the JSON file (stable across enum reorders).
-        private const string RoleAdmin = "admin";
-        private const string RolePermitted = "permitted";
-        private const string RoleBanned = "banned";
 
         public static ServerPreferences FromFile(ServerPreferencesFile? file)
         {
@@ -90,7 +87,7 @@ namespace ValheimServerGUI.Game
                 foreach (var (key, entry) in file.PlayerRoles)
                 {
                     if (string.IsNullOrWhiteSpace(key) || entry == null) continue;
-                    if (TryParseRole(entry.Role, out var role))
+                    if (PlayerRoleTokens.TryParse(entry.Role, out var role))
                         prefs.PlayerRoles[key] = new PlayerRoleEntry(role, entry.PlatformRaw);
                 }
             }
@@ -129,31 +126,12 @@ namespace ValheimServerGUI.Game
                     kvp => kvp.Key,
                     kvp => new PlayerRoleFileEntry
                     {
-                        Role = RoleToString(kvp.Value.Role),
+                        Role = PlayerRoleTokens.ToToken(kvp.Value.Role),
                         PlatformRaw = kvp.Value.PlatformRaw,
                     });
             }
 
             return file;
-        }
-
-        private static string RoleToString(PlayerRole role) => role switch
-        {
-            PlayerRole.Admin => RoleAdmin,
-            PlayerRole.Permitted => RolePermitted,
-            PlayerRole.Banned => RoleBanned,
-            _ => RoleBanned,
-        };
-
-        private static bool TryParseRole(string? value, out PlayerRole role)
-        {
-            switch (value?.Trim().ToLowerInvariant())
-            {
-                case RoleAdmin: role = PlayerRole.Admin; return true;
-                case RolePermitted: role = PlayerRole.Permitted; return true;
-                case RoleBanned: role = PlayerRole.Banned; return true;
-                default: role = default; return false;
-            }
         }
     }
 }

@@ -141,6 +141,59 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.NotNull(plan.FailureReason);
         }
 
+        // ---- BuildImport with global defaults ----
+
+        private static Dictionary<string, PlayerDefaultEntry> Defaults(params (string key, PlayerCategory cat, PlayerRole role)[] entries)
+            => entries.ToDictionary(e => e.key, e => new PlayerDefaultEntry(e.cat, e.role, "Steam"));
+
+        [Fact]
+        public void BuildImport_WithDefaults_FileMatchingTheDefault_NeedsNoOverride()
+        {
+            Seed("adminlist.txt", SteamA);
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.MyAccount, PlayerRole.Admin));
+
+            var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
+
+            Assert.Empty(plan.Roles);
+            Assert.Equal(0, plan.UpdateCount);
+            Assert.Empty(plan.NewPlayers); // already known via the defaults
+        }
+
+        [Fact]
+        public void BuildImport_WithDefaults_DefaultedPlayerAbsentFromFiles_GetsNonePin()
+        {
+            Seed("adminlist.txt", SteamB);
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.MyAccount, PlayerRole.Admin));
+
+            var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
+
+            Assert.Equal(PlayerRole.None, plan.Roles[$"Steam:{SteamA}"].Role);
+            Assert.Equal(PlayerRole.Admin, plan.Roles[$"Steam:{SteamB}"].Role);
+            Assert.Equal(2, plan.UpdateCount); // A: Admin→None, B: None→Admin
+        }
+
+        [Fact]
+        public void BuildImport_WithDefaults_FileDisagreeingWithDefault_BecomesOverride()
+        {
+            Seed("bannedlist.txt", SteamA);
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.Friend, PlayerRole.Permitted));
+
+            var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
+
+            Assert.Equal(PlayerRole.Banned, Assert.Single(plan.Roles).Value.Role);
+        }
+
+        [Fact]
+        public void BuildImport_UnlistedPlayerAbsentFromFiles_IsCleared_NotPinned()
+        {
+            Seed("adminlist.txt", SteamA);
+            var current = Roles(($"Steam:{SteamB}", PlayerRole.Permitted, "Steam")); // B has no default
+
+            var plan = _svc.BuildImport(_savedir, current, currentFlag: false, Defaults());
+
+            Assert.False(plan.Roles.ContainsKey($"Steam:{SteamB}"));
+        }
+
         // ---- CheckConflicts ----
 
         [Fact]
@@ -183,6 +236,32 @@ namespace ValheimServerGUI.Core.Tests.Game
 
             Assert.Equal(0, report.ConflictCount);
             Assert.Empty(report.Additions);
+        }
+
+        [Fact]
+        public void CheckConflicts_ComparesAgainstEffectiveRole_FromDefaults()
+        {
+            Seed("adminlist.txt", SteamA, SteamB);
+            var defaults = Defaults(
+                ($"Steam:{SteamA}", PlayerCategory.MyAccount, PlayerRole.Admin),   // satisfied by default
+                ($"Steam:{SteamB}", PlayerCategory.Friend, PlayerRole.Permitted)); // default disagrees
+
+            var report = _svc.CheckConflicts(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
+
+            Assert.Equal(1, report.ConflictCount);
+            Assert.Empty(report.Additions);
+        }
+
+        [Fact]
+        public void CheckConflicts_OverrideWinsOverDefault()
+        {
+            Seed("adminlist.txt", SteamA);
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.Friend, PlayerRole.Permitted));
+            var current = Roles(($"Steam:{SteamA}", PlayerRole.Admin, "Steam"));
+
+            var report = _svc.CheckConflicts(_savedir, current, currentFlag: false, defaults);
+
+            Assert.Equal(0, report.ConflictCount);
         }
 
         [Fact]

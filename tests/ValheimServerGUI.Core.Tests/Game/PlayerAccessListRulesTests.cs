@@ -15,6 +15,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         [InlineData(PlayerRole.Admin, new[] { PlayerAccessList.Admin })]
         [InlineData(PlayerRole.Banned, new[] { PlayerAccessList.Banned })]
         [InlineData(PlayerRole.Permitted, new PlayerAccessList[0])]
+        [InlineData(PlayerRole.None, new PlayerAccessList[0])]
         public void OpenMode_MapsRoleToLists(PlayerRole role, PlayerAccessList[] expected)
         {
             Assert.Equal(expected, PlayerAccessListRules.TargetLists(role, usePermittedList: false).ToArray());
@@ -25,6 +26,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         [InlineData(PlayerRole.Admin, new[] { PlayerAccessList.Admin, PlayerAccessList.Permitted })]
         [InlineData(PlayerRole.Permitted, new[] { PlayerAccessList.Permitted })]
         [InlineData(PlayerRole.Banned, new PlayerAccessList[0])]
+        [InlineData(PlayerRole.None, new PlayerAccessList[0])]
         public void PermittedMode_MapsRoleToLists(PlayerRole role, PlayerAccessList[] expected)
         {
             Assert.Equal(expected, PlayerAccessListRules.TargetLists(role, usePermittedList: true).ToArray());

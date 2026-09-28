@@ -38,6 +38,10 @@ namespace ValheimServerGUI.Game
                     // The ban list is ignored in permitted-list mode (join is decided by the permitted list).
                     if (!usePermittedList) yield return PlayerAccessList.Banned;
                     break;
+
+                case PlayerRole.None:
+                    // Explicitly no role: the player is on no list.
+                    break;
             }
         }
     }

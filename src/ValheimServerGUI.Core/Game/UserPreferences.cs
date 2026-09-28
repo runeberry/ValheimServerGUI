@@ -38,6 +38,18 @@ namespace ValheimServerGUI.Game
 
         public List<WorldPreferences> Worlds { get; set; } = new();
 
+        /// <summary>
+        /// App-global player defaults (the Manage Players lists), keyed by <see cref="PlayerInfo.Key"/>. Each
+        /// entry's default role applies on every server unless the profile overrides it
+        /// (see <see cref="PlayerRoleResolver"/>).
+        /// </summary>
+        public Dictionary<string, PlayerDefaultEntry> PlayerDefaults { get; set; } = new();
+
+        // The lowercase string tokens persisted for each category (stable across enum reorders).
+        private const string CategoryMyAccount = "myaccount";
+        private const string CategoryFriend = "friend";
+        private const string CategoryBanned = "banned";
+
         public static UserPreferences FromFile(UserPreferencesFile? file)
         {
             var prefs = new UserPreferences();
@@ -71,6 +83,18 @@ namespace ValheimServerGUI.Game
                     .Select(f => WorldPreferences.FromFile(f))
                     .DistinctBy(f => f.WorldName)
                     .ToList();
+            }
+
+            if (file.PlayerDefaults != null)
+            {
+                foreach (var (key, entry) in file.PlayerDefaults)
+                {
+                    // Unknown tokens (e.g. from a newer version) drop the entry rather than guess.
+                    if (string.IsNullOrWhiteSpace(key) || entry == null) continue;
+                    if (!TryParseCategory(entry.Category, out var category)) continue;
+                    if (!PlayerRoleTokens.TryParse(entry.DefaultRole, out var role)) role = PlayerRole.None;
+                    prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, entry.PlatformRaw).Normalized();
+                }
             }
 
             return prefs;
@@ -114,7 +138,42 @@ namespace ValheimServerGUI.Game
                 file.Worlds.AddRange(worlds);
             }
 
+            // Written only when there are defaults, so files that never used the feature stay byte-identical.
+            if (PlayerDefaults is { Count: > 0 })
+            {
+                file.PlayerDefaults = PlayerDefaults.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp =>
+                    {
+                        var entry = kvp.Value.Normalized();
+                        return new PlayerDefaultFileEntry
+                        {
+                            Category = CategoryToString(entry.Category),
+                            DefaultRole = PlayerRoleTokens.ToToken(entry.DefaultRole),
+                            PlatformRaw = entry.PlatformRaw,
+                        };
+                    });
+            }
+
             return file;
+        }
+
+        private static string CategoryToString(PlayerCategory category) => category switch
+        {
+            PlayerCategory.MyAccount => CategoryMyAccount,
+            PlayerCategory.Friend => CategoryFriend,
+            _ => CategoryBanned,
+        };
+
+        private static bool TryParseCategory(string? value, out PlayerCategory category)
+        {
+            switch (value?.Trim().ToLowerInvariant())
+            {
+                case CategoryMyAccount: category = PlayerCategory.MyAccount; return true;
+                case CategoryFriend: category = PlayerCategory.Friend; return true;
+                case CategoryBanned: category = PlayerCategory.Banned; return true;
+                default: category = default; return false;
+            }
         }
     }
 }

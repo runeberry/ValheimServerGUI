@@ -7,16 +7,19 @@ namespace ValheimServerGUI.Game
 {
     /// <summary>
     /// Pure logic that reconciles the on-disk <c>adminlist.txt</c> / <c>bannedlist.txt</c> /
-    /// <c>permittedlist.txt</c> files with a profile's player roles. It does no UI and no file writing beyond
+    /// <c>permittedlist.txt</c> files with a profile's player roles. A profile stores role <b>overrides</b> layered
+    /// over the app-global player <b>defaults</b>; both directions compare the files against the resolved
+    /// (effective) roles (see <see cref="PlayerRoleResolver"/>) and produce overrides. It does no UI and no file writing beyond
     /// reading the lists (via <see cref="IPlayerAccessListService"/>); the caller decides what to apply and
     /// when. Two directions:
     /// <list type="bullet">
     /// <item><see cref="BuildImport"/> — the <b>wholesale</b> file→roles adoption (ad-hoc button, first-launch
-    /// auto-import). It replaces the role map with exactly what the files describe, unsetting anyone not in the
-    /// files.</item>
+    /// auto-import). It rebuilds the override map so the effective roles are exactly what the files describe: no
+    /// override where the files agree with the player's default, otherwise an override (a defaulted player absent
+    /// from the files gets a <see cref="PlayerRole.None"/> pin).</item>
     /// <item><see cref="CheckConflicts"/> — the <b>one-directional</b> start-time safety check when roles
-    /// already exist. It only <i>adds</i> missing roles the files require and reports disagreements; it never
-    /// unsets.</item>
+    /// already exist. It only <i>adds</i> (as overrides) missing roles the files require and reports disagreements;
+    /// it never unsets.</item>
     /// </list>
     /// </summary>
     public interface IPlayerListImportService
@@ -28,23 +31,25 @@ namespace ValheimServerGUI.Game
         ImportPlan BuildImport(
             string saveDataFolder,
             IReadOnlyDictionary<string, PlayerRoleEntry> currentRoles,
-            bool currentFlag);
+            bool currentFlag,
+            IReadOnlyDictionary<string, PlayerDefaultEntry>? defaults = null);
 
         /// <summary>Builds the start-time conflict report (see the type remarks). Never mutates state.</summary>
         ConflictReport CheckConflicts(
             string saveDataFolder,
             IReadOnlyDictionary<string, PlayerRoleEntry> currentRoles,
-            bool currentFlag);
+            bool currentFlag,
+            IReadOnlyDictionary<string, PlayerDefaultEntry>? defaults = null);
     }
 
     /// <summary>The result of a wholesale <see cref="IPlayerListImportService.BuildImport"/>.</summary>
     /// <param name="Success">False when a token could not be resolved (see <paramref name="FailureReason"/>).</param>
     /// <param name="FailureReason">Human-readable failure detail for the log; null on success.</param>
     /// <param name="AnyFilesPresent">False when none of the three list files exist on disk.</param>
-    /// <param name="UpdateCount">Count of real changes: role adds + changes + removes + a permitted-list flag flip.</param>
-    /// <param name="Roles">The full role map the import would apply (file-derived; keyed by <c>Platform:PlayerId</c>).</param>
+    /// <param name="UpdateCount">Count of real changes: players whose effective role changes + a permitted-list flag flip.</param>
+    /// <param name="Roles">The full override map the import would apply (keyed by <c>Platform:PlayerId</c>).</param>
     /// <param name="UsePermittedList">The permitted-list flag derived from the files (permittedlist non-empty).</param>
-    /// <param name="NewPlayers">Players not previously in the role map, as assignments for name lookups.</param>
+    /// <param name="NewPlayers">Players with neither an override nor a default before, as assignments for name lookups.</param>
     public record ImportPlan(
         bool Success,
         string? FailureReason,
@@ -54,7 +59,7 @@ namespace ValheimServerGUI.Game
         bool UsePermittedList,
         IReadOnlyList<PlayerRoleAssignment> NewPlayers);
 
-    /// <summary>A missing role the files require, ready to fold into the profile's role map.</summary>
+    /// <summary>A missing role the files require, ready to fold into the profile's override map.</summary>
     /// <param name="Key">The role-map key (<c>Platform:PlayerId</c>).</param>
     /// <param name="Entry">The role + raw platform token to store.</param>
     public record RoleAddition(string Key, PlayerRoleEntry Entry);
@@ -62,7 +67,7 @@ namespace ValheimServerGUI.Game
     /// <summary>The result of a start-time <see cref="IPlayerListImportService.CheckConflicts"/>.</summary>
     /// <param name="Success">False when a token could not be resolved (see <paramref name="FailureReason"/>).</param>
     /// <param name="FailureReason">Human-readable failure detail for the log; null on success.</param>
-    /// <param name="ConflictCount">Count of players whose file membership disagrees with their stored role.</param>
+    /// <param name="ConflictCount">Count of players whose file membership disagrees with their effective role.</param>
     /// <param name="Additions">Missing roles the files require (never unsets); fold into the profile.</param>
     /// <param name="NewPlayers">The additions as assignments, for name lookups.</param>
     /// <param name="ConflictingFiles">Which files contained at least one conflict (drives per-file backup).</param>
@@ -102,8 +107,11 @@ namespace ValheimServerGUI.Game
         public ImportPlan BuildImport(
             string saveDataFolder,
             IReadOnlyDictionary<string, PlayerRoleEntry> currentRoles,
-            bool currentFlag)
+            bool currentFlag,
+            IReadOnlyDictionary<string, PlayerDefaultEntry>? defaults = null)
         {
+            defaults ??= new Dictionary<string, PlayerDefaultEntry>();
+
             var dir = new DirectoryInfo(saveDataFolder);
             var anyFiles = dir.GetAdminListFile().Exists
                 || dir.GetBannedListFile().Exists
@@ -119,7 +127,7 @@ namespace ValheimServerGUI.Game
 
             // Resolve every token in every list up-front so any failure fails the whole import.
             var permittedHasEntries = _accessLists.ReadEntries(saveDataFolder, PlayerAccessList.Permitted).Count > 0;
-            var target = new Dictionary<string, PlayerRoleEntry>();
+            var desired = new Dictionary<string, PlayerRoleEntry>();
             var resolvedById = new Dictionary<string, ResolvedToken>();
 
             foreach (var (list, role) in Precedence)
@@ -136,31 +144,42 @@ namespace ValheimServerGUI.Game
 
                     // Precedence order guarantees banned wins over admin wins over permitted: only take a role
                     // for a player we have not already assigned a higher-precedence one.
-                    if (!target.ContainsKey(key))
-                        target[key] = new PlayerRoleEntry(role, platformRaw);
+                    if (!desired.ContainsKey(key))
+                        desired[key] = new PlayerRoleEntry(role, platformRaw);
                 }
             }
 
             var usePermittedList = permittedHasEntries;
 
-            // Diff the file-derived target against the current config to count real changes.
+            // Rebuild the override map so every player's effective role is exactly what the files say (absent =
+            // None). A player the files agree with needs no override unless one already pins them; an unlisted
+            // player whose desired role is None needs none either (no stray pins).
+            var overrides = new Dictionary<string, PlayerRoleEntry>();
             var updateCount = 0;
-            foreach (var (key, entry) in target)
+            foreach (var key in desired.Keys.Union(currentRoles.Keys).Union(defaults.Keys))
             {
-                if (!currentRoles.TryGetValue(key, out var existing) || existing != entry) updateCount++;
+                var desiredRole = desired.TryGetValue(key, out var fromFile) ? fromFile.Role : PlayerRole.None;
+                var hasDefault = defaults.TryGetValue(key, out var def);
+                var baseline = hasDefault ? def!.DefaultRole : PlayerRole.None;
+                var hadOverride = currentRoles.TryGetValue(key, out var existing);
+
+                if (PlayerRoleResolver.Resolve(key, currentRoles, defaults).Effective != desiredRole) updateCount++;
+
+                if (desiredRole == baseline && (!hadOverride || !hasDefault)) continue;
+
+                var platformRaw = fromFile?.PlatformRaw ?? existing?.PlatformRaw ?? def?.PlatformRaw;
+                overrides[key] = new PlayerRoleEntry(desiredRole, platformRaw);
             }
-            // Literal unset: any current player not present in the files is a removal.
-            updateCount += currentRoles.Keys.Count(k => !target.ContainsKey(k));
             if (usePermittedList != currentFlag) updateCount++;
 
-            var newPlayers = target.Keys
-                .Where(k => !currentRoles.ContainsKey(k))
-                .Select(k => Assignment(resolvedById[k], target[k].Role))
+            var newPlayers = desired.Keys
+                .Where(k => !currentRoles.ContainsKey(k) && !defaults.ContainsKey(k))
+                .Select(k => Assignment(resolvedById[k], desired[k].Role))
                 .ToList();
 
             return new ImportPlan(
                 Success: true, FailureReason: null, AnyFilesPresent: true, UpdateCount: updateCount,
-                Roles: target, UsePermittedList: usePermittedList, NewPlayers: newPlayers);
+                Roles: overrides, UsePermittedList: usePermittedList, NewPlayers: newPlayers);
 
             static ImportPlan Failure(string reason) => new(
                 Success: false, FailureReason: reason, AnyFilesPresent: true, UpdateCount: 0,
@@ -171,8 +190,13 @@ namespace ValheimServerGUI.Game
         public ConflictReport CheckConflicts(
             string saveDataFolder,
             IReadOnlyDictionary<string, PlayerRoleEntry> currentRoles,
-            bool currentFlag)
+            bool currentFlag,
+            IReadOnlyDictionary<string, PlayerDefaultEntry>? defaults = null)
         {
+            // Compare against what actually applies on this server: overrides layered over defaults (None = no role).
+            var effectiveRoles = PlayerRoleResolver.EffectiveRoles(
+                currentRoles, defaults ?? new Dictionary<string, PlayerDefaultEntry>());
+
             var additions = new Dictionary<string, RoleAddition>();
             var resolvedById = new Dictionary<string, ResolvedToken>();
             var conflictingFiles = new List<PlayerAccessList>();
@@ -197,14 +221,14 @@ namespace ValheimServerGUI.Game
                     var key = $"{platform}:{playerId}";
                     resolvedById[key] = new ResolvedToken(platform, platformRaw, playerId);
 
-                    // Effective role = a pending addition (this pass) overlaid on the stored config.
+                    // Effective role = a pending addition (this pass) overlaid on the resolved config.
                     PlayerRole? effective = additions.TryGetValue(key, out var pending)
                         ? pending.Entry.Role
-                        : currentRoles.TryGetValue(key, out var existing) ? existing.Role : null;
+                        : effectiveRoles.TryGetValue(key, out var existing) ? existing.Role : null;
 
                     if (effective is null)
                     {
-                        // Missing from config → adopt the role the file requires.
+                        // No effective role → adopt the role the file requires (as a server override).
                         additions[key] = new RoleAddition(key, new PlayerRoleEntry(expected, platformRaw));
                     }
                     else if (!Satisfies(effective.Value, list))

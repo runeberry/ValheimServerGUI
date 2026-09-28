@@ -97,6 +97,75 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Empty(restored.PlayerRoles);
         }
 
+        // An explicit "no role" override (pins None against a global default) persists as "none".
+        [Fact]
+        public void ServerPreferences_RoundTrip_PreservesExplicitNoneOverride()
+        {
+            var original = new ServerPreferences { ProfileName = "P" };
+            original.PlayerRoles["Steam:1"] = new PlayerRoleEntry(PlayerRole.None, "Steam");
+
+            var file = original.ToFile();
+            Assert.Equal("none", file.PlayerRoles!["Steam:1"].Role);
+
+            var restored = ServerPreferences.FromFile(file);
+            Assert.Equal(PlayerRole.None, restored.PlayerRoles["Steam:1"].Role);
+        }
+
+        // Global player defaults survive ToFile/FromFile with lowercase category + role tokens.
+        [Fact]
+        public void UserPreferences_RoundTrip_PreservesPlayerDefaults()
+        {
+            var original = new UserPreferences();
+            original.PlayerDefaults["Steam:1"] = new PlayerDefaultEntry(PlayerCategory.MyAccount, PlayerRole.Admin, "Steam");
+            original.PlayerDefaults["Steam:2"] = new PlayerDefaultEntry(PlayerCategory.Friend, PlayerRole.None, null);
+            original.PlayerDefaults["Xbox:3"] = new PlayerDefaultEntry(PlayerCategory.Banned, PlayerRole.Banned, "Xbox");
+
+            var file = original.ToFile();
+            Assert.Equal("myaccount", file.PlayerDefaults!["Steam:1"].Category);
+            Assert.Equal("admin", file.PlayerDefaults["Steam:1"].DefaultRole);
+            Assert.Equal("friend", file.PlayerDefaults["Steam:2"].Category);
+
+            var restored = UserPreferences.FromFile(file);
+            Assert.Equal(3, restored.PlayerDefaults.Count);
+            Assert.Equal(original.PlayerDefaults["Steam:1"], restored.PlayerDefaults["Steam:1"]);
+            Assert.Equal(original.PlayerDefaults["Steam:2"], restored.PlayerDefaults["Steam:2"]);
+            Assert.Equal(original.PlayerDefaults["Xbox:3"], restored.PlayerDefaults["Xbox:3"]);
+        }
+
+        // Files that never used Manage Players stay byte-identical: no playerDefaults key is written.
+        [Fact]
+        public void UserPreferences_EmptyPlayerDefaults_AreOmittedFromFile()
+        {
+            var file = new UserPreferences().ToFile();
+            Assert.Null(file.PlayerDefaults);
+
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(file);
+            Assert.DoesNotContain("playerDefaults", json);
+        }
+
+        // A Banned-list entry always carries the Banned role, whatever the file (or caller) says.
+        [Fact]
+        public void UserPreferences_BannedCategory_IsNormalizedToBannedRole()
+        {
+            var file = new UserPreferencesFile
+            {
+                PlayerDefaults = new()
+                {
+                    ["Steam:1"] = new PlayerDefaultFileEntry { Category = "banned", DefaultRole = "admin" },
+                    ["Steam:2"] = new PlayerDefaultFileEntry { Category = "mystery", DefaultRole = "admin" },
+                },
+            };
+
+            var restored = UserPreferences.FromFile(file);
+
+            Assert.Equal(PlayerRole.Banned, restored.PlayerDefaults["Steam:1"].DefaultRole);
+            Assert.False(restored.PlayerDefaults.ContainsKey("Steam:2")); // unknown category dropped
+
+            var prefs = new UserPreferences();
+            prefs.PlayerDefaults["Steam:3"] = new PlayerDefaultEntry(PlayerCategory.Banned, PlayerRole.Permitted, null);
+            Assert.Equal("banned", prefs.ToFile().PlayerDefaults!["Steam:3"].DefaultRole);
+        }
+
         // E38 / E39: ToFile drops blank-named profiles and de-dups by profile name.
         [Fact]
         public void UserPreferences_ToFile_DropsBlankNamesAndDedups()

@@ -48,17 +48,6 @@ namespace ValheimServerGUI.Core.Tests.Game
         }
 
         [Fact]
-        public void Explicit_None_override_pins_no_role_against_a_default()
-        {
-            var r = PlayerRoleResolver.Resolve("Steam:1",
-                Overrides(("Steam:1", PlayerRole.None)),
-                Defaults(("Steam:1", PlayerRole.Admin)));
-
-            Assert.Equal(PlayerRole.None, r.Effective);
-            Assert.True(r.ShowsOverrideMarker);
-        }
-
-        [Fact]
         public void Pinned_override_survives_a_default_change()
         {
             var overrides = Overrides(("Steam:1", PlayerRole.Permitted));
@@ -80,17 +69,20 @@ namespace ValheimServerGUI.Core.Tests.Game
         }
 
         [Fact]
-        public void BuildAssignments_unions_both_layers_and_skips_None()
+        public void BuildAssignments_unions_both_layers_with_overrides_winning()
         {
             var assignments = PlayerRoleResolver.BuildAssignments(
-                Overrides(("Steam:1", PlayerRole.Banned), ("Steam:2", PlayerRole.None), ("Xbox:9", PlayerRole.Admin)),
+                Overrides(("Steam:1", PlayerRole.Banned), ("Steam:2", PlayerRole.Permitted), ("Xbox:9", PlayerRole.Admin)),
                 Defaults(
                     ("Steam:2", PlayerRole.Admin),
-                    ("Steam:3", PlayerRole.Permitted),
-                    ("Steam:4", PlayerRole.None)));
+                    ("Steam:3", PlayerRole.Permitted)));
 
             Assert.Equal(
-                new (string?, string?, PlayerRole)[] { ("Steam", "1", PlayerRole.Banned), ("Steam", "3", PlayerRole.Permitted), ("Xbox", "9", PlayerRole.Admin) },
+                new (string?, string?, PlayerRole)[]
+                {
+                    ("Steam", "1", PlayerRole.Banned), ("Steam", "2", PlayerRole.Permitted),
+                    ("Steam", "3", PlayerRole.Permitted), ("Xbox", "9", PlayerRole.Admin),
+                },
                 assignments.Select(a => (a.Platform, a.PlayerId, a.Role)).ToArray());
         }
     }

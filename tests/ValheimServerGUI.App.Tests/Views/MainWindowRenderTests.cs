@@ -153,4 +153,46 @@ public class MainWindowRenderTests
         Assert.False(start.IsEffectivelyEnabled);
         Assert.True(stop.IsEffectivelyEnabled);
     }
+
+    // The Players tab's "Set server role" submenu: the fourth item names the default it falls back to, and
+    // checking a radio item writes this server's override through the TwoWay binding.
+    [AvaloniaFact]
+    public void Players_tab_server_role_submenu_writes_the_override()
+    {
+        var repo = new Fakes.FakePlayerDataRepository();
+        var player = new PlayerInfo { Platform = "Steam", PlatformRaw = "Steam", PlayerId = "1", PlayerName = "Odin" };
+        repo.PushUpdate(player);
+        var prefs = new UserPreferences();
+        prefs.PlayerDefaults[player.Key] = new PlayerDefaultEntry(PlayerRole.Permitted, "Steam");
+        var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
+        var vm = new MainWindowViewModel(
+            Core.GetRequiredService<IServerManager>(), new FakeUserPreferencesProvider(prefs),
+            new FakeServerPreferencesProvider(), Core.GetRequiredService<IWorldPreferencesProvider>(),
+            Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
+            repo, Core.GetRequiredService<IApplicationLogger>(), new FakeSoftwareUpdateProvider(), shell,
+            Core.GetRequiredService<IValheimPathResolver>(), Core.GetRequiredService<IPlayerListImportService>(),
+            Core.GetRequiredService<IRuneberryApiClient>());
+        vm.LoadProfile(new ServerPreferences { ProfileName = "Menu" });
+        var view = new ValheimServerGUI.App.Views.Tabs.PlayersView { DataContext = vm };
+        var window = new Window { Content = view, Width = 550, Height = 400 };
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        vm.Players.SelectedPlayer = vm.Players.Players[0];
+
+        var list = view.GetVisualDescendants().OfType<ValheimServerGUI.App.Controls.DataListView>().First();
+        var menu = list.RowContextMenu!;
+        menu.Open(list.GetVisualDescendants().OfType<DataGrid>().First()); // attached to the inner grid
+        Dispatcher.UIThread.RunJobs();
+        var setRole = menu.Items.OfType<MenuItem>().First(m => (string?)m.Header == "Set server role");
+        var items = setRole.Items.OfType<MenuItem>().ToList();
+
+        Assert.Equal(new[] { "Admin", "Permitted", "Banned", "Default role (Permitted)" }, items.Select(m => (string?)m.Header));
+        Assert.True(items[3].IsChecked); // no override yet
+
+        items[0].IsChecked = true;       // what a click on a radio item does
+        Dispatcher.UIThread.RunJobs();
+        menu.Close();
+
+        Assert.Equal(PlayerRole.Admin, vm.Form.GetOverride(player.Key));
+    }
 }

@@ -31,13 +31,18 @@
             <c:DataListView.RowContextMenu>
                 <ContextMenu>
                     <MenuItem Header="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
-                    <Separator />
-                    <MenuItem Header="{Binding Players.AdminToggleLabel}" Command="{Binding Players.ToggleAdminCommand}" />
-                    <MenuItem Header="{Binding Players.BanToggleLabel}" Command="{Binding Players.ToggleBanCommand}"
-                              IsVisible="{Binding Players.ShowBanToggle}" />
-                    <MenuItem Header="{Binding Players.PermitToggleLabel}" Command="{Binding Players.TogglePermitCommand}"
-                              IsVisible="{Binding Players.ShowPermitToggle}" />
-                    <MenuItem Header="Clear role override" Command="{Binding Players.ClearOverrideCommand}" />
+                    <!-- Radio items read/write this server's override for the selected player; the last one
+                         removes the override (labelled with the default it falls back to, or "None"). -->
+                    <MenuItem Header="Set server role">
+                        <MenuItem Header="Admin" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsAdmin, Mode=TwoWay}" />
+                        <MenuItem Header="Permitted" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsPermitted, Mode=TwoWay}" />
+                        <MenuItem Header="Banned" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsBanned, Mode=TwoWay}" />
+                        <MenuItem Header="{Binding Players.ServerRoleDefaultLabel}" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsDefault, Mode=TwoWay}" />
+                    </MenuItem>
                     <Separator />
                     <MenuItem Header="Add player…" Command="{Binding Players.AddPlayerCommand}" />
                     <MenuItem Header="Remove player" Command="{Binding Players.RemoveCommand}" />

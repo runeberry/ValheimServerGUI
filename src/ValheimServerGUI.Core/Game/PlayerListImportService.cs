@@ -14,9 +14,9 @@ namespace ValheimServerGUI.Game
     /// when. Two directions:
     /// <list type="bullet">
     /// <item><see cref="BuildImport"/> — the <b>wholesale</b> file→roles adoption (ad-hoc button, first-launch
-    /// auto-import). It rebuilds the override map so the effective roles are exactly what the files describe: no
-    /// override where the files agree with the player's default, otherwise an override (a defaulted player absent
-    /// from the files gets a <see cref="PlayerRole.None"/> pin).</item>
+    /// auto-import). It rebuilds the override map so the effective roles match the files: no override where the
+    /// files agree with the player's default, otherwise an override. A server can't override to "no role", so a
+    /// defaulted player absent from the files keeps their default.</item>
     /// <item><see cref="CheckConflicts"/> — the <b>one-directional</b> start-time safety check when roles
     /// already exist. It only <i>adds</i> (as overrides) missing roles the files require and reports disagreements;
     /// it never unsets.</item>
@@ -151,9 +151,9 @@ namespace ValheimServerGUI.Game
 
             var usePermittedList = permittedHasEntries;
 
-            // Rebuild the override map so every player's effective role is exactly what the files say (absent =
-            // None). A player the files agree with needs no override unless one already pins them; an unlisted
-            // player whose desired role is None needs none either (no stray pins).
+            // Rebuild the override map so every player's effective role matches the files (absent = None). A player
+            // the files agree with needs no override unless one already pins them. Absent from the files means "no
+            // role", which a server can't override to, so the player falls back to their default (if any).
             var overrides = new Dictionary<string, PlayerRoleEntry>();
             var updateCount = 0;
             foreach (var key in desired.Keys.Union(currentRoles.Keys).Union(defaults.Keys))
@@ -163,12 +163,16 @@ namespace ValheimServerGUI.Game
                 var baseline = hasDefault ? def!.DefaultRole : PlayerRole.None;
                 var hadOverride = currentRoles.TryGetValue(key, out var existing);
 
-                if (PlayerRoleResolver.Resolve(key, currentRoles, defaults).Effective != desiredRole) updateCount++;
+                var keepsOverride = desiredRole != PlayerRole.None
+                    && (desiredRole != baseline || (hadOverride && hasDefault));
+                if (keepsOverride)
+                {
+                    var platformRaw = fromFile?.PlatformRaw ?? existing?.PlatformRaw ?? def?.PlatformRaw;
+                    overrides[key] = new PlayerRoleEntry(desiredRole, platformRaw);
+                }
 
-                if (desiredRole == baseline && (!hadOverride || !hasDefault)) continue;
-
-                var platformRaw = fromFile?.PlatformRaw ?? existing?.PlatformRaw ?? def?.PlatformRaw;
-                overrides[key] = new PlayerRoleEntry(desiredRole, platformRaw);
+                var newEffective = keepsOverride ? desiredRole : baseline;
+                if (PlayerRoleResolver.Resolve(key, currentRoles, defaults).Effective != newEffective) updateCount++;
             }
             if (usePermittedList != currentFlag) updateCount++;
 

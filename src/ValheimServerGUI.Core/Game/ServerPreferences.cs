@@ -50,7 +50,7 @@ namespace ValheimServerGUI.Game
 
         /// <summary>
         /// The profile's per-player role <b>overrides</b>, keyed by <see cref="PlayerInfo.Key"/>
-        /// (<c>"{Platform}:{PlayerId}"</c>). An override wins over the player's global default
+        /// (<c>"{Platform}:{PlayerId}"</c>), never <see cref="PlayerRole.None"/>. An override wins over the player's global default
         /// (<see cref="UserPreferences.PlayerDefaults"/>); a player absent from the map falls back to that default
         /// (see <see cref="PlayerRoleResolver"/>). The three <c>*.txt</c> files are regenerated from the resolved
         /// roles at server start.
@@ -87,7 +87,8 @@ namespace ValheimServerGUI.Game
                 foreach (var (key, entry) in file.PlayerRoles)
                 {
                     if (string.IsNullOrWhiteSpace(key) || entry == null) continue;
-                    if (PlayerRoleTokens.TryParse(entry.Role, out var role))
+                    // "none" overrides (written by an earlier build) are dropped: a server never pins "no role".
+                    if (PlayerRoleTokens.TryParse(entry.Role, out var role) && role != PlayerRole.None)
                         prefs.PlayerRoles[key] = new PlayerRoleEntry(role, entry.PlatformRaw);
                 }
             }
@@ -120,9 +121,10 @@ namespace ValheimServerGUI.Game
             };
 
             // Written only when there are roles, so profiles that never used the feature stay byte-identical.
-            if (PlayerRoles.Count > 0)
+            var roles = PlayerRoles.Where(kvp => kvp.Value.Role != PlayerRole.None).ToList();
+            if (roles.Count > 0)
             {
-                file.PlayerRoles = PlayerRoles.ToDictionary(
+                file.PlayerRoles = roles.ToDictionary(
                     kvp => kvp.Key,
                     kvp => new PlayerRoleFileEntry
                     {

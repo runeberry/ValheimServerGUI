@@ -45,8 +45,7 @@ public partial class PlayerRowViewModel : ObservableObject
     [NotifyPropertyChangedFor(nameof(RoleText))]
     private bool _showsOverrideMarker;
 
-    /// <summary>The displayed role's label (with <c>(*)</c> when overridden), or null for a blank cell. A plain
-    /// None is blank; an overridden None reads "None (*)" so a pinned no-role stays visible.</summary>
+    /// <summary>The displayed role's label (with <c>(*)</c> when overridden), or null for a blank cell (no role).</summary>
     public string? RoleText
     {
         get
@@ -56,7 +55,6 @@ public partial class PlayerRowViewModel : ObservableObject
                 PlayerRole.Admin => "Admin",
                 PlayerRole.Permitted => "Permitted",
                 PlayerRole.Banned => "Banned",
-                PlayerRole.None when ShowsOverrideMarker => "None",
                 _ => null,
             };
             return label is not null && ShowsOverrideMarker ? $"{label} (*)" : label;

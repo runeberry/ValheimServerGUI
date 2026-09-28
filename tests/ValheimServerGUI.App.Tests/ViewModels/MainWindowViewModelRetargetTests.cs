@@ -184,13 +184,13 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         Assert.Contains(server.Options.PlayerRoles, a => a.PlayerId == "600" && a.Role == PlayerRole.Admin);
     }
 
-    // The override still wins on the running server: a banned override beats an admin default.
+    // The override still wins on the running server: a permitted override beats an admin default.
     [Fact]
     public void Live_applied_defaults_respect_the_profile_overrides()
     {
         var (vm, mgr, serverPrefs) = Build("A");
         var profile = new ServerPreferences { ProfileName = "A" };
-        profile.PlayerRoles["Steam:600"] = new PlayerRoleEntry(PlayerRole.None, "Steam");
+        profile.PlayerRoles["Steam:600"] = new PlayerRoleEntry(PlayerRole.Permitted, "Steam");
         serverPrefs.SavePreferences(profile);
         RunToRunning(mgr.GetOrCreate("A"), Options());
         vm.LoadProfile(profile);

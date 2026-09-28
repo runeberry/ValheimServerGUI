@@ -63,14 +63,14 @@ public class AddPlayerFlowTests
     }
 
     [Fact]
-    public void Server_role_None_pins_None_over_a_default_but_otherwise_clears()
+    public void Server_role_None_removes_the_override_and_the_default_applies()
     {
-        Add(PlayerRole.None, asDefault: false);
-        Assert.Null(_overrides["Steam:42"]); // no default → no stray pin
-
         _defaults["Steam:42"] = new PlayerDefaultEntry(PlayerRole.Admin, "Steam");
+
         Add(PlayerRole.None, asDefault: false);
-        Assert.Equal(PlayerRole.None, _overrides["Steam:42"]);
+
+        Assert.Null(_overrides["Steam:42"]); // never a "no role" override
+        Assert.Equal(PlayerRole.Admin, _defaults["Steam:42"].DefaultRole);
     }
 
     [Fact]

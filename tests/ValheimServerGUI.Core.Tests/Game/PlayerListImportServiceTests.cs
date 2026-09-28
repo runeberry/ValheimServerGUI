@@ -160,16 +160,18 @@ namespace ValheimServerGUI.Core.Tests.Game
         }
 
         [Fact]
-        public void BuildImport_WithDefaults_DefaultedPlayerAbsentFromFiles_GetsNonePin()
+        public void BuildImport_WithDefaults_DefaultedPlayerAbsentFromFiles_KeepsTheirDefault()
         {
             Seed("adminlist.txt", SteamB);
             var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Admin));
+            var current = Roles(($"Steam:{SteamA}", PlayerRole.Banned, "Steam")); // an override the files don't back
 
-            var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
+            var plan = _svc.BuildImport(_savedir, current, currentFlag: false, defaults);
 
-            Assert.Equal(PlayerRole.None, plan.Roles[$"Steam:{SteamA}"].Role);
+            // A server can't override to "no role": A's override is dropped and A falls back to the default.
+            Assert.False(plan.Roles.ContainsKey($"Steam:{SteamA}"));
             Assert.Equal(PlayerRole.Admin, plan.Roles[$"Steam:{SteamB}"].Role);
-            Assert.Equal(2, plan.UpdateCount); // A: Admin→None, B: None→Admin
+            Assert.Equal(2, plan.UpdateCount); // A: Banned→Admin (default), B: None→Admin
         }
 
         [Fact]

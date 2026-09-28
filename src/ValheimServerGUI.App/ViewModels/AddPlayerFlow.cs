@@ -58,14 +58,10 @@ public static class AddPlayerFlow
             // From a server, the new default should actually apply there: drop any override that would mask it.
             setServerOverride?.Invoke(player, null);
         }
-        else if (result.Role == PlayerRole.None)
-        {
-            // No role on this server: pin None over a default role; otherwise just clear any override.
-            setServerOverride(player, defaults.ContainsKey(key) ? PlayerRole.None : null);
-        }
         else
         {
-            setServerOverride(player, result.Role);
+            // A server role of None removes this server's override (the player's default, if any, applies).
+            setServerOverride(player, result.Role == PlayerRole.None ? null : result.Role);
         }
 
         records.Upsert(player);

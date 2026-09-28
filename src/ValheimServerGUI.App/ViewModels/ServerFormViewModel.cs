@@ -77,7 +77,7 @@ public partial class ServerFormViewModel : ObservableObject
     public event EventHandler? PlayerRolesEdited;
 
     /// <summary>This server's role override for a player key, or null when it has none (the global default
-    /// applies). <see cref="PlayerRole.None"/> is an explicit "no role" pin.</summary>
+    /// applies). Never <see cref="PlayerRole.None"/>.</summary>
     public PlayerRole? GetOverride(string key)
         => _playerRoles.TryGetValue(key, out var entry) ? entry.Role : null;
 
@@ -118,6 +118,8 @@ public partial class ServerFormViewModel : ObservableObject
     public void SetRole(PlayerInfo player, PlayerRole? role)
     {
         var key = player.Key;
+        // A server never stores a "no role" override: None just removes the override (the default applies).
+        if (role == PlayerRole.None) role = null;
 
         if (role is null)
         {

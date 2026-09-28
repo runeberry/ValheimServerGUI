@@ -97,18 +97,26 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Empty(restored.PlayerRoles);
         }
 
-        // An explicit "no role" override (pins None against a global default) persists as "none".
+        // A server never stores a "no role" override: "none" entries (from an earlier build) are dropped on load,
+        // and never written.
         [Fact]
-        public void ServerPreferences_RoundTrip_PreservesExplicitNoneOverride()
+        public void ServerPreferences_NoneOverrides_AreNotStored()
         {
-            var original = new ServerPreferences { ProfileName = "P" };
-            original.PlayerRoles["Steam:1"] = new PlayerRoleEntry(PlayerRole.None, "Steam");
-
-            var file = original.ToFile();
-            Assert.Equal("none", file.PlayerRoles!["Steam:1"].Role);
+            var file = new ServerPreferencesFile
+            {
+                ProfileName = "P",
+                PlayerRoles = new()
+                {
+                    ["Steam:1"] = new PlayerRoleFileEntry { Role = "none" },
+                    ["Steam:2"] = new PlayerRoleFileEntry { Role = "admin" },
+                },
+            };
 
             var restored = ServerPreferences.FromFile(file);
-            Assert.Equal(PlayerRole.None, restored.PlayerRoles["Steam:1"].Role);
+            Assert.Equal(new[] { "Steam:2" }, restored.PlayerRoles.Keys);
+
+            restored.PlayerRoles["Steam:3"] = new PlayerRoleEntry(PlayerRole.None, "Steam");
+            Assert.False(restored.ToFile().PlayerRoles!.ContainsKey("Steam:3"));
         }
 
         // Global player default roles survive ToFile/FromFile as lowercase role tokens.

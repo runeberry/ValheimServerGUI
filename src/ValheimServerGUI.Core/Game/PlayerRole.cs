@@ -14,8 +14,8 @@ namespace ValheimServerGUI.Game
         Banned,
 
         /// <summary>
-        /// Explicitly no role. As an override it pins "no role" on one server even when the player's global
-        /// default grants one; it never appears in any list file.
+        /// No role: the result when neither a server override nor a default applies, and the "no role" choice in
+        /// the UI. Never stored — neither as a server override nor as a default — and never in any list file.
         /// </summary>
         None,
     }

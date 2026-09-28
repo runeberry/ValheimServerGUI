@@ -23,7 +23,7 @@ namespace ValheimServerGUI.App.ViewModels;
 /// server is its <b>override</b> (stored on <see cref="ServerFormViewModel"/>) layered over its app-global
 /// <b>default</b> (the Manage Players lists), resolved by <see cref="PlayerRoleResolver"/>. The tab shows the
 /// effective role for the current mode (with <c>(*)</c> when an override replaces a default) and edits only
-/// the override via the form (which trips the profile's dirty flag); the three list files are generated from
+/// the override via the form — the "Set server role" submenu — (which trips the profile's dirty flag); the three list files are generated from
 /// the resolved roles at server start, not edited here.
 /// </summary>
 public partial class PlayersViewModel : ViewModelBase
@@ -89,36 +89,53 @@ public partial class PlayersViewModel : ViewModelBase
     public string? EmptyText => Players.Count == 0 ? NoPlayersText : null;
 
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(CanViewDetails), nameof(CanRemove), nameof(CanManageAccess),
-        nameof(CanClearOverride), nameof(AdminToggleLabel), nameof(BanToggleLabel), nameof(PermitToggleLabel))]
-    [NotifyCanExecuteChangedFor(nameof(ViewDetailsCommand), nameof(RemoveCommand), nameof(ClearOverrideCommand),
-        nameof(ToggleAdminCommand), nameof(ToggleBanCommand), nameof(TogglePermitCommand))]
+    [NotifyPropertyChangedFor(nameof(CanViewDetails), nameof(CanRemove))]
+    [NotifyCanExecuteChangedFor(nameof(ViewDetailsCommand), nameof(RemoveCommand))]
     private PlayerRowViewModel? _selectedPlayer;
 
-    // Context-menu labels reflect the selected row's EFFECTIVE role (derived, never mirrored). Positive verbs
-    // write an override; negative verbs pin None for a listed player, or clear the override otherwise.
-    public string AdminToggleLabel => SelectedRole == PlayerRole.Admin ? "Remove admin" : "Make admin";
-    public string BanToggleLabel => SelectedRole == PlayerRole.Banned ? "Unban player" : "Ban player";
-    public string PermitToggleLabel => SelectedRole == PlayerRole.Permitted ? "Revoke join permission" : "Add to permitted";
-
-    // The ban/permit verbs only apply to the mode that actually uses their list: ban when not using the
-    // permitted list, permit when using it. The admin pair is relevant in both modes.
-    public bool ShowBanToggle => !_form.UsePermittedList;
-    public bool ShowPermitToggle => _form.UsePermittedList;
+    partial void OnSelectedPlayerChanged(PlayerRowViewModel? value) => RaiseServerRoleMenu();
 
     public bool CanViewDetails => SelectedPlayer is not null;
 
     /// <summary>Remove is only allowed for an Offline player (§7.4).</summary>
     public bool CanRemove => SelectedPlayer is { IsOffline: true };
 
-    /// <summary>Role toggles need a selected player (roles are profile working state, always available).</summary>
-    public bool CanManageAccess => SelectedPlayer is not null;
+    // ----- "Set server role" submenu -----
+    // Radio items for the selected player's override on this server: Admin / Permitted / Banned, or no override
+    // (the fourth item, which falls back to the player's default role). Each reads the stored override and, when
+    // checked, writes it through the form; a radio group's uncheck-the-others `false` writes are ignored. A server
+    // never stores a "no role" override — the fourth item just removes the override.
+    public bool ServerRoleIsAdmin { get => HasOverride(PlayerRole.Admin); set => SetOverrideIfChecked(value, PlayerRole.Admin); }
+    public bool ServerRoleIsPermitted { get => HasOverride(PlayerRole.Permitted); set => SetOverrideIfChecked(value, PlayerRole.Permitted); }
+    public bool ServerRoleIsBanned { get => HasOverride(PlayerRole.Banned); set => SetOverrideIfChecked(value, PlayerRole.Banned); }
+    public bool ServerRoleIsDefault
+    {
+        get => SelectedPlayer is { } row && _form.GetOverride(row.Key) is null;
+        set => SetOverrideIfChecked(value, null);
+    }
 
-    /// <summary>"Clear role override" needs a selected player whose role this server overrides.</summary>
-    public bool CanClearOverride => SelectedPlayer is { } row && _form.GetOverride(row.Key) is not null;
+    /// <summary>The fourth item's label: "Default role (Admin)" when there is a default to fall back on, else "None".</summary>
+    public string ServerRoleDefaultLabel
+        => SelectedPlayer is { } row && _defaults.TryGetValue(row.Key, out var entry)
+            ? $"Default role ({entry.DefaultRole})"
+            : "None";
 
-    // The selected player's effective role on this server (None when it has none).
-    private PlayerRole? SelectedRole => SelectedPlayer is { } row ? Resolve(row.Key).Effective : null;
+    private bool HasOverride(PlayerRole role) => SelectedPlayer is { } row && _form.GetOverride(row.Key) == role;
+
+    private void SetOverrideIfChecked(bool value, PlayerRole? role)
+    {
+        // Row re-render + menu refresh happen on the form's RoleStateChanged callback.
+        if (value && SelectedPlayer is { } row) _form.SetRole(row.Player, role);
+    }
+
+    private void RaiseServerRoleMenu()
+    {
+        OnPropertyChanged(nameof(ServerRoleIsAdmin));
+        OnPropertyChanged(nameof(ServerRoleIsPermitted));
+        OnPropertyChanged(nameof(ServerRoleIsBanned));
+        OnPropertyChanged(nameof(ServerRoleIsDefault));
+        OnPropertyChanged(nameof(ServerRoleDefaultLabel));
+    }
 
     /// <summary>Raised for View Player Details.</summary>
     public event Action<PlayerInfo>? ViewDetailsRequested;
@@ -158,22 +175,6 @@ public partial class PlayersViewModel : ViewModelBase
             _repo.Remove(row.Key);
     }
 
-    [RelayCommand(CanExecute = nameof(CanManageAccess))]
-    private void ToggleAdmin() => Toggle(PlayerRole.Admin);
-
-    [RelayCommand(CanExecute = nameof(CanManageAccess))]
-    private void ToggleBan() => Toggle(PlayerRole.Banned);
-
-    [RelayCommand(CanExecute = nameof(CanManageAccess))]
-    private void TogglePermit() => Toggle(PlayerRole.Permitted);
-
-    /// <summary>Drops this server's override so the player's global default applies again.</summary>
-    [RelayCommand(CanExecute = nameof(CanClearOverride))]
-    private void ClearOverride()
-    {
-        if (SelectedPlayer is { } row) _form.SetRole(row.Player, null);
-    }
-
     [RelayCommand]
     private async Task AddPlayer()
     {
@@ -192,21 +193,6 @@ public partial class PlayersViewModel : ViewModelBase
         // A brand-new record with no name yet: look it up the same way the join path does (fire-and-forget).
         if (outcome.IsNewRecord && string.IsNullOrWhiteSpace(outcome.Player.PlayerName))
             _ = _api.RequestPlayerInfoAsync(outcome.Player.Platform ?? string.Empty, outcome.Player.PlayerId ?? string.Empty);
-    }
-
-    // Flips the selected player's effective role for one verb. The positive verb always writes an override.
-    // The negative verb must leave the player with no role: a listed player (has a default) gets an explicit
-    // None pin; an unlisted player just loses the override (no stray pins).
-    private void Toggle(PlayerRole role)
-    {
-        if (SelectedPlayer is not { } row) return;
-
-        var resolved = Resolve(row.Key);
-        if (resolved.Effective != role)
-            _form.SetRole(row.Player, role);
-        else
-            _form.SetRole(row.Player, resolved.HasDefault ? PlayerRole.None : null);
-        // Row re-render + label refresh happen on the form's RoleStateChanged callback.
     }
 
     private ResolvedRole Resolve(string key) => PlayerRoleResolver.Resolve(key, _form.PlayerRoles, _defaults);
@@ -230,12 +216,14 @@ public partial class PlayersViewModel : ViewModelBase
         _ => null,
     };
 
-    // A role that has no effect in this mode reads as None, which only renders when overridden ("None (*)").
+    // A role that has no effect in this mode renders blank — including its "(*)" marker, since there is no role
+    // shown for the marker to qualify.
     private void ApplyRole(PlayerRowViewModel row)
     {
         var resolved = Resolve(row.Key);
-        row.ShowsOverrideMarker = resolved.ShowsOverrideMarker;
-        row.DisplayRole = ModeFiltered(resolved.Effective) ?? (resolved.ShowsOverrideMarker ? PlayerRole.None : null);
+        var shown = ModeFiltered(resolved.Effective);
+        row.DisplayRole = shown;
+        row.ShowsOverrideMarker = shown is not null && resolved.ShowsOverrideMarker;
     }
 
     private void OnFormRolesChanged(object? sender, EventArgs e) => RunOnUi(RerenderAccess);
@@ -251,18 +239,12 @@ public partial class PlayersViewModel : ViewModelBase
         if (e.PropertyName == nameof(ServerFormViewModel.UsePermittedList)) RunOnUi(RerenderAccess);
     }
 
-    // Re-derive every row's displayed role and refresh the mode-dependent menu labels/visibility.
+    // Re-derive every row's displayed role and visibility, and the selected row's role menu.
     private void RerenderAccess()
     {
         foreach (var row in _allRows) ApplyRole(row);
         SyncVisibleRows(); // a role change can ban or unban a player
-        OnPropertyChanged(nameof(AdminToggleLabel));
-        OnPropertyChanged(nameof(BanToggleLabel));
-        OnPropertyChanged(nameof(PermitToggleLabel));
-        OnPropertyChanged(nameof(ShowBanToggle));
-        OnPropertyChanged(nameof(ShowPermitToggle));
-        OnPropertyChanged(nameof(CanClearOverride));
-        ClearOverrideCommand.NotifyCanExecuteChanged();
+        RaiseServerRoleMenu();
     }
 
     private void OnEntityUpdated(object? sender, PlayerInfo player) => RunOnUi(() => Upsert(player));

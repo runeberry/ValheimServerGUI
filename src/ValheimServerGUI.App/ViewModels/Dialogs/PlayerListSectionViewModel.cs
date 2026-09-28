@@ -24,6 +24,7 @@ public partial class PlayerListSectionViewModel : ObservableObject
         Caption = caption;
         Header = header;
         KnownCharacters = knownCharacters;
+        Accounts.CollectionChanged += (_, _) => OnPropertyChanged(nameof(AccountsEmptyText));
     }
 
     public PlayerCategory Category { get; }
@@ -35,6 +36,9 @@ public partial class PlayerListSectionViewModel : ObservableObject
     public string Header { get; }
 
     public ObservableCollection<PlayerRowViewModel> Accounts { get; } = new();
+
+    /// <summary>The accounts table's empty-state hint, or null when it has rows.</summary>
+    public string? AccountsEmptyText => Accounts.Count == 0 ? ManagePlayersViewModel.NoAccountsText : null;
 
     /// <summary>The selected account's known characters; null on the Banned list.</summary>
     public KnownCharactersViewModel? KnownCharacters { get; }

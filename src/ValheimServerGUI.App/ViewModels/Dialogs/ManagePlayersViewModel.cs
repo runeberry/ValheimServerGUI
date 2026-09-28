@@ -29,8 +29,9 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
 
     public const string MyAccountsCaption = "Add your account here and set default permissions for any server you host.";
     public const string FriendsCaption = "Add your friends' accounts here and set default permissions for any server you host.";
-    public const string NoAccountSelectedText = "Select an account to see Known Characters.";
+    public const string NoAccountSelectedText = "Select an account to see known characters.";
     public const string NoKnownCharactersText = "No known characters for this account.";
+    public const string NoAccountsText = "Add an account using the button below.";
 
     private readonly IUserPreferencesProvider _prefs;
     private readonly IPlayerDataRepository _repo;
@@ -52,7 +53,7 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
             NewKnownCharacters());
         Banned = new PlayerListSectionViewModel(this, PlayerCategory.Banned, null, "Banned Accounts", null);
 
-        // Status/Since are display-only and follow the live cache.
+        // Names (e.g. a background lookup resolving) follow the live cache.
         _repo.EntityUpdated += OnRepoPlayerChanged;
         _repo.PlayerStatusChanged += OnRepoPlayerChanged;
 

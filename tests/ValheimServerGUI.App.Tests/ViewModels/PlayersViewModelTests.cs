@@ -170,6 +170,18 @@ public class PlayersViewModelTests
         Assert.Equal(string.Empty, row.SinceText);
     }
 
+    [AvaloniaFact]
+    public void Empty_table_shows_the_join_hint_until_a_player_appears()
+    {
+        var repo = new FakePlayerDataRepository();
+        var vm = NewVm(repo);
+        Assert.Equal("Players will appear here as they join your server.", vm.EmptyText);
+
+        repo.PushUpdate(Player("1", PlayerStatus.Online));
+
+        Assert.Null(vm.EmptyText);
+    }
+
     // ---- menu labels + mode-gated visibility ----
 
     [AvaloniaFact]

@@ -131,6 +131,35 @@ public class ManagePlayersViewModelTests
         Assert.Empty(_questions);
     }
 
+    [AvaloniaFact]
+    public async Task Empty_lists_show_the_add_hint_until_an_account_exists()
+    {
+        var vm = NewVm();
+        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.MyAccounts.AccountsEmptyText);
+        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.Banned.AccountsEmptyText);
+
+        NextAdd(vm, "1", PlayerRole.Admin);
+        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
+
+        Assert.Null(vm.MyAccounts.AccountsEmptyText);
+    }
+
+    [AvaloniaFact]
+    public void Rows_show_the_account_name_alone_and_the_platform_id()
+    {
+        var named = Player("76561198000001111", "Odin");
+        named.LastStatusCharacter = "Ragnar";
+        _repo.PushUpdate(named);
+        var vm = NewVm(
+            ("Steam:76561198000001111", PlayerCategory.Friend, PlayerRole.Permitted),
+            ("Steam:76561198000002222", PlayerCategory.Friend, PlayerRole.Permitted));
+
+        var odin = vm.Friends.Accounts.First(r => r.PlatformId == "76561198000001111");
+        Assert.Equal("Odin", odin.AccountName); // no "(Ragnar)" — characters live in their own table
+        var unknown = vm.Friends.Accounts.First(r => r.PlatformId == "76561198000002222");
+        Assert.False(unknown.HasAccountName);  // renders "(name unknown)"
+    }
+
     // ---- cross-list validation ----
 
     [AvaloniaFact]
@@ -281,7 +310,7 @@ public class ManagePlayersViewModelTests
             ("Steam:2", PlayerCategory.Friend, PlayerRole.Permitted));
         var kc = vm.Friends.KnownCharacters!;
 
-        Assert.Equal("Select an account to see Known Characters.", kc.EmptyText);
+        Assert.Equal("Select an account to see known characters.", kc.EmptyText);
 
         vm.Friends.SelectedAccount = vm.Friends.Accounts.First(r => r.Key == "Steam:1");
         Assert.Equal("Ragnar", Assert.Single(kc.Characters).CharacterName);
@@ -402,7 +431,8 @@ public class ManagePlayersViewModelTests
             ManagePlayersViewModel.MyAccountsCaption);
         Assert.Equal("Add your friends' accounts here and set default permissions for any server you host.",
             ManagePlayersViewModel.FriendsCaption);
-        Assert.Equal("Select an account to see Known Characters.", ManagePlayersViewModel.NoAccountSelectedText);
+        Assert.Equal("Select an account to see known characters.", ManagePlayersViewModel.NoAccountSelectedText);
+        Assert.Equal("Add an account using the button below.", ManagePlayersViewModel.NoAccountsText);
         Assert.Equal("No known characters for this account.", ManagePlayersViewModel.NoKnownCharactersText);
     }
 }

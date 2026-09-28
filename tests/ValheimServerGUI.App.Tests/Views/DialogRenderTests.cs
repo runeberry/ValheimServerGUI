@@ -1,3 +1,5 @@
+using Avalonia.LogicalTree;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
@@ -60,6 +62,24 @@ public class DialogRenderTests
         Realize(new ManagePlayersWindow(
             new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null),
             repo, null));
+    }
+
+    // Banned entries are always Banned, so that tab drops the Default Role column; the other tabs keep it last.
+    [AvaloniaFact]
+    public void ManagePlayers_banned_tab_has_no_role_column()
+    {
+        var repo = Core.GetRequiredService<IPlayerDataRepository>();
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null);
+        var sections = new[] { vm.MyAccounts, vm.Friends, vm.Banned }
+            .Select(s => new PlayerListSectionView { DataContext = s })
+            .ToList();
+
+        string[] Visible(PlayerListSectionView v) => v.GetLogicalDescendants().OfType<ValheimServerGUI.App.Controls.DataListView>()
+            .First(l => l.Name == "AccountsList").Columns.Where(c => c.IsVisible).Select(c => (string)c.Header!).ToArray();
+
+        Assert.Equal(new[] { "Player Name", "Platform ID", "Default Role" }, Visible(sections[0]));
+        Assert.Equal(new[] { "Player Name", "Platform ID", "Default Role" }, Visible(sections[1]));
+        Assert.Equal(new[] { "Player Name", "Platform ID" }, Visible(sections[2]));
     }
 
     [AvaloniaFact]

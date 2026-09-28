@@ -1,7 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="using:ValheimServerGUI.App.Controls"
-             xmlns:conv="using:ValheimServerGUI.App.Converters"
              xmlns:v="using:ValheimServerGUI.App.Views"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
              xmlns:vmr="using:ValheimServerGUI.App.ViewModels"
@@ -22,8 +21,9 @@
             <v:KnownCharactersView DataContext="{Binding KnownCharacters}" Height="120" />
         </StackPanel>
 
-        <c:DataListView ItemsSource="{Binding Accounts}"
+        <c:DataListView x:Name="AccountsList" ItemsSource="{Binding Accounts}"
                         SelectedItem="{Binding SelectedAccount}"
+                        EmptyText="{Binding AccountsEmptyText}"
                         RowInvokeCommand="{Binding ViewDetailsCommand}">
             <c:DataListView.RowContextMenu>
                 <ContextMenu>
@@ -39,18 +39,31 @@
                 </ContextMenu>
             </c:DataListView.RowContextMenu>
             <c:DataListView.Columns>
-                <DataGridTemplateColumn Header="Player (Character)" Width="*" SortMemberPath="DisplayName">
+                <!-- The account name only (characters are in the Known Characters table below). -->
+                <DataGridTemplateColumn Header="Player Name" Width="*" SortMemberPath="AccountName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vmr:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
                                 <Image Source="{Binding PlatformIcon}" Width="16" Height="16"
                                        VerticalAlignment="Center"
                                        RenderOptions.BitmapInterpolationMode="HighQuality" />
-                                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding AccountName}" VerticalAlignment="Center"
+                                           IsVisible="{Binding HasAccountName}" />
+                                <TextBlock Text="(name unknown)" VerticalAlignment="Center" FontStyle="Italic"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                           IsVisible="{Binding !HasAccountName}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Platform ID" Width="190" SortMemberPath="PlatformId">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
+                            <TextBlock Text="{Binding PlatformId}" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- Kept LAST: hidden on Banned from code-behind (every entry there is Banned). -->
                 <DataGridTemplateColumn Header="Default Role" Width="120" SortMemberPath="RoleText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vmr:PlayerRowViewModel">
@@ -60,25 +73,6 @@
                                        Source="{Binding RoleIcon}" />
                                 <TextBlock Text="{Binding RoleText}" VerticalAlignment="Center" />
                             </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Status" Width="100" SortMemberPath="StatusText">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
-                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                <Image Width="16" Height="16" VerticalAlignment="Center"
-                                       RenderOptions.BitmapInterpolationMode="HighQuality"
-                                       Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
-                                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
-                            </StackPanel>
-                        </DataTemplate>
-                    </DataGridTemplateColumn.CellTemplate>
-                </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
-                    <DataGridTemplateColumn.CellTemplate>
-                        <DataTemplate x:DataType="vmr:PlayerRowViewModel">
-                            <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>

@@ -63,10 +63,18 @@ public partial class PlayersViewModel : ViewModelBase
         // Defaults change from the Manage Players dialog (any window): re-resolve every row.
         _userPrefs.PreferencesSaved += OnUserPreferencesSaved;
 
+        Players.CollectionChanged += (_, _) => OnPropertyChanged(nameof(EmptyText));
+
         ReloadAll();
     }
 
     public ObservableCollection<PlayerRowViewModel> Players { get; } = new();
+
+    // User copy (EXACT — do not paraphrase); asserted verbatim by a test.
+    public const string NoPlayersText = "Players will appear here as they join your server.";
+
+    /// <summary>The table's empty-state hint, or null when it has rows.</summary>
+    public string? EmptyText => Players.Count == 0 ? NoPlayersText : null;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanViewDetails), nameof(CanRemove), nameof(CanManageAccess),

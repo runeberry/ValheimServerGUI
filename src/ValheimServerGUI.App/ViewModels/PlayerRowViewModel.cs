@@ -23,6 +23,16 @@ public partial class PlayerRowViewModel : ObservableObject
     [ObservableProperty] private bool _isOffline;
     [ObservableProperty] private Bitmap? _platformIcon;
 
+    /// <summary>The account name alone (no character), or null when unknown. Used by the Manage Players lists,
+    /// which show characters in their own table.</summary>
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(HasAccountName))]
+    private string? _accountName;
+
+    [ObservableProperty] private string _platformId = string.Empty;
+
+    public bool HasAccountName => AccountName is not null;
+
     // The role shown in this row, computed by the owning list: on the Players tab the effective role for the
     // current profile + mode (admin shows in both modes; permitted only in permitted-list mode; banned only
     // otherwise); on a Manage Players list the account's default role. Null renders a blank cell.
@@ -67,6 +77,8 @@ public partial class PlayerRowViewModel : ObservableObject
         Player = player;
 
         var name = string.IsNullOrWhiteSpace(player.PlayerName) ? FallbackName(player.PlayerId) : player.PlayerName;
+        AccountName = string.IsNullOrWhiteSpace(player.PlayerName) ? null : player.PlayerName;
+        PlatformId = player.PlayerId ?? string.Empty;
         DisplayName = string.IsNullOrWhiteSpace(player.LastStatusCharacter)
             ? name
             : $"{name} ({player.LastStatusCharacter})";

@@ -43,6 +43,7 @@ namespace ValheimServerGUI.Game
         public event EventHandler<ServerStatus> StatusChanged;
         public event EventHandler<decimal> WorldSaved;
         public event EventHandler<string> InviteCodeReady;
+        public event EventHandler<string> PlayerDied;
 
         public bool CanStart => IsAnyStatus(ServerStatus.Stopped) && ProcessKey == null;
         public bool CanStop => IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && ProcessKey != null;
@@ -84,6 +85,8 @@ namespace ValheimServerGUI.Game
 
             // Connected - NOTE: ZDOID can be a negative number, account for that w/ regex!
             LogBasedActions.Add(@"Got character ZDOID from (.+?) : ([\d-]+?)\D*?:(\d+?)\D*?$", OnPlayerConnected);
+            // Death: Valheim emits character ZDOID 0:0.
+            LogBasedActions.Add(@"Got character ZDOID from (.+?) : 0:0\s*$", OnPlayerDied);
 
             // Disconnecting
             LogBasedActions.Add(@"Peer (\d+?) has wrong password", OnPlayerDisconnecting);
@@ -279,11 +282,19 @@ namespace ValheimServerGUI.Game
             var zdoid = captures[1]; // Seems to be a unique object id for the game session
             //var otherNumber = captures[2]; // Not sure what this is for?
 
-            if (string.IsNullOrWhiteSpace(playerName)) return;
+            // Valheim emits 0:0 when the character dies. Do not mark that as a new login.
+            if (string.IsNullOrWhiteSpace(playerName) || zdoid == "0") return;
 
             PlayerDataRepository.SetPlayerOnline(playerName, zdoid);
         }
 
+        private void OnPlayerDied(params string[] captures)
+        {
+            var playerName = captures[0];
+            if (string.IsNullOrWhiteSpace(playerName)) return;
+
+            PlayerDied?.Invoke(this, playerName);
+        }
         private void OnPlayerDisconnecting(params string[] captures)
         {
             var playerIdOrZdoId = captures[0];
@@ -415,3 +426,4 @@ namespace ValheimServerGUI.Game
         #endregion
     }
 }
+

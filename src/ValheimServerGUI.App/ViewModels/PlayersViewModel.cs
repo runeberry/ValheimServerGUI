@@ -179,36 +179,19 @@ public partial class PlayersViewModel : ViewModelBase
     {
         if (AddPlayerPrompt is null) return;
 
-        var result = await AddPlayerPrompt(AddPlayerOptions.ForServer);
+        var result = await AddPlayerPrompt(AddPlayerOptions.ForServer(_form.UsePermittedList));
         if (result is null) return;
-        if (!PlayerPlatforms.TryGetValidPlatform(result.Platform, out var platform) || platform is null) return;
-        if (string.IsNullOrWhiteSpace(result.PlayerId)) return;
 
-        var playerId = result.PlayerId.Trim();
-
-        // Create/annotate a repo record so the person appears in the table. For a manually-entered ID the
-        // normalized platform name IS the canonical write token, so PlatformRaw = the platform name.
-        var key = $"{platform}:{playerId}";
-        var existing = _repo.FindById(key);
-        var player = existing ?? new PlayerInfo
-        {
-            Platform = platform,
-            PlatformRaw = platform,
-            PlayerId = playerId,
-            PlayerStatus = PlayerStatus.Offline,
-            LastStatusChange = DateTimeOffset.UtcNow,
-        };
-        if (string.IsNullOrWhiteSpace(player.PlatformRaw)) player.PlatformRaw = platform;
-        if (result.PlayerName is { } name) player.PlayerName = name;
-
-        // The chosen role becomes this server's override; None clears any override (back to the default).
-        _form.SetRole(player, result.Role == PlayerRole.None ? null : result.Role);
-
-        _repo.Upsert(player); // OnEntityUpdated adds/updates the row; ApplyRole reads the role back from the form.
+        // The role lands on this server's override (via the form, tripping the profile's dirty flag) or, as a
+        // default role, in user preferences — saved immediately, which re-renders the tab and live-applies.
+        var prefs = _userPrefs.LoadPreferences();
+        var outcome = AddPlayerFlow.Apply(result, new RepoPlayerRecordStore(_repo), prefs.PlayerDefaults, _form.SetRole);
+        if (outcome is null) return;
+        if (result.AsDefault) _userPrefs.SavePreferences(prefs);
 
         // A brand-new record with no name yet: look it up the same way the join path does (fire-and-forget).
-        if (existing is null && string.IsNullOrWhiteSpace(player.PlayerName))
-            _ = _api.RequestPlayerInfoAsync(platform, playerId);
+        if (outcome.IsNewRecord && string.IsNullOrWhiteSpace(outcome.Player.PlayerName))
+            _ = _api.RequestPlayerInfoAsync(outcome.Player.Platform ?? string.Empty, outcome.Player.PlayerId ?? string.Empty);
     }
 
     // Flips the selected player's effective role for one verb. The positive verb always writes an override.

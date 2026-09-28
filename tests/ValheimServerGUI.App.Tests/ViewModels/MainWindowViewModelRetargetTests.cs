@@ -178,7 +178,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         RunToRunning(server, Options());
         vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
 
-        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:600", PlayerRole.Admin));
 
         Assert.Contains("Steam_600", File.ReadAllLines(Path.Combine(_saveDir, "adminlist.txt")));
         Assert.Contains(server.Options.PlayerRoles, a => a.PlayerId == "600" && a.Role == PlayerRole.Admin);
@@ -195,7 +195,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         RunToRunning(mgr.GetOrCreate("A"), Options());
         vm.LoadProfile(profile);
 
-        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:600", PlayerRole.Admin));
 
         Assert.DoesNotContain("Steam_600", File.ReadAllLines(Path.Combine(_saveDir, "adminlist.txt")));
     }
@@ -207,21 +207,21 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         var (vm, mgr, _) = Build("A");
         RunToRunning(mgr.GetOrCreate("A"), Options());
         vm.LoadProfile(new ServerPreferences { ProfileName = "A" });
-        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:600", PlayerRole.Admin));
         var adminList = Path.Combine(_saveDir, "adminlist.txt");
         File.Delete(adminList);
 
-        SaveDefaults(("Steam:600", PlayerCategory.MyAccount, PlayerRole.Admin)); // same resolved roles
+        SaveDefaults(("Steam:600", PlayerRole.Admin)); // same resolved roles
 
         Assert.False(File.Exists(adminList));
     }
 
-    private void SaveDefaults(params (string key, PlayerCategory category, PlayerRole role)[] entries)
+    private void SaveDefaults(params (string key, PlayerRole role)[] entries)
     {
         var prefs = _userPrefs.LoadPreferences();
         prefs.PlayerDefaults.Clear();
-        foreach (var (key, category, role) in entries)
-            prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, "Steam");
+        foreach (var (key, role) in entries)
+            prefs.PlayerDefaults[key] = new PlayerDefaultEntry(role, "Steam");
         _userPrefs.SavePreferences(prefs);
     }
 

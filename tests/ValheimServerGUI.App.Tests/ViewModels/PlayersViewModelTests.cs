@@ -20,11 +20,11 @@ public class PlayersViewModelTests
     private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form, _api, _userPrefs);
 
     // Saves the app-global defaults the way the Manage Players dialog does (raises PreferencesSaved).
-    private void SaveDefaults(params (string key, PlayerCategory category, PlayerRole role)[] entries)
+    private void SaveDefaults(params (string key, PlayerRole role)[] entries)
     {
         var prefs = new UserPreferences();
-        foreach (var (key, category, role) in entries)
-            prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, "Steam");
+        foreach (var (key, role) in entries)
+            prefs.PlayerDefaults[key] = new PlayerDefaultEntry(role, "Steam");
         _userPrefs.SavePreferences(prefs);
     }
 
@@ -189,7 +189,7 @@ public class PlayersViewModelTests
     public void Players_banned_on_this_server_are_hidden_by_default_and_shown_on_request()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:2", PlayerCategory.Banned, PlayerRole.Banned)); // globally banned
+        SaveDefaults(("Steam:2", PlayerRole.Banned)); // globally banned
         var vm = NewVm(repo);
         var serverBanned = Player("3", PlayerStatus.Offline);
         _form.SetRole(serverBanned, PlayerRole.Banned);                      // banned on this server only
@@ -212,7 +212,7 @@ public class PlayersViewModelTests
     public void A_server_override_that_unbans_a_globally_banned_player_shows_them()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:1", PlayerCategory.Banned, PlayerRole.Banned));
+        SaveDefaults(("Steam:1", PlayerRole.Banned));
         var vm = NewVm(repo);
         var player = Player("1", PlayerStatus.Offline);
         repo.PushUpdate(player);
@@ -318,7 +318,7 @@ public class PlayersViewModelTests
     public void Default_role_shows_without_a_marker()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:1", PlayerRole.Admin));
         var vm = NewVm(repo);
         repo.PushUpdate(Player("1", PlayerStatus.Offline));
 
@@ -331,7 +331,7 @@ public class PlayersViewModelTests
     public void Override_of_a_listed_player_is_marked_even_when_equal_to_the_default()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Admin));
+        SaveDefaults(("Steam:1", PlayerRole.Admin));
         var vm = NewVm(repo);
         var player = Player("1", PlayerStatus.Offline);
         repo.PushUpdate(player);
@@ -356,7 +356,7 @@ public class PlayersViewModelTests
     public void Pinned_None_on_a_listed_player_reads_None_marker()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:1", PlayerRole.Admin));
         var vm = NewVm(repo);
         var player = Player("1", PlayerStatus.Offline);
         repo.PushUpdate(player);
@@ -369,7 +369,7 @@ public class PlayersViewModelTests
     public void Negative_verb_pins_None_for_a_listed_player()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:1", PlayerRole.Admin));
         var vm = NewVm(repo);
         repo.PushUpdate(Player("1", PlayerStatus.Offline));
         vm.SelectedPlayer = vm.Players[0];
@@ -400,7 +400,7 @@ public class PlayersViewModelTests
     public void Clear_role_override_restores_the_default_and_is_gated_on_an_override()
     {
         var repo = new FakePlayerDataRepository();
-        SaveDefaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
+        SaveDefaults(("Steam:1", PlayerRole.Permitted));
         var vm = NewVm(repo);
         vm.ShowBannedPlayers = true; // the override below bans the selected row
         var player = Player("1", PlayerStatus.Offline);
@@ -427,7 +427,7 @@ public class PlayersViewModelTests
         repo.PushUpdate(Player("1", PlayerStatus.Offline));
         Assert.Null(RowFor(vm, "Steam:1").RoleText);
 
-        SaveDefaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
+        SaveDefaults(("Steam:1", PlayerRole.Admin));
 
         Assert.Equal("Admin", RowFor(vm, "Steam:1").RoleText);
     }
@@ -463,43 +463,56 @@ public class PlayersViewModelTests
     // ---- add player ----
 
     [AvaloniaFact]
-    public async Task Add_player_creates_a_row_and_stores_an_override()
+    public async Task Add_player_offers_the_server_preset_for_the_mode()
+    {
+        var vm = NewVm(new FakePlayerDataRepository());
+        var offered = new System.Collections.Generic.List<AddPlayerOptions>();
+        vm.AddPlayerPrompt = options => { offered.Add(options); return Task.FromResult<AddPlayerResult?>(null); };
+
+        _form.UsePermittedList = false;
+        await vm.AddPlayerCommand.ExecuteAsync(null);
+        _form.UsePermittedList = true;
+        await vm.AddPlayerCommand.ExecuteAsync(null);
+
+        Assert.Equal(new[] { AddPlayerOptions.ForServer(false), AddPlayerOptions.ForServer(true) }, offered);
+    }
+
+    [AvaloniaFact]
+    public async Task Add_player_with_a_server_role_stores_an_override()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        _form.UsePermittedList = false;
-        AddPlayerOptions? offered = null;
-        vm.AddPlayerPrompt = options =>
-        {
-            offered = options;
-            return Task.FromResult<AddPlayerResult?>(new AddPlayerResult(PlayerPlatforms.Xbox, "XUID9", "Thor", PlayerRole.Admin));
-        };
+        vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(
+            new AddPlayerResult(PlayerPlatforms.Xbox, "XUID9", "Thor", PlayerRole.Admin, AsDefault: false));
 
         await vm.AddPlayerCommand.ExecuteAsync(null);
 
-        Assert.Same(AddPlayerOptions.ForServer, offered);
         var row = Assert.Single(vm.Players);
         Assert.Equal("Xbox:XUID9", row.Key);
         Assert.Equal("Thor", row.Player.PlayerName);
         Assert.Equal(PlayerRole.Admin, _form.GetOverride(row.Key));
-        Assert.Equal(PlayerRole.Admin, row.DisplayRole);
+        Assert.Empty(_userPrefs.LoadPreferences().PlayerDefaults);
         Assert.Equal(0, _api.RequestPlayerInfoCallCount); // name given, no lookup needed
     }
 
     [AvaloniaFact]
-    public async Task Add_player_with_role_None_clears_the_override()
+    public async Task Add_player_as_default_saves_the_default_and_clears_this_servers_override()
     {
         var repo = new FakePlayerDataRepository();
         var existing = Player("5", PlayerStatus.Offline, name: "A");
         repo.PushUpdate(existing);
         var vm = NewVm(repo);
         _form.SetRole(existing, PlayerRole.Banned);
+        var saves = _userPrefs.SaveCount;
         vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(
-            new AddPlayerResult(PlayerPlatforms.Steam, "5", null, PlayerRole.None));
+            new AddPlayerResult(PlayerPlatforms.Steam, "5", null, PlayerRole.Admin, AsDefault: true));
 
         await vm.AddPlayerCommand.ExecuteAsync(null);
 
+        Assert.Equal(saves + 1, _userPrefs.SaveCount);
+        Assert.Equal(PlayerRole.Admin, _userPrefs.LoadPreferences().PlayerDefaults["Steam:5"].DefaultRole);
         Assert.Null(_form.GetOverride("Steam:5"));
+        Assert.Equal("Admin", RowFor(vm, "Steam:5").RoleText); // the default now applies here, unmarked
         Assert.Equal("A", RowFor(vm, "Steam:5").Player.PlayerName); // blank name keeps the cached one
     }
 
@@ -509,7 +522,7 @@ public class PlayersViewModelTests
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
         vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(
-            new AddPlayerResult(PlayerPlatforms.Steam, "77", null, PlayerRole.Admin));
+            new AddPlayerResult(PlayerPlatforms.Steam, "77", null, PlayerRole.Admin, AsDefault: false));
 
         await vm.AddPlayerCommand.ExecuteAsync(null);
 

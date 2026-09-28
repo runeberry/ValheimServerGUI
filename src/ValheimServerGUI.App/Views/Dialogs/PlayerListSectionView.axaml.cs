@@ -11,8 +11,8 @@ public partial class PlayerListSectionView : UserControl
         InitializeComponent();
 
         // Grid columns sit outside the visual tree (no DataContext to bind, no generated name field), so the
-        // Default Role column — declared last — is hidden here: the Banned list has no role to show or change.
+        // Default Role column — declared last — is hidden here: every row on the Banned tab is Banned.
         DataContextChanged += (_, _) =>
-            AccountsList.Columns[^1].IsVisible = DataContext is PlayerListSectionViewModel { HasRoleCommands: true };
+            AccountsList.Columns[^1].IsVisible = DataContext is PlayerListSectionViewModel { IsBanned: false };
     }
 }

@@ -7,15 +7,9 @@
              x:Class="ValheimServerGUI.App.Views.Dialogs.PlayerListSectionView"
              x:DataType="vm:PlayerListSectionViewModel">
 
-    <!-- One Manage Players tab. The accounts table fills whatever the Known Characters table (absent on
-         Banned) leaves, so every tab is the same height and the window never resizes on a tab switch. -->
+    <!-- One Manage Players tab (Player Accounts / Banned). The accounts table fills whatever the Known Characters
+         table (absent on Banned) leaves, so both tabs are the same height and the window never resizes. -->
     <DockPanel Margin="8">
-        <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,6">
-            <TextBlock Text="{Binding Caption}" TextWrapping="Wrap"
-                       IsVisible="{Binding Caption, Converter={x:Static ObjectConverters.IsNotNull}}" />
-            <TextBlock Text="{Binding Header}" FontWeight="SemiBold" />
-        </StackPanel>
-
         <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0" IsVisible="{Binding HasKnownCharacters}">
             <TextBlock Text="Known Characters" FontWeight="SemiBold" />
             <v:KnownCharactersView DataContext="{Binding KnownCharacters}" Height="120" />
@@ -28,11 +22,17 @@
             <c:DataListView.RowContextMenu>
                 <ContextMenu>
                     <MenuItem Header="View Player Details…" Command="{Binding ViewDetailsCommand}" />
-                    <Separator IsVisible="{Binding HasRoleCommands}" />
-                    <MenuItem Header="{Binding AdminToggleLabel}" Command="{Binding ToggleAdminCommand}"
-                              IsVisible="{Binding HasRoleCommands}" />
-                    <MenuItem Header="{Binding PermitToggleLabel}" Command="{Binding TogglePermitCommand}"
-                              IsVisible="{Binding HasRoleCommands}" />
+                    <!-- Radio items read/write the selected row's default role (see PlayerListSectionViewModel). -->
+                    <MenuItem Header="Set default role">
+                        <MenuItem Header="Admin" ToggleType="Radio" GroupName="DefaultRole"
+                                  IsChecked="{Binding DefaultIsAdmin, Mode=TwoWay}" />
+                        <MenuItem Header="Permitted" ToggleType="Radio" GroupName="DefaultRole"
+                                  IsChecked="{Binding DefaultIsPermitted, Mode=TwoWay}" />
+                        <MenuItem Header="Banned" ToggleType="Radio" GroupName="DefaultRole"
+                                  IsChecked="{Binding DefaultIsBanned, Mode=TwoWay}" />
+                        <MenuItem Header="None" ToggleType="Radio" GroupName="DefaultRole"
+                                  IsChecked="{Binding DefaultIsNone, Mode=TwoWay}" />
+                    </MenuItem>
                     <Separator />
                     <MenuItem Header="Add player…" Command="{Binding AddCommand}" />
                     <MenuItem Header="Remove player" Command="{Binding RemoveCommand}" />
@@ -63,7 +63,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <!-- Kept LAST: hidden on Banned from code-behind (every entry there is Banned). -->
+                <!-- Kept LAST: hidden on Banned from code-behind (every row there is Banned). -->
                 <DataGridTemplateColumn Header="Default Role" Width="120" SortMemberPath="RoleText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vmr:PlayerRowViewModel">

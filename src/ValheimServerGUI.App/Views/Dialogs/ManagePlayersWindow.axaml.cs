@@ -9,7 +9,7 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>
-/// Manage Players: the app-global My Accounts / Friends / Banned lists. Save commits the staged defaults and
+/// Manage Players: every known player's app-global default role, on a Player Accounts tab and a Banned tab. Save commits the staged defaults and
 /// player records; Cancel (or closing without saving) discards them, guarded by the shared unsaved-changes prompt.
 /// </summary>
 public partial class ManagePlayersWindow : DialogWindow
@@ -33,8 +33,6 @@ public partial class ManagePlayersWindow : DialogWindow
         DataContext = viewModel;
 
         viewModel.AddPlayerPrompt = options => new AddPlayerWindow(options).ShowDialog<AddPlayerResult?>(this);
-        viewModel.MessagePrompt = (title, body) => MessageBox.ShowAsync(this, title, body);
-        viewModel.ChoicePrompt = (title, body) => MessageBox.ConfirmAsync(this, title, body);
         viewModel.DetailsRequested += key => _ = ShowDetailsAsync(key);
         Closed += (_, _) => viewModel.Dispose();
     }

@@ -7,95 +7,85 @@ using ValheimServerGUI.Game;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// One Manage Players tab (My Accounts / Friends / Banned): the accounts on that list with their default role,
-/// the selected account's Known Characters (not on Banned), and the list's commands. All state changes route
-/// through the owning <see cref="ManagePlayersViewModel"/>, which holds the staged defaults and dirty flag.
+/// One Manage Players tab: <b>Player Accounts</b> (every known player whose default role is not Banned) or
+/// <b>Banned</b> (default role Banned). Holds the rows, the selection, the selected account's Known Characters
+/// (Player Accounts only), and the row commands. All state changes route through the owning
+/// <see cref="ManagePlayersViewModel"/>, which holds the staged data and the dirty flag.
 /// </summary>
 public partial class PlayerListSectionViewModel : ObservableObject
 {
     private readonly ManagePlayersViewModel _owner;
 
-    internal PlayerListSectionViewModel(
-        ManagePlayersViewModel owner, PlayerCategory category, string? caption, string header,
-        KnownCharactersViewModel? knownCharacters)
+    internal PlayerListSectionViewModel(ManagePlayersViewModel owner, bool isBanned, KnownCharactersViewModel? knownCharacters)
     {
         _owner = owner;
-        Category = category;
-        Caption = caption;
-        Header = header;
+        IsBanned = isBanned;
         KnownCharacters = knownCharacters;
         Accounts.CollectionChanged += (_, _) => OnPropertyChanged(nameof(AccountsEmptyText));
     }
 
-    public PlayerCategory Category { get; }
-
-    /// <summary>Explanatory text above the table (null = none).</summary>
-    public string? Caption { get; }
-
-    /// <summary>The table's header label.</summary>
-    public string Header { get; }
+    /// <summary>True for the Banned tab (rows whose default role is Banned).</summary>
+    public bool IsBanned { get; }
 
     public ObservableCollection<PlayerRowViewModel> Accounts { get; } = new();
 
     /// <summary>The accounts table's empty-state hint, or null when it has rows.</summary>
     public string? AccountsEmptyText => Accounts.Count == 0 ? ManagePlayersViewModel.NoAccountsText : null;
 
-    /// <summary>The selected account's known characters; null on the Banned list.</summary>
+    /// <summary>The selected account's known characters; null on the Banned tab.</summary>
     public KnownCharactersViewModel? KnownCharacters { get; }
 
     public bool HasKnownCharacters => KnownCharacters is not null;
 
-    /// <summary>Default-role verbs apply to My Accounts and Friends; a Banned entry is always Banned.</summary>
-    public bool HasRoleCommands => Category != PlayerCategory.Banned;
-
     [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(AdminToggleLabel), nameof(PermitToggleLabel))]
-    [NotifyCanExecuteChangedFor(nameof(RemoveCommand), nameof(ViewDetailsCommand),
-        nameof(ToggleAdminCommand), nameof(TogglePermitCommand))]
+    [NotifyPropertyChangedFor(nameof(DefaultIsAdmin), nameof(DefaultIsPermitted), nameof(DefaultIsBanned),
+        nameof(DefaultIsNone), nameof(HasSelection))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveCommand), nameof(ViewDetailsCommand))]
     private PlayerRowViewModel? _selectedAccount;
 
-    // Labels follow the selected account's default role (derived, never mirrored).
-    public string AdminToggleLabel => SelectedAccount?.DisplayRole == PlayerRole.Admin ? "Remove admin" : "Make admin";
-    public string PermitToggleLabel =>
-        SelectedAccount?.DisplayRole == PlayerRole.Permitted ? "Revoke join permission" : "Add to permitted";
+    public bool HasSelection => SelectedAccount is not null;
 
-    private bool HasSelection => SelectedAccount is not null;
-    private bool CanEditRole => HasSelection && HasRoleCommands;
+    /// <summary>Forgetting a player needs them Offline (same rule as the Players tab).</summary>
+    private bool CanRemove => SelectedAccount is { IsOffline: true };
+
+    // "Set default role" radio items: each reads the selected row's default role and, when checked, sets it.
+    // A radio group's uncheck-the-others `false` writes are ignored; the owner re-derives these after a change.
+    public bool DefaultIsAdmin { get => Is(PlayerRole.Admin); set => SetIfChecked(value, PlayerRole.Admin); }
+    public bool DefaultIsPermitted { get => Is(PlayerRole.Permitted); set => SetIfChecked(value, PlayerRole.Permitted); }
+    public bool DefaultIsBanned { get => Is(PlayerRole.Banned); set => SetIfChecked(value, PlayerRole.Banned); }
+    public bool DefaultIsNone { get => SelectedAccount is not null && SelectedAccount.DisplayRole is null; set => SetIfChecked(value, PlayerRole.None); }
+
+    private bool Is(PlayerRole role) => SelectedAccount?.DisplayRole == role;
+
+    private void SetIfChecked(bool value, PlayerRole role)
+    {
+        if (value && SelectedAccount is { } row) _owner.SetDefaultRole(row.Key, role);
+    }
 
     partial void OnSelectedAccountChanged(PlayerRowViewModel? value) => _owner.OnSelectionChanged(this);
 
-    /// <summary>Re-raises the role-derived labels after the selected row's role changed in place.</summary>
-    internal void RefreshRoleLabels()
+    /// <summary>Re-raises the role-derived menu state after the selected row's role changed in place.</summary>
+    internal void RefreshRoleFlags()
     {
-        OnPropertyChanged(nameof(AdminToggleLabel));
-        OnPropertyChanged(nameof(PermitToggleLabel));
+        OnPropertyChanged(nameof(DefaultIsAdmin));
+        OnPropertyChanged(nameof(DefaultIsPermitted));
+        OnPropertyChanged(nameof(DefaultIsBanned));
+        OnPropertyChanged(nameof(DefaultIsNone));
+        RemoveCommand.NotifyCanExecuteChanged();
     }
 
     [RelayCommand]
     private Task Add() => _owner.AddAsync(this);
 
-    [RelayCommand(CanExecute = nameof(HasSelection))]
+    [RelayCommand(CanExecute = nameof(CanRemove))]
     private void Remove()
     {
-        if (SelectedAccount is { } row) _owner.RemoveAccount(this, row.Key);
+        if (SelectedAccount is { } row) _owner.RemoveAccount(row.Key);
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
     private void ViewDetails()
     {
         if (SelectedAccount is { } row) _owner.RequestDetails(row.Key);
-    }
-
-    [RelayCommand(CanExecute = nameof(CanEditRole))]
-    private void ToggleAdmin() => ToggleRole(PlayerRole.Admin);
-
-    [RelayCommand(CanExecute = nameof(CanEditRole))]
-    private void TogglePermit() => ToggleRole(PlayerRole.Permitted);
-
-    // Positive verb sets the default role; the negative verb drops it to None (the account stays on the list).
-    private void ToggleRole(PlayerRole role)
-    {
-        if (SelectedAccount is not { } row) return;
-        _owner.SetDefaultRole(row.Key, row.DisplayRole == role ? PlayerRole.None : role);
     }
 }

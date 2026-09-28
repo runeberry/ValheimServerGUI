@@ -143,14 +143,14 @@ namespace ValheimServerGUI.Core.Tests.Game
 
         // ---- BuildImport with global defaults ----
 
-        private static Dictionary<string, PlayerDefaultEntry> Defaults(params (string key, PlayerCategory cat, PlayerRole role)[] entries)
-            => entries.ToDictionary(e => e.key, e => new PlayerDefaultEntry(e.cat, e.role, "Steam"));
+        private static Dictionary<string, PlayerDefaultEntry> Defaults(params (string key, PlayerRole role)[] entries)
+            => entries.ToDictionary(e => e.key, e => new PlayerDefaultEntry(e.role, "Steam"));
 
         [Fact]
         public void BuildImport_WithDefaults_FileMatchingTheDefault_NeedsNoOverride()
         {
             Seed("adminlist.txt", SteamA);
-            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.MyAccount, PlayerRole.Admin));
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Admin));
 
             var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
 
@@ -163,7 +163,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         public void BuildImport_WithDefaults_DefaultedPlayerAbsentFromFiles_GetsNonePin()
         {
             Seed("adminlist.txt", SteamB);
-            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.MyAccount, PlayerRole.Admin));
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Admin));
 
             var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
 
@@ -176,7 +176,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         public void BuildImport_WithDefaults_FileDisagreeingWithDefault_BecomesOverride()
         {
             Seed("bannedlist.txt", SteamA);
-            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.Friend, PlayerRole.Permitted));
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Permitted));
 
             var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
 
@@ -243,8 +243,8 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             Seed("adminlist.txt", SteamA, SteamB);
             var defaults = Defaults(
-                ($"Steam:{SteamA}", PlayerCategory.MyAccount, PlayerRole.Admin),   // satisfied by default
-                ($"Steam:{SteamB}", PlayerCategory.Friend, PlayerRole.Permitted)); // default disagrees
+                ($"Steam:{SteamA}", PlayerRole.Admin),   // satisfied by default
+                ($"Steam:{SteamB}", PlayerRole.Permitted)); // default disagrees
 
             var report = _svc.CheckConflicts(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
 
@@ -256,7 +256,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         public void CheckConflicts_OverrideWinsOverDefault()
         {
             Seed("adminlist.txt", SteamA);
-            var defaults = Defaults(($"Steam:{SteamA}", PlayerCategory.Friend, PlayerRole.Permitted));
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Permitted));
             var current = Roles(($"Steam:{SteamA}", PlayerRole.Admin, "Steam"));
 
             var report = _svc.CheckConflicts(_savedir, current, currentFlag: false, defaults);

@@ -62,7 +62,7 @@ public class TabFontConsistencyTests
         Dispatcher.UIThread.RunJobs();
 
         var tabs = window.GetVisualDescendants().OfType<TabItem>().ToList();
-        Assert.Equal(3, tabs.Count);
+        Assert.Equal(2, tabs.Count);
         foreach (var tab in tabs)
         {
             Assert.Equal(12, tab.FontSize);

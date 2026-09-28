@@ -15,28 +15,18 @@ public class ManagePlayersViewModelTests
     private readonly FakeUserPreferencesProvider _prefs = new();
     private readonly FakePlayerDataRepository _repo = new();
     private readonly FakeRuneberryApiClient _api = new();
-
     private readonly List<AddPlayerOptions> _offered = new();
-    private readonly List<(string Title, string Body)> _messages = new();
-    private readonly List<(string Title, string Body)> _questions = new();
-    private bool _answerYes = true;
 
-    private ManagePlayersViewModel NewVm(params (string key, PlayerCategory category, PlayerRole role)[] defaults)
+    private ManagePlayersViewModel NewVm(params (string key, PlayerRole role)[] defaults)
     {
         if (defaults.Length > 0)
         {
             var prefs = new UserPreferences();
-            foreach (var (key, category, role) in defaults)
-                prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, "Steam");
+            foreach (var (key, role) in defaults)
+                prefs.PlayerDefaults[key] = new PlayerDefaultEntry(role, "Steam");
             _prefs.SavePreferences(prefs);
         }
-
-        var vm = new ManagePlayersViewModel(_prefs, _repo, _api)
-        {
-            MessagePrompt = (title, body) => { _messages.Add((title, body)); return Task.CompletedTask; },
-            ChoicePrompt = (title, body) => { _questions.Add((title, body)); return Task.FromResult(_answerYes); },
-        };
-        return vm;
+        return new ManagePlayersViewModel(_prefs, _repo, _api);
     }
 
     // Makes the next Add Player dialog return the given result, recording the options it was opened with.
@@ -44,260 +34,176 @@ public class ManagePlayersViewModelTests
         => vm.AddPlayerPrompt = options =>
         {
             _offered.Add(options);
-            return Task.FromResult<AddPlayerResult?>(new AddPlayerResult(PlayerPlatforms.Steam, id, name, role));
+            return Task.FromResult<AddPlayerResult?>(new AddPlayerResult(PlayerPlatforms.Steam, id, name, role, true));
         };
 
-    private static PlayerInfo Player(string id, string? name = null) => new()
+    private static PlayerInfo Player(string id, string? name = null, PlayerStatus status = PlayerStatus.Offline) => new()
     {
-        Platform = "Steam", PlatformRaw = "Steam", PlayerId = id, PlayerName = name,
+        Platform = "Steam", PlatformRaw = "Steam", PlayerId = id, PlayerName = name, PlayerStatus = status,
     };
 
-    // ---- loading + add ----
+    private static string[] Keys(PlayerListSectionViewModel section) => section.Accounts.Select(r => r.Key).ToArray();
+
+    // ---- data source ----
 
     [AvaloniaFact]
-    public void Loads_each_list_from_the_saved_defaults()
+    public void Player_accounts_lists_every_known_player_except_default_banned()
     {
-        _repo.PushUpdate(Player("1", "Me"));
-        var vm = NewVm(
-            ("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin),
-            ("Steam:2", PlayerCategory.Friend, PlayerRole.Permitted),
-            ("Steam:3", PlayerCategory.Banned, PlayerRole.Banned));
+        _repo.PushUpdate(Player("1", "Nuffle"));  // no default role — still a known account
+        _repo.PushUpdate(Player("2", "Mochi"));
+        _repo.PushUpdate(Player("3", "Loki"));
+        var vm = NewVm(("Steam:2", PlayerRole.Admin), ("Steam:3", PlayerRole.Banned));
 
-        var mine = Assert.Single(vm.MyAccounts.Accounts);
-        Assert.Equal("Me", mine.DisplayName);
-        Assert.Equal("Admin", mine.RoleText);
-        Assert.Equal("[…2]", Assert.Single(vm.Friends.Accounts).DisplayName); // no cached record → fallback
-        Assert.Single(vm.Banned.Accounts);
+        Assert.Equal(new[] { "Steam:2", "Steam:1" }, Keys(vm.PlayerAccounts)); // sorted by name
+        Assert.Equal(new[] { "Steam:3" }, Keys(vm.Banned));
+        Assert.Null(vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:1").RoleText);
+        Assert.Equal("Admin", vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:2").RoleText);
         Assert.False(vm.IsDirty);
     }
+
+    [AvaloniaFact]
+    public void A_default_without_a_cached_record_still_shows()
+    {
+        var vm = NewVm(("Steam:9", PlayerRole.Banned));
+
+        var row = Assert.Single(vm.Banned.Accounts);
+        Assert.False(row.HasAccountName);
+        Assert.Equal("9", row.PlatformId);
+    }
+
+    [AvaloniaFact]
+    public void Players_joining_while_open_appear()
+    {
+        var vm = NewVm();
+        Assert.Empty(vm.PlayerAccounts.Accounts);
+
+        _repo.PushUpdate(Player("1", "Nuffle", PlayerStatus.Online));
+
+        Assert.Equal(new[] { "Steam:1" }, Keys(vm.PlayerAccounts));
+    }
+
+    // ---- add ----
 
     [AvaloniaFact]
     public async Task Each_tab_opens_Add_Player_with_its_preset()
     {
         var vm = NewVm();
 
-        NextAdd(vm, "1", PlayerRole.Admin);
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
-        NextAdd(vm, "2", PlayerRole.Permitted);
-        await vm.Friends.AddCommand.ExecuteAsync(null);
-        NextAdd(vm, "3", PlayerRole.Banned);
+        NextAdd(vm, "1", PlayerRole.Permitted);
+        await vm.PlayerAccounts.AddCommand.ExecuteAsync(null);
+        NextAdd(vm, "2", PlayerRole.Banned);
         await vm.Banned.AddCommand.ExecuteAsync(null);
 
-        Assert.Equal(new[] { AddPlayerOptions.ForMyAccounts, AddPlayerOptions.ForFriends, AddPlayerOptions.ForBanned }, _offered);
+        Assert.Equal(new[] { AddPlayerOptions.ForPlayerAccounts, AddPlayerOptions.ForBanned }, _offered);
     }
 
     [AvaloniaFact]
-    public async Task Add_creates_a_selected_row_marks_dirty_and_writes_nothing_until_save()
+    public async Task Add_lands_by_role_selects_the_row_and_writes_nothing_until_save()
     {
         var vm = NewVm();
-        NextAdd(vm, "1", PlayerRole.Admin, name: "Odin");
 
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
+        NextAdd(vm, "1", PlayerRole.None, name: "Odin");
+        await vm.PlayerAccounts.AddCommand.ExecuteAsync(null);
+        NextAdd(vm, "2", PlayerRole.Banned, name: "Loki");
+        await vm.PlayerAccounts.AddCommand.ExecuteAsync(null); // Banned from the accounts tab → Banned tab
 
-        var row = Assert.Single(vm.MyAccounts.Accounts);
-        Assert.Same(row, vm.MyAccounts.SelectedAccount);
-        Assert.Equal("Odin", row.DisplayName);
+        Assert.Equal(new[] { "Steam:1" }, Keys(vm.PlayerAccounts));
+        Assert.Equal(new[] { "Steam:2" }, Keys(vm.Banned));
+        Assert.Equal("Steam:2", vm.Banned.SelectedAccount?.Key);
         Assert.True(vm.IsDirty);
-        Assert.Empty(_repo.Data);                                 // staged, not written
-        Assert.Empty(_prefs.LoadPreferences().PlayerDefaults);    // staged, not written
+        Assert.Empty(_repo.Data);
+        Assert.Empty(_prefs.LoadPreferences().PlayerDefaults);
     }
 
     [AvaloniaFact]
-    public async Task Banned_add_always_stores_the_Banned_role()
-    {
-        var vm = NewVm();
-        NextAdd(vm, "1", PlayerRole.Admin); // whatever the dialog says
-
-        await vm.Banned.AddCommand.ExecuteAsync(null);
-        vm.Save();
-
-        Assert.Equal(PlayerRole.Banned, _prefs.LoadPreferences().PlayerDefaults["Steam:1"].DefaultRole);
-    }
-
-    [AvaloniaFact]
-    public async Task Re_adding_to_the_same_list_updates_role_and_name_and_selects_it()
+    public async Task Re_adding_an_existing_player_updates_role_and_name()
     {
         _repo.PushUpdate(Player("1", "Old"));
-        var vm = NewVm(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
+        var vm = NewVm(("Steam:1", PlayerRole.Banned));
         NextAdd(vm, "1", PlayerRole.Admin, name: "New");
 
-        await vm.Friends.AddCommand.ExecuteAsync(null);
-
-        var row = Assert.Single(vm.Friends.Accounts);
-        Assert.Same(row, vm.Friends.SelectedAccount);
-        Assert.Equal("Admin", row.RoleText);
-        Assert.Equal("New", row.DisplayName);
-        Assert.Empty(_messages);
-        Assert.Empty(_questions);
-    }
-
-    [AvaloniaFact]
-    public async Task Empty_lists_show_the_add_hint_until_an_account_exists()
-    {
-        var vm = NewVm();
-        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.MyAccounts.AccountsEmptyText);
-        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.Banned.AccountsEmptyText);
-
-        NextAdd(vm, "1", PlayerRole.Admin);
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
-
-        Assert.Null(vm.MyAccounts.AccountsEmptyText);
-    }
-
-    [AvaloniaFact]
-    public void Rows_show_the_account_name_alone_and_the_platform_id()
-    {
-        var named = Player("76561198000001111", "Odin");
-        named.LastStatusCharacter = "Ragnar";
-        _repo.PushUpdate(named);
-        var vm = NewVm(
-            ("Steam:76561198000001111", PlayerCategory.Friend, PlayerRole.Permitted),
-            ("Steam:76561198000002222", PlayerCategory.Friend, PlayerRole.Permitted));
-
-        var odin = vm.Friends.Accounts.First(r => r.PlatformId == "76561198000001111");
-        Assert.Equal("Odin", odin.AccountName); // no "(Ragnar)" — characters live in their own table
-        var unknown = vm.Friends.Accounts.First(r => r.PlatformId == "76561198000002222");
-        Assert.False(unknown.HasAccountName);  // renders "(name unknown)"
-    }
-
-    // ---- cross-list validation ----
-
-    [AvaloniaFact]
-    public async Task Adding_your_own_account_to_Friends_is_refused()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
-        NextAdd(vm, "1", PlayerRole.Permitted, name: "Me");
-
-        await vm.Friends.AddCommand.ExecuteAsync(null);
-
-        Assert.Equal(("Add Player", "Player Me is already set as your own account. You cannot add yourself to the Friends list."),
-            Assert.Single(_messages));
-        Assert.Empty(vm.Friends.Accounts);
-        Assert.Single(vm.MyAccounts.Accounts);
-        Assert.False(vm.IsDirty);
-    }
-
-    [AvaloniaFact]
-    public async Task Adding_your_own_account_to_Banned_is_refused()
-    {
-        _repo.PushUpdate(Player("1", "Me"));
-        var vm = NewVm(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
-        NextAdd(vm, "1", PlayerRole.Banned);
-
         await vm.Banned.AddCommand.ExecuteAsync(null);
 
-        // With no name entered, the cached name is used.
-        Assert.Equal("Player Me is already set as your own account. You cannot add yourself to the Banned list.",
-            Assert.Single(_messages).Body);
         Assert.Empty(vm.Banned.Accounts);
+        var row = Assert.Single(vm.PlayerAccounts.Accounts);
+        Assert.Equal("New", row.AccountName);
+        Assert.Equal("Admin", row.RoleText);
     }
 
-    [AvaloniaFact]
-    public async Task Claiming_a_friend_as_your_account_moves_them_on_Yes()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
-        NextAdd(vm, "1", PlayerRole.Admin);
-
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
-
-        Assert.Equal(("Add Player", "Player […1] is already on the Friends list. Claim this as your account instead?"),
-            Assert.Single(_questions));
-        Assert.Empty(vm.Friends.Accounts);
-        Assert.Equal("Admin", Assert.Single(vm.MyAccounts.Accounts).RoleText); // moved with the dialog's role
-    }
+    // ---- set default role ----
 
     [AvaloniaFact]
-    public async Task Claiming_a_banned_player_as_your_account_is_left_alone_on_No()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.Banned, PlayerRole.Banned));
-        _answerYes = false;
-        NextAdd(vm, "1", PlayerRole.Admin, name: "Loki");
-
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
-
-        Assert.Equal("Player Loki is already on the Banned list. Claim this as your account instead?",
-            Assert.Single(_questions).Body);
-        Assert.Single(vm.Banned.Accounts);
-        Assert.Empty(vm.MyAccounts.Accounts);
-        Assert.False(vm.IsDirty);
-    }
-
-    [AvaloniaFact]
-    public async Task Banning_a_friend_moves_them_on_Yes_with_the_Banned_role()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.Friend, PlayerRole.Admin));
-        NextAdd(vm, "1", PlayerRole.Banned, name: "Loki");
-
-        await vm.Banned.AddCommand.ExecuteAsync(null);
-        vm.Save();
-
-        Assert.Equal("Player Loki is already on the Friends list. Move them to the Banned list instead?",
-            Assert.Single(_questions).Body);
-        Assert.Empty(vm.Friends.Accounts);
-        var entry = _prefs.LoadPreferences().PlayerDefaults["Steam:1"];
-        Assert.Equal(new PlayerDefaultEntry(PlayerCategory.Banned, PlayerRole.Banned, "Steam"), entry);
-    }
-
-    [AvaloniaFact]
-    public async Task Befriending_a_banned_player_is_left_alone_on_No()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.Banned, PlayerRole.Banned));
-        _answerYes = false;
-        NextAdd(vm, "1", PlayerRole.Permitted, name: "Loki");
-
-        await vm.Friends.AddCommand.ExecuteAsync(null);
-
-        Assert.Equal("Player Loki is already on the Banned list. Move them to the Friends list instead?",
-            Assert.Single(_questions).Body);
-        Assert.Single(vm.Banned.Accounts);
-        Assert.Empty(vm.Friends.Accounts);
-    }
-
-    // ---- editing ----
-
-    [AvaloniaFact]
-    public void Role_verbs_set_and_clear_the_default_role()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
-        vm.Friends.SelectedAccount = vm.Friends.Accounts[0];
-        Assert.Equal("Revoke join permission", vm.Friends.PermitToggleLabel);
-        Assert.False(vm.IsDirty); // selection is view state
-
-        vm.Friends.ToggleAdminCommand.Execute(null);
-        Assert.Equal("Admin", vm.Friends.Accounts[0].RoleText);
-        Assert.Equal("Remove admin", vm.Friends.AdminToggleLabel);
-        Assert.True(vm.IsDirty);
-
-        vm.Friends.ToggleAdminCommand.Execute(null);
-        vm.Save();
-        Assert.Equal(PlayerRole.None, _prefs.LoadPreferences().PlayerDefaults["Steam:1"].DefaultRole);
-    }
-
-    [AvaloniaFact]
-    public void Banned_list_has_no_role_verbs_or_known_characters()
-    {
-        var vm = NewVm(("Steam:1", PlayerCategory.Banned, PlayerRole.Banned));
-        vm.Banned.SelectedAccount = vm.Banned.Accounts[0];
-
-        Assert.False(vm.Banned.HasRoleCommands);
-        Assert.False(vm.Banned.ToggleAdminCommand.CanExecute(null));
-        Assert.Null(vm.Banned.KnownCharacters);
-    }
-
-    [AvaloniaFact]
-    public void Remove_drops_list_membership_but_keeps_the_player_record()
+    public void Set_default_role_updates_in_place_and_None_clears_it()
     {
         _repo.PushUpdate(Player("1", "Odin"));
-        var vm = NewVm(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
-        vm.Friends.SelectedAccount = vm.Friends.Accounts[0];
+        var vm = NewVm();
+        var section = vm.PlayerAccounts;
+        section.SelectedAccount = section.Accounts[0];
+        Assert.True(section.DefaultIsNone);
 
-        vm.Friends.RemoveCommand.Execute(null);
+        section.DefaultIsAdmin = true;
+        Assert.True(section.DefaultIsAdmin);
+        Assert.Equal("Admin", section.Accounts[0].RoleText);
+        Assert.Same(section.Accounts[0], section.SelectedAccount);
+
+        section.DefaultIsPermitted = false; // a radio group's uncheck write is ignored
+        Assert.True(section.DefaultIsAdmin);
+
+        section.DefaultIsNone = true;
         vm.Save();
-
-        Assert.Empty(vm.Friends.Accounts);
         Assert.Empty(_prefs.LoadPreferences().PlayerDefaults);
-        Assert.NotNull(_repo.FindById("Steam:1"));
     }
+
+    [AvaloniaFact]
+    public void Setting_Banned_moves_the_player_to_the_Banned_tab_and_back()
+    {
+        _repo.PushUpdate(Player("1", "Loki"));
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+
+        vm.PlayerAccounts.DefaultIsBanned = true;
+
+        Assert.Empty(vm.PlayerAccounts.Accounts);
+        Assert.Equal(new[] { "Steam:1" }, Keys(vm.Banned));
+
+        vm.Banned.SelectedAccount = vm.Banned.Accounts[0];
+        Assert.True(vm.Banned.DefaultIsBanned);
+        vm.Banned.DefaultIsPermitted = true;
+
+        Assert.Empty(vm.Banned.Accounts);
+        Assert.Equal("Permitted", Assert.Single(vm.PlayerAccounts.Accounts).RoleText);
+    }
+
+    // ---- remove ----
+
+    [AvaloniaFact]
+    public void Remove_forgets_the_player_and_their_default_on_save()
+    {
+        _repo.PushUpdate(Player("1", "Loki"));
+        var vm = NewVm(("Steam:1", PlayerRole.Banned));
+        vm.Banned.SelectedAccount = vm.Banned.Accounts[0];
+
+        vm.Banned.RemoveCommand.Execute(null);
+
+        Assert.Empty(vm.Banned.Accounts);
+        Assert.NotNull(_repo.FindById("Steam:1")); // staged
+
+        vm.Save();
+        Assert.Null(_repo.FindById("Steam:1"));
+        Assert.Empty(_prefs.LoadPreferences().PlayerDefaults);
+    }
+
+    [AvaloniaFact]
+    public void Remove_needs_the_player_offline()
+    {
+        _repo.PushUpdate(Player("1", "Nuffle", PlayerStatus.Online));
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+
+        Assert.False(vm.PlayerAccounts.RemoveCommand.CanExecute(null));
+    }
+
+    // ---- known characters ----
 
     [AvaloniaFact]
     public void Known_characters_follow_the_selection_with_empty_states()
@@ -305,36 +211,31 @@ public class ManagePlayersViewModelTests
         var withChars = Player("1", "Odin");
         withChars.Characters = new() { new() { CharacterName = "Ragnar", MatchConfident = true } };
         _repo.PushUpdate(withChars);
-        var vm = NewVm(
-            ("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted),
-            ("Steam:2", PlayerCategory.Friend, PlayerRole.Permitted));
-        var kc = vm.Friends.KnownCharacters!;
+        _repo.PushUpdate(Player("2", "Thor"));
+        var vm = NewVm();
+        var kc = vm.PlayerAccounts.KnownCharacters!;
 
         Assert.Equal("Select an account to see known characters.", kc.EmptyText);
 
-        vm.Friends.SelectedAccount = vm.Friends.Accounts.First(r => r.Key == "Steam:1");
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:1");
         Assert.Equal("Ragnar", Assert.Single(kc.Characters).CharacterName);
-        Assert.Null(kc.EmptyText);
 
-        vm.Friends.SelectedAccount = vm.Friends.Accounts.First(r => r.Key == "Steam:2");
-        Assert.Empty(kc.Characters);
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:2");
         Assert.Equal("No known characters for this account.", kc.EmptyText);
         Assert.False(vm.IsDirty);
+        Assert.Null(vm.Banned.KnownCharacters);
     }
 
     [AvaloniaFact]
     public void Character_edits_are_staged_then_merged_onto_the_live_record_on_save()
     {
-        var live = Player("1", "Odin");
-        live.PlayerStatus = PlayerStatus.Online;
-        _repo.PushUpdate(live);
-        var vm = NewVm(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin));
-        vm.MyAccounts.SelectedAccount = vm.MyAccounts.Accounts[0];
+        _repo.PushUpdate(Player("1", "Odin", PlayerStatus.Online));
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
 
-        vm.MyAccounts.KnownCharacters!.AddCharacter("Ragnar");
-
+        vm.PlayerAccounts.KnownCharacters!.AddCharacter("Ragnar");
         Assert.True(vm.IsDirty);
-        Assert.Null(_repo.FindById("Steam:1")!.Characters); // not written yet
+        Assert.Null(_repo.FindById("Steam:1")!.Characters);
 
         vm.Save();
 
@@ -344,60 +245,45 @@ public class ManagePlayersViewModelTests
     }
 
     [AvaloniaFact]
-    public void Characters_added_to_an_account_with_no_cached_record_create_it_on_save()
-    {
-        var vm = NewVm(("Steam:9", PlayerCategory.Friend, PlayerRole.Permitted)); // listed, never joined
-        vm.Friends.SelectedAccount = vm.Friends.Accounts[0];
-
-        vm.Friends.KnownCharacters!.AddCharacter("Ragnar");
-        vm.Save();
-
-        Assert.Contains(_repo.FindById("Steam:9")!.Characters!, c => c.CharacterName == "Ragnar");
-    }
-
-    [AvaloniaFact]
     public void Player_details_opened_from_here_edits_the_staged_record()
     {
         _repo.PushUpdate(Player("1", "Odin"));
-        var vm = NewVm(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted));
+        var vm = NewVm();
         string? requested = null;
         vm.DetailsRequested += key => requested = key;
-        vm.Friends.SelectedAccount = vm.Friends.Accounts[0];
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
 
-        vm.Friends.ViewDetailsCommand.Execute(null);
+        vm.PlayerAccounts.ViewDetailsCommand.Execute(null);
         Assert.Equal("Steam:1", requested);
 
-        // What the window does: Player Details over the dialog's staged records, then report the save back.
         var details = new PlayerDetailsViewModel(_repo, "Steam:1", store: vm.Records) { DisplayName = "Allfather" };
         details.Save();
         vm.OnDetailsSaved("Steam:1");
 
-        Assert.Equal("Allfather", vm.Friends.Accounts[0].DisplayName);
-        Assert.True(vm.IsDirty);
+        Assert.Equal("Allfather", vm.PlayerAccounts.Accounts[0].AccountName);
         Assert.Equal("Odin", _repo.FindById("Steam:1")!.PlayerName); // outer Save still authoritative
 
         vm.Save();
         Assert.Equal("Allfather", _repo.FindById("Steam:1")!.PlayerName);
     }
 
-    // ---- save / cancel ----
+    // ---- save / cancel / copy ----
 
     [AvaloniaFact]
     public async Task Save_writes_defaults_and_new_records_and_looks_up_unnamed_players()
     {
         var vm = NewVm();
-        NextAdd(vm, "1", PlayerRole.Admin);                 // no name → lookup
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
-        NextAdd(vm, "2", PlayerRole.Permitted, name: "Thor"); // named → no lookup
-        await vm.Friends.AddCommand.ExecuteAsync(null);
+        NextAdd(vm, "1", PlayerRole.Admin);                  // no name → lookup
+        await vm.PlayerAccounts.AddCommand.ExecuteAsync(null);
+        NextAdd(vm, "2", PlayerRole.Banned, name: "Loki");   // named → no lookup
+        await vm.Banned.AddCommand.ExecuteAsync(null);
 
         vm.Save();
 
         var defaults = _prefs.LoadPreferences().PlayerDefaults;
-        Assert.Equal(new PlayerDefaultEntry(PlayerCategory.MyAccount, PlayerRole.Admin, "Steam"), defaults["Steam:1"]);
-        Assert.Equal(new PlayerDefaultEntry(PlayerCategory.Friend, PlayerRole.Permitted, "Steam"), defaults["Steam:2"]);
-        Assert.NotNull(_repo.FindById("Steam:1"));
-        Assert.Equal("Thor", _repo.FindById("Steam:2")!.PlayerName);
+        Assert.Equal(new PlayerDefaultEntry(PlayerRole.Admin, "Steam"), defaults["Steam:1"]);
+        Assert.Equal(new PlayerDefaultEntry(PlayerRole.Banned, "Steam"), defaults["Steam:2"]);
+        Assert.Equal("Loki", _repo.FindById("Steam:2")!.PlayerName);
         Assert.Equal(1, _api.RequestPlayerInfoCallCount);
     }
 
@@ -408,31 +294,26 @@ public class ManagePlayersViewModelTests
         var savesBefore = _prefs.SaveCount;
         NextAdd(vm, "1", PlayerRole.Admin, name: "Odin");
 
-        await vm.MyAccounts.AddCommand.ExecuteAsync(null);
+        await vm.PlayerAccounts.AddCommand.ExecuteAsync(null);
         vm.Dispose(); // the window closes without Save
 
         Assert.Equal(savesBefore, _prefs.SaveCount);
         Assert.Empty(_repo.Data);
     }
 
-    // ---- exact copy ----
+    [AvaloniaFact]
+    public void Empty_tabs_show_the_add_hint()
+    {
+        var vm = NewVm();
+        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.PlayerAccounts.AccountsEmptyText);
+        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.Banned.AccountsEmptyText);
+    }
 
     [Fact]
     public void Manage_players_copy_is_verbatim()
     {
-        Assert.Equal("Add Player", ManagePlayersViewModel.AddPlayerTitle);
-        Assert.Equal("Player {name} is already set as your own account. You cannot add yourself to the {list} list.",
-            ManagePlayersViewModel.SelfOnListMessage);
-        Assert.Equal("Player {name} is already on the {list} list. Claim this as your account instead?",
-            ManagePlayersViewModel.ClaimAccountMessage);
-        Assert.Equal("Player {name} is already on the {list} list. Move them to the {target} list instead?",
-            ManagePlayersViewModel.MoveListMessage);
-        Assert.Equal("Add your account here and set default permissions for any server you host.",
-            ManagePlayersViewModel.MyAccountsCaption);
-        Assert.Equal("Add your friends' accounts here and set default permissions for any server you host.",
-            ManagePlayersViewModel.FriendsCaption);
-        Assert.Equal("Select an account to see known characters.", ManagePlayersViewModel.NoAccountSelectedText);
         Assert.Equal("Add an account using the button below.", ManagePlayersViewModel.NoAccountsText);
+        Assert.Equal("Select an account to see known characters.", ManagePlayersViewModel.NoAccountSelectedText);
         Assert.Equal("No known characters for this account.", ManagePlayersViewModel.NoKnownCharactersText);
     }
 }

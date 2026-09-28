@@ -22,9 +22,23 @@
         <c:TextFormField LabelText="Player Name" MaxLength="64"
                          Value="{Binding PlayerName}" />
 
-        <c:DropdownFormField LabelText="Role" IsVisible="{Binding ShowRole}"
+        <!-- One role field shows at a time: the player's default role (Manage Players) or this server's role
+             (Players tab). Both edit the same SelectedRole. -->
+        <c:DropdownFormField LabelText="Default Role" IsVisible="{Binding ShowDefaultRole}"
+                             HelpText="{x:Static vm:AddPlayerViewModel.DefaultRoleHelp}"
                              ItemsSource="{Binding Roles}"
                              Value="{Binding SelectedRole}" />
+
+        <c:DropdownFormField LabelText="Server Role" IsVisible="{Binding ShowServerRole}"
+                             HelpText="{x:Static vm:AddPlayerViewModel.ServerRoleHelp}"
+                             ItemsSource="{Binding Roles}"
+                             Value="{Binding SelectedRole}" />
+
+        <c:CheckBoxFormField LabelText="Set as default role for this player"
+                             HelpText="{x:Static vm:AddPlayerViewModel.SetAsDefaultHelp}"
+                             IsVisible="{Binding ShowServerRole}"
+                             IsEnabled="{Binding CanSetAsDefault}"
+                             Value="{Binding SetAsDefault}" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
             <Button Content="Add Player" MinWidth="80" IsDefault="True" IsEnabled="{Binding CanSubmit}" Click="OnOk" />

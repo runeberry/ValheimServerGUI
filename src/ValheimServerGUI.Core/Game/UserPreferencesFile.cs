@@ -56,17 +56,14 @@ namespace ValheimServerGUI.Game
         [JsonProperty("worlds")]
         public List<WorldPreferencesFile>? Worlds { get; set; }
 
-        /// <summary>App-global player defaults keyed by <c>"{Platform}:{PlayerId}"</c>. Omitted when there are none.</summary>
+        /// <summary>App-global player default roles keyed by <c>"{Platform}:{PlayerId}"</c>. Omitted when there are none.</summary>
         [JsonProperty("playerDefaults", NullValueHandling = NullValueHandling.Ignore)]
         public Dictionary<string, PlayerDefaultFileEntry>? PlayerDefaults { get; set; }
     }
 
-    /// <summary>The persisted form of one player default: lowercase category + role tokens and an optional raw platform.</summary>
+    /// <summary>The persisted form of one player default: a lowercase role token and an optional raw platform.</summary>
     public class PlayerDefaultFileEntry
     {
-        [JsonProperty("category")]
-        public string? Category { get; set; }
-
         [JsonProperty("defaultRole")]
         public string? DefaultRole { get; set; }
 

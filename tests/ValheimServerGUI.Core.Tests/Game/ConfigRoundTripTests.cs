@@ -111,24 +111,21 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(PlayerRole.None, restored.PlayerRoles["Steam:1"].Role);
         }
 
-        // Global player defaults survive ToFile/FromFile with lowercase category + role tokens.
+        // Global player default roles survive ToFile/FromFile as lowercase role tokens.
         [Fact]
         public void UserPreferences_RoundTrip_PreservesPlayerDefaults()
         {
             var original = new UserPreferences();
-            original.PlayerDefaults["Steam:1"] = new PlayerDefaultEntry(PlayerCategory.MyAccount, PlayerRole.Admin, "Steam");
-            original.PlayerDefaults["Steam:2"] = new PlayerDefaultEntry(PlayerCategory.Friend, PlayerRole.None, null);
-            original.PlayerDefaults["Xbox:3"] = new PlayerDefaultEntry(PlayerCategory.Banned, PlayerRole.Banned, "Xbox");
+            original.PlayerDefaults["Steam:1"] = new PlayerDefaultEntry(PlayerRole.Admin, "Steam");
+            original.PlayerDefaults["Xbox:3"] = new PlayerDefaultEntry(PlayerRole.Banned, "Xbox");
 
             var file = original.ToFile();
-            Assert.Equal("myaccount", file.PlayerDefaults!["Steam:1"].Category);
-            Assert.Equal("admin", file.PlayerDefaults["Steam:1"].DefaultRole);
-            Assert.Equal("friend", file.PlayerDefaults["Steam:2"].Category);
+            Assert.Equal("admin", file.PlayerDefaults!["Steam:1"].DefaultRole);
+            Assert.Equal("banned", file.PlayerDefaults["Xbox:3"].DefaultRole);
 
             var restored = UserPreferences.FromFile(file);
-            Assert.Equal(3, restored.PlayerDefaults.Count);
+            Assert.Equal(2, restored.PlayerDefaults.Count);
             Assert.Equal(original.PlayerDefaults["Steam:1"], restored.PlayerDefaults["Steam:1"]);
-            Assert.Equal(original.PlayerDefaults["Steam:2"], restored.PlayerDefaults["Steam:2"]);
             Assert.Equal(original.PlayerDefaults["Xbox:3"], restored.PlayerDefaults["Xbox:3"]);
         }
 
@@ -143,27 +140,40 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.DoesNotContain("playerDefaults", json);
         }
 
-        // A Banned-list entry always carries the Banned role, whatever the file (or caller) says.
+        // "No default" is the absence of an entry: None and unknown role tokens are dropped on load and save.
         [Fact]
-        public void UserPreferences_BannedCategory_IsNormalizedToBannedRole()
+        public void UserPreferences_NoneOrUnknownDefaults_AreNotStored()
         {
             var file = new UserPreferencesFile
             {
                 PlayerDefaults = new()
                 {
-                    ["Steam:1"] = new PlayerDefaultFileEntry { Category = "banned", DefaultRole = "admin" },
-                    ["Steam:2"] = new PlayerDefaultFileEntry { Category = "mystery", DefaultRole = "admin" },
+                    ["Steam:1"] = new PlayerDefaultFileEntry { DefaultRole = "none" },
+                    ["Steam:2"] = new PlayerDefaultFileEntry { DefaultRole = "mystery" },
+                    ["Steam:3"] = new PlayerDefaultFileEntry { DefaultRole = "permitted" },
                 },
             };
 
             var restored = UserPreferences.FromFile(file);
+            Assert.Equal(new[] { "Steam:3" }, restored.PlayerDefaults.Keys);
+
+            restored.PlayerDefaults["Steam:4"] = new PlayerDefaultEntry(PlayerRole.None, null);
+            Assert.False(restored.ToFile().PlayerDefaults!.ContainsKey("Steam:4"));
+        }
+
+        // Files written by the earlier My Accounts/Friends/Banned build still load: the old "category" key is
+        // ignored and Banned entries already carried defaultRole "banned".
+        [Fact]
+        public void UserPreferences_LegacyCategoryKey_IsIgnored()
+        {
+            var json = "{ \"playerDefaults\": { " +
+                "\"Steam:1\": { \"category\": \"banned\", \"defaultRole\": \"banned\" }, " +
+                "\"Steam:2\": { \"category\": \"friend\", \"defaultRole\": \"permitted\" } } }";
+
+            var restored = UserPreferences.FromFile(Newtonsoft.Json.JsonConvert.DeserializeObject<UserPreferencesFile>(json));
 
             Assert.Equal(PlayerRole.Banned, restored.PlayerDefaults["Steam:1"].DefaultRole);
-            Assert.False(restored.PlayerDefaults.ContainsKey("Steam:2")); // unknown category dropped
-
-            var prefs = new UserPreferences();
-            prefs.PlayerDefaults["Steam:3"] = new PlayerDefaultEntry(PlayerCategory.Banned, PlayerRole.Permitted, null);
-            Assert.Equal("banned", prefs.ToFile().PlayerDefaults!["Steam:3"].DefaultRole);
+            Assert.Equal(PlayerRole.Permitted, restored.PlayerDefaults["Steam:2"].DefaultRole);
         }
 
         // E38 / E39: ToFile drops blank-named profiles and de-dups by profile name.

@@ -30,8 +30,8 @@ public sealed class RepoPlayerRecordStore : IPlayerRecordStore
 
 /// <summary>
 /// A staged view over the live player cache for a dialog with its own Save/Cancel (Manage Players). Reads fall
-/// through to the repo as <b>clones</b>, so an editor mutating a record never touches the live cache; writes are
-/// held here until <see cref="CommitTo"/>. Only the user-editable fields (name + known characters) are merged
+/// through to the repo as <b>clones</b>, so an editor mutating a record never touches the live cache; writes and
+/// removals are held here until <see cref="CommitTo"/>. Only the user-editable fields (name + known characters) are merged
 /// onto the live record at commit, so live status and characters recorded meanwhile are not overwritten
 /// wholesale by a stale snapshot.
 /// </summary>
@@ -39,13 +39,34 @@ public sealed class StagedPlayerRecords : IPlayerRecordStore
 {
     private readonly IPlayerDataRepository _repo;
     private readonly Dictionary<string, PlayerInfo> _staged = new();
+    private readonly HashSet<string> _removed = new();
 
     public StagedPlayerRecords(IPlayerDataRepository repo) => _repo = repo;
 
     public PlayerInfo? FindById(string key)
-        => _staged.TryGetValue(key, out var staged) ? staged : Clone(_repo.FindById(key));
+    {
+        if (_removed.Contains(key)) return null;
+        return _staged.TryGetValue(key, out var staged) ? staged : Clone(_repo.FindById(key));
+    }
 
-    public void Upsert(PlayerInfo player) => _staged[player.Key] = player;
+    public void Upsert(PlayerInfo player)
+    {
+        _removed.Remove(player.Key);
+        _staged[player.Key] = player;
+    }
+
+    /// <summary>Stages forgetting a player (the record is deleted from the repo at commit).</summary>
+    public void Remove(string key)
+    {
+        _staged.Remove(key);
+        _removed.Add(key);
+    }
+
+    /// <summary>Every known player's key: the live cache plus staged additions, minus staged removals.</summary>
+    public IEnumerable<string> KnownKeys => _repo.Data.Select(p => p.Key)
+        .Concat(_staged.Keys)
+        .Distinct()
+        .Where(k => !_removed.Contains(k));
 
     /// <summary>
     /// The record to show for a key: the live record (current status) with any staged name/characters laid
@@ -53,6 +74,7 @@ public sealed class StagedPlayerRecords : IPlayerRecordStore
     /// </summary>
     public PlayerInfo? FindForDisplay(string key)
     {
+        if (_removed.Contains(key)) return null;
         var live = _repo.FindById(key);
         if (!_staged.TryGetValue(key, out var staged)) return live;
         if (live is null) return staged;
@@ -64,11 +86,14 @@ public sealed class StagedPlayerRecords : IPlayerRecordStore
     }
 
     /// <summary>
-    /// Writes every staged record to the repo: new records as-is, existing ones by merging the editable fields
-    /// onto the live record. Returns the records that were new to the repo.
+    /// Applies the staged removals, then writes every staged record to the repo: new records as-is, existing ones
+    /// by merging the editable fields onto the live record. Returns the records that were new to the repo.
     /// </summary>
     public IReadOnlyList<PlayerInfo> CommitTo(IPlayerDataRepository repo)
     {
+        foreach (var key in _removed) repo.Remove(key);
+        _removed.Clear();
+
         var created = new List<PlayerInfo>();
         foreach (var staged in _staged.Values)
         {

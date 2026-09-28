@@ -4,7 +4,7 @@ using ValheimServerGUI.App.ViewModels.Dialogs;
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>
-/// Add Player prompt (platform + ID, optional name, and a role from the caller's <see cref="AddPlayerOptions"/>).
+/// Add Player prompt (platform + ID, optional name, and a default or server role per <see cref="AddPlayerOptions"/>).
 /// Closes with an <see cref="AddPlayerResult"/> on Add Player, or null on Cancel.
 /// </summary>
 public partial class AddPlayerWindow : DialogWindow
@@ -13,7 +13,7 @@ public partial class AddPlayerWindow : DialogWindow
     public AddPlayerWindow()
     {
         InitializeComponent();
-        DataContext = new AddPlayerViewModel(AddPlayerOptions.ForServer);
+        DataContext = new AddPlayerViewModel(AddPlayerOptions.ForPlayerAccounts);
     }
 
     public AddPlayerWindow(AddPlayerOptions options) : this()

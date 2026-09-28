@@ -19,11 +19,8 @@
 
     <StackPanel Margin="12" Spacing="12">
         <TabControl>
-            <TabItem Header="My Accounts">
-                <local:PlayerListSectionView DataContext="{Binding MyAccounts}" Height="420" />
-            </TabItem>
-            <TabItem Header="Friends">
-                <local:PlayerListSectionView DataContext="{Binding Friends}" Height="420" />
+            <TabItem Header="Player Accounts">
+                <local:PlayerListSectionView DataContext="{Binding PlayerAccounts}" Height="420" />
             </TabItem>
             <TabItem Header="Banned">
                 <local:PlayerListSectionView DataContext="{Binding Banned}" Height="420" />

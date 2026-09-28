@@ -11,15 +11,15 @@ namespace ValheimServerGUI.Core.Tests.Game
         private static Dictionary<string, PlayerRoleEntry> Overrides(params (string key, PlayerRole role)[] entries)
             => entries.ToDictionary(e => e.key, e => new PlayerRoleEntry(e.role, "Steam"));
 
-        private static Dictionary<string, PlayerDefaultEntry> Defaults(params (string key, PlayerCategory cat, PlayerRole role)[] entries)
-            => entries.ToDictionary(e => e.key, e => new PlayerDefaultEntry(e.cat, e.role, "Steam"));
+        private static Dictionary<string, PlayerDefaultEntry> Defaults(params (string key, PlayerRole role)[] entries)
+            => entries.ToDictionary(e => e.key, e => new PlayerDefaultEntry(e.role, "Steam"));
 
         [Fact]
         public void Override_wins_over_default()
         {
             var r = PlayerRoleResolver.Resolve("Steam:1",
                 Overrides(("Steam:1", PlayerRole.Banned)),
-                Defaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted)));
+                Defaults(("Steam:1", PlayerRole.Permitted)));
 
             Assert.Equal(PlayerRole.Banned, r.Effective);
             Assert.True(r.HasOverride);
@@ -30,7 +30,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         public void Default_applies_without_override()
         {
             var r = PlayerRoleResolver.Resolve("Steam:1", Overrides(),
-                Defaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin)));
+                Defaults(("Steam:1", PlayerRole.Admin)));
 
             Assert.Equal(PlayerRole.Admin, r.Effective);
             Assert.False(r.HasOverride);
@@ -52,7 +52,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             var r = PlayerRoleResolver.Resolve("Steam:1",
                 Overrides(("Steam:1", PlayerRole.None)),
-                Defaults(("Steam:1", PlayerCategory.MyAccount, PlayerRole.Admin)));
+                Defaults(("Steam:1", PlayerRole.Admin)));
 
             Assert.Equal(PlayerRole.None, r.Effective);
             Assert.True(r.ShowsOverrideMarker);
@@ -63,9 +63,9 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             var overrides = Overrides(("Steam:1", PlayerRole.Permitted));
             var before = PlayerRoleResolver.Resolve("Steam:1", overrides,
-                Defaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Permitted)));
+                Defaults(("Steam:1", PlayerRole.Permitted)));
             var after = PlayerRoleResolver.Resolve("Steam:1", overrides,
-                Defaults(("Steam:1", PlayerCategory.Friend, PlayerRole.Admin)));
+                Defaults(("Steam:1", PlayerRole.Admin)));
 
             Assert.Equal(PlayerRole.Permitted, before.Effective);
             Assert.Equal(PlayerRole.Permitted, after.Effective);
@@ -85,9 +85,9 @@ namespace ValheimServerGUI.Core.Tests.Game
             var assignments = PlayerRoleResolver.BuildAssignments(
                 Overrides(("Steam:1", PlayerRole.Banned), ("Steam:2", PlayerRole.None), ("Xbox:9", PlayerRole.Admin)),
                 Defaults(
-                    ("Steam:2", PlayerCategory.MyAccount, PlayerRole.Admin),
-                    ("Steam:3", PlayerCategory.Friend, PlayerRole.Permitted),
-                    ("Steam:4", PlayerCategory.Friend, PlayerRole.None)));
+                    ("Steam:2", PlayerRole.Admin),
+                    ("Steam:3", PlayerRole.Permitted),
+                    ("Steam:4", PlayerRole.None)));
 
             Assert.Equal(
                 new (string?, string?, PlayerRole)[] { ("Steam", "1", PlayerRole.Banned), ("Steam", "3", PlayerRole.Permitted), ("Xbox", "9", PlayerRole.Admin) },

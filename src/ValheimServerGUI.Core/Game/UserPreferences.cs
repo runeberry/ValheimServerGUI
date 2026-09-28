@@ -39,16 +39,11 @@ namespace ValheimServerGUI.Game
         public List<WorldPreferences> Worlds { get; set; } = new();
 
         /// <summary>
-        /// App-global player defaults (the Manage Players lists), keyed by <see cref="PlayerInfo.Key"/>. Each
-        /// entry's default role applies on every server unless the profile overrides it
-        /// (see <see cref="PlayerRoleResolver"/>).
+        /// App-global player default roles (set in Manage Players), keyed by <see cref="PlayerInfo.Key"/>. Each
+        /// entry's role applies on every server unless the profile overrides it (see
+        /// <see cref="PlayerRoleResolver"/>). A player without a default has no entry.
         /// </summary>
         public Dictionary<string, PlayerDefaultEntry> PlayerDefaults { get; set; } = new();
-
-        // The lowercase string tokens persisted for each category (stable across enum reorders).
-        private const string CategoryMyAccount = "myaccount";
-        private const string CategoryFriend = "friend";
-        private const string CategoryBanned = "banned";
 
         public static UserPreferences FromFile(UserPreferencesFile? file)
         {
@@ -89,11 +84,11 @@ namespace ValheimServerGUI.Game
             {
                 foreach (var (key, entry) in file.PlayerDefaults)
                 {
-                    // Unknown tokens (e.g. from a newer version) drop the entry rather than guess.
+                    // Unknown tokens (e.g. from a newer version) drop the entry rather than guess; None means
+                    // "no default", which is represented by the absence of an entry.
                     if (string.IsNullOrWhiteSpace(key) || entry == null) continue;
-                    if (!TryParseCategory(entry.Category, out var category)) continue;
-                    if (!PlayerRoleTokens.TryParse(entry.DefaultRole, out var role)) role = PlayerRole.None;
-                    prefs.PlayerDefaults[key] = new PlayerDefaultEntry(category, role, entry.PlatformRaw).Normalized();
+                    if (!PlayerRoleTokens.TryParse(entry.DefaultRole, out var role) || role == PlayerRole.None) continue;
+                    prefs.PlayerDefaults[key] = new PlayerDefaultEntry(role, entry.PlatformRaw);
                 }
             }
 
@@ -139,41 +134,19 @@ namespace ValheimServerGUI.Game
             }
 
             // Written only when there are defaults, so files that never used the feature stay byte-identical.
-            if (PlayerDefaults is { Count: > 0 })
+            var defaults = PlayerDefaults?.Where(kvp => kvp.Value.DefaultRole != PlayerRole.None).ToList();
+            if (defaults is { Count: > 0 })
             {
-                file.PlayerDefaults = PlayerDefaults.ToDictionary(
+                file.PlayerDefaults = defaults.ToDictionary(
                     kvp => kvp.Key,
-                    kvp =>
+                    kvp => new PlayerDefaultFileEntry
                     {
-                        var entry = kvp.Value.Normalized();
-                        return new PlayerDefaultFileEntry
-                        {
-                            Category = CategoryToString(entry.Category),
-                            DefaultRole = PlayerRoleTokens.ToToken(entry.DefaultRole),
-                            PlatformRaw = entry.PlatformRaw,
-                        };
+                        DefaultRole = PlayerRoleTokens.ToToken(kvp.Value.DefaultRole),
+                        PlatformRaw = kvp.Value.PlatformRaw,
                     });
             }
 
             return file;
-        }
-
-        private static string CategoryToString(PlayerCategory category) => category switch
-        {
-            PlayerCategory.MyAccount => CategoryMyAccount,
-            PlayerCategory.Friend => CategoryFriend,
-            _ => CategoryBanned,
-        };
-
-        private static bool TryParseCategory(string? value, out PlayerCategory category)
-        {
-            switch (value?.Trim().ToLowerInvariant())
-            {
-                case CategoryMyAccount: category = PlayerCategory.MyAccount; return true;
-                case CategoryFriend: category = PlayerCategory.Friend; return true;
-                case CategoryBanned: category = PlayerCategory.Banned; return true;
-                default: category = default; return false;
-            }
         }
     }
 }

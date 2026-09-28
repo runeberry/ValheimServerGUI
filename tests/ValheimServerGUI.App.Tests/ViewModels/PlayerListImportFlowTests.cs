@@ -126,7 +126,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
     public async Task Start_with_defaults_does_not_pin_None_for_a_defaulted_player_absent_from_files()
     {
         var prefs = new UserPreferences();
-        prefs.PlayerDefaults[$"Steam:{SteamB}"] = new PlayerDefaultEntry(PlayerCategory.MyAccount, PlayerRole.Admin, "Steam");
+        prefs.PlayerDefaults[$"Steam:{SteamB}"] = new PlayerDefaultEntry(PlayerRole.Admin, "Steam");
         var h = Build(withConfig: true, userPrefs: prefs);
         Seed("adminlist.txt", SteamA); // predates B's default
 

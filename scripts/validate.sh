@@ -50,9 +50,11 @@ BOOT_LOG="$LOGDIR/boot.log"
 
 cleanup() {
   # Never leave a stray app/Xvfb/testhost behind if a phase is interrupted or a test deadlocks.
-  # (These patterns are specific enough not to match this script's own command line.)
-  pkill -f "ValheimServerGUI.App" 2>/dev/null || true
-  pkill -f "Xvfb" 2>/dev/null || true
+  # The app pattern is anchored to argv[0] (the built apphost, or `dotnet <built dll>`), so a shell whose
+  # command line merely MENTIONS the app — e.g. the caller's own shell — is never matched; a bare
+  # "ValheimServerGUI.App" pattern used to kill the invoking shell. Xvfb is matched by exact process name.
+  pkill -f '^[^ ]*(dotnet [^ ]*)?valheim-server-gui/artifacts/bin/ValheimServerGUI\.App/' 2>/dev/null || true
+  pkill -x Xvfb 2>/dev/null || true
   pkill -f "valheim-server-gui/artifacts/bin/ValheimServerGUI.*Tests" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM

@@ -90,8 +90,9 @@ mkdir -p "$ARTIFACT_DIR"
 
 cleanup() {
   # Never leave a live server or orphaned testhost behind, even if a test bailed mid-boot or the run
-  # was force-killed by the hang guard. (Patterns are specific enough not to match this script.)
-  pkill -f "valheim_server" 2>/dev/null || true
+  # was force-killed by the hang guard. The server pattern is anchored to argv[0], so a shell whose command
+  # line merely mentions the server binary (e.g. the caller's own shell) is never matched.
+  pkill -f '^[^ ]*valheim_server\.x86_64( |$)' 2>/dev/null || true
   pkill -f "valheim-server-gui/artifacts/bin/ValheimServerGUI.Integration.Tests" 2>/dev/null || true
   if [[ $KEEP -eq 0 ]]; then
     rm -rf "$SAVEDIR" 2>/dev/null || true

@@ -148,7 +148,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>After a MANUAL update check, asks "…go to the download page?" (returns true for yes). Wired by the window.</summary>
     public Func<string, Task<bool>>? UpdateResultPrompt { get; set; }
 
-    /// <summary>Shows the Save / Don't Save / Cancel unsaved-changes prompt (§13.3). Wired by the window.</summary>
+    /// <summary>Shows the Save Changes / Discard Changes / Cancel unsaved-changes prompt (§13.3). Wired by the window.</summary>
     public Func<Task<UnsavedChangesChoice>>? UnsavedChangesPrompt { get; set; }
 
     // ===== Player-list import / conflict user copy (EXACT — do not paraphrase) =====

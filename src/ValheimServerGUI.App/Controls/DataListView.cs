@@ -52,6 +52,11 @@ public class DataListView : TemplatedControl
     public static readonly StyledProperty<ContextMenu?> RowContextMenuProperty =
         AvaloniaProperty.Register<DataListView, ContextMenu?>(nameof(RowContextMenu));
 
+    /// <summary>Italic hint centred over the rows (e.g. an empty-state message). Hidden when null; the
+    /// ViewModel decides when to show it, so the control never sniffs the item count.</summary>
+    public static readonly StyledProperty<string?> EmptyTextProperty =
+        AvaloniaProperty.Register<DataListView, string?>(nameof(EmptyText));
+
     /// <summary>The height of every data row (px). Sized so a 16px icon sits centred with a little
     /// breathing room.</summary>
     public const double RowUnitHeight = 20;
@@ -60,6 +65,9 @@ public class DataListView : TemplatedControl
     /// with their content still vertically centred. The template binds the footer to this via x:Static, and
     /// the header uses it below, so the two stay a matched pair.</summary>
     public const double HeaderFooterHeight = RowUnitHeight + 8;
+
+    /// <summary>Insets the <see cref="EmptyText"/> overlay below the column header so it centres over the rows.</summary>
+    public static readonly Thickness EmptyTextMargin = new(8, HeaderFooterHeight, 8, 0);
 
     private DataGrid? _grid;
     private bool _hasFooter;
@@ -104,6 +112,12 @@ public class DataListView : TemplatedControl
     {
         get => GetValue(RowInvokeCommandProperty);
         set => SetValue(RowInvokeCommandProperty, value);
+    }
+
+    public string? EmptyText
+    {
+        get => GetValue(EmptyTextProperty);
+        set => SetValue(EmptyTextProperty, value);
     }
 
     public ContextMenu? RowContextMenu

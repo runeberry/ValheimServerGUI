@@ -23,7 +23,17 @@
                             </Grid>
                         </Border>
 
-                        <DataGrid Name="PART_Grid" />
+                        <!-- EmptyText overlays the rows area (below the header), centred and italic. -->
+                        <Panel>
+                            <DataGrid Name="PART_Grid" />
+                            <TextBlock Name="PART_EmptyText" Text="{TemplateBinding EmptyText}"
+                                       IsVisible="{TemplateBinding EmptyText, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                       Margin="{x:Static c:DataListView.EmptyTextMargin}"
+                                       HorizontalAlignment="Center" VerticalAlignment="Center"
+                                       TextAlignment="Center" TextWrapping="Wrap" FontStyle="Italic"
+                                       IsHitTestVisible="False"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                        </Panel>
                     </DockPanel>
                 </Border>
             </ControlTemplate>

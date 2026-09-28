@@ -15,16 +15,9 @@ public partial class PlayerDetailsWindow : DialogWindow
         InitializeComponent();
         Closing += OnClosingGuard;
 
-        // Add/Rename/Edit-name open a text prompt (owned by this window), so they live in the code-behind as
-        // commands the buttons invoke; Remove is a plain VM command bound in XAML.
-        AddCharacterButton.Command = new AsyncRelayCommand(AddCharacterAsync);
+        // Edit-name opens a text prompt owned by this window, so it lives in the code-behind. The Known
+        // Characters table (KnownCharactersView) wires its own add/rename prompts.
         EditNameButton.Command = new AsyncRelayCommand(EditNameAsync);
-
-        // Rename is shared by the Edit button, the row double-click, and the right-click menu.
-        var renameCharacter = new AsyncRelayCommand(RenameCharacterAsync);
-        EditCharacterButton.Command = renameCharacter;
-        CharactersListView.RowInvokeCommand = renameCharacter;
-        RenameCharacterMenuItem.Command = renameCharacter;
     }
 
     public PlayerDetailsWindow(PlayerDetailsViewModel viewModel) : this()
@@ -33,21 +26,6 @@ public partial class PlayerDetailsWindow : DialogWindow
     }
 
     private PlayerDetailsViewModel Vm => (PlayerDetailsViewModel)DataContext!;
-
-    private async Task AddCharacterAsync()
-    {
-        var name = await new TextPromptWindow("Add Character", "Add a Valheim character name for this player:",
-            maxLength: 64).ShowDialog<string?>(this);
-        if (!string.IsNullOrWhiteSpace(name)) Vm.AddCharacter(name);
-    }
-
-    private async Task RenameCharacterAsync()
-    {
-        if (Vm.SelectedCharacter?.CharacterName is not { } current) return;
-        var name = await new TextPromptWindow("Edit Character", $"Edit the name for character '{current}'",
-            current, maxLength: 64).ShowDialog<string?>(this);
-        if (!string.IsNullOrWhiteSpace(name)) Vm.RenameCharacter(current, name);
-    }
 
     private async Task EditNameAsync()
     {

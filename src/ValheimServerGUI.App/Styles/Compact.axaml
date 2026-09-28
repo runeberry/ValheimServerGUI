@@ -75,7 +75,7 @@
          Styles/CheckBox.axaml and Styles/RadioButton.axaml — a Style pass can't shrink the box because
          Fluent hard-codes the part sizes as local values, so we own the template instead. -->
 
-    <!-- TabItem look lives in Styles/TabStyles.axaml (the custom bordered tab theme). -->
+    <!-- TabItem/TabControl look lives in Styles/Tabs.axaml (the custom bordered tab theme, merged per window). -->
 
     <Style Selector="Menu">
         <Setter Property="MinHeight" Value="0" />

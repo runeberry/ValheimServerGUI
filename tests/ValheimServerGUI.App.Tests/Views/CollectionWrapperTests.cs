@@ -65,6 +65,22 @@ public class CollectionWrapperTests
     }
 
     [AvaloniaFact]
+    public void DataListView_empty_text_overlays_the_rows_only_when_set()
+    {
+        var view = new DataListView { ItemsSource = System.Array.Empty<string>(), EmptyText = "Nothing here." };
+        Realize(view);
+
+        var hint = view.GetVisualDescendants().OfType<TextBlock>().First(t => t.Name == "PART_EmptyText");
+        Assert.True(hint.IsVisible);
+        Assert.Equal("Nothing here.", hint.Text);
+        Assert.Equal(Avalonia.Media.FontStyle.Italic, hint.FontStyle);
+
+        view.EmptyText = null;
+        Dispatcher.UIThread.RunJobs();
+        Assert.False(hint.IsVisible);
+    }
+
+    [AvaloniaFact]
     public void DataListView_selection_flows_back_to_bound_property()
     {
         var view = new DataListView { ItemsSource = new[] { "Ragnar", "Odin" } };

@@ -60,4 +60,20 @@ public class MessageBoxWindowTests
         Assert.True(ButtonNamed(window, "A").IsDefault);
         Assert.True(ButtonNamed(window, "B").IsCancel);
     }
+
+    // The shared unsaved-changes guard uses the same captions app-wide.
+    [AvaloniaFact]
+    public async System.Threading.Tasks.Task Unsaved_changes_guard_offers_save_discard_cancel()
+    {
+        var owner = new Window();
+        owner.Show();
+
+        var pending = DialogGuards.ConfirmSaveDiscardCancelAsync(owner);
+        var box = Assert.IsType<MessageBoxWindow>(Assert.Single(owner.OwnedWindows));
+        var captions = box.GetVisualDescendants().OfType<Button>().Select(b => (string?)b.Content).ToArray();
+        Assert.Equal(new[] { "Save Changes", "Discard Changes", "Cancel" }, captions);
+
+        ButtonNamed(box, "Discard Changes").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        Assert.Equal(UnsavedChangesChoice.Discard, await pending);
+    }
 }

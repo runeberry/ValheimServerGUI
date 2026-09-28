@@ -2,6 +2,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Tests.Fakes;
+using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
 using Xunit;
@@ -185,7 +186,7 @@ public class DialogViewModelTests
         var vm = new PlayerDetailsViewModel(repo, "Steam:1");
         Assert.False(vm.IsDirty);
 
-        vm.AddCharacter("Ragnar");
+        vm.KnownCharacters.AddCharacter("Ragnar");
         Assert.True(vm.IsDirty);
 
         vm.Save();
@@ -203,8 +204,8 @@ public class DialogViewModelTests
             Characters = new System.Collections.Generic.List<PlayerInfo.CharacterInfo> { new() { CharacterName = "Odin" } },
         });
         var vm = new PlayerDetailsViewModel(repo, "Steam:1") { DisplayName = "Edited" };
-        vm.AddCharacter("Ragnar");
-        var odin = vm.Characters.First(c => c.CharacterName == "Odin");
+        vm.KnownCharacters.AddCharacter("Ragnar");
+        var odin = vm.KnownCharacters.Characters.First(c => c.CharacterName == "Odin");
         Assert.Equal(PlayerStatus.Online, odin.Status);  // the active character is online
 
         // The player goes offline while the dialog is open.
@@ -216,7 +217,7 @@ public class DialogViewModelTests
 
         Assert.Equal(PlayerStatus.Offline, odin.Status);            // status re-derived
         Assert.Equal("Edited", vm.DisplayName);                     // unsaved edit preserved
-        Assert.Contains(vm.Characters, c => c.CharacterName == "Ragnar"); // unsaved edit preserved
+        Assert.Contains(vm.KnownCharacters.Characters, c => c.CharacterName == "Ragnar"); // unsaved edit preserved
     }
 
     [Fact]
@@ -276,11 +277,11 @@ public class DialogViewModelTests
         Assert.False(vm.IsDirty);
 
         // Selecting a name in the list is view state, not an edit (regression: this used to trip the guard).
-        vm.SelectedCharacter = vm.Characters.First(c => c.CharacterName == "Thor");
+        vm.KnownCharacters.SelectedCharacter = vm.KnownCharacters.Characters.First(c => c.CharacterName == "Thor");
         Assert.False(vm.IsDirty);
 
         // A real edit still marks dirty.
-        vm.RemoveCharacterCommand.Execute(null);
+        vm.KnownCharacters.RemoveCharacterCommand.Execute(null);
         Assert.True(vm.IsDirty);
     }
 
@@ -309,6 +310,73 @@ public class DialogViewModelTests
 
         vm.Save();
         Assert.Equal("Custom", repo.FindById("Steam:1")!.PlayerName);
+    }
+
+    [Fact]
+    public void PlayerDetails_with_a_staged_store_leaves_the_repo_untouched_until_the_owner_commits()
+    {
+        var repo = new FakePlayerDataRepository();
+        repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1", PlayerName = "Odin" });
+        var staged = new RecordingPlayerRecordStore(repo);
+        var vm = new PlayerDetailsViewModel(repo, "Steam:1", store: staged) { DisplayName = "Edited" };
+        vm.KnownCharacters.AddCharacter("Ragnar");
+
+        vm.Save();
+
+        Assert.Equal("Odin", repo.FindById("Steam:1")!.PlayerName);         // live record unchanged
+        var saved = Assert.Single(staged.Upserts);
+        Assert.Equal("Edited", saved.PlayerName);
+        Assert.Contains(saved.Characters!, c => c.CharacterName == "Ragnar");
+    }
+
+    // A store that clones on read (like Manage Players' staged copy) and records writes.
+    private sealed class RecordingPlayerRecordStore : IPlayerRecordStore
+    {
+        private readonly FakePlayerDataRepository _repo;
+        public RecordingPlayerRecordStore(FakePlayerDataRepository repo) => _repo = repo;
+        public System.Collections.Generic.List<PlayerInfo> Upserts { get; } = new();
+
+        public PlayerInfo? FindById(string key) => _repo.FindById(key) is { } p
+            ? new PlayerInfo { Platform = p.Platform, PlayerId = p.PlayerId, PlayerName = p.PlayerName }
+            : null;
+
+        public void Upsert(PlayerInfo player) => Upserts.Add(player);
+    }
+
+    // ----- KnownCharacters -----
+    [Fact]
+    public void KnownCharacters_empty_text_tracks_player_and_rows()
+    {
+        var vm = new KnownCharactersViewModel("Select an account.", "No characters.");
+        Assert.Equal("Select an account.", vm.EmptyText);
+
+        vm.Load(new PlayerInfo { Platform = "Steam", PlayerId = "1" });
+        Assert.Equal("No characters.", vm.EmptyText);
+
+        vm.AddCharacter("Ragnar");
+        Assert.Null(vm.EmptyText);
+
+        vm.Load(null);
+        Assert.Equal("Select an account.", vm.EmptyText);
+    }
+
+    [Fact]
+    public void KnownCharacters_edits_raise_Edited_and_need_a_player()
+    {
+        var vm = new KnownCharactersViewModel();
+        var edits = 0;
+        vm.Edited += (_, _) => edits++;
+
+        vm.AddCharacter("Ignored"); // no player loaded
+        Assert.Empty(vm.Characters);
+
+        vm.Load(new PlayerInfo { Platform = "Steam", PlayerId = "1" });
+        vm.AddCharacter("Ragnar");
+        vm.RenameCharacter("Ragnar", "Bjorn");
+        vm.SelectedCharacter = vm.Characters[0]; // selection is not an edit
+        vm.RemoveCharacterCommand.Execute(null);
+
+        Assert.Equal(3, edits);
     }
 
     // ----- BugReport -----

@@ -1,0 +1,88 @@
+using System.ComponentModel;
+using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Controls;
+using CommunityToolkit.Mvvm.Input;
+using ValheimServerGUI.App.ViewModels;
+using ValheimServerGUI.App.Views.Dialogs;
+
+namespace ValheimServerGUI.App.Views;
+
+/// <summary>
+/// The Known Characters table bound to a <see cref="KnownCharactersViewModel"/>. Add/Rename prompt for a name
+/// with a <see cref="TextPromptWindow"/> owned by the hosting window. <see cref="FooterRight"/> lets the host add
+/// its own trailing footer action (e.g. Player Details' Refresh).
+/// </summary>
+public partial class KnownCharactersView : UserControl
+{
+    public static readonly StyledProperty<object?> FooterRightProperty =
+        AvaloniaProperty.Register<KnownCharactersView, object?>(nameof(FooterRight));
+
+    private readonly AsyncRelayCommand _addCharacter;
+    private readonly AsyncRelayCommand _renameCharacter;
+    private KnownCharactersViewModel? _wired;
+
+    public KnownCharactersView()
+    {
+        InitializeComponent();
+
+        _addCharacter = new AsyncRelayCommand(AddCharacterAsync, () => Vm?.HasPlayer == true);
+        _renameCharacter = new AsyncRelayCommand(RenameCharacterAsync, () => Vm?.SelectedCharacter is not null);
+
+        AddCharacterButton.Command = _addCharacter;
+        // Rename is shared by the Edit button, the row double-click, and the right-click menu.
+        EditCharacterButton.Command = _renameCharacter;
+        CharactersListView.RowInvokeCommand = _renameCharacter;
+        RenameCharacterMenuItem.Command = _renameCharacter;
+
+        DataContextChanged += (_, _) => Wire();
+    }
+
+    public object? FooterRight
+    {
+        get => GetValue(FooterRightProperty);
+        set => SetValue(FooterRightProperty, value);
+    }
+
+    private KnownCharactersViewModel? Vm => DataContext as KnownCharactersViewModel;
+
+    // Re-evaluate the code-behind commands' enablement as the VM's player/selection changes.
+    private void Wire()
+    {
+        if (_wired is not null) _wired.PropertyChanged -= OnVmPropertyChanged;
+        _wired = Vm;
+        if (_wired is not null) _wired.PropertyChanged += OnVmPropertyChanged;
+        RefreshCommands();
+    }
+
+    private void OnVmPropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName is nameof(KnownCharactersViewModel.HasPlayer) or nameof(KnownCharactersViewModel.SelectedCharacter))
+            RefreshCommands();
+    }
+
+    private void RefreshCommands()
+    {
+        _addCharacter.NotifyCanExecuteChanged();
+        _renameCharacter.NotifyCanExecuteChanged();
+    }
+
+    private Window? OwnerWindow => TopLevel.GetTopLevel(this) as Window;
+
+    private async Task AddCharacterAsync()
+    {
+        if (Vm is not { } vm || OwnerWindow is not { } owner) return;
+        var name = await new TextPromptWindow("Add Character", "Add a Valheim character name for this player:",
+            maxLength: 64).ShowDialog<string?>(owner);
+        if (!string.IsNullOrWhiteSpace(name)) vm.AddCharacter(name);
+    }
+
+    private async Task RenameCharacterAsync()
+    {
+        if (Vm is not { } vm || OwnerWindow is not { } owner) return;
+        if (vm.SelectedCharacter?.CharacterName is not { } current) return;
+        var name = await new TextPromptWindow("Edit Character", $"Edit the name for character '{current}'",
+            current, maxLength: 64).ShowDialog<string?>(owner);
+        if (!string.IsNullOrWhiteSpace(name)) vm.RenameCharacter(current, name);
+    }
+}

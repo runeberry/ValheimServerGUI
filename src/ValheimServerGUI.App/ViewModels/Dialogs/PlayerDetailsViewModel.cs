@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -12,23 +9,25 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
 /// Player Details dialog (§7.4): read-only identity + an editable display-name override (0–64) and
-/// known-characters table (name + derived Status/Since; added names are flagged <c>matchConfident=true</c>).
-/// Pulls fresh data from the repo by key; unsaved edits are guarded on close.
+/// known-characters table (<see cref="KnownCharactersViewModel"/>). Edits are read from and written to an
+/// <see cref="IPlayerRecordStore"/> (the live repo by default; Manage Players passes its staged copy); live
+/// status and name lookups always come from the repo. Unsaved edits are guarded on close.
 /// </summary>
 public partial class PlayerDetailsViewModel : ModalEditViewModel
 {
     private readonly IPlayerDataRepository _repo;
+    private readonly IPlayerRecordStore _store;
     private readonly IRuneberryApiClient? _api;
     private readonly string _key;
 
-    public PlayerDetailsViewModel(IPlayerDataRepository repo, string playerKey, IRuneberryApiClient? api = null)
+    public PlayerDetailsViewModel(
+        IPlayerDataRepository repo, string playerKey, IRuneberryApiClient? api = null, IPlayerRecordStore? store = null)
     {
         _repo = repo;
+        _store = store ?? new RepoPlayerRecordStore(repo);
         _api = api;
         _key = playerKey;
-        // Selecting a character in the table is view state, not an edit — it must not trip the unsaved-changes
-        // guard (the actual edits are AddCharacter/RenameCharacter/RemoveCharacter and the display-name field).
-        IgnoreForDirty(nameof(SelectedCharacter));
+        KnownCharacters.Edited += (_, _) => IsDirty = true;
         Load();
     }
 
@@ -43,7 +42,9 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayNameOrUnknown))]
     private string _displayName = string.Empty;
-    [ObservableProperty] private CharacterRowViewModel? _selectedCharacter;
+
+    /// <summary>The editable known-characters table.</summary>
+    public KnownCharactersViewModel KnownCharacters { get; } = new();
 
     /// <summary>The display name for the read-only Player Name row; "(unknown)" when none is set.</summary>
     public string DisplayNameOrUnknown =>
@@ -53,25 +54,14 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     public string PlatformIdLabel =>
         string.Equals(Platform, "Xbox", StringComparison.OrdinalIgnoreCase) ? "Xbox ID:" : "Steam ID:";
 
-    public ObservableCollection<CharacterRowViewModel> Characters { get; } = new();
-
     private void Load() => LoadClean(() =>
     {
-        var player = _repo.FindById(_key);
+        var player = _store.FindById(_key);
         if (player is null) return;
 
         LoadIdentity(player);
         DisplayName = player.PlayerName ?? string.Empty;
-
-        Characters.Clear();
-        var now = DateTimeOffset.Now;
-        foreach (var c in player.Characters ?? new List<PlayerInfo.CharacterInfo>())
-        {
-            if (string.IsNullOrWhiteSpace(c.CharacterName)) continue;
-            var row = new CharacterRowViewModel(c.CharacterName!, c.MatchConfident, c.LastSeen);
-            row.Refresh(player, now);
-            Characters.Add(row);
-        }
+        KnownCharacters.Load(player);
     });
 
     // The read-only identity fields (everything except the editable display name + character table).
@@ -92,8 +82,7 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     {
         if (_repo.FindById(_key) is not { } player) return;
         LoadIdentity(player);
-        var now = DateTimeOffset.Now;
-        foreach (var row in Characters) row.Refresh(player, now);
+        KnownCharacters.Refresh(player);
 
         // Only look the name up when it's currently unknown; a lookup writes to the same PlayerName field the
         // user can override, so firing it unconditionally could clobber a custom name.
@@ -114,44 +103,14 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
 
     public override void ApplyDefaults() { /* Player Details has no defaults to restore. */ }
 
-    public void AddCharacter(string name)
-    {
-        if (string.IsNullOrWhiteSpace(name) || Characters.Any(c => c.CharacterName == name)) return;
-        Characters.Add(new CharacterRowViewModel(name));
-        IsDirty = true;
-    }
-
-    public void RenameCharacter(string oldName, string newName)
-    {
-        var row = Characters.FirstOrDefault(c => c.CharacterName == oldName);
-        if (row is null || string.IsNullOrWhiteSpace(newName)) return;
-        row.CharacterName = newName;
-        IsDirty = true;
-    }
-
-    [RelayCommand]
-    private void RemoveCharacter()
-    {
-        if (SelectedCharacter is { } row && Characters.Remove(row))
-            IsDirty = true;
-    }
-
     public void Save()
     {
-        var player = _repo.FindById(_key);
+        var player = _store.FindById(_key);
         if (player is null) return;
 
         player.PlayerName = string.IsNullOrWhiteSpace(DisplayName) ? null : DisplayName;
-        player.Characters = Characters
-            .Select(row => new PlayerInfo.CharacterInfo
-            {
-                CharacterName = row.CharacterName,
-                // Added names are confident; loaded ones keep their original flag and last-seen time.
-                MatchConfident = row.MatchConfident,
-                LastSeen = row.LastSeen,
-            })
-            .ToList();
+        KnownCharacters.WriteTo(player);
 
-        _repo.Upsert(player);
+        _store.Upsert(player);
     }
 }

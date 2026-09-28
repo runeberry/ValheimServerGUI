@@ -3,7 +3,7 @@
         xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:conv="using:ValheimServerGUI.App.Converters"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
-        xmlns:vmr="using:ValheimServerGUI.App.ViewModels"
+        xmlns:v="using:ValheimServerGUI.App.Views"
         x:Class="ValheimServerGUI.App.Views.Dialogs.PlayerDetailsWindow"
         x:DataType="vm:PlayerDetailsViewModel"
         Title="Player Info"
@@ -40,57 +40,12 @@
                 <TextBlock Text="Known Characters" FontWeight="SemiBold" VerticalAlignment="Center" />
                 <c:HelpLabel HelpText="The Valheim character names that this player is known by. Names are automatically added to this list when a player joins the server, but you may modify them manually.&#10;&#10;If a name appears with a (!), it means that name may not be matched to the correct player (due to a Valheim server limitation). You may remove this name if it's incorrect, or select the name and click Confirm to remove the warning." />
             </StackPanel>
-            <c:DataListView x:Name="CharactersListView" Height="140" ItemsSource="{Binding Characters}"
-                            SelectedItem="{Binding SelectedCharacter, Mode=TwoWay}">
-                <c:DataListView.RowContextMenu>
-                    <ContextMenu>
-                        <!-- Rename opens a window-owned prompt, so its command is wired in code-behind. -->
-                        <MenuItem x:Name="RenameCharacterMenuItem" Header="Rename character" />
-                        <MenuItem Header="Remove character name" Command="{Binding RemoveCharacterCommand}" />
-                    </ContextMenu>
-                </c:DataListView.RowContextMenu>
-                <c:DataListView.Columns>
-                    <DataGridTemplateColumn Header="Character Name" Width="*" SortMemberPath="CharacterName">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate x:DataType="vmr:CharacterRowViewModel">
-                                <TextBlock Text="{Binding CharacterName}" VerticalAlignment="Center" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <!-- Status glyph + text; only the active character is ever non-Offline. -->
-                    <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="StatusText">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate x:DataType="vmr:CharacterRowViewModel">
-                                <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-                                    <Image Width="16" Height="16" VerticalAlignment="Center"
-                                           RenderOptions.BitmapInterpolationMode="HighQuality"
-                                           Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
-                                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
-                                </StackPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                    <!-- Blank for characters recorded before the last-seen field existed. -->
-                    <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate x:DataType="vmr:CharacterRowViewModel">
-                                <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-                </c:DataListView.Columns>
-                <c:DataListView.FooterLeft>
-                    <StackPanel Orientation="Horizontal" Spacing="8">
-                        <c:IconButton x:Name="AddCharacterButton" IconName="Add_16x" ToolTip.Tip="Add" />
-                        <c:IconButton x:Name="EditCharacterButton" IconName="Edit_16x" ToolTip.Tip="Rename" />
-                        <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove"
-                                      Command="{Binding RemoveCharacterCommand}" />
-                    </StackPanel>
-                </c:DataListView.FooterLeft>
-                <c:DataListView.FooterRight>
-                    <c:RefreshButton ToolTip.Tip="Refresh player data" Command="{Binding RefreshCommand}" />
-                </c:DataListView.FooterRight>
-            </c:DataListView>
+            <v:KnownCharactersView DataContext="{Binding KnownCharacters}" Height="140">
+                <v:KnownCharactersView.FooterRight>
+                    <c:RefreshButton ToolTip.Tip="Refresh player data"
+                                     Command="{Binding $parent[Window].((vm:PlayerDetailsViewModel)DataContext).RefreshCommand}" />
+                </v:KnownCharactersView.FooterRight>
+            </v:KnownCharactersView>
         </StackPanel>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">

@@ -11,7 +11,7 @@
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
                     <Button Content="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
-                    <Button Content="Add by ID…" Command="{Binding Players.AddByIdCommand}" />
+                    <Button Content="Add Player…" Command="{Binding Players.AddPlayerCommand}" />
                 </StackPanel>
                 <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
                                   Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
@@ -34,7 +34,7 @@
                     <MenuItem Header="{Binding Players.PermitToggleLabel}" Command="{Binding Players.TogglePermitCommand}"
                               IsVisible="{Binding Players.ShowPermitToggle}" />
                     <Separator />
-                    <MenuItem Header="Add player by ID…" Command="{Binding Players.AddByIdCommand}" />
+                    <MenuItem Header="Add player…" Command="{Binding Players.AddPlayerCommand}" />
                     <MenuItem Header="Remove player" Command="{Binding Players.RemoveCommand}" />
                 </ContextMenu>
             </c:DataListView.RowContextMenu>
@@ -104,8 +104,8 @@
                 <StackPanel Orientation="Horizontal" Spacing="4">
                     <c:IconButton IconName="ImportFile_16x" ToolTip.Tip="Import player lists"
                                   Command="{Binding ImportPlayerListsCommand}" />
-                    <c:IconButton IconName="Add_16x" ToolTip.Tip="Add player by ID"
-                                  Command="{Binding Players.AddByIdCommand}" />
+                    <c:IconButton IconName="Add_16x" ToolTip.Tip="Add player"
+                                  Command="{Binding Players.AddPlayerCommand}" />
                     <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove player"
                                   Command="{Binding Players.RemoveCommand}" />
                 </StackPanel>

@@ -9,7 +9,8 @@ namespace ValheimServerGUI.Tools.Models
         public const string PlayStation = "PlayStation";
         public const string Nintendo = "Nintendo";
 
-        public static readonly HashSet<string> All = new()
+        /// <summary>Every canonical platform, in display order (Steam first).</summary>
+        public static readonly IReadOnlyList<string> All = new[]
         {
             Steam,
             Xbox,

@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Avalonia.Headless.XUnit;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
+using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
@@ -238,46 +239,70 @@ public class PlayersViewModelTests
         Assert.Equal(PlayerRole.Admin, vm.Players[0].DisplayRole);
     }
 
-    // ---- add by id ----
+    // ---- add player ----
 
     [AvaloniaFact]
-    public async Task Add_by_id_creates_a_row_and_stores_a_role()
+    public async Task Add_player_creates_a_row_and_stores_an_override()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
         _form.UsePermittedList = false;
-        vm.AddByIdPrompt = _ => Task.FromResult<AddByIdResult?>(
-            new AddByIdResult(PlayerPlatforms.Xbox, "XUID9", PlayerRole.Admin));
+        AddPlayerOptions? offered = null;
+        vm.AddPlayerPrompt = options =>
+        {
+            offered = options;
+            return Task.FromResult<AddPlayerResult?>(new AddPlayerResult(PlayerPlatforms.Xbox, "XUID9", "Thor", PlayerRole.Admin));
+        };
 
-        await vm.AddByIdCommand.ExecuteAsync(null);
+        await vm.AddPlayerCommand.ExecuteAsync(null);
 
+        Assert.Same(AddPlayerOptions.ForServer, offered);
         var row = Assert.Single(vm.Players);
         Assert.Equal("Xbox:XUID9", row.Key);
+        Assert.Equal("Thor", row.Player.PlayerName);
         Assert.Equal(PlayerRole.Admin, _form.GetRole(row.Key));
         Assert.Equal(PlayerRole.Admin, row.DisplayRole);
+        Assert.Equal(0, _api.RequestPlayerInfoCallCount); // name given, no lookup needed
     }
 
     [AvaloniaFact]
-    public async Task Add_by_id_new_record_triggers_a_name_lookup()
+    public async Task Add_player_with_role_None_clears_the_override()
+    {
+        var repo = new FakePlayerDataRepository();
+        var existing = Player("5", PlayerStatus.Offline, name: "A");
+        repo.PushUpdate(existing);
+        var vm = NewVm(repo);
+        _form.SetRole(existing, PlayerRole.Banned);
+        vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(
+            new AddPlayerResult(PlayerPlatforms.Steam, "5", null, PlayerRole.None));
+
+        await vm.AddPlayerCommand.ExecuteAsync(null);
+
+        Assert.Null(_form.GetRole("Steam:5"));
+        Assert.Equal("A", RowFor(vm, "Steam:5").Player.PlayerName); // blank name keeps the cached one
+    }
+
+    [AvaloniaFact]
+    public async Task Add_player_new_record_without_a_name_triggers_a_lookup()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        vm.AddByIdPrompt = _ => Task.FromResult<AddByIdResult?>(
-            new AddByIdResult(PlayerPlatforms.Steam, "77", PlayerRole.Admin));
+        vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(
+            new AddPlayerResult(PlayerPlatforms.Steam, "77", null, PlayerRole.Admin));
 
-        await vm.AddByIdCommand.ExecuteAsync(null);
+        await vm.AddPlayerCommand.ExecuteAsync(null);
 
         Assert.Equal(1, _api.RequestPlayerInfoCallCount); // same lookup path a join uses
     }
 
     [AvaloniaFact]
-    public async Task Add_by_id_cancelled_does_nothing()
+    public async Task Add_player_cancelled_does_nothing()
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        vm.AddByIdPrompt = _ => Task.FromResult<AddByIdResult?>(null);
+        vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(null);
 
-        await vm.AddByIdCommand.ExecuteAsync(null);
+        await vm.AddPlayerCommand.ExecuteAsync(null);
 
         Assert.Empty(vm.Players);
     }

@@ -50,6 +50,10 @@ public class DialogRenderTests
             Core.GetRequiredService<IPlayerDataRepository>(), "steam-1")));
 
     [AvaloniaFact]
+    public void AddPlayerWindow_realizes()
+        => Realize(new AddPlayerWindow(ValheimServerGUI.App.ViewModels.Dialogs.AddPlayerOptions.ForMyAccounts));
+
+    [AvaloniaFact]
     public void BugReportWindow_realizes()
         => Realize(new BugReportWindow(new BugReportViewModel(new FakeRuneberryApiClient())));
 }

@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.App.ViewModels;
-
-/// <summary>The identity + single role returned by the "Add by ID" dialog.</summary>
-public record AddByIdResult(string Platform, string PlayerId, PlayerRole Role);
 
 /// <summary>
 /// Players tab (§7.4): a live table fed by the shared player repository. Rows update from
@@ -91,11 +89,8 @@ public partial class PlayersViewModel : ViewModelBase
     /// <summary>Raised for View Player Details.</summary>
     public event Action<PlayerInfo>? ViewDetailsRequested;
 
-    /// <summary>
-    /// Shows the "Add by ID" dialog for the given mode (<c>usePermittedList</c>); returns null on cancel. The
-    /// mode drives which role options the dialog offers. Wired by the window.
-    /// </summary>
-    public Func<bool, Task<AddByIdResult?>>? AddByIdPrompt { get; set; }
+    /// <summary>Shows the Add Player dialog with the given role options; returns null on cancel. Wired by the window.</summary>
+    public Func<AddPlayerOptions, Task<AddPlayerResult?>>? AddPlayerPrompt { get; set; }
 
     public void SetActive(bool active)
     {
@@ -133,11 +128,11 @@ public partial class PlayersViewModel : ViewModelBase
     private void TogglePermit() => Toggle(PlayerRole.Permitted);
 
     [RelayCommand]
-    private async Task AddById()
+    private async Task AddPlayer()
     {
-        if (AddByIdPrompt is null) return;
+        if (AddPlayerPrompt is null) return;
 
-        var result = await AddByIdPrompt(_form.UsePermittedList);
+        var result = await AddPlayerPrompt(AddPlayerOptions.ForServer);
         if (result is null) return;
         if (!PlayerPlatforms.TryGetValidPlatform(result.Platform, out var platform) || platform is null) return;
         if (string.IsNullOrWhiteSpace(result.PlayerId)) return;
@@ -157,14 +152,15 @@ public partial class PlayersViewModel : ViewModelBase
             LastStatusChange = DateTimeOffset.UtcNow,
         };
         if (string.IsNullOrWhiteSpace(player.PlatformRaw)) player.PlatformRaw = platform;
+        if (result.PlayerName is { } name) player.PlayerName = name;
 
-        // The dialog picks exactly one role for the active mode; store it directly.
-        _form.SetRole(player, result.Role);
+        // The chosen role becomes this server's override; None clears any override (back to the default).
+        _form.SetRole(player, result.Role == PlayerRole.None ? null : result.Role);
 
         _repo.Upsert(player); // OnEntityUpdated adds/updates the row; ApplyRole reads the role back from the form.
 
-        // A brand-new record has no name yet: look it up the same way the join path does (fire-and-forget).
-        if (existing is null)
+        // A brand-new record with no name yet: look it up the same way the join path does (fire-and-forget).
+        if (existing is null && string.IsNullOrWhiteSpace(player.PlayerName))
             _ = _api.RequestPlayerInfoAsync(platform, playerId);
     }
 

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: "Existing tag to release, e.g. v2.4.0"
+        description: "Existing tag to release, e.g. v3.0.0"
         required: true
         type: string
 
@@ -50,7 +50,7 @@ jobs:
     env:
       TAG: ${{ needs.check.outputs.tag }}
       SHA: ${{ needs.check.outputs.sha }}
-      ZIP: ValheimServerGUI-${{ needs.check.outputs.version }}.zip
+      OUT_DIR: ${{ github.workspace }}/dist
     steps:
       - uses: actions/checkout@v4
 
@@ -61,7 +61,10 @@ jobs:
 
       - name: Install tools
         shell: bash
-        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq zip
+        run: |
+          set -euo pipefail
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
+          packaging/install-tools.sh
 
       - uses: actions/setup-dotnet@v4
         with:
@@ -76,23 +79,14 @@ jobs:
         run: ../ci/release-build.sh
 
       - uses: https://forge.nuffle.dev/homelab/act-runner/actions/sign@main
-        id: sign
         with:
-          files: src/publish/small-x64/ValheimServerGUI.exe
+          files: dist/*-win-x64.exe
           credentials: ${{ secrets.CS_SIGNER_KEY }}
-
-      - name: Package
-        shell: bash
-        env:
-          SIGNED: ${{ steps.sign.outputs.signed-files }}
-        run: |
-          set -euo pipefail
-          zip -j "$ZIP" $SIGNED
-          unzip -l "$ZIP"
 
       - name: Create draft releases
         shell: bash
         env:
+          ASSET_DIR: dist
           GH_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
           FORGE_TOKEN: ${{ secrets.FORGE_MIRROR_TOKEN }}
         run: ci/release-draft.sh

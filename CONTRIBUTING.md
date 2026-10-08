@@ -44,30 +44,17 @@ This project uses a **Publish Profile** (.pubxml) file to store configuration fo
 4. Click the **Publish** button in the top-right.
 5. The .exe file will appear in the **/publish/small-x64/** folder in the root of this repo.
 
-### Publishing a signed version of the app
-
-_For projects maintainers only._
-
-Signed releases are built by CI, not locally. Pushing a version tag (e.g. `v2.4.0`, matching
-`<Version>` in `ValheimServerGUI.csproj`) builds the app, signs `ValheimServerGUI.exe` with the
-Runeberry Software code signing certificate, and creates **draft** releases with
-`ValheimServerGUI-<version>.zip` attached. A maintainer then edits the release notes and publishes
-the drafts. The workflow can also be run by hand for an existing tag.
-
-### Creating a new release
+### Publishing a release
 
 _For project maintainers only._
 
-In order to bump the desktop client's application version, simply change the number in the `<Version>` section of **ValheimServerGUI.csproj**, then publish the app using the steps outlined above.
+Releases are built and signed by CI, not locally. To cut one:
 
-The desktop client queries GitHub to find out if a new release is available. Follow these instructions to ensure that users will be notified about a client update.
+1. Set the new version in the `<Version>` element of **src/ValheimServerGUI.Core/ValheimServerGUI.Core.csproj** (a semantic version, e.g. `3.0.0` or `3.0.0-rc.1`).
+2. Push a matching tag prefixed with `v`, such as `v3.0.0`. The workflow can also be run by hand for an existing tag.
 
-1. Start creating a new release [here](https://github.com/runeberry/ValheimServerGUI/releases/new). Set the release title and description to whatever you see fit.
-2. Set the release tag version to a semantic version prefixed with `v`, such as `v1.2.3`.
-   * This semver should correspond to the `<Version>` set in the .csproj file.
-   * The semver on GitHub must be greater than the client's current version trigger an update notification.
-3. Attach a .zip file containing just the `ValheimServerGUI.exe` file published from the previous section. The release must contain an asset in order to trigger an update notification.
-4. Ensure the Pre-release button is **NOT** checked. Pre-releases will not trigger an update notification.
-5. Click **Publish release**.
+The release workflow (`.forgejo/workflows/release.yml`) runs the test suite, builds the Windows `.exe`, Linux `.tar.gz`, and `.AppImage`, signs the `.exe` with the Runeberry Software code signing certificate, and creates **draft** releases on GitHub and the public forge with all three attached. A tag with a pre-release suffix (e.g. `v3.0.0-rc.1`) is marked as a pre-release.
 
-Users will be notified that an update is available the next time they open the desktop client, or within 24 hours. This timeframe is configured in the project's [Resource file](ValheimServerGUI/Properties/Resources.resx).
+A maintainer then edits the release notes and publishes the drafts.
+
+The desktop client queries GitHub to find out if a new release is available. It only considers releases that are published, **not** marked as pre-releases, and have at least one asset, and it notifies the user when that release's version is greater than its own. Pre-releases never trigger an update notification. Users are notified the next time they open the desktop client, or within 24 hours (`UpdateCheckInterval` in [CoreConstants.cs](src/ValheimServerGUI.Core/CoreConstants.cs)).

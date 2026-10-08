@@ -1,0 +1,98 @@
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing tag to release, e.g. v2.4.0"
+        required: true
+        type: string
+
+concurrency:
+  group: release-${{ inputs.tag || github.ref_name }}
+  cancel-in-progress: false
+
+env:
+  GITHUB_REPO: runeberry/ValheimServerGUI
+  FORGE_URL: https://forge.nuffle.me
+  FORGE_REPO: runeberry/ValheimServerGUI
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.check.outputs.tag }}
+      version: ${{ steps.check.outputs.version }}
+      sha: ${{ steps.check.outputs.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install tools
+        shell: bash
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
+
+      - name: Check the tag and existing releases
+        id: check
+        shell: bash
+        env:
+          TAG: ${{ inputs.tag || github.ref_name }}
+          GH_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
+          FORGE_TOKEN: ${{ secrets.FORGE_MIRROR_TOKEN }}
+        run: ci/release-check.sh
+
+  release:
+    needs: check
+    runs-on: ubuntu-latest
+    env:
+      TAG: ${{ needs.check.outputs.tag }}
+      SHA: ${{ needs.check.outputs.sha }}
+      ZIP: ValheimServerGUI-${{ needs.check.outputs.version }}.zip
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/checkout@v4
+        with:
+          ref: refs/tags/${{ needs.check.outputs.tag }}
+          path: src
+
+      - name: Install tools
+        shell: bash
+        run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq zip
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Build
+        shell: bash
+        working-directory: src
+        env:
+          RUNEBERRY_API_KEY_HEADER: ${{ secrets.RUNEBERRY_API_KEY_HEADER }}
+          RUNEBERRY_CLIENT_API_KEY: ${{ secrets.RUNEBERRY_CLIENT_API_KEY }}
+        run: ../ci/release-build.sh
+
+      - uses: https://forge.nuffle.dev/homelab/act-runner/actions/sign@main
+        id: sign
+        with:
+          files: src/publish/small-x64/ValheimServerGUI.exe
+          credentials: ${{ secrets.CS_SIGNER_KEY }}
+
+      - name: Package
+        shell: bash
+        env:
+          SIGNED: ${{ steps.sign.outputs.signed-files }}
+        run: |
+          set -euo pipefail
+          zip -j "$ZIP" $SIGNED
+          unzip -l "$ZIP"
+
+      - name: Create draft releases
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
+          FORGE_TOKEN: ${{ secrets.FORGE_MIRROR_TOKEN }}
+        run: ci/release-draft.sh

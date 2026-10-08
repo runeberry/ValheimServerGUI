@@ -86,7 +86,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             Assert.True(_svc.Add(_savedir, PlayerAccessList.Admin, Steam("1")));
             Assert.False(_svc.Add(_savedir, PlayerAccessList.Admin, Steam("1")));
-            Assert.Single(AdminLines().Where(l => l.Contains('1'))); // not duplicated
+            Assert.Single(AdminLines(), l => l.Contains('1')); // not duplicated
         }
 
         // ---- matching (ListContainsId) ----

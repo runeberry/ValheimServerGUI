@@ -70,7 +70,9 @@ warn_count=0
 # ---- 1. build -------------------------------------------------------------------------------
 if [[ $RUN_BUILD -eq 1 ]]; then
   section "Build ($(basename "$SOLUTION"))"
-  if dotnet build "$SOLUTION" >"$BUILD_LOG" 2>&1; then
+  # --no-incremental: an up-to-date project is skipped and prints none of its warnings, which would
+  # let the 0-warning check below pass with warnings still in the code.
+  if dotnet build "$SOLUTION" --no-incremental >"$BUILD_LOG" 2>&1; then
     warn_count="$(grep -cE 'warning [A-Z]+[0-9]+' "$BUILD_LOG" || true)"
     if [[ "$warn_count" -gt 0 ]]; then
       fail "build succeeded but with $warn_count warning(s) — treated as failure (0-warning rule)"

@@ -157,7 +157,7 @@ public sealed class ServerManagerTests : IDisposable
     }
 
     [Fact]
-    public void StopAllAndDispose_stops_a_running_server_and_waits_for_stopped()
+    public async Task StopAllAndDispose_stops_a_running_server_and_waits_for_stopped()
     {
         var mgr = NewManager();
         var server = mgr.GetOrCreate("A");
@@ -167,11 +167,11 @@ public sealed class ServerManagerTests : IDisposable
 
         // StopAllAndDispose blocks until the server reports Stopped; simulate the process exiting from this
         // thread once the graceful kill has been dispatched, so the wait completes deterministically.
-        var task = Task.Run(mgr.StopAllAndDispose);
+        var task = Task.Run(mgr.StopAllAndDispose, TestContext.Current.CancellationToken);
         WaitFor(() => process.SafelyKilledKeys.Count > 0);
         process.SimulateExit(); // → Stopped
 
-        Assert.True(task.Wait(TimeSpan.FromSeconds(5)));
+        await task.WaitAsync(TimeSpan.FromSeconds(5), TestContext.Current.CancellationToken);
         Assert.Equal(ServerStatus.Stopped, server.Status);
         Assert.Empty(mgr.All);
     }

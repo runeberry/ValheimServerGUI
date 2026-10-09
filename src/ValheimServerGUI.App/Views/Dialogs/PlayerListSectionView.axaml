@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
              xmlns:c="using:ValheimServerGUI.App.Controls"
              xmlns:v="using:ValheimServerGUI.App.Views"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
@@ -11,7 +12,7 @@
          table (absent on Banned) leaves, so both tabs are the same height and the window never resizes. -->
     <DockPanel Margin="8">
         <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0" IsVisible="{Binding HasKnownCharacters}">
-            <TextBlock Text="Known Characters" FontWeight="SemiBold" />
+            <TextBlock Text="{x:Static loc:Strings.KnownCharacters_Header}" FontWeight="SemiBold" />
             <v:KnownCharactersView DataContext="{Binding KnownCharacters}" Height="120" />
         </StackPanel>
 
@@ -21,26 +22,26 @@
                         RowInvokeCommand="{Binding ViewDetailsCommand}">
             <c:DataListView.RowContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="View Player Details…" Command="{Binding ViewDetailsCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_ViewDetails}" Command="{Binding ViewDetailsCommand}" />
                     <!-- Radio items read/write the selected row's default role (see PlayerListSectionViewModel). -->
-                    <MenuItem Header="Set default role">
-                        <MenuItem Header="Admin" ToggleType="Radio" GroupName="DefaultRole"
+                    <MenuItem Header="{x:Static loc:Strings.ManagePlayers_Menu_SetDefaultRole}">
+                        <MenuItem Header="{x:Static loc:Strings.Role_Admin}" ToggleType="Radio" GroupName="DefaultRole"
                                   IsChecked="{Binding DefaultIsAdmin, Mode=TwoWay}" />
-                        <MenuItem Header="Permitted" ToggleType="Radio" GroupName="DefaultRole"
+                        <MenuItem Header="{x:Static loc:Strings.Role_Permitted}" ToggleType="Radio" GroupName="DefaultRole"
                                   IsChecked="{Binding DefaultIsPermitted, Mode=TwoWay}" />
-                        <MenuItem Header="Banned" ToggleType="Radio" GroupName="DefaultRole"
+                        <MenuItem Header="{x:Static loc:Strings.Role_Banned}" ToggleType="Radio" GroupName="DefaultRole"
                                   IsChecked="{Binding DefaultIsBanned, Mode=TwoWay}" />
-                        <MenuItem Header="None" ToggleType="Radio" GroupName="DefaultRole"
+                        <MenuItem Header="{x:Static loc:Strings.Role_None}" ToggleType="Radio" GroupName="DefaultRole"
                                   IsChecked="{Binding DefaultIsNone, Mode=TwoWay}" />
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="Add player…" Command="{Binding AddCommand}" />
-                    <MenuItem Header="Remove player" Command="{Binding RemoveCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_AddPlayer}" Command="{Binding AddCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_RemovePlayer}" Command="{Binding RemoveCommand}" />
                 </ContextMenu>
             </c:DataListView.RowContextMenu>
             <c:DataListView.Columns>
                 <!-- The account name only (characters are in the Known Characters table below). -->
-                <DataGridTemplateColumn Header="Player Name" Width="*" SortMemberPath="AccountName">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.ManagePlayers_Column_PlayerName}" Width="*" SortMemberPath="AccountName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vmr:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
@@ -49,14 +50,14 @@
                                        RenderOptions.BitmapInterpolationMode="HighQuality" />
                                 <TextBlock Text="{Binding AccountName}" VerticalAlignment="Center"
                                            IsVisible="{Binding HasAccountName}" />
-                                <TextBlock Text="(name unknown)" VerticalAlignment="Center" FontStyle="Italic"
+                                <TextBlock Text="{x:Static loc:Strings.ManagePlayers_NameUnknown}" VerticalAlignment="Center" FontStyle="Italic"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                            IsVisible="{Binding !HasAccountName}" />
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Platform ID" Width="190" SortMemberPath="PlatformId">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.ManagePlayers_Column_PlatformId}" Width="190" SortMemberPath="PlatformId">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vmr:PlayerRowViewModel">
                             <TextBlock Text="{Binding PlatformId}" VerticalAlignment="Center" />
@@ -64,7 +65,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <!-- Kept LAST: hidden on Banned from code-behind (every row there is Banned). -->
-                <DataGridTemplateColumn Header="Default Role" Width="120" SortMemberPath="RoleText">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.ManagePlayers_Column_DefaultRole}" Width="120" SortMemberPath="RoleText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vmr:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
@@ -78,13 +79,13 @@
                 </DataGridTemplateColumn>
             </c:DataListView.Columns>
             <c:DataListView.FooterLeft>
-                <c:IconButton IconName="User_16x" ToolTip.Tip="View player details"
+                <c:IconButton IconName="User_16x" ToolTip.Tip="{x:Static loc:Strings.Players_ViewDetails_Tip}"
                               Command="{Binding ViewDetailsCommand}" />
             </c:DataListView.FooterLeft>
             <c:DataListView.FooterRight>
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <c:IconButton IconName="Add_16x" ToolTip.Tip="Add player" Command="{Binding AddCommand}" />
-                    <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove player" Command="{Binding RemoveCommand}" />
+                    <c:IconButton IconName="Add_16x" ToolTip.Tip="{x:Static loc:Strings.Players_AddPlayer_Tip}" Command="{Binding AddCommand}" />
+                    <c:IconButton IconName="Cancel_16x" ToolTip.Tip="{x:Static loc:Strings.Players_RemovePlayer_Tip}" Command="{Binding RemoveCommand}" />
                 </StackPanel>
             </c:DataListView.FooterRight>
         </c:DataListView>

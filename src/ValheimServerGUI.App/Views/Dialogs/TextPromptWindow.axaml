@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         x:Class="ValheimServerGUI.App.Views.Dialogs.TextPromptWindow"
         SizeToContent="Height" Width="420"
         MinWidth="360"
@@ -12,8 +13,8 @@
         <TextBox x:Name="InputBox" KeyDown="OnInputKeyDown" />
         <TextBlock x:Name="ErrorText" Foreground="#E53935" IsVisible="False" TextWrapping="Wrap" />
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8">
-            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
-            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>
 </Window>

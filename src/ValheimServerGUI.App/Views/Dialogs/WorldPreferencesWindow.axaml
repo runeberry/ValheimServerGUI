@@ -1,25 +1,26 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.WorldPreferencesWindow"
         x:DataType="vm:WorldPreferencesViewModel"
-        Title="{Binding WorldName, StringFormat='World Settings - {0}'}"
+        Title="{Binding WorldName, StringFormat={x:Static loc:Strings.WorldPreferences_Title}}"
         SizeToContent="Height" Width="460" MinWidth="400"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="10">
-        <c:DropdownFormField LabelText="Difficulty Preset" Width="240" HorizontalAlignment="Left"
-                             HelpText="Presets are quick sets of options to help you get a server up and running quickly.&#10;&#10;If you select a preset and change any individual settings, then the preset will be deselected."
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.WorldPreferences_Preset_Label}" Width="240" HorizontalAlignment="Left"
+                             HelpText="{x:Static loc:Strings.WorldPreferences_Preset_Help}"
                              ItemsSource="{Binding Presets}" Value="{Binding SelectedPresetDisplay}" />
 
         <StackPanel Orientation="Horizontal" Spacing="4">
-            <TextBlock Text="Read more about world modifiers on the"
+            <TextBlock Text="{x:Static loc:Strings.WorldPreferences_WikiPrefix}"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-            <c:HyperlinkLabel Text="Valheim Wiki." Command="{Binding OpenWorldModifiersWikiCommand}" />
+            <c:HyperlinkLabel Text="{x:Static loc:Strings.WorldPreferences_WikiLink}" Command="{Binding OpenWorldModifiersWikiCommand}" />
         </StackPanel>
 
-        <TextBlock Text="Modifiers" FontWeight="SemiBold" Margin="0,6,0,0" />
+        <TextBlock Text="{x:Static loc:Strings.WorldPreferences_Modifiers_Header}" FontWeight="SemiBold" Margin="0,6,0,0" />
         <ItemsControl ItemsSource="{Binding Modifiers}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:ModifierRow">
@@ -33,13 +34,13 @@
         </ItemsControl>
 
         <StackPanel Spacing="2" Margin="12,0,0,0">
-            <TextBlock Text="Modifiers not working like you expected? You may already have modifiers set in-game."
+            <TextBlock Text="{x:Static loc:Strings.WorldPreferences_NotWorking}"
                        TextWrapping="Wrap"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
-            <c:HyperlinkLabel Text="Read more here." Command="{Binding OpenWorldModifiersHelpCommand}" />
+            <c:HyperlinkLabel Text="{x:Static loc:Strings.WorldPreferences_NotWorkingLink}" Command="{Binding OpenWorldModifiersHelpCommand}" />
         </StackPanel>
 
-        <TextBlock Text="Additional Keys" FontWeight="SemiBold" Margin="0,6,0,0" />
+        <TextBlock Text="{x:Static loc:Strings.WorldPreferences_Keys_Header}" FontWeight="SemiBold" Margin="0,6,0,0" />
         <ItemsControl ItemsSource="{Binding Keys}">
             <ItemsControl.ItemTemplate>
                 <DataTemplate x:DataType="vm:WorldKeyToggle">
@@ -50,9 +51,9 @@
         </ItemsControl>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-            <Button Content="Restore Defaults" Click="OnRestoreDefaults" />
-            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
-            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>
 </Window>

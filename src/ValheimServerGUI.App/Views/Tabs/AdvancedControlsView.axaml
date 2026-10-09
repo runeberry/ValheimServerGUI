@@ -11,11 +11,11 @@
             <StackPanel Grid.Column="0" Spacing="2">
                 <c:GroupBox Header="{x:Static loc:Strings.AdvancedControls_DirectoryOverrides_Header}">
                     <StackPanel Spacing="2">
-                        <c:FilenameFormField LabelText="{x:Static loc:Strings.AdvancedControls_ServerExe_Label}" SelectMode="File"
+                        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_ServerExe_Label}" SelectMode="File"
                                              HelpText="{x:Static loc:Strings.AdvancedControls_ServerExe_Help}"
                                              Value="{Binding Form.ServerExePath}" IsEnabled="{Binding AllowServerChanges}"
                                              ShowOpenFolder="True" OpenFolderCommand="{Binding OpenServerExeFolderCommand}" />
-                        <c:FilenameFormField LabelText="{x:Static loc:Strings.AdvancedControls_SaveData_Label}" SelectMode="Directory"
+                        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_SaveData_Label}" SelectMode="Directory"
                                              HelpText="{x:Static loc:Strings.AdvancedControls_SaveData_Help}"
                                              Value="{Binding Form.SaveDataFolderPath}" IsEnabled="{Binding AllowServerChanges}"
                                              ShowOpenFolder="True" OpenFolderCommand="{Binding OpenSaveFolderCommand}" />

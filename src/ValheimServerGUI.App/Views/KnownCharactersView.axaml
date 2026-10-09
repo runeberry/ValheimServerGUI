@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
              xmlns:c="using:ValheimServerGUI.App.Controls"
              xmlns:conv="using:ValheimServerGUI.App.Converters"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels"
@@ -15,12 +16,12 @@
                     FooterRight="{Binding #Root.FooterRight}">
         <c:DataListView.RowContextMenu>
             <ContextMenu>
-                <MenuItem x:Name="RenameCharacterMenuItem" Header="Rename character" />
-                <MenuItem Header="Remove character name" Command="{Binding RemoveCharacterCommand}" />
+                <MenuItem x:Name="RenameCharacterMenuItem" Header="{x:Static loc:Strings.KnownCharacters_Menu_Rename}" />
+                <MenuItem Header="{x:Static loc:Strings.KnownCharacters_Menu_Remove}" Command="{Binding RemoveCharacterCommand}" />
             </ContextMenu>
         </c:DataListView.RowContextMenu>
         <c:DataListView.Columns>
-            <DataGridTemplateColumn Header="Character Name" Width="*" SortMemberPath="CharacterName">
+            <DataGridTemplateColumn Header="{x:Static loc:Strings.KnownCharacters_Column_Name}" Width="*" SortMemberPath="CharacterName">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate x:DataType="vm:CharacterRowViewModel">
                         <TextBlock Text="{Binding CharacterName}" VerticalAlignment="Center" />
@@ -28,7 +29,7 @@
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
             <!-- Status glyph + text; only the active character is ever non-Offline. -->
-            <DataGridTemplateColumn Header="Status" Width="Auto" SortMemberPath="StatusText">
+            <DataGridTemplateColumn Header="{x:Static loc:Strings.KnownCharacters_Column_Status}" Width="Auto" SortMemberPath="StatusText">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate x:DataType="vm:CharacterRowViewModel">
                         <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
@@ -41,7 +42,7 @@
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
             <!-- Blank for characters recorded before the last-seen field existed. -->
-            <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
+            <DataGridTemplateColumn Header="{x:Static loc:Strings.KnownCharacters_Column_Since}" Width="Auto" SortMemberPath="SinceText">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate x:DataType="vm:CharacterRowViewModel">
                         <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
@@ -51,9 +52,9 @@
         </c:DataListView.Columns>
         <c:DataListView.FooterLeft>
             <StackPanel Orientation="Horizontal" Spacing="8">
-                <c:IconButton x:Name="AddCharacterButton" IconName="Add_16x" ToolTip.Tip="Add" />
-                <c:IconButton x:Name="EditCharacterButton" IconName="Edit_16x" ToolTip.Tip="Rename" />
-                <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove"
+                <c:IconButton x:Name="AddCharacterButton" IconName="Add_16x" ToolTip.Tip="{x:Static loc:Strings.KnownCharacters_Add_Tip}" />
+                <c:IconButton x:Name="EditCharacterButton" IconName="Edit_16x" ToolTip.Tip="{x:Static loc:Strings.KnownCharacters_Rename_Tip}" />
+                <c:IconButton IconName="Cancel_16x" ToolTip.Tip="{x:Static loc:Strings.KnownCharacters_Remove_Tip}"
                               Command="{Binding RemoveCharacterCommand}" />
             </StackPanel>
         </c:DataListView.FooterLeft>

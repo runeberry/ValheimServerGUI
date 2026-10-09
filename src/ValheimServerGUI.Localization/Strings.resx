@@ -25,6 +25,15 @@
   <data name="Common_No" xml:space="preserve">
     <value>No</value>
   </data>
+  <data name="Common_RestoreDefaults" xml:space="preserve">
+    <value>Restore Defaults</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>Save</value>
+  </data>
   <!-- Main window -->
   <data name="MainWindow_Profile_Label" xml:space="preserve">
     <value>Profile</value>
@@ -185,7 +194,7 @@ You may need to provide other players an Invite Code, which appears in game and 
   <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
     <value>Directory Overrides (for just this Profile)</value>
   </data>
-  <data name="AdvancedControls_ServerExe_Label" xml:space="preserve">
+  <data name="Paths_ServerExe_Label" xml:space="preserve">
     <value>Valheim Dedicated Server .exe</value>
   </data>
   <data name="AdvancedControls_ServerExe_Help" xml:space="preserve">
@@ -193,7 +202,7 @@ You may need to provide other players an Invite Code, which appears in game and 
 
 This field sets the path just for this profile. Leave this field empty if you do not want a profile-specific override. To set this path for all profiles, see File &gt; Set Directories.</value>
   </data>
-  <data name="AdvancedControls_SaveData_Label" xml:space="preserve">
+  <data name="Paths_SaveData_Label" xml:space="preserve">
     <value>Valheim Save Data Folder</value>
   </data>
   <data name="AdvancedControls_SaveData_Help" xml:space="preserve">
@@ -382,5 +391,261 @@ TIP: You can also connect to "localhost", which is a little easier than typing "
   </data>
   <data name="Logs_ClearLogs" xml:space="preserve">
     <value>Clear Logs</value>
+  </data>
+  <!-- Roles -->
+  <data name="Role_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <!-- Preferences dialog -->
+  <data name="Preferences_Title" xml:space="preserve">
+    <value>Preferences</value>
+  </data>
+  <data name="Preferences_CheckForUpdates_Label" xml:space="preserve">
+    <value>Automatically check for updates</value>
+  </data>
+  <data name="Preferences_CheckForUpdates_Help" xml:space="preserve">
+    <value>If enabled, ValheimServerGUI will check for updates automatically when the app starts up, and again every 24 hours.
+
+If disabled, you can check for updates anytime from Help &gt; Check for updates.</value>
+  </data>
+  <data name="Preferences_StartWithOs_Label" xml:space="preserve">
+    <value>Start with the operating system</value>
+  </data>
+  <data name="Preferences_StartWithOs_Help" xml:space="preserve">
+    <value>To start your server(s) on system startup, enable this setting along with "Start this server with ValheimServerGUI" under Advanced Controls for each server.</value>
+  </data>
+  <data name="Preferences_StartMinimized_Label" xml:space="preserve">
+    <value>Start ValheimServerGUI minimized</value>
+  </data>
+  <data name="Preferences_StartMinimized_Help" xml:space="preserve">
+    <value>Enable this setting to minimize VSG to the system tray when it starts up.</value>
+  </data>
+  <data name="Preferences_SaveOnStart_Label" xml:space="preserve">
+    <value>Auto save profile when starting server</value>
+  </data>
+  <data name="Preferences_SaveOnStart_Help" xml:space="preserve">
+    <value>If enabled, any changes you made to your server profile will be saved when you click Start Server. Otherwise, you must manually save changes with File &gt; Save.</value>
+  </data>
+  <data name="Preferences_WriteAppLogs_Label" xml:space="preserve">
+    <value>Write application logs to file</value>
+  </data>
+  <data name="Preferences_WriteAppLogs_Help" xml:space="preserve">
+    <value>If enabled, any application logs from ValheimServerGUI will be written to a daily rolling log file on disk. Logs older than 30 days will be deleted automatically.
+
+Note: this setting does not affect your server's logs. You can toggle server logs under the Advanced Controls tab for each server profile.</value>
+  </data>
+  <data name="Preferences_ValidatePassword_Label" xml:space="preserve">
+    <value>Validate password when starting server</value>
+  </data>
+  <data name="Preferences_ValidatePassword_Help" xml:space="preserve">
+    <value>Valheim Dedicated Server will not start if certain password requirements aren't met, and VSG enforces these requirements.
+
+Only disable this setting if you are running a mod that bypasses server password requirements, and you would like VSG to stop validating passwords as well.</value>
+  </data>
+  <data name="Preferences_Theme_Label" xml:space="preserve">
+    <value>Theme</value>
+  </data>
+  <!-- Directories dialog -->
+  <data name="Directories_Title" xml:space="preserve">
+    <value>Directories</value>
+  </data>
+  <data name="Directories_Intro" xml:space="preserve">
+    <value>These paths are used for all profiles. You can override these paths for individual profiles in the Advanced Controls tab.</value>
+  </data>
+  <data name="Directories_ServerExe_Help" xml:space="preserve">
+    <value>The location of the Valheim Dedicated Server executable, usually "valheim_server.exe".
+
+NOTE: You must have Valheim Dedicated Server installed in order to use this application. See Help for installation instructions.</value>
+  </data>
+  <data name="Directories_SaveData_Help" xml:space="preserve">
+    <value>The location of the save data for your Valheim server, including the "worlds" folder, admin lists, etc.</value>
+  </data>
+  <!-- Known characters -->
+  <data name="KnownCharacters_Header" xml:space="preserve">
+    <value>Known Characters</value>
+  </data>
+  <data name="KnownCharacters_Help" xml:space="preserve">
+    <value>The Valheim character names that this player is known by. Names are automatically added to this list when a player joins the server, but you may modify them manually.
+
+If a name appears with a (!), it means that name may not be matched to the correct player (due to a Valheim server limitation). You may remove this name if it's incorrect, or select the name and click Confirm to remove the warning.</value>
+  </data>
+  <data name="KnownCharacters_Menu_Rename" xml:space="preserve">
+    <value>Rename character</value>
+  </data>
+  <data name="KnownCharacters_Menu_Remove" xml:space="preserve">
+    <value>Remove character name</value>
+  </data>
+  <data name="KnownCharacters_Column_Name" xml:space="preserve">
+    <value>Character Name</value>
+  </data>
+  <data name="KnownCharacters_Column_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="KnownCharacters_Column_Since" xml:space="preserve">
+    <value>Since</value>
+  </data>
+  <data name="KnownCharacters_Add_Tip" xml:space="preserve">
+    <value>Add</value>
+  </data>
+  <data name="KnownCharacters_Rename_Tip" xml:space="preserve">
+    <value>Rename</value>
+  </data>
+  <data name="KnownCharacters_Remove_Tip" xml:space="preserve">
+    <value>Remove</value>
+  </data>
+  <!-- Manage Players dialog -->
+  <data name="ManagePlayers_Title" xml:space="preserve">
+    <value>Manage Players</value>
+  </data>
+  <data name="ManagePlayers_Tab_Accounts" xml:space="preserve">
+    <value>Player Accounts</value>
+  </data>
+  <data name="ManagePlayers_Tab_Banned" xml:space="preserve">
+    <value>Banned</value>
+  </data>
+  <data name="ManagePlayers_Menu_SetDefaultRole" xml:space="preserve">
+    <value>Set default role</value>
+  </data>
+  <data name="ManagePlayers_Column_PlayerName" xml:space="preserve">
+    <value>Player Name</value>
+  </data>
+  <data name="ManagePlayers_NameUnknown" xml:space="preserve">
+    <value>(name unknown)</value>
+  </data>
+  <data name="ManagePlayers_Column_PlatformId" xml:space="preserve">
+    <value>Platform ID</value>
+  </data>
+  <data name="ManagePlayers_Column_DefaultRole" xml:space="preserve">
+    <value>Default Role</value>
+  </data>
+  <!-- Player Details dialog -->
+  <data name="PlayerDetails_Title" xml:space="preserve">
+    <value>Player Info</value>
+  </data>
+  <data name="PlayerDetails_Name_Label" xml:space="preserve">
+    <value>Player Name:</value>
+  </data>
+  <data name="PlayerDetails_Name_Help" xml:space="preserve">
+    <value>The player's Steam/Xbox username. This will be determined automatically, but in case it doesn't work, you may edit the player's name manually.</value>
+  </data>
+  <data name="PlayerDetails_EditName_Tip" xml:space="preserve">
+    <value>Edit player name</value>
+  </data>
+  <data name="PlayerDetails_PlatformId_Help" xml:space="preserve">
+    <value>The ID associated with the player's Steam or Xbox account. You can use this ID to allow or ban players, or add players as admins.</value>
+  </data>
+  <data name="PlayerDetails_CopyId_Tip" xml:space="preserve">
+    <value>Copy ID to clipboard</value>
+  </data>
+  <data name="PlayerDetails_ZdoId_Label" xml:space="preserve">
+    <value>ZDO ID:</value>
+  </data>
+  <data name="PlayerDetails_ZdoId_Help" xml:space="preserve">
+    <value>The player's object ID in game. This changes with each game session.</value>
+  </data>
+  <data name="PlayerDetails_Refresh_Tip" xml:space="preserve">
+    <value>Refresh player data</value>
+  </data>
+  <!-- Add Player dialog -->
+  <data name="AddPlayer_Title" xml:space="preserve">
+    <value>Add Player</value>
+  </data>
+  <data name="AddPlayer_Platform_Label" xml:space="preserve">
+    <value>Platform</value>
+  </data>
+  <data name="AddPlayer_PlatformId_Label" xml:space="preserve">
+    <value>Platform ID</value>
+  </data>
+  <data name="AddPlayer_PlatformId_Watermark" xml:space="preserve">
+    <value>e.g. 76561198000000000</value>
+  </data>
+  <data name="AddPlayer_PlayerName_Label" xml:space="preserve">
+    <value>Player Name</value>
+  </data>
+  <data name="AddPlayer_DefaultRole_Label" xml:space="preserve">
+    <value>Default Role</value>
+  </data>
+  <data name="AddPlayer_ServerRole_Label" xml:space="preserve">
+    <value>Server Role</value>
+  </data>
+  <data name="AddPlayer_SetAsDefault_Label" xml:space="preserve">
+    <value>Set as default role for this player</value>
+  </data>
+  <data name="AddPlayer_Submit" xml:space="preserve">
+    <value>Add Player</value>
+  </data>
+  <!-- World Settings dialog -->
+  <data name="WorldPreferences_Preset_Label" xml:space="preserve">
+    <value>Difficulty Preset</value>
+  </data>
+  <data name="WorldPreferences_Preset_Help" xml:space="preserve">
+    <value>Presets are quick sets of options to help you get a server up and running quickly.
+
+If you select a preset and change any individual settings, then the preset will be deselected.</value>
+  </data>
+  <data name="WorldPreferences_WikiPrefix" xml:space="preserve">
+    <value>Read more about world modifiers on the</value>
+  </data>
+  <data name="WorldPreferences_WikiLink" xml:space="preserve">
+    <value>Valheim Wiki.</value>
+  </data>
+  <data name="WorldPreferences_Modifiers_Header" xml:space="preserve">
+    <value>Modifiers</value>
+  </data>
+  <data name="WorldPreferences_NotWorking" xml:space="preserve">
+    <value>Modifiers not working like you expected? You may already have modifiers set in-game.</value>
+  </data>
+  <data name="WorldPreferences_NotWorkingLink" xml:space="preserve">
+    <value>Read more here.</value>
+  </data>
+  <data name="WorldPreferences_Keys_Header" xml:space="preserve">
+    <value>Additional Keys</value>
+  </data>
+  <data name="WorldPreferences_Title" xml:space="preserve">
+    <value>World Settings - {0}</value>
+  </data>
+  <!-- Bug Report dialog -->
+  <data name="BugReport_Title" xml:space="preserve">
+    <value>Submit a Bug Report</value>
+  </data>
+  <data name="BugReport_Intro" xml:space="preserve">
+    <value>Describe the problem. A crash report with your app/OS details and recent logs is included.</value>
+  </data>
+  <data name="BugReport_Description_Label" xml:space="preserve">
+    <value>Description</value>
+  </data>
+  <data name="BugReport_Description_Help" xml:space="preserve">
+    <value>Describe the bug you're experiencing in detail, including:
+- A detailed description of the problem you're experiencing
+- Any steps required to reproduce the bug
+
+Your bug report will be submitted alongside some details about your computer, which version you're running, etc. to help us further troubleshoot the problem. No personal or identifying details about your computer will be collected.</value>
+  </data>
+  <data name="BugReport_Contact_Label" xml:space="preserve">
+    <value>(Optional) Contact details for follow-up</value>
+  </data>
+  <data name="BugReport_Contact_Help" xml:space="preserve">
+    <value>If you'd like, supply your email address, Twitter handle, or any other way we can contact you in case we need more information to follow up on your bug report.
+
+Of course, we will never share this information with any third parties. (I don't even know how to do that)</value>
+  </data>
+  <data name="BugReport_Submit" xml:space="preserve">
+    <value>Submit</value>
+  </data>
+  <!-- About dialog -->
+  <data name="About_Title" xml:space="preserve">
+    <value>About</value>
+  </data>
+  <data name="About_Donate" xml:space="preserve">
+    <value>Donate</value>
+  </data>
+  <data name="About_BuyValheim" xml:space="preserve">
+    <value>Don't have Valheim yet? Why not? Buy it here!</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>Version: {0}</value>
+  </data>
+  <data name="About_BuildDate" xml:space="preserve">
+    <value>Build Date: {0}</value>
   </data>
 </root>

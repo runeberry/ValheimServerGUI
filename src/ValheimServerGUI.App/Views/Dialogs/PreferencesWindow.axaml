@@ -1,34 +1,35 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.PreferencesWindow"
         x:DataType="vm:PreferencesViewModel"
-        Title="Preferences"
+        Title="{x:Static loc:Strings.Preferences_Title}"
         SizeToContent="Height" Width="440" MinWidth="380"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="6">
-        <c:CheckBoxFormField LabelText="Automatically check for updates" Value="{Binding CheckForUpdates}"
-                             HelpText="If enabled, ValheimServerGUI will check for updates automatically when the app starts up, and again every 24 hours.&#10;&#10;If disabled, you can check for updates anytime from Help &gt; Check for updates." />
-        <c:CheckBoxFormField LabelText="Start with the operating system" Value="{Binding StartWithWindows}"
-                             HelpText="To start your server(s) on system startup, enable this setting along with &quot;Start this server with ValheimServerGUI&quot; under Advanced Controls for each server." />
-        <c:CheckBoxFormField LabelText="Start ValheimServerGUI minimized" Value="{Binding StartMinimized}"
-                             HelpText="Enable this setting to minimize VSG to the system tray when it starts up." />
-        <c:CheckBoxFormField LabelText="Auto save profile when starting server" Value="{Binding SaveProfileOnStart}"
-                             HelpText="If enabled, any changes you made to your server profile will be saved when you click Start Server. Otherwise, you must manually save changes with File &gt; Save." />
-        <c:CheckBoxFormField LabelText="Write application logs to file" Value="{Binding WriteApplicationLogsToFile}"
-                             HelpText="If enabled, any application logs from ValheimServerGUI will be written to a daily rolling log file on disk. Logs older than 30 days will be deleted automatically.&#10;&#10;Note: this setting does not affect your server's logs. You can toggle server logs under the Advanced Controls tab for each server profile." />
-        <c:CheckBoxFormField LabelText="Validate password when starting server" Value="{Binding EnablePasswordValidation}"
-                             HelpText="Valheim Dedicated Server will not start if certain password requirements aren't met, and VSG enforces these requirements.&#10;&#10;Only disable this setting if you are running a mod that bypasses server password requirements, and you would like VSG to stop validating passwords as well." />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_CheckForUpdates_Label}" Value="{Binding CheckForUpdates}"
+                             HelpText="{x:Static loc:Strings.Preferences_CheckForUpdates_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartWithOs_Label}" Value="{Binding StartWithWindows}"
+                             HelpText="{x:Static loc:Strings.Preferences_StartWithOs_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartMinimized_Label}" Value="{Binding StartMinimized}"
+                             HelpText="{x:Static loc:Strings.Preferences_StartMinimized_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_SaveOnStart_Label}" Value="{Binding SaveProfileOnStart}"
+                             HelpText="{x:Static loc:Strings.Preferences_SaveOnStart_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_WriteAppLogs_Label}" Value="{Binding WriteApplicationLogsToFile}"
+                             HelpText="{x:Static loc:Strings.Preferences_WriteAppLogs_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_ValidatePassword_Label}" Value="{Binding EnablePasswordValidation}"
+                             HelpText="{x:Static loc:Strings.Preferences_ValidatePassword_Help}" />
 
-        <c:DropdownFormField LabelText="Theme" Width="200" HorizontalAlignment="Left" Margin="0,4,0,0"
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.Preferences_Theme_Label}" Width="200" HorizontalAlignment="Left" Margin="0,4,0,0"
                              ItemsSource="{Binding Themes}" Value="{Binding Theme}" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-            <Button Content="Restore Defaults" Click="OnRestoreDefaults" HorizontalAlignment="Left" />
-            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
-            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" HorizontalAlignment="Left" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>
 </Window>

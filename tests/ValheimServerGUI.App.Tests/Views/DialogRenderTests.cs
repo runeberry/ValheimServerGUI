@@ -10,6 +10,7 @@ using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using Xunit;
 
@@ -78,8 +79,8 @@ public class DialogRenderTests
         string[] Visible(PlayerListSectionView v) => v.GetLogicalDescendants().OfType<ValheimServerGUI.App.Controls.DataListView>()
             .First(l => l.Name == "AccountsList").Columns.Where(c => c.IsVisible).Select(c => (string)c.Header!).ToArray();
 
-        Assert.Equal(new[] { "Player Name", "Platform ID", "Default Role" }, Visible(sections[0]));
-        Assert.Equal(new[] { "Player Name", "Platform ID" }, Visible(sections[1]));
+        Assert.Equal(new[] { Strings.ManagePlayers_Column_PlayerName, Strings.ManagePlayers_Column_PlatformId, Strings.ManagePlayers_Column_DefaultRole }, Visible(sections[0]));
+        Assert.Equal(new[] { Strings.ManagePlayers_Column_PlayerName, Strings.ManagePlayers_Column_PlatformId }, Visible(sections[1]));
     }
 
     // The "Set default role" submenu's radio items write through their TwoWay IsChecked binding: checking Banned
@@ -102,9 +103,9 @@ public class DialogRenderTests
         menu.Open(list.GetVisualDescendants().OfType<DataGrid>().First()); // attached to the inner grid
         Dispatcher.UIThread.RunJobs();
 
-        var setRole = menu.Items.OfType<MenuItem>().First(m => (string?)m.Header == "Set default role");
-        var none = setRole.Items.OfType<MenuItem>().First(m => (string?)m.Header == "None");
-        var banned = setRole.Items.OfType<MenuItem>().First(m => (string?)m.Header == "Banned");
+        var setRole = menu.Items.OfType<MenuItem>().First(m => (string?)m.Header == Strings.ManagePlayers_Menu_SetDefaultRole);
+        var none = setRole.Items.OfType<MenuItem>().First(m => (string?)m.Header == Strings.Role_None);
+        var banned = setRole.Items.OfType<MenuItem>().First(m => (string?)m.Header == Strings.Role_Banned);
         Assert.True(none.IsChecked); // reflects the current (absent) default
 
         banned.IsChecked = true;     // what a click on a radio item does

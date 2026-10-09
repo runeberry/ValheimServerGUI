@@ -1,10 +1,11 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         xmlns:local="using:ValheimServerGUI.App.Views.Dialogs"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.ManagePlayersWindow"
         x:DataType="vm:ManagePlayersViewModel"
-        Title="Manage Players"
+        Title="{x:Static loc:Strings.ManagePlayers_Title}"
         SizeToContent="Height" Width="560"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
@@ -19,17 +20,17 @@
 
     <StackPanel Margin="12" Spacing="12">
         <TabControl>
-            <TabItem Header="Player Accounts">
+            <TabItem Header="{x:Static loc:Strings.ManagePlayers_Tab_Accounts}">
                 <local:PlayerListSectionView DataContext="{Binding PlayerAccounts}" Height="420" />
             </TabItem>
-            <TabItem Header="Banned">
+            <TabItem Header="{x:Static loc:Strings.ManagePlayers_Tab_Banned}">
                 <local:PlayerListSectionView DataContext="{Binding Banned}" Height="420" />
             </TabItem>
         </TabControl>
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
-            <Button Content="Save" MinWidth="80" IsDefault="True" Click="OnSave" />
-            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+            <Button Content="{x:Static loc:Strings.Common_Save}" MinWidth="80" IsDefault="True" Click="OnSave" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>
 </Window>

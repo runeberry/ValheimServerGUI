@@ -25,6 +25,15 @@
   <data name="Common_No" xml:space="preserve">
     <value>⟦Common_No⟧</value>
   </data>
+  <data name="Common_RestoreDefaults" xml:space="preserve">
+    <value>⟦Common_RestoreDefaults⟧</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>⟦Common_Close⟧</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>⟦Common_Save⟧</value>
+  </data>
   <!-- Main window -->
   <data name="MainWindow_Profile_Label" xml:space="preserve">
     <value>⟦MainWindow_Profile_Label⟧</value>
@@ -181,14 +190,14 @@
   <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
     <value>⟦AdvancedControls_DirectoryOverrides_Header⟧</value>
   </data>
-  <data name="AdvancedControls_ServerExe_Label" xml:space="preserve">
-    <value>⟦AdvancedControls_ServerExe_Label⟧</value>
+  <data name="Paths_ServerExe_Label" xml:space="preserve">
+    <value>⟦Paths_ServerExe_Label⟧</value>
   </data>
   <data name="AdvancedControls_ServerExe_Help" xml:space="preserve">
     <value>⟦AdvancedControls_ServerExe_Help⟧</value>
   </data>
-  <data name="AdvancedControls_SaveData_Label" xml:space="preserve">
-    <value>⟦AdvancedControls_SaveData_Label⟧</value>
+  <data name="Paths_SaveData_Label" xml:space="preserve">
+    <value>⟦Paths_SaveData_Label⟧</value>
   </data>
   <data name="AdvancedControls_SaveData_Help" xml:space="preserve">
     <value>⟦AdvancedControls_SaveData_Help⟧</value>
@@ -372,5 +381,243 @@
   </data>
   <data name="Logs_ClearLogs" xml:space="preserve">
     <value>⟦Logs_ClearLogs⟧</value>
+  </data>
+  <!-- Roles -->
+  <data name="Role_None" xml:space="preserve">
+    <value>⟦Role_None⟧</value>
+  </data>
+  <!-- Preferences dialog -->
+  <data name="Preferences_Title" xml:space="preserve">
+    <value>⟦Preferences_Title⟧</value>
+  </data>
+  <data name="Preferences_CheckForUpdates_Label" xml:space="preserve">
+    <value>⟦Preferences_CheckForUpdates_Label⟧</value>
+  </data>
+  <data name="Preferences_CheckForUpdates_Help" xml:space="preserve">
+    <value>⟦Preferences_CheckForUpdates_Help⟧</value>
+  </data>
+  <data name="Preferences_StartWithOs_Label" xml:space="preserve">
+    <value>⟦Preferences_StartWithOs_Label⟧</value>
+  </data>
+  <data name="Preferences_StartWithOs_Help" xml:space="preserve">
+    <value>⟦Preferences_StartWithOs_Help⟧</value>
+  </data>
+  <data name="Preferences_StartMinimized_Label" xml:space="preserve">
+    <value>⟦Preferences_StartMinimized_Label⟧</value>
+  </data>
+  <data name="Preferences_StartMinimized_Help" xml:space="preserve">
+    <value>⟦Preferences_StartMinimized_Help⟧</value>
+  </data>
+  <data name="Preferences_SaveOnStart_Label" xml:space="preserve">
+    <value>⟦Preferences_SaveOnStart_Label⟧</value>
+  </data>
+  <data name="Preferences_SaveOnStart_Help" xml:space="preserve">
+    <value>⟦Preferences_SaveOnStart_Help⟧</value>
+  </data>
+  <data name="Preferences_WriteAppLogs_Label" xml:space="preserve">
+    <value>⟦Preferences_WriteAppLogs_Label⟧</value>
+  </data>
+  <data name="Preferences_WriteAppLogs_Help" xml:space="preserve">
+    <value>⟦Preferences_WriteAppLogs_Help⟧</value>
+  </data>
+  <data name="Preferences_ValidatePassword_Label" xml:space="preserve">
+    <value>⟦Preferences_ValidatePassword_Label⟧</value>
+  </data>
+  <data name="Preferences_ValidatePassword_Help" xml:space="preserve">
+    <value>⟦Preferences_ValidatePassword_Help⟧</value>
+  </data>
+  <data name="Preferences_Theme_Label" xml:space="preserve">
+    <value>⟦Preferences_Theme_Label⟧</value>
+  </data>
+  <!-- Directories dialog -->
+  <data name="Directories_Title" xml:space="preserve">
+    <value>⟦Directories_Title⟧</value>
+  </data>
+  <data name="Directories_Intro" xml:space="preserve">
+    <value>⟦Directories_Intro⟧</value>
+  </data>
+  <data name="Directories_ServerExe_Help" xml:space="preserve">
+    <value>⟦Directories_ServerExe_Help⟧</value>
+  </data>
+  <data name="Directories_SaveData_Help" xml:space="preserve">
+    <value>⟦Directories_SaveData_Help⟧</value>
+  </data>
+  <!-- Known characters -->
+  <data name="KnownCharacters_Header" xml:space="preserve">
+    <value>⟦KnownCharacters_Header⟧</value>
+  </data>
+  <data name="KnownCharacters_Help" xml:space="preserve">
+    <value>⟦KnownCharacters_Help⟧</value>
+  </data>
+  <data name="KnownCharacters_Menu_Rename" xml:space="preserve">
+    <value>⟦KnownCharacters_Menu_Rename⟧</value>
+  </data>
+  <data name="KnownCharacters_Menu_Remove" xml:space="preserve">
+    <value>⟦KnownCharacters_Menu_Remove⟧</value>
+  </data>
+  <data name="KnownCharacters_Column_Name" xml:space="preserve">
+    <value>⟦KnownCharacters_Column_Name⟧</value>
+  </data>
+  <data name="KnownCharacters_Column_Status" xml:space="preserve">
+    <value>⟦KnownCharacters_Column_Status⟧</value>
+  </data>
+  <data name="KnownCharacters_Column_Since" xml:space="preserve">
+    <value>⟦KnownCharacters_Column_Since⟧</value>
+  </data>
+  <data name="KnownCharacters_Add_Tip" xml:space="preserve">
+    <value>⟦KnownCharacters_Add_Tip⟧</value>
+  </data>
+  <data name="KnownCharacters_Rename_Tip" xml:space="preserve">
+    <value>⟦KnownCharacters_Rename_Tip⟧</value>
+  </data>
+  <data name="KnownCharacters_Remove_Tip" xml:space="preserve">
+    <value>⟦KnownCharacters_Remove_Tip⟧</value>
+  </data>
+  <!-- Manage Players dialog -->
+  <data name="ManagePlayers_Title" xml:space="preserve">
+    <value>⟦ManagePlayers_Title⟧</value>
+  </data>
+  <data name="ManagePlayers_Tab_Accounts" xml:space="preserve">
+    <value>⟦ManagePlayers_Tab_Accounts⟧</value>
+  </data>
+  <data name="ManagePlayers_Tab_Banned" xml:space="preserve">
+    <value>⟦ManagePlayers_Tab_Banned⟧</value>
+  </data>
+  <data name="ManagePlayers_Menu_SetDefaultRole" xml:space="preserve">
+    <value>⟦ManagePlayers_Menu_SetDefaultRole⟧</value>
+  </data>
+  <data name="ManagePlayers_Column_PlayerName" xml:space="preserve">
+    <value>⟦ManagePlayers_Column_PlayerName⟧</value>
+  </data>
+  <data name="ManagePlayers_NameUnknown" xml:space="preserve">
+    <value>⟦ManagePlayers_NameUnknown⟧</value>
+  </data>
+  <data name="ManagePlayers_Column_PlatformId" xml:space="preserve">
+    <value>⟦ManagePlayers_Column_PlatformId⟧</value>
+  </data>
+  <data name="ManagePlayers_Column_DefaultRole" xml:space="preserve">
+    <value>⟦ManagePlayers_Column_DefaultRole⟧</value>
+  </data>
+  <!-- Player Details dialog -->
+  <data name="PlayerDetails_Title" xml:space="preserve">
+    <value>⟦PlayerDetails_Title⟧</value>
+  </data>
+  <data name="PlayerDetails_Name_Label" xml:space="preserve">
+    <value>⟦PlayerDetails_Name_Label⟧</value>
+  </data>
+  <data name="PlayerDetails_Name_Help" xml:space="preserve">
+    <value>⟦PlayerDetails_Name_Help⟧</value>
+  </data>
+  <data name="PlayerDetails_EditName_Tip" xml:space="preserve">
+    <value>⟦PlayerDetails_EditName_Tip⟧</value>
+  </data>
+  <data name="PlayerDetails_PlatformId_Help" xml:space="preserve">
+    <value>⟦PlayerDetails_PlatformId_Help⟧</value>
+  </data>
+  <data name="PlayerDetails_CopyId_Tip" xml:space="preserve">
+    <value>⟦PlayerDetails_CopyId_Tip⟧</value>
+  </data>
+  <data name="PlayerDetails_ZdoId_Label" xml:space="preserve">
+    <value>⟦PlayerDetails_ZdoId_Label⟧</value>
+  </data>
+  <data name="PlayerDetails_ZdoId_Help" xml:space="preserve">
+    <value>⟦PlayerDetails_ZdoId_Help⟧</value>
+  </data>
+  <data name="PlayerDetails_Refresh_Tip" xml:space="preserve">
+    <value>⟦PlayerDetails_Refresh_Tip⟧</value>
+  </data>
+  <!-- Add Player dialog -->
+  <data name="AddPlayer_Title" xml:space="preserve">
+    <value>⟦AddPlayer_Title⟧</value>
+  </data>
+  <data name="AddPlayer_Platform_Label" xml:space="preserve">
+    <value>⟦AddPlayer_Platform_Label⟧</value>
+  </data>
+  <data name="AddPlayer_PlatformId_Label" xml:space="preserve">
+    <value>⟦AddPlayer_PlatformId_Label⟧</value>
+  </data>
+  <data name="AddPlayer_PlatformId_Watermark" xml:space="preserve">
+    <value>⟦AddPlayer_PlatformId_Watermark⟧</value>
+  </data>
+  <data name="AddPlayer_PlayerName_Label" xml:space="preserve">
+    <value>⟦AddPlayer_PlayerName_Label⟧</value>
+  </data>
+  <data name="AddPlayer_DefaultRole_Label" xml:space="preserve">
+    <value>⟦AddPlayer_DefaultRole_Label⟧</value>
+  </data>
+  <data name="AddPlayer_ServerRole_Label" xml:space="preserve">
+    <value>⟦AddPlayer_ServerRole_Label⟧</value>
+  </data>
+  <data name="AddPlayer_SetAsDefault_Label" xml:space="preserve">
+    <value>⟦AddPlayer_SetAsDefault_Label⟧</value>
+  </data>
+  <data name="AddPlayer_Submit" xml:space="preserve">
+    <value>⟦AddPlayer_Submit⟧</value>
+  </data>
+  <!-- World Settings dialog -->
+  <data name="WorldPreferences_Preset_Label" xml:space="preserve">
+    <value>⟦WorldPreferences_Preset_Label⟧</value>
+  </data>
+  <data name="WorldPreferences_Preset_Help" xml:space="preserve">
+    <value>⟦WorldPreferences_Preset_Help⟧</value>
+  </data>
+  <data name="WorldPreferences_WikiPrefix" xml:space="preserve">
+    <value>⟦WorldPreferences_WikiPrefix⟧</value>
+  </data>
+  <data name="WorldPreferences_WikiLink" xml:space="preserve">
+    <value>⟦WorldPreferences_WikiLink⟧</value>
+  </data>
+  <data name="WorldPreferences_Modifiers_Header" xml:space="preserve">
+    <value>⟦WorldPreferences_Modifiers_Header⟧</value>
+  </data>
+  <data name="WorldPreferences_NotWorking" xml:space="preserve">
+    <value>⟦WorldPreferences_NotWorking⟧</value>
+  </data>
+  <data name="WorldPreferences_NotWorkingLink" xml:space="preserve">
+    <value>⟦WorldPreferences_NotWorkingLink⟧</value>
+  </data>
+  <data name="WorldPreferences_Keys_Header" xml:space="preserve">
+    <value>⟦WorldPreferences_Keys_Header⟧</value>
+  </data>
+  <data name="WorldPreferences_Title" xml:space="preserve">
+    <value>⟦WorldPreferences_Title {0}⟧</value>
+  </data>
+  <!-- Bug Report dialog -->
+  <data name="BugReport_Title" xml:space="preserve">
+    <value>⟦BugReport_Title⟧</value>
+  </data>
+  <data name="BugReport_Intro" xml:space="preserve">
+    <value>⟦BugReport_Intro⟧</value>
+  </data>
+  <data name="BugReport_Description_Label" xml:space="preserve">
+    <value>⟦BugReport_Description_Label⟧</value>
+  </data>
+  <data name="BugReport_Description_Help" xml:space="preserve">
+    <value>⟦BugReport_Description_Help⟧</value>
+  </data>
+  <data name="BugReport_Contact_Label" xml:space="preserve">
+    <value>⟦BugReport_Contact_Label⟧</value>
+  </data>
+  <data name="BugReport_Contact_Help" xml:space="preserve">
+    <value>⟦BugReport_Contact_Help⟧</value>
+  </data>
+  <data name="BugReport_Submit" xml:space="preserve">
+    <value>⟦BugReport_Submit⟧</value>
+  </data>
+  <!-- About dialog -->
+  <data name="About_Title" xml:space="preserve">
+    <value>⟦About_Title⟧</value>
+  </data>
+  <data name="About_Donate" xml:space="preserve">
+    <value>⟦About_Donate⟧</value>
+  </data>
+  <data name="About_BuyValheim" xml:space="preserve">
+    <value>⟦About_BuyValheim⟧</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>⟦About_Version {0}⟧</value>
+  </data>
+  <data name="About_BuildDate" xml:space="preserve">
+    <value>⟦About_BuildDate {0}⟧</value>
   </data>
 </root>

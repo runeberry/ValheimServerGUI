@@ -1,29 +1,30 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.DirectoriesWindow"
         x:DataType="vm:DirectoriesViewModel"
-        Title="Directories"
+        Title="{x:Static loc:Strings.Directories_Title}"
         SizeToContent="Height" Width="560" MinWidth="480"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="8">
         <TextBlock TextWrapping="Wrap"
-                   Text="These paths are used for all profiles. You can override these paths for individual profiles in the Advanced Controls tab." />
-        <c:FilenameFormField LabelText="Valheim Dedicated Server .exe" SelectMode="File"
+                   Text="{x:Static loc:Strings.Directories_Intro}" />
+        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_ServerExe_Label}" SelectMode="File"
                              Value="{Binding ServerExePath}"
                              ShowOpenFolder="True" OpenFolderCommand="{Binding OpenServerExeFolderCommand}"
-                             HelpText="The location of the Valheim Dedicated Server executable, usually &quot;valheim_server.exe&quot;.&#10;&#10;NOTE: You must have Valheim Dedicated Server installed in order to use this application. See Help for installation instructions." />
-        <c:FilenameFormField LabelText="Valheim Save Data Folder" SelectMode="Directory"
+                             HelpText="{x:Static loc:Strings.Directories_ServerExe_Help}" />
+        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_SaveData_Label}" SelectMode="Directory"
                              Value="{Binding SaveDataFolderPath}"
                              ShowOpenFolder="True" OpenFolderCommand="{Binding OpenSaveFolderCommand}"
-                             HelpText="The location of the save data for your Valheim server, including the &quot;worlds&quot; folder, admin lists, etc." />
+                             HelpText="{x:Static loc:Strings.Directories_SaveData_Help}" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-            <Button Content="Restore Defaults" Click="OnRestoreDefaults" />
-            <Button Content="OK" MinWidth="80" IsDefault="True" Click="OnOk" />
-            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>
 </Window>

@@ -1,48 +1,49 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         xmlns:c="using:ValheimServerGUI.App.Controls"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
         x:Class="ValheimServerGUI.App.Views.Dialogs.AddPlayerWindow"
         x:DataType="vm:AddPlayerViewModel"
-        Title="Add Player"
+        Title="{x:Static loc:Strings.AddPlayer_Title}"
         SizeToContent="Height" Width="360"
         WindowStartupLocation="CenterOwner"
         CanResize="False"
         ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="12">
-        <c:DropdownFormField LabelText="Platform"
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.AddPlayer_Platform_Label}"
                              ItemsSource="{Binding Platforms}"
                              Value="{Binding SelectedPlatform}" />
 
-        <c:TextFormField LabelText="Platform ID"
-                         Watermark="e.g. 76561198000000000"
+        <c:TextFormField LabelText="{x:Static loc:Strings.AddPlayer_PlatformId_Label}"
+                         Watermark="{x:Static loc:Strings.AddPlayer_PlatformId_Watermark}"
                          Value="{Binding PlayerId}" />
 
-        <c:TextFormField LabelText="Player Name" MaxLength="64"
+        <c:TextFormField LabelText="{x:Static loc:Strings.AddPlayer_PlayerName_Label}" MaxLength="64"
                          Value="{Binding PlayerName}" />
 
         <!-- One role field shows at a time: the player's default role (Manage Players) or this server's role
              (Players tab). Both edit the same SelectedRole. -->
-        <c:DropdownFormField LabelText="Default Role" IsVisible="{Binding ShowDefaultRole}"
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.AddPlayer_DefaultRole_Label}" IsVisible="{Binding ShowDefaultRole}"
                              HelpText="{x:Static vm:AddPlayerViewModel.DefaultRoleHelp}"
                              ItemsSource="{Binding Roles}"
                              Value="{Binding SelectedRole}" />
 
-        <c:DropdownFormField LabelText="Server Role" IsVisible="{Binding ShowServerRole}"
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.AddPlayer_ServerRole_Label}" IsVisible="{Binding ShowServerRole}"
                              HelpText="{x:Static vm:AddPlayerViewModel.ServerRoleHelp}"
                              ItemsSource="{Binding Roles}"
                              Value="{Binding SelectedRole}" />
 
-        <c:CheckBoxFormField LabelText="Set as default role for this player"
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.AddPlayer_SetAsDefault_Label}"
                              HelpText="{x:Static vm:AddPlayerViewModel.SetAsDefaultHelp}"
                              IsVisible="{Binding ShowServerRole}"
                              IsEnabled="{Binding CanSetAsDefault}"
                              Value="{Binding SetAsDefault}" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,8,0,0">
-            <Button Content="Add Player" MinWidth="80" IsDefault="True" IsEnabled="{Binding CanSubmit}" Click="OnOk" />
-            <Button Content="Cancel" MinWidth="80" IsCancel="True" Click="OnCancel" />
+            <Button Content="{x:Static loc:Strings.AddPlayer_Submit}" MinWidth="80" IsDefault="True" IsEnabled="{Binding CanSubmit}" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>
 </Window>

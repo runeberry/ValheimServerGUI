@@ -2,6 +2,7 @@
   <Folder Name="/src/">
     <Project Path="src/ValheimServerGUI.App/ValheimServerGUI.App.csproj" />
     <Project Path="src/ValheimServerGUI.Core/ValheimServerGUI.Core.csproj" />
+    <Project Path="src/ValheimServerGUI.Localization/ValheimServerGUI.Localization.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/ValheimServerGUI.App.Tests/ValheimServerGUI.App.Tests.csproj" />

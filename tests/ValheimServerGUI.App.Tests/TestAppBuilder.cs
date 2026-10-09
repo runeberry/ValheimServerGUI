@@ -20,17 +20,20 @@ namespace ValheimServerGUI.App.Tests;
 /// </summary>
 public static class TestAppBuilder
 {
-    // Pin the UI culture so any localized/formatted assertion is deterministic regardless of the machine
-    // locale. Runs at assembly load, before xUnit creates any worker thread, so the default-thread culture
-    // covers every worker too.
+    // Pin the cultures so assertions are deterministic regardless of the machine locale. The UI culture is
+    // the key-echo TEST culture (qps-ploc: every string is "⟦Key⟧"), so no test can depend on English copy;
+    // assertions compare against the Strings accessor instead. Number/date formatting stays en-US. Runs at
+    // assembly load, before xUnit creates any worker thread, so the default-thread cultures cover every
+    // worker too.
     [ModuleInitializer]
     internal static void PinCulture()
     {
         var en = CultureInfo.GetCultureInfo("en-US");
+        var test = CultureInfo.GetCultureInfo("qps-ploc");
         CultureInfo.DefaultThreadCurrentCulture = en;
-        CultureInfo.DefaultThreadCurrentUICulture = en;
+        CultureInfo.DefaultThreadCurrentUICulture = test;
         CultureInfo.CurrentCulture = en;
-        CultureInfo.CurrentUICulture = en;
+        CultureInfo.CurrentUICulture = test;
     }
 
     // Redirect the app-data / XDG roots to a throwaway temp dir for the whole suite, so any test that

@@ -34,10 +34,23 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ValheimServerGUI.Core\ValheimServerGUI.Core.csproj" />
+    <!-- Referenced directly (not only through Core) so it is guaranteed to build before XamlIl
+         resolves {x:Static loc:Strings.*}. -->
+    <ProjectReference Include="..\ValheimServerGUI.Localization\ValheimServerGUI.Localization.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="ValheimServerGUI.App.Tests" />
   </ItemGroup>
+
+  <!-- The qps-ploc satellite is the key-echo TEST culture (see ValheimServerGUI.Localization). It is
+       built into the normal output so tests and `VSG_LANG=qps-ploc dotnet run` QA work, but it must
+       never ship: drop it from the publish list, which also feeds the single-file bundle. -->
+  <Target Name="ExcludeTestCultureFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="$([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').Replace('\', '/').StartsWith('qps-ploc/'))" />
+    </ItemGroup>
+  </Target>
 
 </Project>

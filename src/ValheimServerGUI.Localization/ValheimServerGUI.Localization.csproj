@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <!-- The manifest resource name (and the generated ResourceManager base name) is
+         RootNamespace + file name = ValheimServerGUI.Localization.Strings. -->
+    <RootNamespace>ValheimServerGUI.Localization</RootNamespace>
+    <!-- Strings.resx is the English set; any culture without a satellite falls back to it. -->
+    <NeutralLanguage>en</NeutralLanguage>
+    <!-- Emit the strongly-typed `Strings` accessor as PUBLIC. It must be public because Avalonia's
+         XAML compiler resolves {x:Static loc:Strings.*} against this referenced assembly and ignores
+         InternalsVisibleTo. NullForgivingOperators makes the properties `string` (not `string?`) so
+         the call sites don't each raise a nullable warning. -->
+    <ResXFileCodeGenerator_PublicClass>true</ResXFileCodeGenerator_PublicClass>
+    <ResXFileCodeGenerator_NullForgivingOperators>true</ResXFileCodeGenerator_NullForgivingOperators>
+  </PropertyGroup>
+
+  <!-- Strings live in their own assembly so a ProjectReference forces it to build before the App's
+       XAML compiler runs (the canonical fix for the generator/XamlIl ordering race). The strongly-typed
+       `Strings` class is produced at compile time, in-memory, by the VocaDb.ResXFileCodeGenerator Roslyn
+       source generator (build-only; nothing committed). It replaces the VS ResXFileCodeGenerator custom
+       tool, which does not run under `dotnet build`, and MSBuild's built-in StronglyTyped generator,
+       which only emits an internal class.
+
+       Strings.resx is hand-maintained. Strings.qps-ploc.resx is the key-echo TEST culture, generated
+       from it by scripts/gen-test-strings.sh; it is excluded from published artifacts (see the App
+       csproj). -->
+  <ItemGroup>
+    <PackageReference Include="VocaDb.ResXFileCodeGenerator" Version="3.2.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

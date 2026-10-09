@@ -30,6 +30,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\ValheimServerGUI.Localization\ValheimServerGUI.Localization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Include="..\..\SolutionResources\ClientSecrets.cs" Link="ClientSecrets.cs"
              Condition="'$(Configuration)'=='Release' Or Exists('..\..\SolutionResources\ClientSecrets.cs')" />
     <Compile Include="..\..\SolutionResources\ClientSecrets.Values.cs" Link="ClientSecrets.Values.cs"

@@ -179,7 +179,9 @@ namespace ValheimServerGUI.Core.Tests.Game
             _server.Stop();
             // Simulate a hung process: never raise Exited.
 
-            WaitFor(() => _processProvider.ForceKilledKeys.Count > 0);
+            // The timeout task force-kills and THEN raises StopTimedOut, so wait for both: waiting for the kill alone
+            // let the assertion below land between the two under load.
+            WaitFor(() => _processProvider.ForceKilledKeys.Count > 0 && timedOut);
 
             Assert.Single(_processProvider.ForceKilledKeys);
             Assert.True(timedOut);

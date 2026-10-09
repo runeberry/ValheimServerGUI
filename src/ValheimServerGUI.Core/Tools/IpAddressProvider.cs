@@ -64,8 +64,9 @@ namespace ValheimServerGUI.Tools
         public event EventHandler<string?>? InternalIpChanged;
 
         /// <summary>
-        /// External-IP endpoints tried in order (§16.2 fallback chain, E52): ipify → ifconfig.co →
-        /// icanhazip. The first non-blank result wins; if all fail the previous value is kept.
+        /// External-IP endpoints tried in order (§16.2 fallback chain, E52): ipify → icanhazip → ident.me, all
+        /// IPv4-only. The first result that parses as an IPv4 address wins; anything else (blank, IPv6, an HTML
+        /// challenge page) moves on to the next endpoint. If all fail the previous value is kept.
         /// </summary>
         protected virtual IReadOnlyList<string> ExternalIpEndpoints { get; } = new[]
         {
@@ -80,12 +81,15 @@ namespace ValheimServerGUI.Tools
             {
                 try
                 {
-                    var ip = await FetchExternalIpAsync(url);
-                    if (!string.IsNullOrWhiteSpace(ip))
+                    var ip = (await FetchExternalIpAsync(url))?.Trim();
+                    if (IsIPv4(ip))
                     {
-                        ExternalIpAddress = ip.Trim();
+                        ExternalIpAddress = ip;
                         return;
                     }
+
+                    if (!string.IsNullOrEmpty(ip))
+                        Logger.Warning("External IP lookup from {Url} did not return an IPv4 address", url);
                 }
                 catch (Exception e)
                 {
@@ -95,6 +99,13 @@ namespace ValheimServerGUI.Tools
 
             // E52: every endpoint failed/blank — keep the previous value (no-op).
         }
+
+        // TryParse alone is lenient ("1.2.3" parses as 1.2.0.3), so also require the text to be the address's
+        // canonical dotted-quad form.
+        private static bool IsIPv4(string? text) =>
+            IPAddress.TryParse(text, out var address)
+            && address.AddressFamily == AddressFamily.InterNetwork
+            && address.ToString() == text;
 
         /// <summary>Fetches the external IP from one endpoint. ipify returns <c>{"ip":…}</c>; the others return the bare IP.</summary>
         /// <remarks>Routed through <see cref="RestClient"/> (not a raw HttpClient) so the call is logged at the

@@ -976,8 +976,10 @@ save-flush must be shown to fail under force-kill).
    overwrite" property) rather than moving to `%APPDATA%`.
 2. **Startup scope:** recommend **per-user only** on both OSes (drop the Windows HKLM "all users"
    tier — it needed admin and silently fell back to HKCU anyway).
-3. **External-IP resiliency:** recommend a small **fallback chain** (ipify → ifconfig.co →
-   icanhazip) so one outage doesn't blank the field.
+3. **External-IP resiliency:** recommend a small **fallback chain** of IPv4-only endpoints (ipify →
+   ipv4.icanhazip.com → v4.ident.me) so one outage doesn't blank the field. Accept only a result that is a
+   canonical IPv4 address (players join over IPv4; a dual-stack host must never show an IPv6 address, and a
+   bot-challenge HTML page must never show at all) — anything else falls through to the next endpoint.
 4. **Legacy `userprefs.txt` migration:** recommend **keep** (cheap, one-time).
 5. **Theme:** recommend **add a light/dark/system preference** (Avalonia norm; small).
 6. **Persist last-active profile:** recommend **yes** — add `LastActiveProfile` so restart reopens

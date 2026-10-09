@@ -8,7 +8,7 @@ using Xunit;
 
 namespace ValheimServerGUI.Core.Tests.Tools
 {
-    // §16.2 external-IP fallback chain (E52): try endpoints in order, first non-blank wins, keep prior on total failure.
+    // §16.2 external-IP fallback chain (E52): try endpoints in order, first IPv4 result wins, keep prior on total failure.
     public class IpAddressProviderTests
     {
         private sealed class StubIpProvider : IpAddressProvider
@@ -63,6 +63,22 @@ namespace ValheimServerGUI.Core.Tests.Tools
             await p.LoadExternalIpAddressAsync();
 
             Assert.Equal("4.4.4.4", p.ExternalIpAddress);
+        }
+
+        [Theory]
+        [InlineData("2001:db8::1")]
+        [InlineData("<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>")]
+        [InlineData("not an ip")]
+        [InlineData("1.2.3")]
+        public async Task A_response_that_is_not_IPv4_falls_through_to_the_next_endpoint(string response)
+        {
+            var p = new StubIpProvider();
+            p.Responses["one"] = response;
+            p.Responses["two"] = "5.6.7.8";
+
+            await p.LoadExternalIpAddressAsync();
+
+            Assert.Equal("5.6.7.8", p.ExternalIpAddress);
         }
 
         [Fact]

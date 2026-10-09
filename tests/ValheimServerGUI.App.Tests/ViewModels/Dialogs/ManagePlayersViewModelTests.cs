@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
 
@@ -57,7 +58,7 @@ public class ManagePlayersViewModelTests
         Assert.Equal(new[] { "Steam:2", "Steam:1" }, Keys(vm.PlayerAccounts)); // sorted by name
         Assert.Equal(new[] { "Steam:3" }, Keys(vm.Banned));
         Assert.Null(vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:1").RoleText);
-        Assert.Equal("Admin", vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:2").RoleText);
+        Assert.Equal(Strings.Role_Admin, vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:2").RoleText);
         Assert.False(vm.IsDirty);
     }
 
@@ -127,7 +128,7 @@ public class ManagePlayersViewModelTests
         Assert.Empty(vm.Banned.Accounts);
         var row = Assert.Single(vm.PlayerAccounts.Accounts);
         Assert.Equal("New", row.AccountName);
-        Assert.Equal("Admin", row.RoleText);
+        Assert.Equal(Strings.Role_Admin, row.RoleText);
     }
 
     // ---- set default role ----
@@ -143,7 +144,7 @@ public class ManagePlayersViewModelTests
 
         section.DefaultIsAdmin = true;
         Assert.True(section.DefaultIsAdmin);
-        Assert.Equal("Admin", section.Accounts[0].RoleText);
+        Assert.Equal(Strings.Role_Admin, section.Accounts[0].RoleText);
         Assert.Same(section.Accounts[0], section.SelectedAccount);
 
         section.DefaultIsPermitted = false; // a radio group's uncheck write is ignored
@@ -171,7 +172,7 @@ public class ManagePlayersViewModelTests
         vm.Banned.DefaultIsPermitted = true;
 
         Assert.Empty(vm.Banned.Accounts);
-        Assert.Equal("Permitted", Assert.Single(vm.PlayerAccounts.Accounts).RoleText);
+        Assert.Equal(Strings.Role_Permitted, Assert.Single(vm.PlayerAccounts.Accounts).RoleText);
     }
 
     // ---- remove ----

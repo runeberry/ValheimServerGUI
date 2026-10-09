@@ -382,6 +382,35 @@ TIP: You can also connect to "localhost", which is a little easier than typing "
   <data name="Players_RemovePlayer_Tip" xml:space="preserve">
     <value>Remove player</value>
   </data>
+  <!-- Server status -->
+  <data name="ServerStatus_Stopped" xml:space="preserve">
+    <value>Stopped</value>
+  </data>
+  <data name="ServerStatus_Starting" xml:space="preserve">
+    <value>Starting</value>
+  </data>
+  <data name="ServerStatus_Running" xml:space="preserve">
+    <value>Running</value>
+  </data>
+  <data name="ServerStatus_Stopping" xml:space="preserve">
+    <value>Stopping</value>
+  </data>
+  <!-- Player status -->
+  <data name="PlayerStatus_Offline" xml:space="preserve">
+    <value>Offline</value>
+  </data>
+  <data name="PlayerStatus_Joining" xml:space="preserve">
+    <value>Joining</value>
+  </data>
+  <data name="PlayerStatus_Online" xml:space="preserve">
+    <value>Online</value>
+  </data>
+  <data name="PlayerStatus_Leaving" xml:space="preserve">
+    <value>Leaving</value>
+  </data>
+  <data name="Players_RoleOverridden" xml:space="preserve">
+    <value>{0} (*)</value>
+  </data>
   <!-- Logs tab -->
   <data name="Logs_ViewFor_Label" xml:space="preserve">
     <value>View logs for:</value>
@@ -394,6 +423,35 @@ TIP: You can also connect to "localhost", which is a little easier than typing "
   </data>
   <data name="Logs_ClearLogs" xml:space="preserve">
     <value>Clear Logs</value>
+  </data>
+  <!-- Theme -->
+  <data name="Theme_System" xml:space="preserve">
+    <value>System</value>
+  </data>
+  <data name="Theme_Light" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="Theme_Dark" xml:space="preserve">
+    <value>Dark</value>
+  </data>
+  <!-- Duration units -->
+  <data name="DurationUnit_Seconds" xml:space="preserve">
+    <value>Seconds</value>
+  </data>
+  <data name="DurationUnit_Minutes" xml:space="preserve">
+    <value>Minutes</value>
+  </data>
+  <data name="DurationUnit_Hours" xml:space="preserve">
+    <value>Hours</value>
+  </data>
+  <data name="DurationUnit_Days" xml:space="preserve">
+    <value>Days</value>
+  </data>
+  <data name="Logs_View_Server" xml:space="preserve">
+    <value>Server</value>
+  </data>
+  <data name="Logs_View_Application" xml:space="preserve">
+    <value>Application</value>
   </data>
   <!-- Prompts -->
   <data name="Prompt_UnsavedChanges_Title" xml:space="preserve">

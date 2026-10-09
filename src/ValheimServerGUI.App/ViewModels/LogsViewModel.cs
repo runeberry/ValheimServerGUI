@@ -47,7 +47,7 @@ public partial class LogsViewModel : ViewModelBase
         while (lines.Count > MaxLines) lines.RemoveAt(0);
     }
 
-    public IReadOnlyList<string> Views { get; } = new[] { LogViews.Server, LogViews.Application };
+    public IReadOnlyList<LogView> Views { get; } = new[] { LogView.Server, LogView.Application };
 
     // The Server buffer is owned by the selected profile's server entry (IServerManager); SetServerLog
     // re-points it on a switch. Starts as an empty local buffer until the first re-target.
@@ -56,13 +56,13 @@ public partial class LogsViewModel : ViewModelBase
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CurrentLines))]
-    private string _selectedView = LogViews.Server;
+    private LogView _selectedView = LogView.Server;
 
     public ObservableCollection<string> CurrentLines =>
-        SelectedView == LogViews.Application ? AppLines : _serverLines;
+        SelectedView == LogView.Application ? AppLines : _serverLines;
 
     /// <summary>Shows the save-file picker and writes the current view's lines (wired by the window).</summary>
-    public event Func<string, IReadOnlyList<string>, Task>? SaveLogsRequested;
+    public event Func<LogView, IReadOnlyList<string>, Task>? SaveLogsRequested;
 
     /// <summary>Surfaces a warning (e.g. nothing to save).</summary>
     public event Action<string>? Warning;

@@ -19,7 +19,7 @@ public partial class CharacterRowViewModel : ObservableObject
         CharacterName = characterName;
         MatchConfident = matchConfident;
         LastSeen = lastSeen;
-        StatusText = Status.ToString();
+        StatusText = EnumDisplayConverter.ToText(Status);
     }
 
     [ObservableProperty] private string _characterName;
@@ -38,7 +38,7 @@ public partial class CharacterRowViewModel : ObservableObject
     {
         var isActive = CharacterName == player.LastStatusCharacter && player.PlayerStatus != PlayerStatus.Offline;
         Status = isActive ? player.PlayerStatus : PlayerStatus.Offline;
-        StatusText = Status.ToString();
+        StatusText = EnumDisplayConverter.ToText(Status);
         SinceText = LastSeen is { } seen ? RelativeTimeConverter.Format(seen, now) : string.Empty;
     }
 }

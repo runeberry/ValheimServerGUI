@@ -6,6 +6,7 @@ using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
 
@@ -156,7 +157,7 @@ public class PlayersViewModelTests
     public void Role_text_and_icon_derive_from_displayed_role()
     {
         var row = new PlayerRowViewModel(Player("1", PlayerStatus.Offline)) { DisplayRole = PlayerRole.Admin };
-        Assert.Equal("Admin", row.RoleText);
+        Assert.Equal(Strings.Role_Admin, row.RoleText);
         Assert.NotNull(row.RoleIcon);
 
         row.DisplayRole = null;
@@ -239,7 +240,7 @@ public class PlayersViewModelTests
         Assert.Null(vm.SelectedPlayer);
 
         vm.ShowBannedPlayers = true;
-        Assert.Equal("Banned", Assert.Single(vm.Players).RoleText);
+        Assert.Equal(Strings.Role_Banned, Assert.Single(vm.Players).RoleText);
     }
 
     // ---- "Set server role" submenu ----
@@ -301,10 +302,10 @@ public class PlayersViewModelTests
         vm.SelectedPlayer = vm.Players[0];
 
         vm.ServerRoleIsAdmin = true;
-        Assert.Equal("Admin (*)", RowFor(vm, "Steam:1").RoleText);
+        Assert.Equal(string.Format(Strings.Players_RoleOverridden, Strings.Role_Admin), RowFor(vm, "Steam:1").RoleText);
 
         vm.ServerRoleIsDefault = true;
-        Assert.Equal("Permitted", RowFor(vm, "Steam:1").RoleText);
+        Assert.Equal(Strings.Role_Permitted, RowFor(vm, "Steam:1").RoleText);
     }
 
     // A server never stores a "no role" override: setting None just removes the override.
@@ -321,7 +322,7 @@ public class PlayersViewModelTests
         _form.SetRole(player, PlayerRole.None);
 
         Assert.Null(_form.GetOverride("Steam:1"));
-        Assert.Equal("Admin", RowFor(vm, "Steam:1").RoleText);
+        Assert.Equal(Strings.Role_Admin, RowFor(vm, "Steam:1").RoleText);
     }
 
     // ---- global defaults + server overrides ----
@@ -336,7 +337,7 @@ public class PlayersViewModelTests
 
         var row = RowFor(vm, "Steam:1");
         Assert.Equal(PlayerRole.Admin, row.DisplayRole);
-        Assert.Equal("Admin", row.RoleText);
+        Assert.Equal(Strings.Role_Admin, row.RoleText);
     }
 
     [AvaloniaFact]
@@ -349,7 +350,7 @@ public class PlayersViewModelTests
         repo.PushUpdate(player);
 
         _form.SetRole(player, PlayerRole.Admin); // pins the current default
-        Assert.Equal("Admin (*)", RowFor(vm, "Steam:1").RoleText);
+        Assert.Equal(string.Format(Strings.Players_RoleOverridden, Strings.Role_Admin), RowFor(vm, "Steam:1").RoleText);
     }
 
     [AvaloniaFact]
@@ -361,7 +362,7 @@ public class PlayersViewModelTests
         repo.PushUpdate(player);
 
         _form.SetRole(player, PlayerRole.Admin);
-        Assert.Equal("Admin", RowFor(vm, "Steam:1").RoleText);
+        Assert.Equal(Strings.Role_Admin, RowFor(vm, "Steam:1").RoleText);
     }
 
     [AvaloniaFact]
@@ -374,7 +375,7 @@ public class PlayersViewModelTests
 
         SaveDefaults(("Steam:1", PlayerRole.Admin));
 
-        Assert.Equal("Admin", RowFor(vm, "Steam:1").RoleText);
+        Assert.Equal(Strings.Role_Admin, RowFor(vm, "Steam:1").RoleText);
     }
 
     [AvaloniaFact]
@@ -457,7 +458,7 @@ public class PlayersViewModelTests
         Assert.Equal(saves + 1, _userPrefs.SaveCount);
         Assert.Equal(PlayerRole.Admin, _userPrefs.LoadPreferences().PlayerDefaults["Steam:5"].DefaultRole);
         Assert.Null(_form.GetOverride("Steam:5"));
-        Assert.Equal("Admin", RowFor(vm, "Steam:5").RoleText); // the default now applies here, unmarked
+        Assert.Equal(Strings.Role_Admin, RowFor(vm, "Steam:5").RoleText); // the default now applies here, unmarked
         Assert.Equal("A", RowFor(vm, "Steam:5").Player.PlayerName); // blank name keeps the cached one
     }
 

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.Services;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
@@ -91,7 +92,7 @@ public class MainWindowViewModelTests
         Assert.Equal(canStart, vm.CanStart);
         Assert.Equal(canStop, vm.CanStop);
         Assert.Equal(canRestart, vm.CanRestart);
-        Assert.Equal("Stopping".Equals(status.ToString()) ? "Stopping" : "Starting", vm.StatusText);
+        Assert.Equal(EnumDisplayConverter.ToText(status), vm.StatusText);
     }
 
     [Fact]

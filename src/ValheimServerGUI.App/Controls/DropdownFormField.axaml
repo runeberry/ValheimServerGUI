@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
              x:Class="ValheimServerGUI.App.Controls.DropdownFormField"
              x:Name="Root" x:CompileBindings="False">
     <UserControl.Resources>
@@ -13,6 +14,7 @@
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <ComboBox HorizontalAlignment="Stretch"
                   ItemsSource="{Binding #Root.ItemsSource}"
+                  DisplayMemberBinding="{Binding Converter={x:Static conv:EnumDisplayConverter.Instance}}"
                   PlaceholderText="{Binding #Root.PlaceholderText}"
                   SelectedItem="{Binding #Root.Value, Mode=TwoWay}" />
     </c:FormRow>

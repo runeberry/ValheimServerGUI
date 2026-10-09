@@ -30,7 +30,7 @@ public class LogsViewModelTests
         vm.SetServerLog(buffer);
         buffer.Add("world loaded");
 
-        Assert.Equal(LogViews.Server, vm.SelectedView);
+        Assert.Equal(LogView.Server, vm.SelectedView);
         Assert.Contains("world loaded", vm.CurrentLines);
     }
 
@@ -61,7 +61,7 @@ public class LogsViewModelTests
 
         var raised = false;
         vm.PropertyChanged += (_, e) => raised |= e.PropertyName == nameof(LogsViewModel.CurrentLines);
-        vm.SelectedView = LogViews.Application;
+        vm.SelectedView = LogView.Application;
 
         Assert.True(raised);
         Assert.DoesNotContain("server-line", vm.CurrentLines); // now showing the Application buffer

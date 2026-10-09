@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
              x:Class="ValheimServerGUI.App.Controls.DurationFormField"
              x:Name="Root" x:CompileBindings="False">
     <UserControl.Resources>
@@ -27,6 +28,7 @@
                 <ComboBox Grid.Column="1" Classes="affix" Width="96"
                           HorizontalContentAlignment="Left"
                           ItemsSource="{Binding #Root.Units}"
+                          DisplayMemberBinding="{Binding Converter={x:Static conv:EnumDisplayConverter.Instance}}"
                           SelectedItem="{Binding #Root.SelectedUnit, Mode=TwoWay}" />
             </Grid>
         </Border>

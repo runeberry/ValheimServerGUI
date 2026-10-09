@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using ValheimServerGUI.App.Controls;
 using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.ViewModels;
 
@@ -50,14 +51,10 @@ public partial class PlayerRowViewModel : ObservableObject
     {
         get
         {
-            var label = DisplayRole switch
-            {
-                PlayerRole.Admin => "Admin",
-                PlayerRole.Permitted => "Permitted",
-                PlayerRole.Banned => "Banned",
-                _ => null,
-            };
-            return label is not null && ShowsOverrideMarker ? $"{label} (*)" : label;
+            var label = DisplayRole is PlayerRole.Admin or PlayerRole.Permitted or PlayerRole.Banned
+                ? EnumDisplayConverter.ToText(DisplayRole.Value)
+                : null;
+            return label is not null && ShowsOverrideMarker ? string.Format(Strings.Players_RoleOverridden, label) : label;
         }
     }
 
@@ -82,7 +79,7 @@ public partial class PlayerRowViewModel : ObservableObject
             : $"{name} ({player.LastStatusCharacter})";
 
         Status = player.PlayerStatus;
-        StatusText = player.PlayerStatus.ToString();
+        StatusText = EnumDisplayConverter.ToText(player.PlayerStatus);
         IsOffline = player.PlayerStatus == PlayerStatus.Offline;
         PlatformIcon = PlatformToIconConverter.ForPlatform(player.Platform);
         RefreshSince();

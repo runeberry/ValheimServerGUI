@@ -39,7 +39,7 @@ public partial class LogsView : UserControl
         }
     }
 
-    private async Task OnSaveLogsRequested(string viewName, IReadOnlyList<string> lines)
+    private async Task OnSaveLogsRequested(LogView view, IReadOnlyList<string> lines)
     {
         var topLevel = TopLevel.GetTopLevel(this);
         if (topLevel is null) return;
@@ -47,7 +47,7 @@ public partial class LogsView : UserControl
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
             Title = Strings.Logs_SaveDialog_Title,
-            SuggestedFileName = $"{viewName}Logs.txt",
+            SuggestedFileName = $"{view}Logs.txt",
             DefaultExtension = "txt",
         });
 

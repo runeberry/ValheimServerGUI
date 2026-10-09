@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
@@ -237,7 +238,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// with no worlds it shows a disabled "-- No worlds --" empty state.</summary>
     public bool CanSelectExistingWorld => AllowServerChanges && Form.Worlds.Count > 0;
 
-    public string StatusText => ServerStatus.ToString();
+    public string StatusText => EnumDisplayConverter.ToText(ServerStatus);
 
     // --- update-check status ---
     [ObservableProperty]

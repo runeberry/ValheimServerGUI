@@ -1,9 +1,11 @@
 using System;
 using System.Linq;
 using Avalonia.Headless.XUnit;
+using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using Xunit;
 
 namespace ValheimServerGUI.App.Tests.ViewModels;
@@ -17,7 +19,8 @@ namespace ValheimServerGUI.App.Tests.ViewModels;
 public class PlayerRoleTruthTableTests
 {
     // null default = the player has no default role; null server role = no server-specific role.
-    // Expected role "" = the Role column is blank; null = not checked (the row is hidden).
+    // Expected role "" = the Role column is blank; null = not checked (the row is hidden). The role is shorthand
+    // ("Admin", "Admin (*)" for an override marker), resolved to the displayed copy by ExpectedRoleText.
     public static readonly TheoryData<PlayerRole?, PlayerRole?, bool, bool, bool, string?> Cases = new()
     {
         // default              server role           permit  showBan visible role
@@ -112,7 +115,15 @@ public class PlayerRoleTruthTableTests
 
         var row = vm.Players.SingleOrDefault(r => r.Key == player.Key);
         Assert.Equal(expectVisible, row is not null);
-        if (row is not null) Assert.Equal(expectRole, row.RoleText ?? string.Empty);
+        if (row is not null) Assert.Equal(ExpectedRoleText(expectRole!), row.RoleText ?? string.Empty);
+    }
+
+    private static string ExpectedRoleText(string shorthand)
+    {
+        if (shorthand.Length == 0) return string.Empty;
+        var marked = shorthand.EndsWith(" (*)", StringComparison.Ordinal);
+        var label = EnumDisplayConverter.ToText(Enum.Parse<PlayerRole>(marked ? shorthand[..^4] : shorthand));
+        return marked ? string.Format(Strings.Players_RoleOverridden, label) : label;
     }
 
     // Guards the table itself: exactly one row per combination of the four inputs (4 × 4 × 2 × 2).

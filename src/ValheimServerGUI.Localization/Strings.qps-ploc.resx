@@ -372,6 +372,35 @@
   <data name="Players_RemovePlayer_Tip" xml:space="preserve">
     <value>⟦Players_RemovePlayer_Tip⟧</value>
   </data>
+  <!-- Server status -->
+  <data name="ServerStatus_Stopped" xml:space="preserve">
+    <value>⟦ServerStatus_Stopped⟧</value>
+  </data>
+  <data name="ServerStatus_Starting" xml:space="preserve">
+    <value>⟦ServerStatus_Starting⟧</value>
+  </data>
+  <data name="ServerStatus_Running" xml:space="preserve">
+    <value>⟦ServerStatus_Running⟧</value>
+  </data>
+  <data name="ServerStatus_Stopping" xml:space="preserve">
+    <value>⟦ServerStatus_Stopping⟧</value>
+  </data>
+  <!-- Player status -->
+  <data name="PlayerStatus_Offline" xml:space="preserve">
+    <value>⟦PlayerStatus_Offline⟧</value>
+  </data>
+  <data name="PlayerStatus_Joining" xml:space="preserve">
+    <value>⟦PlayerStatus_Joining⟧</value>
+  </data>
+  <data name="PlayerStatus_Online" xml:space="preserve">
+    <value>⟦PlayerStatus_Online⟧</value>
+  </data>
+  <data name="PlayerStatus_Leaving" xml:space="preserve">
+    <value>⟦PlayerStatus_Leaving⟧</value>
+  </data>
+  <data name="Players_RoleOverridden" xml:space="preserve">
+    <value>⟦Players_RoleOverridden {0}⟧</value>
+  </data>
   <!-- Logs tab -->
   <data name="Logs_ViewFor_Label" xml:space="preserve">
     <value>⟦Logs_ViewFor_Label⟧</value>
@@ -384,6 +413,35 @@
   </data>
   <data name="Logs_ClearLogs" xml:space="preserve">
     <value>⟦Logs_ClearLogs⟧</value>
+  </data>
+  <!-- Theme -->
+  <data name="Theme_System" xml:space="preserve">
+    <value>⟦Theme_System⟧</value>
+  </data>
+  <data name="Theme_Light" xml:space="preserve">
+    <value>⟦Theme_Light⟧</value>
+  </data>
+  <data name="Theme_Dark" xml:space="preserve">
+    <value>⟦Theme_Dark⟧</value>
+  </data>
+  <!-- Duration units -->
+  <data name="DurationUnit_Seconds" xml:space="preserve">
+    <value>⟦DurationUnit_Seconds⟧</value>
+  </data>
+  <data name="DurationUnit_Minutes" xml:space="preserve">
+    <value>⟦DurationUnit_Minutes⟧</value>
+  </data>
+  <data name="DurationUnit_Hours" xml:space="preserve">
+    <value>⟦DurationUnit_Hours⟧</value>
+  </data>
+  <data name="DurationUnit_Days" xml:space="preserve">
+    <value>⟦DurationUnit_Days⟧</value>
+  </data>
+  <data name="Logs_View_Server" xml:space="preserve">
+    <value>⟦Logs_View_Server⟧</value>
+  </data>
+  <data name="Logs_View_Application" xml:space="preserve">
+    <value>⟦Logs_View_Application⟧</value>
   </data>
   <!-- Prompts -->
   <data name="Prompt_UnsavedChanges_Title" xml:space="preserve">

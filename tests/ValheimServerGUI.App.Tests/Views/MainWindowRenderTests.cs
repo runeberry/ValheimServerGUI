@@ -10,6 +10,7 @@ using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
 using Xunit;
@@ -183,10 +184,10 @@ public class MainWindowRenderTests
         var menu = list.RowContextMenu!;
         menu.Open(list.GetVisualDescendants().OfType<DataGrid>().First()); // attached to the inner grid
         Dispatcher.UIThread.RunJobs();
-        var setRole = menu.Items.OfType<MenuItem>().First(m => (string?)m.Header == "Set server role");
+        var setRole = menu.Items.OfType<MenuItem>().First(m => (string?)m.Header == Strings.Players_Menu_SetServerRole);
         var items = setRole.Items.OfType<MenuItem>().ToList();
 
-        Assert.Equal(new[] { "Admin", "Permitted", "Banned", "Default role (Permitted)" }, items.Select(m => (string?)m.Header));
+        Assert.Equal(new[] { Strings.Role_Admin, Strings.Role_Permitted, Strings.Role_Banned, "Default role (Permitted)" }, items.Select(m => (string?)m.Header));
         Assert.True(items[3].IsChecked); // no override yet
 
         items[0].IsChecked = true;       // what a click on a radio item does

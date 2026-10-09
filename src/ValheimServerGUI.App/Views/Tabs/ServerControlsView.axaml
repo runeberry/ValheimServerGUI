@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
              xmlns:c="using:ValheimServerGUI.App.Controls"
              xmlns:conv="using:ValheimServerGUI.App.Converters"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels"
@@ -10,69 +11,69 @@
         <StackPanel Margin="8" Spacing="2">
             <!-- Name (wide) + Port (narrow) on one row. -->
             <Grid ColumnDefinitions="*,12,Auto">
-                <c:TextFormField Grid.Column="0" LabelText="Server Name"
-                                 HelpText="This is the name that will appear in the Community Servers list within Valheim."
+                <c:TextFormField Grid.Column="0" LabelText="{x:Static loc:Strings.ServerControls_Name_Label}"
+                                 HelpText="{x:Static loc:Strings.ServerControls_Name_Help}"
                                  Value="{Binding Form.Name}" MaxLength="64" IsEnabled="{Binding AllowServerChanges}" />
-                <c:NumericFormField Grid.Column="2" Width="110" LabelText="Port"
-                                    HelpText="The UDP port to run on (1–65535). Valheim also uses the next port up."
+                <c:NumericFormField Grid.Column="2" Width="110" LabelText="{x:Static loc:Strings.ServerControls_Port_Label}"
+                                    HelpText="{x:Static loc:Strings.ServerControls_Port_Help}"
                                     Value="{Binding Form.Port}" Minimum="1" Maximum="65535"
                                     IsEnabled="{Binding AllowServerChanges}" />
             </Grid>
 
-            <c:TextFormField LabelText="Server Password"
-                             HelpText="Your server must be protected with a password. The password must be at least 5 characters and must not contain the name of the server or the world that you're hosting."
+            <c:TextFormField LabelText="{x:Static loc:Strings.ServerControls_Password_Label}"
+                             HelpText="{x:Static loc:Strings.ServerControls_Password_Help}"
                              Value="{Binding Form.Password}" ShowValue="{Binding Form.ShowPassword}"
                              IsEnabled="{Binding AllowServerChanges}">
                 <c:TextFormField.Affix>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                         <!-- Eye toggle (left of copy): open eye when shown, struck-through when hidden. -->
                         <Button Classes="affix" Command="{Binding Form.ToggleShowPasswordCommand}"
-                                ToolTip.Tip="Show/hide password">
+                                ToolTip.Tip="{x:Static loc:Strings.ServerControls_ShowPassword_Tip}">
                             <Image Width="16" Height="16"
                                    Source="{Binding Form.ShowPassword, Converter={x:Static conv:ShowPasswordToIconConverter.Instance}}" />
                         </Button>
                         <c:CopyButton Classes="affix" Text="{Binding Form.Password}"
-                                      ToolTip.Tip="Copy password to clipboard" />
+                                      ToolTip.Tip="{x:Static loc:Strings.ServerControls_CopyPassword_Tip}" />
                     </StackPanel>
                 </c:TextFormField.Affix>
             </c:TextFormField>
 
             <!-- World | Join Options -->
             <Grid ColumnDefinitions="*,8,*" Margin="0,4,0,0">
-                <c:GroupBox Grid.Column="0" Header="World">
+                <c:GroupBox Grid.Column="0" Header="{x:Static loc:Strings.ServerControls_World_Header}">
                     <StackPanel Spacing="4">
                         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
-                            <c:RadioFormField Grid.Column="0" GroupName="World" LabelText="Existing"
+                            <c:RadioFormField Grid.Column="0" GroupName="World" LabelText="{x:Static loc:Strings.ServerControls_ExistingWorld_Label}"
                                               Value="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
                                               IsEnabled="{Binding AllowServerChanges}" />
-                            <c:RadioFormField Grid.Column="1" GroupName="World" LabelText="New" Margin="10,0,0,0"
+                            <c:RadioFormField Grid.Column="1" GroupName="World" LabelText="{x:Static loc:Strings.ServerControls_NewWorld_Label}" Margin="10,0,0,0"
                                               Value="{Binding Form.UseNewWorld}" IsEnabled="{Binding AllowServerChanges}" />
-                            <c:SettingsButton Grid.Column="3" ToolTip.Tip="World Modifier Settings"
+                            <c:SettingsButton Grid.Column="3" ToolTip.Tip="{x:Static loc:Strings.ServerControls_WorldSettings_Tip}"
                                               Command="{Binding WorldPreferencesCommand}" />
-                            <c:RefreshButton Grid.Column="4" ToolTip.Tip="Refresh the worlds list"
+                            <c:RefreshButton Grid.Column="4" ToolTip.Tip="{x:Static loc:Strings.ServerControls_RefreshWorlds_Tip}"
                                              Command="{Binding RefreshWorldsCommand}" />
-                            <c:OpenButton Grid.Column="5" ToolTip.Tip="Open the save data folder in your file manager"
+                            <c:OpenButton Grid.Column="5" ToolTip.Tip="{x:Static loc:Strings.ServerControls_OpenSaveFolder_Tip}"
                                           Command="{Binding OpenSaveFolderCommand}" />
                         </Grid>
 
-                        <c:DropdownFormField LabelText="Select World" PlaceholderText="(no worlds)"
+                        <c:DropdownFormField LabelText="{x:Static loc:Strings.ServerControls_SelectWorld_Label}" PlaceholderText="{x:Static loc:Strings.ServerControls_SelectWorld_Placeholder}"
                                              IsVisible="{Binding Form.UseNewWorld, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
                                              ItemsSource="{Binding Form.Worlds}" Value="{Binding Form.ExistingWorld}"
                                              IsEnabled="{Binding CanSelectExistingWorld}" />
-                        <c:TextFormField LabelText="New World Name" Watermark="5–20 characters"
+                        <c:TextFormField LabelText="{x:Static loc:Strings.ServerControls_NewWorldName_Label}" Watermark="{x:Static loc:Strings.ServerControls_NewWorldName_Watermark}"
                                          IsVisible="{Binding Form.UseNewWorld}"
                                          Value="{Binding Form.NewWorldName}" MaxLength="20"
                                          IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>
                 </c:GroupBox>
 
-                <c:GroupBox Grid.Column="2" Header="Join Options">
+                <c:GroupBox Grid.Column="2" Header="{x:Static loc:Strings.ServerControls_JoinOptions_Header}">
                     <StackPanel Spacing="6">
-                        <c:CheckBoxFormField LabelText="Community Server (Public)"
-                                             HelpText="If this box is checked, your server will show up in the Community Servers list within Valheim. If not, other players will need to &quot;Join by IP&quot; to connect to your game.&#10;&#10;NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game, but it can take up to 15 minutes, and rarely not show up at all. You can always &quot;Join by IP&quot; as a fallback."
+                        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.ServerControls_Public_Label}"
+                                             HelpText="{x:Static loc:Strings.ServerControls_Public_Help}"
                                              Value="{Binding Form.IsPublic}" IsEnabled="{Binding AllowServerChanges}" />
-                        <c:CheckBoxFormField LabelText="Enable Crossplay"
-                                             HelpText="Allow players on other platforms to join your game (Microsoft Store, Xbox, etc.)&#10;&#10;You may need to provide other players an Invite Code, which appears in game and in the server logs."
+                        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.ServerControls_Crossplay_Label}"
+                                             HelpText="{x:Static loc:Strings.ServerControls_Crossplay_Help}"
                                              Value="{Binding Form.Crossplay}" IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>
                 </c:GroupBox>
@@ -83,19 +84,19 @@
                 <Button x:Name="StartButton" Command="{Binding StartCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <c:IconImage IconName="Run_16x" VerticalAlignment="Center" />
-                        <TextBlock Text="Start Server" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static loc:Strings.ServerAction_Start}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="RestartButton" Command="{Binding RestartCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <c:IconImage IconName="Restart_16x" VerticalAlignment="Center" />
-                        <TextBlock Text="Restart Server" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static loc:Strings.ServerAction_Restart}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
                 <Button x:Name="StopButton" Command="{Binding StopCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <c:IconImage IconName="Stop_16x" VerticalAlignment="Center" />
-                        <TextBlock Text="Stop Server" VerticalAlignment="Center" />
+                        <TextBlock Text="{x:Static loc:Strings.ServerAction_Stop}" VerticalAlignment="Center" />
                     </StackPanel>
                 </Button>
             </StackPanel>

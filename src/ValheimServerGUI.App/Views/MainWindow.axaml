@@ -1,5 +1,6 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:vm="using:ValheimServerGUI.App.ViewModels"
@@ -33,30 +34,30 @@
              Server Controls tab and the tray, so their enablement is derived from the selected server. -->
         <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="3"
                     VerticalAlignment="Center" Margin="6,0,6,0">
-            <TextBlock Text="Profile" VerticalAlignment="Center" Margin="0,0,4,0"
+            <TextBlock Text="{x:Static loc:Strings.MainWindow_Profile_Label}" VerticalAlignment="Center" Margin="0,0,4,0"
                        Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
             <c:DropdownFormField x:Name="ProfileDropdown" Width="170" VerticalAlignment="Center"
                                  ItemsSource="{Binding Profiles}" />
-            <c:IconButton IconName="Run_16x" ToolTip.Tip="Start Server" Command="{Binding StartCommand}" />
-            <c:IconButton IconName="Restart_16x" ToolTip.Tip="Restart Server" Command="{Binding RestartCommand}" />
-            <c:IconButton IconName="Stop_16x" ToolTip.Tip="Stop Server" Command="{Binding StopCommand}" />
+            <c:IconButton IconName="Run_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Start}" Command="{Binding StartCommand}" />
+            <c:IconButton IconName="Restart_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Restart}" Command="{Binding RestartCommand}" />
+            <c:IconButton IconName="Stop_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Stop}" Command="{Binding StopCommand}" />
         </StackPanel>
         <Menu>
-            <MenuItem Header="_File">
-                <MenuItem Header="New _Window" Command="{Binding NewWindowCommand}">
+            <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_File}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_NewWindow}" Command="{Binding NewWindowCommand}">
                     <MenuItem.Icon><c:IconImage IconName="AddImmediateWindow_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="New _Profile" Command="{Binding NewProfileCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_NewProfile}" Command="{Binding NewProfileCommand}">
                     <MenuItem.Icon><c:IconImage IconName="NewFile_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Save Profile" Command="{Binding SaveProfileCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SaveProfile}" Command="{Binding SaveProfileCommand}">
                     <MenuItem.Icon><c:IconImage IconName="Save_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Save Profile _As…" Command="{Binding SaveProfileAsCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SaveProfileAs}" Command="{Binding SaveProfileAsCommand}">
                     <MenuItem.Icon><c:IconImage IconName="Save_16x" /></MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="_Load Profile" ItemsSource="{Binding Profiles}"
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_LoadProfile}" ItemsSource="{Binding Profiles}"
                           IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
                     <MenuItem.Icon><c:IconImage IconName="OpenFile_16x" /></MenuItem.Icon>
                     <MenuItem.Styles>
@@ -70,7 +71,7 @@
                         </Style>
                     </MenuItem.Styles>
                 </MenuItem>
-                <MenuItem Header="_Remove Profile" ItemsSource="{Binding Profiles}"
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_RemoveProfile}" ItemsSource="{Binding Profiles}"
                           IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
                     <MenuItem.Icon><c:IconImage IconName="Cancel_16x" /></MenuItem.Icon>
                     <MenuItem.Styles>
@@ -83,36 +84,36 @@
                     </MenuItem.Styles>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="_Preferences…" Command="{Binding PreferencesCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Preferences}" Command="{Binding PreferencesCommand}">
                     <MenuItem.Icon><c:IconImage IconName="Settings_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Set _Directories…" Command="{Binding SetDirectoriesCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SetDirectories}" Command="{Binding SetDirectoriesCommand}">
                     <MenuItem.Icon><c:IconImage IconName="FolderInformation_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Open Settings Directory…" Command="{Binding OpenSettingsDirectoryCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_OpenSettingsDirectory}" Command="{Binding OpenSettingsDirectoryCommand}">
                     <MenuItem.Icon><c:IconImage IconName="OpenFolder_16x" /></MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="_Close" Command="{Binding CloseCommand}" />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Close}" Command="{Binding CloseCommand}" />
             </MenuItem>
-            <MenuItem Header="_Help">
-                <MenuItem Header="Online _Manual" Command="{Binding OnlineManualCommand}">
+            <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Help}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_OnlineManual}" Command="{Binding OnlineManualCommand}">
                     <MenuItem.Icon><c:IconImage IconName="OpenWeb_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_Port Forwarding" Command="{Binding PortForwardingCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_PortForwarding}" Command="{Binding PortForwardingCommand}">
                     <MenuItem.Icon><c:IconImage IconName="OpenWeb_16x" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Submit a _Bug Report…" Command="{Binding BugReportCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_BugReport}" Command="{Binding BugReportCommand}">
                     <MenuItem.Icon><c:IconImage IconName="NewBug_16x" /></MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="Check for _Updates" Command="{Binding CheckForUpdatesCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_CheckForUpdates}" Command="{Binding CheckForUpdatesCommand}">
                     <MenuItem.Icon><c:IconImage IconName="UnsyncedCommits_16x_Horiz" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="Get support in _Discord" Command="{Binding DiscordCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Discord}" Command="{Binding DiscordCommand}">
                     <MenuItem.Icon><c:IconImage IconName="DiscordLogo" /></MenuItem.Icon>
                 </MenuItem>
-                <MenuItem Header="_About…" Command="{Binding AboutCommand}" />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_About}" Command="{Binding AboutCommand}" />
             </MenuItem>
         </Menu>
         </DockPanel>
@@ -145,19 +146,19 @@
 
         <!-- ===== Tabs ===== -->
         <TabControl Margin="8" x:Name="Tabs" SelectionChanged="OnTabChanged">
-            <TabItem Header="Server Controls">
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_ServerControls}">
                 <tabs:ServerControlsView />
             </TabItem>
-            <TabItem Header="Advanced Controls">
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_AdvancedControls}">
                 <tabs:AdvancedControlsView />
             </TabItem>
-            <TabItem Header="Server Details" x:Name="DetailsTab">
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_ServerDetails}" x:Name="DetailsTab">
                 <tabs:ServerDetailsView />
             </TabItem>
-            <TabItem Header="Players" x:Name="PlayersTab">
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_Players}" x:Name="PlayersTab">
                 <tabs:PlayersView />
             </TabItem>
-            <TabItem Header="Logs">
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_Logs}">
                 <tabs:LogsView />
             </TabItem>
         </TabControl>

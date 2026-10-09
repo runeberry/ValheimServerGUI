@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
              xmlns:c="using:ValheimServerGUI.App.Controls"
              xmlns:conv="using:ValheimServerGUI.App.Converters"
              xmlns:vm="using:ValheimServerGUI.App.ViewModels"
@@ -10,16 +11,16 @@
         <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,6">
             <Grid ColumnDefinitions="Auto,*,Auto">
                 <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
-                    <Button Content="Manage Players…" Command="{Binding Players.ManagePlayersCommand}" />
+                    <Button Content="{x:Static loc:Strings.Players_ManagePlayers}" Command="{Binding Players.ManagePlayersCommand}" />
                 </StackPanel>
-                <c:HyperlinkLabel Grid.Column="2" Text="Character names wrong? Click here."
+                <c:HyperlinkLabel Grid.Column="2" Text="{x:Static loc:Strings.Players_CharacterNamesHelp}"
                                   Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
             </Grid>
             <StackPanel Orientation="Horizontal" Spacing="24">
-                <c:CheckBoxFormField LabelText="Use permitted list"
-                                     HelpText="If enabled, only players on the permitted list can join the server. Add players to the permitted list using the table below."
+                <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Players_UsePermittedList_Label}"
+                                     HelpText="{x:Static loc:Strings.Players_UsePermittedList_Help}"
                                      Value="{Binding Form.UsePermittedList}" />
-                <c:CheckBoxFormField LabelText="Show banned players"
+                <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Players_ShowBanned_Label}"
                                      Value="{Binding Players.ShowBannedPlayers}" />
             </StackPanel>
         </StackPanel>
@@ -30,22 +31,22 @@
                         RowInvokeCommand="{Binding Players.ViewDetailsCommand}">
             <c:DataListView.RowContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="View Player Details…" Command="{Binding Players.ViewDetailsCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_ViewDetails}" Command="{Binding Players.ViewDetailsCommand}" />
                     <!-- Radio items read/write this server's override for the selected player; the last one
                          removes the override (labelled with the default it falls back to, or "None"). -->
-                    <MenuItem Header="Set server role">
-                        <MenuItem Header="Admin" ToggleType="Radio" GroupName="ServerRole"
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_SetServerRole}">
+                        <MenuItem Header="{x:Static loc:Strings.Role_Admin}" ToggleType="Radio" GroupName="ServerRole"
                                   IsChecked="{Binding Players.ServerRoleIsAdmin, Mode=TwoWay}" />
-                        <MenuItem Header="Permitted" ToggleType="Radio" GroupName="ServerRole"
+                        <MenuItem Header="{x:Static loc:Strings.Role_Permitted}" ToggleType="Radio" GroupName="ServerRole"
                                   IsChecked="{Binding Players.ServerRoleIsPermitted, Mode=TwoWay}" />
-                        <MenuItem Header="Banned" ToggleType="Radio" GroupName="ServerRole"
+                        <MenuItem Header="{x:Static loc:Strings.Role_Banned}" ToggleType="Radio" GroupName="ServerRole"
                                   IsChecked="{Binding Players.ServerRoleIsBanned, Mode=TwoWay}" />
                         <MenuItem Header="{Binding Players.ServerRoleDefaultLabel}" ToggleType="Radio" GroupName="ServerRole"
                                   IsChecked="{Binding Players.ServerRoleIsDefault, Mode=TwoWay}" />
                     </MenuItem>
                     <Separator />
-                    <MenuItem Header="Add player…" Command="{Binding Players.AddPlayerCommand}" />
-                    <MenuItem Header="Remove player" Command="{Binding Players.RemoveCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_AddPlayer}" Command="{Binding Players.AddPlayerCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_RemovePlayer}" Command="{Binding Players.RemoveCommand}" />
                 </ContextMenu>
             </c:DataListView.RowContextMenu>
             <c:DataListView.Styles>
@@ -62,7 +63,7 @@
             <c:DataListView.Columns>
                 <!-- Platform icon is a prefix of the name (its own column was collapsed here); the column
                      still sorts by the plain DisplayName so the icon doesn't affect ordering. -->
-                <DataGridTemplateColumn Header="Player (Character)" Width="*" SortMemberPath="DisplayName">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Player}" Width="*" SortMemberPath="DisplayName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
@@ -77,7 +78,7 @@
                 <!-- The effective role on this server (override ?? global default), mode-filtered; "(*)" marks a
                      server override of a global default. Blank when the player has no role. Kept the same
                      fixed width as Status (the column to its right) so the two read as a matched pair. -->
-                <DataGridTemplateColumn Header="Role" Width="100" SortMemberPath="RoleText">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Role}" Width="100" SortMemberPath="RoleText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
@@ -90,7 +91,7 @@
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
                 <!-- Status text prefixed with a glyph representing the status. Width matches Role (its left neighbour). -->
-                <DataGridTemplateColumn Header="Status" Width="100" SortMemberPath="StatusText">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Status}" Width="100" SortMemberPath="StatusText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
                             <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
@@ -102,7 +103,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="Since" Width="Auto" SortMemberPath="SinceText">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Since}" Width="Auto" SortMemberPath="SinceText">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
                             <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
@@ -111,16 +112,16 @@
                 </DataGridTemplateColumn>
             </c:DataListView.Columns>
             <c:DataListView.FooterLeft>
-                <c:IconButton IconName="User_16x" ToolTip.Tip="View player details"
+                <c:IconButton IconName="User_16x" ToolTip.Tip="{x:Static loc:Strings.Players_ViewDetails_Tip}"
                               Command="{Binding Players.ViewDetailsCommand}" />
             </c:DataListView.FooterLeft>
             <c:DataListView.FooterRight>
                 <StackPanel Orientation="Horizontal" Spacing="4">
-                    <c:IconButton IconName="ImportFile_16x" ToolTip.Tip="Import player lists"
+                    <c:IconButton IconName="ImportFile_16x" ToolTip.Tip="{x:Static loc:Strings.Players_ImportLists_Tip}"
                                   Command="{Binding ImportPlayerListsCommand}" />
-                    <c:IconButton IconName="Add_16x" ToolTip.Tip="Add player"
+                    <c:IconButton IconName="Add_16x" ToolTip.Tip="{x:Static loc:Strings.Players_AddPlayer_Tip}"
                                   Command="{Binding Players.AddPlayerCommand}" />
-                    <c:IconButton IconName="Cancel_16x" ToolTip.Tip="Remove player"
+                    <c:IconButton IconName="Cancel_16x" ToolTip.Tip="{x:Static loc:Strings.Players_RemovePlayer_Tip}"
                                   Command="{Binding Players.RemoveCommand}" />
                 </StackPanel>
             </c:DataListView.FooterRight>

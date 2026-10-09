@@ -25,4 +25,352 @@
   <data name="Common_No" xml:space="preserve">
     <value>⟦Common_No⟧</value>
   </data>
+  <!-- Main window -->
+  <data name="MainWindow_Profile_Label" xml:space="preserve">
+    <value>⟦MainWindow_Profile_Label⟧</value>
+  </data>
+  <data name="ServerAction_Start" xml:space="preserve">
+    <value>⟦ServerAction_Start⟧</value>
+  </data>
+  <data name="ServerAction_Restart" xml:space="preserve">
+    <value>⟦ServerAction_Restart⟧</value>
+  </data>
+  <data name="ServerAction_Stop" xml:space="preserve">
+    <value>⟦ServerAction_Stop⟧</value>
+  </data>
+  <data name="MainWindow_Menu_File" xml:space="preserve">
+    <value>⟦MainWindow_Menu_File⟧</value>
+  </data>
+  <data name="MainWindow_Menu_NewWindow" xml:space="preserve">
+    <value>⟦MainWindow_Menu_NewWindow⟧</value>
+  </data>
+  <data name="MainWindow_Menu_NewProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_NewProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_SaveProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_SaveProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_SaveProfileAs" xml:space="preserve">
+    <value>⟦MainWindow_Menu_SaveProfileAs⟧</value>
+  </data>
+  <data name="MainWindow_Menu_LoadProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_LoadProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_RemoveProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_RemoveProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Preferences" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Preferences⟧</value>
+  </data>
+  <data name="MainWindow_Menu_SetDirectories" xml:space="preserve">
+    <value>⟦MainWindow_Menu_SetDirectories⟧</value>
+  </data>
+  <data name="MainWindow_Menu_OpenSettingsDirectory" xml:space="preserve">
+    <value>⟦MainWindow_Menu_OpenSettingsDirectory⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Close" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Close⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Help" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Help⟧</value>
+  </data>
+  <data name="MainWindow_Menu_OnlineManual" xml:space="preserve">
+    <value>⟦MainWindow_Menu_OnlineManual⟧</value>
+  </data>
+  <data name="MainWindow_Menu_PortForwarding" xml:space="preserve">
+    <value>⟦MainWindow_Menu_PortForwarding⟧</value>
+  </data>
+  <data name="MainWindow_Menu_BugReport" xml:space="preserve">
+    <value>⟦MainWindow_Menu_BugReport⟧</value>
+  </data>
+  <data name="MainWindow_Menu_CheckForUpdates" xml:space="preserve">
+    <value>⟦MainWindow_Menu_CheckForUpdates⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Discord" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Discord⟧</value>
+  </data>
+  <data name="MainWindow_Menu_About" xml:space="preserve">
+    <value>⟦MainWindow_Menu_About⟧</value>
+  </data>
+  <data name="MainWindow_Tab_ServerControls" xml:space="preserve">
+    <value>⟦MainWindow_Tab_ServerControls⟧</value>
+  </data>
+  <data name="MainWindow_Tab_AdvancedControls" xml:space="preserve">
+    <value>⟦MainWindow_Tab_AdvancedControls⟧</value>
+  </data>
+  <data name="MainWindow_Tab_ServerDetails" xml:space="preserve">
+    <value>⟦MainWindow_Tab_ServerDetails⟧</value>
+  </data>
+  <data name="MainWindow_Tab_Players" xml:space="preserve">
+    <value>⟦MainWindow_Tab_Players⟧</value>
+  </data>
+  <data name="MainWindow_Tab_Logs" xml:space="preserve">
+    <value>⟦MainWindow_Tab_Logs⟧</value>
+  </data>
+  <!-- Server Controls tab -->
+  <data name="ServerControls_Name_Label" xml:space="preserve">
+    <value>⟦ServerControls_Name_Label⟧</value>
+  </data>
+  <data name="ServerControls_Name_Help" xml:space="preserve">
+    <value>⟦ServerControls_Name_Help⟧</value>
+  </data>
+  <data name="ServerControls_Port_Label" xml:space="preserve">
+    <value>⟦ServerControls_Port_Label⟧</value>
+  </data>
+  <data name="ServerControls_Port_Help" xml:space="preserve">
+    <value>⟦ServerControls_Port_Help⟧</value>
+  </data>
+  <data name="ServerControls_Password_Label" xml:space="preserve">
+    <value>⟦ServerControls_Password_Label⟧</value>
+  </data>
+  <data name="ServerControls_Password_Help" xml:space="preserve">
+    <value>⟦ServerControls_Password_Help⟧</value>
+  </data>
+  <data name="ServerControls_ShowPassword_Tip" xml:space="preserve">
+    <value>⟦ServerControls_ShowPassword_Tip⟧</value>
+  </data>
+  <data name="ServerControls_CopyPassword_Tip" xml:space="preserve">
+    <value>⟦ServerControls_CopyPassword_Tip⟧</value>
+  </data>
+  <data name="ServerControls_World_Header" xml:space="preserve">
+    <value>⟦ServerControls_World_Header⟧</value>
+  </data>
+  <data name="ServerControls_ExistingWorld_Label" xml:space="preserve">
+    <value>⟦ServerControls_ExistingWorld_Label⟧</value>
+  </data>
+  <data name="ServerControls_NewWorld_Label" xml:space="preserve">
+    <value>⟦ServerControls_NewWorld_Label⟧</value>
+  </data>
+  <data name="ServerControls_WorldSettings_Tip" xml:space="preserve">
+    <value>⟦ServerControls_WorldSettings_Tip⟧</value>
+  </data>
+  <data name="ServerControls_RefreshWorlds_Tip" xml:space="preserve">
+    <value>⟦ServerControls_RefreshWorlds_Tip⟧</value>
+  </data>
+  <data name="ServerControls_OpenSaveFolder_Tip" xml:space="preserve">
+    <value>⟦ServerControls_OpenSaveFolder_Tip⟧</value>
+  </data>
+  <data name="ServerControls_SelectWorld_Label" xml:space="preserve">
+    <value>⟦ServerControls_SelectWorld_Label⟧</value>
+  </data>
+  <data name="ServerControls_SelectWorld_Placeholder" xml:space="preserve">
+    <value>⟦ServerControls_SelectWorld_Placeholder⟧</value>
+  </data>
+  <data name="ServerControls_NewWorldName_Label" xml:space="preserve">
+    <value>⟦ServerControls_NewWorldName_Label⟧</value>
+  </data>
+  <data name="ServerControls_NewWorldName_Watermark" xml:space="preserve">
+    <value>⟦ServerControls_NewWorldName_Watermark⟧</value>
+  </data>
+  <data name="ServerControls_JoinOptions_Header" xml:space="preserve">
+    <value>⟦ServerControls_JoinOptions_Header⟧</value>
+  </data>
+  <data name="ServerControls_Public_Label" xml:space="preserve">
+    <value>⟦ServerControls_Public_Label⟧</value>
+  </data>
+  <data name="ServerControls_Public_Help" xml:space="preserve">
+    <value>⟦ServerControls_Public_Help⟧</value>
+  </data>
+  <data name="ServerControls_Crossplay_Label" xml:space="preserve">
+    <value>⟦ServerControls_Crossplay_Label⟧</value>
+  </data>
+  <data name="ServerControls_Crossplay_Help" xml:space="preserve">
+    <value>⟦ServerControls_Crossplay_Help⟧</value>
+  </data>
+  <!-- Advanced Controls tab -->
+  <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
+    <value>⟦AdvancedControls_DirectoryOverrides_Header⟧</value>
+  </data>
+  <data name="AdvancedControls_ServerExe_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_ServerExe_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_ServerExe_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_ServerExe_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveData_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveData_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveData_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveData_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_OtherSettings_Header" xml:space="preserve">
+    <value>⟦AdvancedControls_OtherSettings_Header⟧</value>
+  </data>
+  <data name="AdvancedControls_AutoStart_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_AutoStart_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_AutoStart_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_AutoStart_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_WriteLogs_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_WriteLogs_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_WriteLogs_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_WriteLogs_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_AdditionalArgs_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_AdditionalArgs_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_AdditionalArgs_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_AdditionalArgs_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_SavingBackups_Header" xml:space="preserve">
+    <value>⟦AdvancedControls_SavingBackups_Header⟧</value>
+  </data>
+  <data name="AdvancedControls_Backups_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_Backups_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_Backups_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_Backups_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveInterval_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveInterval_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveInterval_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveInterval_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_ShortBackup_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_ShortBackup_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_ShortBackup_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_ShortBackup_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_LongBackup_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_LongBackup_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_LongBackup_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_LongBackup_Help⟧</value>
+  </data>
+  <!-- Server Details tab -->
+  <data name="ServerDetails_Connection_Header" xml:space="preserve">
+    <value>⟦ServerDetails_Connection_Header⟧</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_Label" xml:space="preserve">
+    <value>⟦ServerDetails_ExternalIp_Label⟧</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_Help" xml:space="preserve">
+    <value>⟦ServerDetails_ExternalIp_Help⟧</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_ExternalIp_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_InternalIp_Label" xml:space="preserve">
+    <value>⟦ServerDetails_InternalIp_Label⟧</value>
+  </data>
+  <data name="ServerDetails_InternalIp_Help" xml:space="preserve">
+    <value>⟦ServerDetails_InternalIp_Help⟧</value>
+  </data>
+  <data name="ServerDetails_InternalIp_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_InternalIp_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_LocalIp_Label" xml:space="preserve">
+    <value>⟦ServerDetails_LocalIp_Label⟧</value>
+  </data>
+  <data name="ServerDetails_LocalIp_Help" xml:space="preserve">
+    <value>⟦ServerDetails_LocalIp_Help⟧</value>
+  </data>
+  <data name="ServerDetails_LocalIp_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_LocalIp_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_InviteCode_Label" xml:space="preserve">
+    <value>⟦ServerDetails_InviteCode_Label⟧</value>
+  </data>
+  <data name="ServerDetails_InviteCode_Help" xml:space="preserve">
+    <value>⟦ServerDetails_InviteCode_Help⟧</value>
+  </data>
+  <data name="ServerDetails_InviteCode_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_InviteCode_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_TroubleConnecting" xml:space="preserve">
+    <value>⟦ServerDetails_TroubleConnecting⟧</value>
+  </data>
+  <data name="ServerDetails_Statistics_Header" xml:space="preserve">
+    <value>⟦ServerDetails_Statistics_Header⟧</value>
+  </data>
+  <data name="ServerDetails_Uptime_Label" xml:space="preserve">
+    <value>⟦ServerDetails_Uptime_Label⟧</value>
+  </data>
+  <data name="ServerDetails_LastWorldSave_Label" xml:space="preserve">
+    <value>⟦ServerDetails_LastWorldSave_Label⟧</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Label" xml:space="preserve">
+    <value>⟦ServerDetails_AvgWorldSave_Label⟧</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Help" xml:space="preserve">
+    <value>⟦ServerDetails_AvgWorldSave_Help⟧</value>
+  </data>
+  <!-- Players tab -->
+  <data name="Players_ManagePlayers" xml:space="preserve">
+    <value>⟦Players_ManagePlayers⟧</value>
+  </data>
+  <data name="Players_CharacterNamesHelp" xml:space="preserve">
+    <value>⟦Players_CharacterNamesHelp⟧</value>
+  </data>
+  <data name="Players_UsePermittedList_Label" xml:space="preserve">
+    <value>⟦Players_UsePermittedList_Label⟧</value>
+  </data>
+  <data name="Players_UsePermittedList_Help" xml:space="preserve">
+    <value>⟦Players_UsePermittedList_Help⟧</value>
+  </data>
+  <data name="Players_ShowBanned_Label" xml:space="preserve">
+    <value>⟦Players_ShowBanned_Label⟧</value>
+  </data>
+  <data name="Players_Menu_ViewDetails" xml:space="preserve">
+    <value>⟦Players_Menu_ViewDetails⟧</value>
+  </data>
+  <data name="Players_Menu_SetServerRole" xml:space="preserve">
+    <value>⟦Players_Menu_SetServerRole⟧</value>
+  </data>
+  <data name="Role_Admin" xml:space="preserve">
+    <value>⟦Role_Admin⟧</value>
+  </data>
+  <data name="Role_Permitted" xml:space="preserve">
+    <value>⟦Role_Permitted⟧</value>
+  </data>
+  <data name="Role_Banned" xml:space="preserve">
+    <value>⟦Role_Banned⟧</value>
+  </data>
+  <data name="Players_Menu_AddPlayer" xml:space="preserve">
+    <value>⟦Players_Menu_AddPlayer⟧</value>
+  </data>
+  <data name="Players_Menu_RemovePlayer" xml:space="preserve">
+    <value>⟦Players_Menu_RemovePlayer⟧</value>
+  </data>
+  <data name="Players_Column_Player" xml:space="preserve">
+    <value>⟦Players_Column_Player⟧</value>
+  </data>
+  <data name="Players_Column_Role" xml:space="preserve">
+    <value>⟦Players_Column_Role⟧</value>
+  </data>
+  <data name="Players_Column_Status" xml:space="preserve">
+    <value>⟦Players_Column_Status⟧</value>
+  </data>
+  <data name="Players_Column_Since" xml:space="preserve">
+    <value>⟦Players_Column_Since⟧</value>
+  </data>
+  <data name="Players_ViewDetails_Tip" xml:space="preserve">
+    <value>⟦Players_ViewDetails_Tip⟧</value>
+  </data>
+  <data name="Players_ImportLists_Tip" xml:space="preserve">
+    <value>⟦Players_ImportLists_Tip⟧</value>
+  </data>
+  <data name="Players_AddPlayer_Tip" xml:space="preserve">
+    <value>⟦Players_AddPlayer_Tip⟧</value>
+  </data>
+  <data name="Players_RemovePlayer_Tip" xml:space="preserve">
+    <value>⟦Players_RemovePlayer_Tip⟧</value>
+  </data>
+  <!-- Logs tab -->
+  <data name="Logs_ViewFor_Label" xml:space="preserve">
+    <value>⟦Logs_ViewFor_Label⟧</value>
+  </data>
+  <data name="Logs_OpenFolder_Tip" xml:space="preserve">
+    <value>⟦Logs_OpenFolder_Tip⟧</value>
+  </data>
+  <data name="Logs_SaveLogs" xml:space="preserve">
+    <value>⟦Logs_SaveLogs⟧</value>
+  </data>
+  <data name="Logs_ClearLogs" xml:space="preserve">
+    <value>⟦Logs_ClearLogs⟧</value>
+  </data>
 </root>

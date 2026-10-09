@@ -25,4 +25,362 @@
   <data name="Common_No" xml:space="preserve">
     <value>No</value>
   </data>
+  <!-- Main window -->
+  <data name="MainWindow_Profile_Label" xml:space="preserve">
+    <value>Profile</value>
+  </data>
+  <data name="ServerAction_Start" xml:space="preserve">
+    <value>Start Server</value>
+  </data>
+  <data name="ServerAction_Restart" xml:space="preserve">
+    <value>Restart Server</value>
+  </data>
+  <data name="ServerAction_Stop" xml:space="preserve">
+    <value>Stop Server</value>
+  </data>
+  <data name="MainWindow_Menu_File" xml:space="preserve">
+    <value>_File</value>
+  </data>
+  <data name="MainWindow_Menu_NewWindow" xml:space="preserve">
+    <value>New _Window</value>
+  </data>
+  <data name="MainWindow_Menu_NewProfile" xml:space="preserve">
+    <value>New _Profile</value>
+  </data>
+  <data name="MainWindow_Menu_SaveProfile" xml:space="preserve">
+    <value>_Save Profile</value>
+  </data>
+  <data name="MainWindow_Menu_SaveProfileAs" xml:space="preserve">
+    <value>Save Profile _As…</value>
+  </data>
+  <data name="MainWindow_Menu_LoadProfile" xml:space="preserve">
+    <value>_Load Profile</value>
+  </data>
+  <data name="MainWindow_Menu_RemoveProfile" xml:space="preserve">
+    <value>_Remove Profile</value>
+  </data>
+  <data name="MainWindow_Menu_Preferences" xml:space="preserve">
+    <value>_Preferences…</value>
+  </data>
+  <data name="MainWindow_Menu_SetDirectories" xml:space="preserve">
+    <value>Set _Directories…</value>
+  </data>
+  <data name="MainWindow_Menu_OpenSettingsDirectory" xml:space="preserve">
+    <value>_Open Settings Directory…</value>
+  </data>
+  <data name="MainWindow_Menu_Close" xml:space="preserve">
+    <value>_Close</value>
+  </data>
+  <data name="MainWindow_Menu_Help" xml:space="preserve">
+    <value>_Help</value>
+  </data>
+  <data name="MainWindow_Menu_OnlineManual" xml:space="preserve">
+    <value>Online _Manual</value>
+  </data>
+  <data name="MainWindow_Menu_PortForwarding" xml:space="preserve">
+    <value>_Port Forwarding</value>
+  </data>
+  <data name="MainWindow_Menu_BugReport" xml:space="preserve">
+    <value>Submit a _Bug Report…</value>
+  </data>
+  <data name="MainWindow_Menu_CheckForUpdates" xml:space="preserve">
+    <value>Check for _Updates</value>
+  </data>
+  <data name="MainWindow_Menu_Discord" xml:space="preserve">
+    <value>Get support in _Discord</value>
+  </data>
+  <data name="MainWindow_Menu_About" xml:space="preserve">
+    <value>_About…</value>
+  </data>
+  <data name="MainWindow_Tab_ServerControls" xml:space="preserve">
+    <value>Server Controls</value>
+  </data>
+  <data name="MainWindow_Tab_AdvancedControls" xml:space="preserve">
+    <value>Advanced Controls</value>
+  </data>
+  <data name="MainWindow_Tab_ServerDetails" xml:space="preserve">
+    <value>Server Details</value>
+  </data>
+  <data name="MainWindow_Tab_Players" xml:space="preserve">
+    <value>Players</value>
+  </data>
+  <data name="MainWindow_Tab_Logs" xml:space="preserve">
+    <value>Logs</value>
+  </data>
+  <!-- Server Controls tab -->
+  <data name="ServerControls_Name_Label" xml:space="preserve">
+    <value>Server Name</value>
+  </data>
+  <data name="ServerControls_Name_Help" xml:space="preserve">
+    <value>This is the name that will appear in the Community Servers list within Valheim.</value>
+  </data>
+  <data name="ServerControls_Port_Label" xml:space="preserve">
+    <value>Port</value>
+  </data>
+  <data name="ServerControls_Port_Help" xml:space="preserve">
+    <value>The UDP port to run on (1–65535). Valheim also uses the next port up.</value>
+  </data>
+  <data name="ServerControls_Password_Label" xml:space="preserve">
+    <value>Server Password</value>
+  </data>
+  <data name="ServerControls_Password_Help" xml:space="preserve">
+    <value>Your server must be protected with a password. The password must be at least 5 characters and must not contain the name of the server or the world that you're hosting.</value>
+  </data>
+  <data name="ServerControls_ShowPassword_Tip" xml:space="preserve">
+    <value>Show/hide password</value>
+  </data>
+  <data name="ServerControls_CopyPassword_Tip" xml:space="preserve">
+    <value>Copy password to clipboard</value>
+  </data>
+  <data name="ServerControls_World_Header" xml:space="preserve">
+    <value>World</value>
+  </data>
+  <data name="ServerControls_ExistingWorld_Label" xml:space="preserve">
+    <value>Existing</value>
+  </data>
+  <data name="ServerControls_NewWorld_Label" xml:space="preserve">
+    <value>New</value>
+  </data>
+  <data name="ServerControls_WorldSettings_Tip" xml:space="preserve">
+    <value>World Modifier Settings</value>
+  </data>
+  <data name="ServerControls_RefreshWorlds_Tip" xml:space="preserve">
+    <value>Refresh the worlds list</value>
+  </data>
+  <data name="ServerControls_OpenSaveFolder_Tip" xml:space="preserve">
+    <value>Open the save data folder in your file manager</value>
+  </data>
+  <data name="ServerControls_SelectWorld_Label" xml:space="preserve">
+    <value>Select World</value>
+  </data>
+  <data name="ServerControls_SelectWorld_Placeholder" xml:space="preserve">
+    <value>(no worlds)</value>
+  </data>
+  <data name="ServerControls_NewWorldName_Label" xml:space="preserve">
+    <value>New World Name</value>
+  </data>
+  <data name="ServerControls_NewWorldName_Watermark" xml:space="preserve">
+    <value>5–20 characters</value>
+  </data>
+  <data name="ServerControls_JoinOptions_Header" xml:space="preserve">
+    <value>Join Options</value>
+  </data>
+  <data name="ServerControls_Public_Label" xml:space="preserve">
+    <value>Community Server (Public)</value>
+  </data>
+  <data name="ServerControls_Public_Help" xml:space="preserve">
+    <value>If this box is checked, your server will show up in the Community Servers list within Valheim. If not, other players will need to "Join by IP" to connect to your game.
+
+NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game, but it can take up to 15 minutes, and rarely not show up at all. You can always "Join by IP" as a fallback.</value>
+  </data>
+  <data name="ServerControls_Crossplay_Label" xml:space="preserve">
+    <value>Enable Crossplay</value>
+  </data>
+  <data name="ServerControls_Crossplay_Help" xml:space="preserve">
+    <value>Allow players on other platforms to join your game (Microsoft Store, Xbox, etc.)
+
+You may need to provide other players an Invite Code, which appears in game and in the server logs.</value>
+  </data>
+  <!-- Advanced Controls tab -->
+  <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
+    <value>Directory Overrides (for just this Profile)</value>
+  </data>
+  <data name="AdvancedControls_ServerExe_Label" xml:space="preserve">
+    <value>Valheim Dedicated Server .exe</value>
+  </data>
+  <data name="AdvancedControls_ServerExe_Help" xml:space="preserve">
+    <value>The location of the Valheim Dedicated Server executable, usually "valheim_server.exe".
+
+This field sets the path just for this profile. Leave this field empty if you do not want a profile-specific override. To set this path for all profiles, see File &gt; Set Directories.</value>
+  </data>
+  <data name="AdvancedControls_SaveData_Label" xml:space="preserve">
+    <value>Valheim Save Data Folder</value>
+  </data>
+  <data name="AdvancedControls_SaveData_Help" xml:space="preserve">
+    <value>The location of the save data for your Valheim server, including the "worlds" folder, admin lists, etc.
+
+This field sets the path just for this profile. Leave this field empty if you do not want a profile-specific override. To set this path for all profiles, see File &gt; Set Directories.</value>
+  </data>
+  <data name="AdvancedControls_OtherSettings_Header" xml:space="preserve">
+    <value>Other Settings</value>
+  </data>
+  <data name="AdvancedControls_AutoStart_Label" xml:space="preserve">
+    <value>Start this server with ValheimServerGUI</value>
+  </data>
+  <data name="AdvancedControls_AutoStart_Help" xml:space="preserve">
+    <value>Automatically start up this server when you open ValheimServerGUI. If you want to restart your server whenever you restart your computer, enable this setting, along with the corresponding setting under File &gt; Preferences.</value>
+  </data>
+  <data name="AdvancedControls_WriteLogs_Label" xml:space="preserve">
+    <value>Write server logs to file</value>
+  </data>
+  <data name="AdvancedControls_WriteLogs_Help" xml:space="preserve">
+    <value>If enabled, this server's logs will be written to a daily rolling log file on disk. Logs older than 30 days will be deleted automatically.</value>
+  </data>
+  <data name="AdvancedControls_AdditionalArgs_Label" xml:space="preserve">
+    <value>Additional Command Line Args</value>
+  </data>
+  <data name="AdvancedControls_AdditionalArgs_Help" xml:space="preserve">
+    <value>Add any additional args you want to pass to the server run command here. These will be appended to the end of the command generated by ValheimServerGUI.</value>
+  </data>
+  <data name="AdvancedControls_SavingBackups_Header" xml:space="preserve">
+    <value>Saving &amp; Backups</value>
+  </data>
+  <data name="AdvancedControls_Backups_Label" xml:space="preserve">
+    <value>Backups</value>
+  </data>
+  <data name="AdvancedControls_Backups_Help" xml:space="preserve">
+    <value>Number of world data backups to maintain. One rolling backup is created on the short backup interval, and subsequent backups are created on the long backup interval.</value>
+  </data>
+  <data name="AdvancedControls_SaveInterval_Label" xml:space="preserve">
+    <value>Save Interval</value>
+  </data>
+  <data name="AdvancedControls_SaveInterval_Help" xml:space="preserve">
+    <value>How often the world is saved.</value>
+  </data>
+  <data name="AdvancedControls_ShortBackup_Label" xml:space="preserve">
+    <value>Short Backup</value>
+  </data>
+  <data name="AdvancedControls_ShortBackup_Help" xml:space="preserve">
+    <value>How often to create a rolling backup of the world save data.</value>
+  </data>
+  <data name="AdvancedControls_LongBackup_Label" xml:space="preserve">
+    <value>Long Backup</value>
+  </data>
+  <data name="AdvancedControls_LongBackup_Help" xml:space="preserve">
+    <value>How often to create additional backups of the world save data. This interval must be longer than the short backup interval.</value>
+  </data>
+  <!-- Server Details tab -->
+  <data name="ServerDetails_Connection_Header" xml:space="preserve">
+    <value>Connection Details</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_Label" xml:space="preserve">
+    <value>External IP Address:</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_Help" xml:space="preserve">
+    <value>This is the address that players from outside your home network will use to connect to your server. Give this address to your friends for standard online play.</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_CopyTip" xml:space="preserve">
+    <value>Copy external IP address to clipboard</value>
+  </data>
+  <data name="ServerDetails_InternalIp_Label" xml:space="preserve">
+    <value>Internal IP Address:</value>
+  </data>
+  <data name="ServerDetails_InternalIp_Help" xml:space="preserve">
+    <value>This is the address that players on your home network (connected to your router) can use to join your server. Give this address to your friends for LAN setups, or use it yourself if you're hosting your server on another machine on your home network (different from the one you're playing on).</value>
+  </data>
+  <data name="ServerDetails_InternalIp_CopyTip" xml:space="preserve">
+    <value>Copy internal IP address to clipboard</value>
+  </data>
+  <data name="ServerDetails_LocalIp_Label" xml:space="preserve">
+    <value>Local IP Address:</value>
+  </data>
+  <data name="ServerDetails_LocalIp_Help" xml:space="preserve">
+    <value>Use this IP address to connect to your server if you're playing on the host machine. This will give you the fastest possible connection! (i.e. "the host advantage")
+
+TIP: You can also connect to "localhost", which is a little easier than typing "127.0.0.1"</value>
+  </data>
+  <data name="ServerDetails_LocalIp_CopyTip" xml:space="preserve">
+    <value>Copy local IP address to clipboard</value>
+  </data>
+  <data name="ServerDetails_InviteCode_Label" xml:space="preserve">
+    <value>Invite Code:</value>
+  </data>
+  <data name="ServerDetails_InviteCode_Help" xml:space="preserve">
+    <value>Invite codes are only available when Crossplay is enabled and change each time the server is restarted. Players on any platform can connect to your server with an invite code instead of an IP address.</value>
+  </data>
+  <data name="ServerDetails_InviteCode_CopyTip" xml:space="preserve">
+    <value>Copy invite code to clipboard</value>
+  </data>
+  <data name="ServerDetails_TroubleConnecting" xml:space="preserve">
+    <value>Trouble connecting? See Help &gt; Port Forwarding.</value>
+  </data>
+  <data name="ServerDetails_Statistics_Header" xml:space="preserve">
+    <value>Statistics</value>
+  </data>
+  <data name="ServerDetails_Uptime_Label" xml:space="preserve">
+    <value>Server Uptime:</value>
+  </data>
+  <data name="ServerDetails_LastWorldSave_Label" xml:space="preserve">
+    <value>Last World Save:</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Label" xml:space="preserve">
+    <value>Avg. World Save:</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Help" xml:space="preserve">
+    <value>The average amount of time it has taken to save your game world, over the past 10 saves.</value>
+  </data>
+  <!-- Players tab -->
+  <data name="Players_ManagePlayers" xml:space="preserve">
+    <value>Manage Players…</value>
+  </data>
+  <data name="Players_CharacterNamesHelp" xml:space="preserve">
+    <value>Character names wrong? Click here.</value>
+  </data>
+  <data name="Players_UsePermittedList_Label" xml:space="preserve">
+    <value>Use permitted list</value>
+  </data>
+  <data name="Players_UsePermittedList_Help" xml:space="preserve">
+    <value>If enabled, only players on the permitted list can join the server. Add players to the permitted list using the table below.</value>
+  </data>
+  <data name="Players_ShowBanned_Label" xml:space="preserve">
+    <value>Show banned players</value>
+  </data>
+  <data name="Players_Menu_ViewDetails" xml:space="preserve">
+    <value>View Player Details…</value>
+  </data>
+  <data name="Players_Menu_SetServerRole" xml:space="preserve">
+    <value>Set server role</value>
+  </data>
+  <data name="Role_Admin" xml:space="preserve">
+    <value>Admin</value>
+  </data>
+  <data name="Role_Permitted" xml:space="preserve">
+    <value>Permitted</value>
+  </data>
+  <data name="Role_Banned" xml:space="preserve">
+    <value>Banned</value>
+  </data>
+  <data name="Players_Menu_AddPlayer" xml:space="preserve">
+    <value>Add player…</value>
+  </data>
+  <data name="Players_Menu_RemovePlayer" xml:space="preserve">
+    <value>Remove player</value>
+  </data>
+  <data name="Players_Column_Player" xml:space="preserve">
+    <value>Player (Character)</value>
+  </data>
+  <data name="Players_Column_Role" xml:space="preserve">
+    <value>Role</value>
+  </data>
+  <data name="Players_Column_Status" xml:space="preserve">
+    <value>Status</value>
+  </data>
+  <data name="Players_Column_Since" xml:space="preserve">
+    <value>Since</value>
+  </data>
+  <data name="Players_ViewDetails_Tip" xml:space="preserve">
+    <value>View player details</value>
+  </data>
+  <data name="Players_ImportLists_Tip" xml:space="preserve">
+    <value>Import player lists</value>
+  </data>
+  <data name="Players_AddPlayer_Tip" xml:space="preserve">
+    <value>Add player</value>
+  </data>
+  <data name="Players_RemovePlayer_Tip" xml:space="preserve">
+    <value>Remove player</value>
+  </data>
+  <!-- Logs tab -->
+  <data name="Logs_ViewFor_Label" xml:space="preserve">
+    <value>View logs for:</value>
+  </data>
+  <data name="Logs_OpenFolder_Tip" xml:space="preserve">
+    <value>Open the logs folder in your file manager</value>
+  </data>
+  <data name="Logs_SaveLogs" xml:space="preserve">
+    <value>Save Logs…</value>
+  </data>
+  <data name="Logs_ClearLogs" xml:space="preserve">
+    <value>Clear Logs</value>
+  </data>
 </root>

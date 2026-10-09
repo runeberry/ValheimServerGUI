@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Services;
@@ -44,6 +42,7 @@ public sealed class StartServerFlowTests : IDisposable
         public required MainWindowViewModel Vm { get; init; }
         public required FakeSteamCloudWorldProvider Cloud { get; init; }
         public required FakeServerPreferencesProvider ServerPrefs { get; init; }
+        public required FakeIpAddressProvider Ip { get; init; }
         public List<string> Errors { get; } = new();
         public List<IValheimServerOptions> Started { get; } = new();
     }
@@ -52,6 +51,7 @@ public sealed class StartServerFlowTests : IDisposable
     {
         var cloud = new FakeSteamCloudWorldProvider(cloudWorlds);
         var serverPrefs = new FakeServerPreferencesProvider();
+        var ip = new FakeIpAddressProvider();
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
 
         var manager = new ServerManager(
@@ -63,7 +63,7 @@ public sealed class StartServerFlowTests : IDisposable
             serverPrefs,
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             cloud,
-            Core.GetRequiredService<IIpAddressProvider>(),
+            ip,
             Core.GetRequiredService<IPlayerDataRepository>(),
             Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(),
@@ -74,7 +74,7 @@ public sealed class StartServerFlowTests : IDisposable
 
         vm.LoadProfile(new ServerPreferences { ProfileName = "Test" });
 
-        var harness = new Harness { Vm = vm, Cloud = cloud, ServerPrefs = serverPrefs };
+        var harness = new Harness { Vm = vm, Cloud = cloud, ServerPrefs = serverPrefs, Ip = ip };
         vm.ErrorReported = harness.Errors.Add;
         vm.CloudImportPrompt = _ => Task.FromResult(cloudChoice);
         vm.StartAction = harness.Started.Add; // don't actually launch
@@ -82,17 +82,10 @@ public sealed class StartServerFlowTests : IDisposable
         // A valid baseline configuration; individual tests tweak the form.
         vm.Form.Name = "MyServer";
         vm.Form.Password = "hunter2";
-        vm.Form.Port = FreeUdpPort();
+        vm.Form.Port = 2456;
         vm.Form.ServerExePath = _exe;
         vm.Form.SaveDataFolderPath = _saveDir;
         return harness;
-    }
-
-    private static int FreeUdpPort()
-    {
-        using var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        s.Bind(new IPEndPoint(IPAddress.Loopback, 0));
-        return ((IPEndPoint)s.LocalEndPoint!).Port;
     }
 
     private void CreateLocalWorld(string name)
@@ -169,18 +162,18 @@ public sealed class StartServerFlowTests : IDisposable
         Assert.Empty(h.Started);
     }
 
-    [Fact]
-    public async Task Port_in_use_surfaces_error()
+    // Valheim needs the server port and the one above it; either being taken blocks the start.
+    [Theory]
+    [InlineData(0)]
+    [InlineData(1)]
+    public async Task Port_in_use_surfaces_error(int occupiedOffset)
     {
         var h = Build();
         CreateLocalWorld("Someworld");
         h.Vm.Form.UseNewWorld = false;
         h.Vm.Form.ExistingWorld = "Someworld";
-
-        var port = FreeUdpPort();
-        using var occupied = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        occupied.Bind(new IPEndPoint(IPAddress.Loopback, port));
-        h.Vm.Form.Port = port;
+        var port = h.Vm.Form.Port;
+        h.Ip.OccupiedPorts.Add(port + occupiedOffset);
 
         await h.Vm.StartServerAsync(isManual: true);
 

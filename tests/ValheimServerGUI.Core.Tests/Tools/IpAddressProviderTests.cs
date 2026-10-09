@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Net;
+using System.Net.Sockets;
 using System.Threading.Tasks;
 using Serilog;
 using ValheimServerGUI.Tools;
@@ -27,6 +29,18 @@ namespace ValheimServerGUI.Core.Tests.Tools
                 if (ThrowFor.Contains(url)) throw new InvalidOperationException("boom");
                 return Task.FromResult(Responses.TryGetValue(url, out var v) ? v : null);
             }
+        }
+
+        // Deterministic because the socket stays bound for the whole assertion (the start flow's tests use a fake).
+        [Fact]
+        public void A_bound_udp_port_is_not_available()
+        {
+            using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+            socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
+            var port = ((IPEndPoint)socket.LocalEndPoint!).Port;
+
+            Assert.False(new StubIpProvider().IsLocalUdpPortAvailable(port));
+            Assert.False(new StubIpProvider().IsLocalUdpPortAvailable(port - 1, port));
         }
 
         [Fact]

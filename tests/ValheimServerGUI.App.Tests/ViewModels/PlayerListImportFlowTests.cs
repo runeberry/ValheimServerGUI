@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Services;
@@ -71,7 +69,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
             new FakeServerPreferencesProvider(),
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             new FakeSteamCloudWorldProvider(),
-            Core.GetRequiredService<IIpAddressProvider>(),
+            new FakeIpAddressProvider(),
             Core.GetRequiredService<IPlayerDataRepository>(),
             Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(),
@@ -95,7 +93,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
         {
             vm.Form.Name = "MyServer";
             vm.Form.Password = "hunter2";
-            vm.Form.Port = FreeUdpPort();
+            vm.Form.Port = 2456;
             CreateLocalWorld("Existingworld");
             vm.RefreshWorldsCommand.Execute(null);
             vm.Form.UseNewWorld = false;
@@ -103,13 +101,6 @@ public sealed class PlayerListImportFlowTests : IDisposable
         }
 
         return h;
-    }
-
-    private static int FreeUdpPort()
-    {
-        using var s = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
-        s.Bind(new IPEndPoint(IPAddress.Loopback, 0));
-        return ((IPEndPoint)s.LocalEndPoint!).Port;
     }
 
     private void CreateLocalWorld(string name)

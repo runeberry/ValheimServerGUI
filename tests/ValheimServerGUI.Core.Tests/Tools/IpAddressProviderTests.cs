@@ -1,35 +1,27 @@
 using System;
-using System.Collections.Generic;
 using System.Net;
+using System.Net.Http;
 using System.Net.Sockets;
 using System.Threading.Tasks;
 using Serilog;
+using ValheimServerGUI.Core.Tests.Fakes;
+using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Http;
 using Xunit;
 
 namespace ValheimServerGUI.Core.Tests.Tools
 {
-    // §16.2 external-IP fallback chain (E52): try endpoints in order, first IPv4 result wins, keep prior on total failure.
+    // §16.2 external IP: one IPv4-only request to the app's API (/ip-check); a failed or non-IPv4 answer keeps the
+    // previous value (E52).
     public class IpAddressProviderTests
     {
-        private sealed class StubIpProvider : IpAddressProvider
-        {
-            public Dictionary<string, string?> Responses { get; } = new();
-            public HashSet<string> ThrowFor { get; } = new();
+        private readonly StubHttpClientProvider _http = new();
 
-            public StubIpProvider() : base(new RestClientContext(new LoggerConfiguration().CreateLogger(), new HttpClientProvider()))
-            {
-            }
+        private IpAddressProvider NewProvider()
+            => new(new RestClientContext(new LoggerConfiguration().CreateLogger(), _http));
 
-            protected override IReadOnlyList<string> ExternalIpEndpoints { get; } = new[] { "one", "two", "three" };
-
-            protected override Task<string?> FetchExternalIpAsync(string url)
-            {
-                if (ThrowFor.Contains(url)) throw new InvalidOperationException("boom");
-                return Task.FromResult(Responses.TryGetValue(url, out var v) ? v : null);
-            }
-        }
+        private void AnswerIp(string ip) => _http.RespondWith(HttpStatusCode.OK, $"{{\"ip\":\"{ip}\"}}");
 
         // Deterministic because the socket stays bound for the whole assertion (the start flow's tests use a fake).
         [Fact]
@@ -39,40 +31,30 @@ namespace ValheimServerGUI.Core.Tests.Tools
             socket.Bind(new IPEndPoint(IPAddress.Loopback, 0));
             var port = ((IPEndPoint)socket.LocalEndPoint!).Port;
 
-            Assert.False(new StubIpProvider().IsLocalUdpPortAvailable(port));
-            Assert.False(new StubIpProvider().IsLocalUdpPortAvailable(port - 1, port));
+            Assert.False(NewProvider().IsLocalUdpPortAvailable(port));
+            Assert.False(NewProvider().IsLocalUdpPortAvailable(port - 1, port));
         }
 
         [Fact]
-        public async Task First_non_blank_endpoint_wins()
+        public async Task Asks_the_api_ip_check_route_over_IPv4_with_the_client_key()
         {
-            var p = new StubIpProvider();
-            p.Responses["one"] = null;
-            p.Responses["two"] = "1.2.3.4";
-            p.Responses["three"] = "5.6.7.8";
+            AnswerIp("203.0.113.7");
+            var p = NewProvider();
 
             await p.LoadExternalIpAddressAsync();
 
-            Assert.Equal("1.2.3.4", p.ExternalIpAddress);
-        }
-
-        [Fact]
-        public async Task A_throwing_endpoint_is_skipped()
-        {
-            var p = new StubIpProvider();
-            p.ThrowFor.Add("one");
-            p.Responses["two"] = "9.9.9.9";
-
-            await p.LoadExternalIpAddressAsync();
-
-            Assert.Equal("9.9.9.9", p.ExternalIpAddress);
+            Assert.Equal("203.0.113.7", p.ExternalIpAddress);
+            var (request, ipv4Only) = Assert.Single(_http.Requests);
+            Assert.Equal($"{CoreConstants.UrlRuneberryApi}/ip-check", request.RequestUri!.ToString());
+            Assert.Equal(new[] { ClientSecrets.RuneberryClientApiKey }, request.Headers.GetValues(ClientSecrets.RuneberryApiKeyHeader));
+            Assert.True(ipv4Only);
         }
 
         [Fact]
         public async Task Result_is_trimmed()
         {
-            var p = new StubIpProvider();
-            p.Responses["one"] = "  4.4.4.4\n";
+            _http.RespondWith(HttpStatusCode.OK, "{\"ip\":\"  4.4.4.4\\n\"}");
+            var p = NewProvider();
 
             await p.LoadExternalIpAddressAsync();
 
@@ -81,34 +63,46 @@ namespace ValheimServerGUI.Core.Tests.Tools
 
         [Theory]
         [InlineData("2001:db8::1")]
-        [InlineData("<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>")]
         [InlineData("not an ip")]
         [InlineData("1.2.3")]
-        public async Task A_response_that_is_not_IPv4_falls_through_to_the_next_endpoint(string response)
+        public async Task An_answer_that_is_not_IPv4_keeps_the_previous_value(string answer)
         {
-            var p = new StubIpProvider();
-            p.Responses["one"] = response;
-            p.Responses["two"] = "5.6.7.8";
-
+            var p = NewProvider();
+            AnswerIp("8.8.8.8");
             await p.LoadExternalIpAddressAsync();
 
-            Assert.Equal("5.6.7.8", p.ExternalIpAddress);
+            AnswerIp(answer);
+            await p.LoadExternalIpAddressAsync();
+
+            Assert.Equal("8.8.8.8", p.ExternalIpAddress);
+        }
+
+        [Theory]
+        [InlineData(HttpStatusCode.InternalServerError, "{\"message\":\"no ip\"}")]
+        [InlineData(HttpStatusCode.OK, "<!DOCTYPE html><html><head><title>Just a moment...</title></head></html>")]
+        public async Task A_failed_request_keeps_the_previous_value(HttpStatusCode status, string body)
+        {
+            var p = NewProvider();
+            AnswerIp("8.8.8.8");
+            await p.LoadExternalIpAddressAsync();
+
+            _http.RespondWith(status, body);
+            await p.LoadExternalIpAddressAsync();
+
+            Assert.Equal("8.8.8.8", p.ExternalIpAddress);
         }
 
         [Fact]
-        public async Task Total_failure_keeps_the_previous_value()
+        public async Task An_unreachable_api_keeps_the_previous_value()
         {
-            var p = new StubIpProvider();
-            p.Responses["one"] = "8.8.8.8";
+            var p = NewProvider();
+            AnswerIp("8.8.8.8");
             await p.LoadExternalIpAddressAsync();
+
+            _http.Respond = _ => throw new HttpRequestException("no route");
+            await p.LoadExternalIpAddressAsync();
+
             Assert.Equal("8.8.8.8", p.ExternalIpAddress);
-
-            // Now every endpoint fails/blank.
-            p.Responses["one"] = null;
-            p.ThrowFor.Add("two");
-            await p.LoadExternalIpAddressAsync();
-
-            Assert.Equal("8.8.8.8", p.ExternalIpAddress); // unchanged (E52)
         }
     }
 }

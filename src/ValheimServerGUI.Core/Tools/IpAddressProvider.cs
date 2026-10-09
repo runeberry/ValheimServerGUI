@@ -1,6 +1,5 @@
 ﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.NetworkInformation;
@@ -64,40 +63,28 @@ namespace ValheimServerGUI.Tools
         public event EventHandler<string?>? InternalIpChanged;
 
         /// <summary>
-        /// External-IP endpoints tried in order (§16.2 fallback chain, E52): ipify → icanhazip → ident.me, all
-        /// IPv4-only. The first result that parses as an IPv4 address wins; anything else (blank, IPv6, an HTML
-        /// challenge page) moves on to the next endpoint. If all fail the previous value is kept.
+        /// Asks the app's API for the address this machine's requests arrive from (§16.2). The request goes over
+        /// IPv4 because the API host is dual-stack and players join on the IPv4 address. Anything other than an IPv4
+        /// address, or a failed request, keeps the previous value (E52).
         /// </summary>
-        protected virtual IReadOnlyList<string> ExternalIpEndpoints { get; } = new[]
-        {
-            CoreConstants.UrlExternalIpLookup,
-            CoreConstants.UrlExternalIpLookupFallback1,
-            CoreConstants.UrlExternalIpLookupFallback2,
-        };
-
         public async Task LoadExternalIpAddressAsync()
         {
-            foreach (var url in ExternalIpEndpoints)
+            try
             {
-                try
+                var ip = (await FetchExternalIpAsync())?.Trim();
+                if (IsIPv4(ip))
                 {
-                    var ip = (await FetchExternalIpAsync(url))?.Trim();
-                    if (IsIPv4(ip))
-                    {
-                        ExternalIpAddress = ip;
-                        return;
-                    }
+                    ExternalIpAddress = ip;
+                    return;
+                }
 
-                    if (!string.IsNullOrEmpty(ip))
-                        Logger.Warning("External IP lookup from {Url} did not return an IPv4 address", url);
-                }
-                catch (Exception e)
-                {
-                    Logger.Warning(e, "External IP lookup failed for {Url}", url);
-                }
+                if (!string.IsNullOrEmpty(ip))
+                    Logger.Warning("External IP lookup did not return an IPv4 address");
             }
-
-            // E52: every endpoint failed/blank — keep the previous value (no-op).
+            catch (Exception e)
+            {
+                Logger.Warning(e, "External IP lookup failed");
+            }
         }
 
         // TryParse alone is lenient ("1.2.3" parses as 1.2.0.3), so also require the text to be the address's
@@ -107,18 +94,16 @@ namespace ValheimServerGUI.Tools
             && address.AddressFamily == AddressFamily.InterNetwork
             && address.ToString() == text;
 
-        /// <summary>Fetches the external IP from one endpoint. ipify returns <c>{"ip":…}</c>; the others return the bare IP.</summary>
+        /// <summary>Fetches the external IP from the API's <c>/ip-check</c> route (<c>{"ip":…}</c>).</summary>
         /// <remarks>Routed through <see cref="RestClient"/> (not a raw HttpClient) so the call is logged at the
         /// shared HTTP chokepoint — Info on success, Error on failure — like every other external request.</remarks>
-        protected virtual async Task<string?> FetchExternalIpAsync(string url)
+        private async Task<string?> FetchExternalIpAsync()
         {
-            var response = await Get(url).SendAsync();
-            if (response is null || !response.IsSuccessStatusCode) return null;
-
-            var body = (await response.Content.ReadAsStringAsync()).Trim();
-            if (body.StartsWith('{'))
-                return JsonConvert.DeserializeObject<ExternalIpResponse>(body)?.Ip;
-            return body;
+            var response = await Get($"{CoreConstants.UrlRuneberryApi}/ip-check")
+                .WithRuneberryApiKey()
+                .WithIPv4Only()
+                .SendAsync<ExternalIpResponse>();
+            return response?.Ip;
         }
 
         // Adapted from: https://stackoverflow.com/a/40528818/7071436

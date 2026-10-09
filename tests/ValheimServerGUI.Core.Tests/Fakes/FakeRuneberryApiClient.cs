@@ -24,6 +24,15 @@ namespace ValheimServerGUI.Core.Tests.Fakes
             return Task.CompletedTask;
         }
 
+        /// <summary>What <see cref="GetLatestReleaseAsync"/> returns (null = no qualifying release).</summary>
+        public LatestReleaseResponse? LatestRelease { get; set; }
+
+        /// <summary>When set, <see cref="GetLatestReleaseAsync"/> throws it (the API was unreachable).</summary>
+        public Exception? LatestReleaseError { get; set; }
+
+        public Task<LatestReleaseResponse?> GetLatestReleaseAsync()
+            => LatestReleaseError is { } e ? Task.FromException<LatestReleaseResponse?>(e) : Task.FromResult(LatestRelease);
+
         /// <summary>Test hook: simulate the backend returning a player name.</summary>
         public void RaisePlayerInfo(PlayerInfoResponse response) => PlayerInfoAvailable?.Invoke(this, response);
     }

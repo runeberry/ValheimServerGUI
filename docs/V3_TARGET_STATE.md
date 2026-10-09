@@ -121,8 +121,8 @@ Serilog, HTTP, semver) and lifts as-is.
 - **Windows:** single-file self-contained `.exe` (preserve the "just one small .exe" value prop).
 - **Linux:** AppImage and/or Flatpak (desktop-integrated install), plus a self-contained tarball
   baseline with a `.desktop` launcher (mirror mochi-paint's `packaging/*.desktop.in`).
-- **Update-notify assets:** the GitHub-releases update check keys on "a release with ≥1 asset"
-  (§9.4). The release must carry per-OS assets; asset naming changes from the v2.4 `.zip`-with-
+- **Update-notify assets:** the update check (the API's `/update-check`, §9.2) keys on "a release with ≥1
+  asset" on the public forge (§9.4). The release must carry per-OS assets; asset naming changes from the v2.4 `.zip`-with-
   `.exe` convention to include the Linux artifacts. The autostart `Exec`/relaunch command
   (§12) must record the correct invocation for the packaging format shipped
   (`Environment.ProcessPath`; AppImage/Flatpak launch differs from a bare apphost).
@@ -638,18 +638,24 @@ live). Two consumers: the in-memory ring buffer + a `LogReceived` event the UI s
 Notify-only (no self-update — roadmap §17). `CheckForUpdatesAsync(isManual)`:
 - Automatic checks throttled to once per `UpdateCheckInterval` (24h) and gated by `CheckForUpdates`;
   manual checks bypass both.
-- Fetch the **full** GitHub releases list (`repos/runeberry/ValheimServerGUI`, `User-Agent`
-  header). `SelectLatestRelease`: keep releases with ≥1 asset AND not draft AND not
-  GitHub-pre-release-flagged; order by `PublishedAt` desc; first, else null.
-- **Release-process invariant (hard requirement):** exclusion is by GitHub's *pre-release flag*,
+- Ask the app's API: `GET {UrlRuneberryApi}/update-check` with the client API key (the
+  `ValheimServerGUI.Api` Worker, 2026-10-09; it replaced the client's direct GitHub releases call, so selection
+  changes ship as Worker deploys). The Worker reads releases from the **public forge `forge.nuffle.me`**
+  (`runeberry/ValheimServerGUI`), so a release must be **published there** to notify users. It keeps releases
+  with ≥1 asset AND not draft AND not pre-release-flagged, newest first, and answers
+  `200 {version, url, publishedAt}` / `404` (none qualifies). The client: 200 → `version` is compared, `url`
+  is the link target; 404 → the running version (up to date, no link); any other status, an unreachable API,
+  or a 200 without a parseable `version` and a `url` → the check fails ("Unable to reach the update server").
+- **Release-process invariant (hard requirement):** exclusion is by the release's *pre-release flag*,
   NOT the version string. A pre-release *version* like `2.4.0-rc.1` published as an ordinary
   release with an asset is deliberately eligible. RCs must ship as **non-pre-release releases that
-  carry an asset** or users aren't notified. Keep the guarding tests.
+  carry an asset** or users aren't notified. (The selection and its tests now live in the Worker.)
 - `CompareVersions` uses Semver precedence (`2.4.0` > `2.4.0-rc.1`; naive string compare is wrong):
   returns 1 (other newer) / -1 (older) / 0 (equal) / -2 (unparseable); accepts a leading `v`.
-- UI: right status-bar item shows Checking / Update available (link) / Up to date / Pre-release
-  build / failed (link); a manual check adds a Yes/No dialog offering to open the releases page
-  (via `IShellLauncher`). A 60s timer re-runs the silent check.
+- UI: right status-bar item shows Checking / Update available (link to the returned release page) / Up to
+  date / Pre-release build / failed (not a link: there is no page without an answer). A manual check reports
+  in a dialog; when the check returned a release page it is a Yes/No offering to open it (via
+  `IShellLauncher`), otherwise a plain message. No hardcoded releases URL. A 60s timer re-runs the silent check.
 
 ### 9.3 Crash & bug reporting (parity)
 
@@ -669,7 +675,11 @@ unguarded — §15).
 
 ### 9.5 IP resolution (parity)
 
-External IP via `api.ipify.org` (silent no-op on failure — consider a fallback chain, §16).
+External IP via the app's API, `GET {UrlRuneberryApi}/ip-check` (client API key, answers `{"ip": …}` from
+Cloudflare's `CF-Connecting-IP`). The API host is dual-stack, so this one request is forced onto **IPv4**
+(`IHttpClientProvider.CreateIPv4Client`: a `SocketsHttpHandler` whose `ConnectCallback` connects only to the
+host's IPv4 addresses); players join over IPv4. No third-party fallbacks (Nuffle, 2026-10-09: fully
+centralized). Anything but a canonical IPv4 answer, or a failed request, keeps the previous value (E52).
 Internal IP via `System.Net.NetworkInformation` (cross-platform): up interfaces with gateways,
 non-loopback IPv4, prefer DHCP-origin (validate on Linux — some stacks report Other/Unknown; the
 fallback to "all eligible" is acceptable), alphabetical tiebreak. UDP port availability via active
@@ -976,10 +986,10 @@ save-flush must be shown to fail under force-kill).
    overwrite" property) rather than moving to `%APPDATA%`.
 2. **Startup scope:** recommend **per-user only** on both OSes (drop the Windows HKLM "all users"
    tier — it needed admin and silently fell back to HKCU anyway).
-3. **External-IP resiliency:** recommend a small **fallback chain** of IPv4-only endpoints (ipify →
-   ipv4.icanhazip.com → v4.ident.me) so one outage doesn't blank the field. Accept only a result that is a
-   canonical IPv4 address (players join over IPv4; a dual-stack host must never show an IPv6 address, and a
-   bot-challenge HTML page must never show at all) — anything else falls through to the next endpoint.
+3. **External-IP resiliency:** ~~fallback chain of IPv4-only endpoints (ipify → icanhazip → ident.me)~~ —
+   superseded 2026-10-09: the lookup moved to the app's API (`/ip-check`, forced IPv4) with no third-party
+   fallbacks (§9.5). Still accept only a canonical IPv4 address (a dual-stack host must never show an IPv6
+   address, and an HTML challenge page must never show at all); anything else keeps the previous value.
 4. **Legacy `userprefs.txt` migration:** recommend **keep** (cheap, one-time).
 5. **Theme:** recommend **add a light/dark/system preference** (Avalonia norm; small).
 6. **Persist last-active profile:** recommend **yes** — add `LastActiveProfile` so restart reopens

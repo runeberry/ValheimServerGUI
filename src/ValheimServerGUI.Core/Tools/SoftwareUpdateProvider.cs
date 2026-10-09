@@ -21,6 +21,10 @@ namespace ValheimServerGUI.Tools
     {
         public string? LatestVersion { get; }
 
+        /// <summary>The latest release's page, or null when there is none to link to (no release qualifies, or
+        /// the check failed).</summary>
+        public string? ReleaseUrl { get; }
+
         public bool IsManualCheck { get; }
 
         public bool IsSuccessful { get; }
@@ -29,9 +33,11 @@ namespace ValheimServerGUI.Tools
 
         public SoftwareUpdateEventArgs(
             string latestVersion,
+            string? releaseUrl,
             bool isManualCheck)
         {
             LatestVersion = latestVersion;
+            ReleaseUrl = releaseUrl;
             IsManualCheck = isManualCheck;
             IsSuccessful = true;
         }
@@ -48,15 +54,15 @@ namespace ValheimServerGUI.Tools
 
     public class SoftwareUpdateProvider : ISoftwareUpdateProvider
     {
-        private readonly IGitHubClient GitHubClient;
+        private readonly IRuneberryApiClient ApiClient;
         private readonly IUserPreferencesProvider UserPrefsProvider;
 
         private readonly TimeSpan UpdateCheckInterval = CoreConstants.UpdateCheckInterval;
         private DateTime NextAutomaticUpdateCheck = DateTime.MinValue;
 
-        public SoftwareUpdateProvider(IGitHubClient gitHubClient, IUserPreferencesProvider userPrefsProvider)
+        public SoftwareUpdateProvider(IRuneberryApiClient apiClient, IUserPreferencesProvider userPrefsProvider)
         {
-            GitHubClient = gitHubClient;
+            ApiClient = apiClient;
             UserPrefsProvider = userPrefsProvider;
         }
 
@@ -86,12 +92,12 @@ namespace ValheimServerGUI.Tools
 
             try
             {
-                var release = await GitHubClient.GetLatestReleaseAsync();
+                var release = await ApiClient.GetLatestReleaseAsync();
 
-                // In case there was no response from GitHub, consider the current running version as the "latest version"
-                var latestVersion = release?.TagName ?? AssemblyHelper.GetApplicationVersion();
-
-                eventArgs = new SoftwareUpdateEventArgs(latestVersion, isManualCheck);
+                // No qualifying release: treat the running version as the latest (nothing newer to offer).
+                eventArgs = release == null
+                    ? new SoftwareUpdateEventArgs(AssemblyHelper.GetApplicationVersion(), null, isManualCheck)
+                    : new SoftwareUpdateEventArgs(release.Version!, release.Url, isManualCheck);
             }
             catch (Exception e)
             {

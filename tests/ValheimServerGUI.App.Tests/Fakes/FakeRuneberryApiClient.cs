@@ -27,6 +27,8 @@ internal sealed class FakeRuneberryApiClient : IRuneberryApiClient
         return OnRequestPlayerInfo?.Invoke(platform, playerId) ?? Task.CompletedTask;
     }
 
+    public Task<LatestReleaseResponse?> GetLatestReleaseAsync() => Task.FromResult<LatestReleaseResponse?>(null);
+
     public Task SendCrashReportAsync(CrashReport report)
     {
         Reports.Add(report);

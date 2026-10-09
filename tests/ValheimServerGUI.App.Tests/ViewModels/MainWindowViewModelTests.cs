@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.Services;
@@ -28,9 +29,10 @@ public class MainWindowViewModelTests
 
     private static MainWindowViewModel Build(
         FakeSoftwareUpdateProvider update,
-        IEnumerable<ServerPreferences>? profiles = null)
+        IEnumerable<ServerPreferences>? profiles = null,
+        Services.RecordingSystemShell? systemShell = null)
     {
-        var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
+        var shell = new ShellLauncher(systemShell ?? new Services.RecordingSystemShell(), TestLog.Silent, isWindows: false);
         // A fresh manager per VM keeps servers isolated between tests (the DI provider is shared/static).
         var manager = new ServerManager(
             () => Core.GetRequiredService<ValheimServer>(),
@@ -141,25 +143,67 @@ public class MainWindowViewModelTests
         Assert.False(removed);
     }
 
+    private const string ReleasePage = "https://forge.example/releases/tag/v9.9.9";
+
+    // The URLs the shell was asked to open (xdg-open's argument; the VM is built with isWindows: false).
+    private static IEnumerable<string> Opened(Services.RecordingSystemShell shell) => shell.Started.SelectMany(s => s.Args);
+
     [Fact]
-    public void Update_available_becomes_a_link()
+    public void Update_available_links_to_the_returned_release_page()
     {
-        var vm = Build(out var update);
-        update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", isManualCheck: true));
+        var update = new FakeSoftwareUpdateProvider();
+        var shell = new Services.RecordingSystemShell();
+        var vm = Build(update, systemShell: shell);
+        update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", ReleasePage, isManualCheck: false));
 
         Assert.Equal(string.Format(Strings.Update_StatusAvailable, "9.9.9"), vm.UpdateStatusText);
         Assert.True(vm.UpdateIsLink);
-        Assert.True(vm.UpdateLinkCommand.CanExecute(null));
+        vm.UpdateLinkCommand.Execute(null);
+        Assert.Equal(new[] { ReleasePage }, Opened(shell));
     }
 
     [Fact]
-    public void Update_failure_becomes_a_link()
+    public void Update_failure_is_not_a_link()
     {
         var vm = Build(out var update);
-        update.RaiseFinished(new SoftwareUpdateEventArgs(new Exception("no net"), isManualCheck: true));
+        update.RaiseFinished(new SoftwareUpdateEventArgs(new Exception("no net"), isManualCheck: false));
 
         Assert.Equal(Strings.Update_StatusFailed, vm.UpdateStatusText);
-        Assert.True(vm.UpdateIsLink);
+        Assert.False(vm.UpdateIsLink);
+        Assert.False(vm.UpdateLinkCommand.CanExecute(null));
+    }
+
+    [Fact]
+    public void Manual_check_with_a_release_page_offers_to_open_it()
+    {
+        var update = new FakeSoftwareUpdateProvider();
+        var shell = new Services.RecordingSystemShell();
+        var vm = Build(update, systemShell: shell);
+        string? asked = null;
+        vm.UpdateResultPrompt = body => { asked = body; return Task.FromResult(true); };
+
+        update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", ReleasePage, isManualCheck: true));
+
+        Assert.Equal(string.Format(Strings.Update_ManualPrompt, Strings.Update_ManualAvailable), asked);
+        Assert.Equal(new[] { ReleasePage }, Opened(shell));
+    }
+
+    [Fact]
+    public void Manual_check_without_a_release_page_only_reports()
+    {
+        var update = new FakeSoftwareUpdateProvider();
+        var shell = new Services.RecordingSystemShell();
+        var vm = Build(update, systemShell: shell);
+        var asked = false;
+        vm.UpdateResultPrompt = _ => { asked = true; return Task.FromResult(true); };
+        (string Title, string Body)? shown = null;
+        vm.MessagePrompt = (title, body) => { shown = (title, body); return Task.CompletedTask; };
+
+        update.RaiseFinished(new SoftwareUpdateEventArgs(new Exception("no net"), isManualCheck: true));
+
+        Assert.False(asked);
+        Assert.Equal((Strings.Prompt_CheckForUpdates_Title, string.Format(Strings.Update_ManualFailed, "no net")), shown);
+        Assert.Empty(Opened(shell));
     }
 
     [Fact]
@@ -167,7 +211,7 @@ public class MainWindowViewModelTests
     {
         var vm = Build(out var update);
         var current = AssemblyHelper.GetApplicationVersion();
-        update.RaiseFinished(new SoftwareUpdateEventArgs(current, isManualCheck: true));
+        update.RaiseFinished(new SoftwareUpdateEventArgs(current, ReleasePage, isManualCheck: false));
 
         Assert.Equal(string.Format(Strings.Update_StatusUpToDate, current), vm.UpdateStatusText); // version shown, WinForms-style
         Assert.Equal(UpdateCheckStatus.UpToDate, vm.UpdateStatus);
@@ -180,7 +224,7 @@ public class MainWindowViewModelTests
     {
         var vm = Build(out var update);
         // A latest older than the running (pre-release) build → "Pre-release build (<current>)".
-        update.RaiseFinished(new SoftwareUpdateEventArgs("0.0.1", isManualCheck: true));
+        update.RaiseFinished(new SoftwareUpdateEventArgs("0.0.1", ReleasePage, isManualCheck: false));
 
         Assert.Equal(string.Format(Strings.Update_StatusPreRelease, AssemblyHelper.GetApplicationVersion()), vm.UpdateStatusText);
         Assert.Equal(UpdateCheckStatus.PreRelease, vm.UpdateStatus);
@@ -191,7 +235,7 @@ public class MainWindowViewModelTests
     public void Unparseable_latest_version_is_an_error_link()
     {
         var vm = Build(out var update);
-        update.RaiseFinished(new SoftwareUpdateEventArgs("not-a-version", isManualCheck: true));
+        update.RaiseFinished(new SoftwareUpdateEventArgs("not-a-version", ReleasePage, isManualCheck: false));
 
         Assert.Equal(string.Format(Strings.Update_StatusUnparsable, "not-a-version"), vm.UpdateStatusText);
         Assert.Equal(UpdateCheckStatus.Error, vm.UpdateStatus);
@@ -204,7 +248,7 @@ public class MainWindowViewModelTests
         // The startup check completes before this window's VM exists; a VM built afterwards must still
         // reflect it from LastResult (not sit blank).
         var update = new FakeSoftwareUpdateProvider();
-        update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", isManualCheck: false)); // sets LastResult
+        update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", ReleasePage, isManualCheck: false)); // sets LastResult
 
         var vm = Build(update);
         Assert.Equal(string.Format(Strings.Update_StatusAvailable, "9.9.9"), vm.UpdateStatusText);

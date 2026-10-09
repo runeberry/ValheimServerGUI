@@ -43,7 +43,7 @@ public class FooterReadoutTests
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
         window.Show();
         var current = ValheimServerGUI.Tools.AssemblyHelper.GetApplicationVersion();
-        update.RaiseFinished(new SoftwareUpdateEventArgs(current, isManualCheck: false));
+        update.RaiseFinished(new SoftwareUpdateEventArgs(current, "https://forge.example/r", isManualCheck: false));
         Dispatcher.UIThread.RunJobs();
         window.Measure(new Size(700, 500));
         window.Arrange(new Rect(new Size(700, 500)));
@@ -70,7 +70,7 @@ public class FooterReadoutTests
 
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
         window.Show();
-        update.RaiseFinished(new SoftwareUpdateEventArgs("999.0.0", isManualCheck: false));
+        update.RaiseFinished(new SoftwareUpdateEventArgs("999.0.0", "https://forge.example/r", isManualCheck: false));
         Dispatcher.UIThread.RunJobs();
         window.Measure(new Size(700, 500));
         window.Arrange(new Rect(new Size(700, 500)));

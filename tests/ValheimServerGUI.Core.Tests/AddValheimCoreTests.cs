@@ -31,7 +31,7 @@ namespace ValheimServerGUI.Core.Tests
         [InlineData(typeof(ISteamCloudWorldProvider))]
         [InlineData(typeof(ISoftwareUpdateProvider))]
         [InlineData(typeof(IExceptionHandler))]
-        [InlineData(typeof(IGitHubClient))]
+        [InlineData(typeof(IRuneberryApiClient))]
         [InlineData(typeof(IIpAddressProvider))]
         public void EveryCoreService_Resolves(System.Type serviceType)
         {

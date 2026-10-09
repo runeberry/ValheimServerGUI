@@ -1316,8 +1316,8 @@ See application logs for more details.</value>
     <value>A world named '{0}' already exists in the local save folder.</value>
   </data>
   <!-- Online services -->
-  <data name="Api_GitHubUnreachable" xml:space="preserve">
-    <value>Unable to reach GitHub.</value>
+  <data name="Api_UpdateServerUnreachable" xml:space="preserve">
+    <value>Unable to reach the update server</value>
   </data>
   <data name="Api_RuneberryUnreachable" xml:space="preserve">
     <value>Unable to reach Runeberry API</value>

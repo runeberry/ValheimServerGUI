@@ -74,7 +74,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IPlayerListImportService _import;
     private readonly IRuneberryApiClient _api;
 
-    private string? _updateLinkTarget;
     private string? _startedNewWorld;
 
     public MainWindowViewModel(
@@ -228,9 +227,13 @@ public partial class MainWindowViewModel : ViewModelBase
     [NotifyCanExecuteChangedFor(nameof(UpdateLinkCommand))]
     private string _updateStatusText = string.Empty;
 
+    /// <summary>The release page the update readout links to; null when it is plain text.</summary>
     [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(UpdateIsLink))]
     [NotifyCanExecuteChangedFor(nameof(UpdateLinkCommand))]
-    private bool _updateIsLink;
+    private string? _updateLinkTarget;
+
+    public bool UpdateIsLink => UpdateLinkTarget is not null;
 
     /// <summary>The update-check outcome the status-bar icon derives from (see the status text below).</summary>
     [ObservableProperty]
@@ -367,8 +370,8 @@ public partial class MainWindowViewModel : ViewModelBase
     [RelayCommand(CanExecute = nameof(UpdateIsLink))]
     private void UpdateLink()
     {
-        if (!string.IsNullOrEmpty(_updateLinkTarget))
-            _shell.OpenWebAddress(_updateLinkTarget);
+        if (UpdateLinkTarget is { } url)
+            _shell.OpenWebAddress(url);
     }
 
     // ===== profile / form loading =====
@@ -949,8 +952,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             UpdateStatusText = Strings.Update_Checking;
             UpdateStatus = UpdateCheckStatus.Checking;
-            UpdateIsLink = false;
-            _updateLinkTarget = null;
+            UpdateLinkTarget = null;
         });
 
     private void OnUpdateCheckFinished(object? sender, SoftwareUpdateEventArgs e)
@@ -960,14 +962,19 @@ public partial class MainWindowViewModel : ViewModelBase
             if (e.IsManualCheck) _ = PromptManualUpdateResultAsync(e);
         });
 
-    // A manual "Check for Updates" reports its result in a dialog and offers to open the download page (parity).
+    // A manual "Check for Updates" reports its result in a dialog, offering to open the release page when the check
+    // returned one (parity); otherwise (no release qualifies, or the check failed) it just reports.
     private async Task PromptManualUpdateResultAsync(SoftwareUpdateEventArgs e)
     {
-        if (UpdateResultPrompt is null) return;
+        var message = BuildManualUpdateMessage(e);
+        if (e.ReleaseUrl is not { } url)
+        {
+            await ShowMessageAsync(Strings.Prompt_CheckForUpdates_Title, message);
+            return;
+        }
 
-        var body = string.Format(Strings.Update_ManualPrompt, BuildManualUpdateMessage(e));
-        if (await UpdateResultPrompt(body))
-            _shell.OpenWebAddress(AppConstants.UrlReleases);
+        if (UpdateResultPrompt is not null && await UpdateResultPrompt(string.Format(Strings.Update_ManualPrompt, message)))
+            _shell.OpenWebAddress(url);
     }
 
     private static string BuildManualUpdateMessage(SoftwareUpdateEventArgs e)
@@ -1006,8 +1013,7 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             UpdateStatusText = Strings.Update_StatusFailed;
             UpdateStatus = UpdateCheckStatus.Error;
-            _updateLinkTarget = AppConstants.UrlReleases;
-            UpdateIsLink = true;
+            UpdateLinkTarget = null;
             return;
         }
 
@@ -1016,26 +1022,22 @@ public partial class MainWindowViewModel : ViewModelBase
             case > 0:
                 UpdateStatusText = string.Format(Strings.Update_StatusAvailable, e.LatestVersion);
                 UpdateStatus = UpdateCheckStatus.Available;
-                _updateLinkTarget = AppConstants.UrlReleases;
-                UpdateIsLink = true;
+                UpdateLinkTarget = e.ReleaseUrl;
                 break;
             case 0:
                 UpdateStatusText = string.Format(Strings.Update_StatusUpToDate, e.LatestVersion);
                 UpdateStatus = UpdateCheckStatus.UpToDate;
-                _updateLinkTarget = null;
-                UpdateIsLink = false;
+                UpdateLinkTarget = null;
                 break;
             case -1:
                 UpdateStatusText = string.Format(Strings.Update_StatusPreRelease, AssemblyHelper.GetApplicationVersion());
                 UpdateStatus = UpdateCheckStatus.PreRelease;
-                _updateLinkTarget = null;
-                UpdateIsLink = false;
+                UpdateLinkTarget = null;
                 break;
             default:
                 UpdateStatusText = string.Format(Strings.Update_StatusUnparsable, e.LatestVersion);
                 UpdateStatus = UpdateCheckStatus.Error;
-                _updateLinkTarget = AppConstants.UrlReleases;
-                UpdateIsLink = true;
+                UpdateLinkTarget = e.ReleaseUrl;
                 break;
         }
     }

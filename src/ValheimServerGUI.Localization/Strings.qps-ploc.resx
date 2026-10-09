@@ -1265,8 +1265,8 @@
     <value>⟦CloudWorld_AlreadyExists {0}⟧</value>
   </data>
   <!-- Online services -->
-  <data name="Api_GitHubUnreachable" xml:space="preserve">
-    <value>⟦Api_GitHubUnreachable⟧</value>
+  <data name="Api_UpdateServerUnreachable" xml:space="preserve">
+    <value>⟦Api_UpdateServerUnreachable⟧</value>
   </data>
   <data name="Api_RuneberryUnreachable" xml:space="preserve">
     <value>⟦Api_RuneberryUnreachable⟧</value>

@@ -23,6 +23,9 @@ namespace ValheimServerGUI.Tools.Http
 
         public Type? ResponseContentType { get; set; }
 
+        /// <summary>Connect over IPv4 only (see <see cref="IHttpClientProvider.CreateIPv4Client"/>).</summary>
+        public bool IPv4Only { get; set; }
+
         public List<Action<HttpClient>> ClientBuilders { get; } = new();
 
         public List<Action<HttpRequestMessage>> RequestBuilders { get; } = new();
@@ -47,7 +50,7 @@ namespace ValheimServerGUI.Tools.Http
 
             try
             {
-                var client = Context.HttpClientProvider.CreateClient();
+                var client = IPv4Only ? Context.HttpClientProvider.CreateIPv4Client() : Context.HttpClientProvider.CreateClient();
 
                 foreach (var clientBuilder in ClientBuilders)
                 {

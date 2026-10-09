@@ -22,7 +22,6 @@ internal static class AppConstants
     public const string UrlHelp = "https://github.com/runeberry/ValheimServerGUI/wiki";
     public const string UrlPortForwarding = "https://github.com/runeberry/ValheimServerGUI/wiki/Connecting-to-your-Server";
     public const string UrlDiscord = "https://discord.gg/HBsNJTY";
-    public const string UrlReleases = "https://github.com/runeberry/ValheimServerGUI/releases";
     public const string UrlDonate = "https://www.buymeacoffee.com/runeberry";
     public const string UrlGitHub = "https://github.com/runeberry/ValheimServerGUI";
     public const string UrlValheimGameSite = "https://www.valheimgame.com/";

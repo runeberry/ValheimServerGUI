@@ -39,25 +39,13 @@ namespace ValheimServerGUI
         /// <summary>How often to check for application updates. (Resources: UpdateCheckInterval "1.00:00:00".)</summary>
         public static readonly TimeSpan UpdateCheckInterval = TimeSpan.FromDays(1);
 
-        /// <summary>GitHub API base for the application repo. (Resources: UrlGithubApi.)</summary>
-        public const string UrlGithubApi = "https://api.github.com/repos/runeberry/ValheimServerGUI";
-
-        /// <summary>External IP lookup endpoint. (Resources: UrlExternalIpLookup.)</summary>
-        public const string UrlExternalIpLookup = "https://api.ipify.org?format=json";
-
         /// <summary>
-        /// Fallback external-IP endpoints tried in order after <see cref="UrlExternalIpLookup"/> (§16.2, E52). Like
-        /// ipify, both are IPv4-only hosts, so a dual-stack machine still gets the IPv4 address players join with.
-        /// </summary>
-        public const string UrlExternalIpLookupFallback1 = "https://ipv4.icanhazip.com";
-        public const string UrlExternalIpLookupFallback2 = "https://v4.ident.me";
-
-        /// <summary>
-        /// Name-lookup + crash-report backend base (player-info lookups, crash reports). Served by the
+        /// The app's backend base (player-info lookups, crash reports, update check, external-IP check). Served by the
         /// Cloudflare Worker in the <c>ValheimServerGUI.Api</c> repo, which replaced the retired Runeberry
         /// AWS Lambda with the identical contract. The Worker enforces <c>CLIENT_API_KEY</c> against
         /// <c>ClientSecrets.RuneberryClientApiKey</c>. Mounted under the <c>/vsg</c> prefix on the shared
-        /// <c>api.runeberry.com</c> host; the client appends <c>/player-info</c> / <c>/crash-report</c>.
+        /// <c>api.runeberry.com</c> host; the client appends the route (<c>/player-info</c>, <c>/crash-report</c>,
+        /// <c>/update-check</c>, <c>/ip-check</c>).
         /// (Resources: UrlRuneberryApi.)
         /// </summary>
         public const string UrlRuneberryApi = "https://api.runeberry.com/vsg";

@@ -24,6 +24,12 @@ namespace ValheimServerGUI.Tools.Http
             return request;
         }
 
+        public static RestClientRequest WithIPv4Only(this RestClientRequest request)
+        {
+            request.IPv4Only = true;
+            return request;
+        }
+
         public static RestClientRequest WithHeader(this RestClientRequest request, string key, string value)
         {
             request.RequestBuilders.Add(message =>

@@ -60,6 +60,7 @@ namespace ValheimServerGUI
                 .AddSingleton<ISteamCloudWorldProvider, SteamCloudWorldProvider>()
                 .AddSingleton<IPlayerAccessListService, PlayerAccessListService>()
                 .AddSingleton<IPlayerListImportService, PlayerListImportService>()
+                .AddSingleton<IPlayerListBaselineStore, PlayerListBaselineStore>()
                 .AddTransient<ValheimServer>()
                 // The manager is the single construction site for servers (one per profile, shared app-wide);
                 // the factory lets it build a fresh transient ValheimServer on first ask for a profile.

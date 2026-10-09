@@ -36,7 +36,17 @@ public interface IServerManager
 
     /// <summary>Gracefully stops every server and blocks until each reports Stopped, then disposes (app shutdown).</summary>
     void StopAllAndDispose();
+
+    /// <summary>
+    /// Any held server adopted list-file changes made during play into its role overrides (see
+    /// <see cref="ValheimServer.PlayerRolesAdopted"/>); carries the server's profile name so the owner can persist
+    /// them. May be raised off the UI thread.
+    /// </summary>
+    event EventHandler<PlayerRolesAdoptedEventArgs>? PlayerRolesAdopted;
 }
+
+/// <summary>A server's adopted list-file changes, tagged with the profile it runs.</summary>
+public sealed record PlayerRolesAdoptedEventArgs(string ProfileName, ReconcileResult Result);
 
 public sealed class ServerManager : IServerManager
 {
@@ -68,6 +78,8 @@ public sealed class ServerManager : IServerManager
         // must marshal back to this context or Avalonia throws. Null in headless tests → append inline.
         _uiContext = SynchronizationContext.Current;
     }
+
+    public event EventHandler<PlayerRolesAdoptedEventArgs>? PlayerRolesAdopted;
 
     public ValheimServer GetOrCreate(string profileName) => GetEntry(profileName).Server;
 
@@ -156,7 +168,13 @@ public sealed class ServerManager : IServerManager
     }
 
     private ServerEntry GetEntry(string profileName)
-        => _entries.GetOrAdd(profileName, _ => new ServerEntry { Server = _serverFactory() });
+        => _entries.GetOrAdd(profileName, _ =>
+        {
+            var server = _serverFactory();
+            server.PlayerRolesAdopted += (_, result)
+                => PlayerRolesAdopted?.Invoke(this, new PlayerRolesAdoptedEventArgs(profileName, result));
+            return new ServerEntry { Server = server };
+        });
 
     private void AppendServerLine(ServerEntry entry, string line)
     {

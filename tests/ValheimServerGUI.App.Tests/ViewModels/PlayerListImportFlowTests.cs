@@ -181,14 +181,15 @@ public sealed class PlayerListImportFlowTests : IDisposable
     }
 
     [Fact]
-    public async Task AdHoc_import_unresolvable_token_reports_failure()
+    public async Task AdHoc_import_skips_an_unrecognized_entry_instead_of_failing()
     {
         var h = Build();
         Seed("adminlist.txt", "totally-bogus");
 
         await h.Vm.RunImportAsync(interactive: true);
 
-        Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportFailedMessage);
+        Assert.DoesNotContain(h.Messages, m => m.Body == MainWindowViewModel.ImportFailedMessage);
+        Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportNoRolesMessage); // nothing else to import
     }
 
     [Fact]
@@ -263,7 +264,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
     }
 
     [Fact]
-    public async Task Start_conflict_use_roles_from_file_sets_skip_generation()
+    public async Task Start_conflict_use_roles_from_file_adopts_the_files_roles()
     {
         var h = Build(withConfig: true);
         h.ConflictResult = RoleConflictChoice.UseRolesFromFile;
@@ -274,8 +275,9 @@ public sealed class PlayerListImportFlowTests : IDisposable
         await h.Vm.StartServerAsync(isManual: true);
 
         var opts = Assert.Single(h.Started);
-        Assert.True(opts.SkipAccessListGeneration);
         Assert.Single(h.ConflictBodies);
+        Assert.Equal(PlayerRole.Admin, opts.RoleOverrides[$"Steam:{SteamA}"].Role); // launched with the file's role
+        Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetOverride($"Steam:{SteamA}"));   // and it's the profile's now
     }
 
     [Fact]
@@ -292,7 +294,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
     }
 
     [Fact]
-    public async Task Start_conflict_autostart_defaults_to_profile_and_backs_up()
+    public async Task Start_conflict_autostart_keeps_the_profile_without_asking()
     {
         var h = Build(withConfig: true);
         h.Vm.Form.SetRole(new PlayerInfo { Platform = "Steam", PlatformRaw = "Steam", PlayerId = SteamA }, PlayerRole.Banned);
@@ -301,8 +303,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
         await h.Vm.StartServerAsync(isManual: false); // auto-start: no prompt, profile wins
 
         var opts = Assert.Single(h.Started);
-        Assert.False(opts.SkipAccessListGeneration);                              // profile wins → generate
-        Assert.Empty(h.ConflictBodies);                                          // prompt never consulted
-        Assert.True(File.Exists(Path.Combine(_saveDir, "adminlist.bak.txt")));   // conflicting file backed up
+        Assert.Empty(h.ConflictBodies);                                            // prompt never consulted
+        Assert.Equal(PlayerRole.Banned, opts.RoleOverrides[$"Steam:{SteamA}"].Role); // profile wins (Core backs up the file)
     }
 }

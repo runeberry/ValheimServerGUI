@@ -5,7 +5,7 @@ namespace ValheimServerGUI.Game
     /// <summary>
     /// The single source of truth for how a stored <see cref="PlayerRole"/> maps onto the three Valheim
     /// gating files, given the profile's <c>usePermittedList</c> flag. Both valid Valheim configurations are
-    /// encoded here so file generation (<see cref="PlayerAccessListService.GenerateFiles"/>) and the UI's
+    /// encoded here so file generation (<see cref="PlayerAccessListService.WriteLists"/>) and the UI's
     /// effective-role display read the same rules:
     ///
     /// <list type="bullet">

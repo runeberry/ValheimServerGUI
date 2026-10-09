@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -49,6 +50,13 @@ namespace ValheimServerGUI.Game
         public event EventHandler<string>? InviteCodeReady;
 
         /// <summary>
+        /// Raised when changes made to the list files during play (the game's in-game ban/permit commands, or a hand
+        /// edit) were adopted into this server's role overrides before a restart or live role change rewrote them.
+        /// The owner persists <see cref="ReconcileResult.Overrides"/> to the profile. May be raised off the UI thread.
+        /// </summary>
+        public event EventHandler<ReconcileResult>? PlayerRolesAdopted;
+
+        /// <summary>
         /// Raised when a graceful <see cref="Stop"/> did not complete within <see cref="GracefulStopTimeout"/>
         /// and the process was force-killed (§16.2). The shell surfaces this as a potential-save-loss warning.
         /// </summary>
@@ -68,6 +76,8 @@ namespace ValheimServerGUI.Game
         private readonly IApplicationLogger ApplicationLogger;
         private readonly IValheimPathResolver PathResolver;
         private readonly IPlayerAccessListService AccessLists;
+        private readonly IPlayerListImportService ListImport;
+        private readonly IPlayerListBaselineStore ListBaselines;
         private readonly ServerLogParser Parser;
 
         /// <summary>
@@ -80,12 +90,16 @@ namespace ValheimServerGUI.Game
             IPlayerDataRepository playerDataRepository,
             IApplicationLogger appLogger,
             IValheimPathResolver pathResolver,
-            IPlayerAccessListService accessLists)
+            IPlayerAccessListService accessLists,
+            IPlayerListImportService listImport,
+            IPlayerListBaselineStore listBaselines)
         {
             ProcessProvider = processProvider;
             ApplicationLogger = appLogger;
             PathResolver = pathResolver;
             AccessLists = accessLists;
+            ListImport = listImport;
+            ListBaselines = listBaselines;
 
             // The parser owns the fragile log->event translation and the player correlation; this
             // class keeps the one piece of state the parser deliberately does not: the stop-during-
@@ -115,7 +129,15 @@ namespace ValheimServerGUI.Game
                         if (!IsRestarting) return;
 
                         IsRestarting = false;
-                        Start(Options);
+                        try
+                        {
+                            // A restart is still "during play": adopt list changes made since the last write.
+                            StartCore(Options, adoptExternalChanges: true);
+                        }
+                        catch (Exception ex)
+                        {
+                            ApplicationLogger.Error(ex, "Failed to restart server: {message}", ex.Message);
+                        }
                     });
                 }
             });
@@ -136,7 +158,9 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// Starts the Valheim server as a background process with the provided options.
         /// </summary>
-        public void Start(IValheimServerOptions options)
+        public void Start(IValheimServerOptions options) => StartCore(options, adoptExternalChanges: false);
+
+        private void StartCore(IValheimServerOptions options, bool adoptExternalChanges)
         {
             if (!CanStart) return;
 
@@ -150,8 +174,8 @@ namespace ValheimServerGUI.Game
                 exePath,
                 CleanArgsForLogging(processArgs));
 
-            // The conflict flow's "use roles from file" choice keeps the on-disk list files as-is for this launch.
-            if (!options.SkipAccessListGeneration) GenerateAccessLists(options);
+            // Before anything launches: a failed list backup throws here and the server is not started.
+            SyncAccessLists(options, adoptExternalChanges);
 
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
@@ -306,57 +330,64 @@ namespace ValheimServerGUI.Game
 
         #region Helper methods
 
-        // Projects the profile's player roles + usePermittedList flag onto the three gating files immediately
-        // before launch, so a manual start, an auto-start, and a restart (all of which re-enter Start) apply
-        // the same rules uniformly.
-        //
-        // Generation OVERWRITES the three files unconditionally, even when the profile has no roles (they
-        // become header-only). That is safe because pre-existing manual entries are no longer at risk:
-        // MainWindowViewModel.ResolveListSafetyBeforeStartAsync runs before start, importing/adopting any
-        // existing adminlist/bannedlist/permittedlist.txt into the profile's role config, detecting conflicts,
-        // and backing up the files — so anything on disk has already been folded into the roles projected here.
-        private void GenerateAccessLists(IValheimServerOptions options)
+        // Writes the profile's effective player roles + usePermittedList flag to the three gating files. Every write
+        // path goes through here — start, restart, and live role changes — so the list-file safety rules hold for all
+        // of them: the writer never drops an entry VSG didn't write without backing the file up first (and writes
+        // nothing if the backup fails), and with adoptExternalChanges the changes made during play (the game's
+        // in-game ban/permit commands, or hand edits) are adopted into the overrides first and win. A manual start
+        // passes false: MainWindowViewModel has already reconciled the files, asking the user about any conflict.
+        private void SyncAccessLists(IValheimServerOptions options, bool adoptExternalChanges)
         {
             var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;
-            RegenerateAccessLists(saveDataFolder, options.PlayerRoles, options.UsePermittedList);
+            var baseline = ListBaselines.Get(saveDataFolder);
 
+            if (adoptExternalChanges && options is ValheimServerOptions mutable)
+            {
+                var adopted = ListImport.Reconcile(
+                    saveDataFolder, mutable.RoleOverrides, mutable.RoleDefaults, externalWins: true);
+                foreach (var line in adopted.LogLines) ApplicationLogger.Information("{line}", line);
+                if (adopted.Changed)
+                {
+                    mutable.RoleOverrides = adopted.Overrides;
+                    PlayerRolesAdopted?.Invoke(this, adopted);
+                }
+            }
+
+            var players = options.PlayerRoles.Select(a => (
+                new PlayerInfo { Platform = a.Platform, PlatformRaw = a.PlatformRaw, PlayerId = a.PlayerId },
+                a.Role));
+            var result = AccessLists.WriteLists(saveDataFolder, players, options.UsePermittedList, baseline);
+            ListBaselines.Save(saveDataFolder, result.Written);
+
+            foreach (var backup in result.Backups)
+                ApplicationLogger.Warning("Backed up {file} before rewriting it (it had entries VSG did not write).", backup.FullName);
             ApplicationLogger.Information(
-                "Generated access lists in {folder}: {count} role(s), usePermittedList={mode}",
+                "Wrote access lists in {folder}: {count} role(s), usePermittedList={mode}",
                 saveDataFolder, options.PlayerRoles.Count, options.UsePermittedList);
         }
 
         /// <summary>
         /// Applies a player-role change to the <b>already-running</b> server (the carve-out from the
         /// "changes only while stopped" rule): updates the live <see cref="Options"/> so a later restart keeps
-        /// the change, then regenerates the three list files, which the server re-reads within seconds. Only
-        /// the roles + flag change — every other launch option is left exactly as it was at start.
+        /// the change, then rewrites the three list files, which the server re-reads within seconds. Changes made
+        /// to the files during play are adopted first (see <see cref="PlayerRolesAdopted"/>). Only the roles + flag
+        /// change — every other launch option is left exactly as it was at start.
         /// </summary>
-        public void ApplyPlayerRoles(IReadOnlyList<PlayerRoleAssignment> roles, bool usePermittedList)
+        public void ApplyPlayerRoles(
+            IReadOnlyDictionary<string, PlayerRoleEntry> overrides,
+            IReadOnlyDictionary<string, PlayerDefaultEntry> defaults,
+            bool usePermittedList)
         {
-            // Keep the live options in step: Restart reuses Options, so without this a restart would regenerate
-            // from the stale start-time roles and revert the change.
+            // Keep the live options in step: Restart reuses Options, so without this a restart would rewrite from
+            // the stale start-time roles and revert the change.
             if (Options is ValheimServerOptions options)
             {
-                options.PlayerRoles = roles;
+                options.RoleOverrides = overrides;
+                options.RoleDefaults = defaults;
                 options.UsePermittedList = usePermittedList;
             }
 
-            var saveDataFolder = Options.GetValidatedSaveDataFolder().FullName;
-            RegenerateAccessLists(saveDataFolder, roles, usePermittedList);
-
-            ApplicationLogger.Information(
-                "Applied live player-role change: regenerated access lists in {folder} ({count} role(s), usePermittedList={mode})",
-                saveDataFolder, roles.Count, usePermittedList);
-        }
-
-        private void RegenerateAccessLists(
-            string saveDataFolder, IReadOnlyList<PlayerRoleAssignment> roles, bool usePermittedList)
-        {
-            var players = roles.Select(a => (
-                new PlayerInfo { Platform = a.Platform, PlatformRaw = a.PlatformRaw, PlayerId = a.PlayerId },
-                a.Role));
-
-            AccessLists.GenerateFiles(saveDataFolder, players, usePermittedList);
+            SyncAccessLists(Options, adoptExternalChanges: true);
         }
 
         private static string GenerateArgs(IValheimServerOptions options)

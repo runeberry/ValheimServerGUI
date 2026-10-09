@@ -16,51 +16,54 @@ namespace ValheimServerGUI.Game
 
     /// <summary>
     /// Profile-scoped read/write of the <c>adminlist.txt</c> / <c>bannedlist.txt</c> / <c>permittedlist.txt</c>
-    /// files that live in the save-data root (the server's <c>-savedir</c>). Matching mirrors the game's
-    /// <c>ZNet.ListContainsId</c>: Steam matches either the bare <c>&lt;steam64&gt;</c> or the prefixed
-    /// <c>Steam_&lt;steam64&gt;</c> form; non-Steam matches only <c>&lt;Platform&gt;_&lt;id&gt;</c>,
-    /// case-sensitive against the raw platform token. Every operation takes the savedir explicitly so the
+    /// files that live in the save-data root (the server's <c>-savedir</c>). Entries are compared by the player
+    /// they name (<see cref="PlayerListToken"/>), so the bare <c>&lt;steam64&gt;</c> and prefixed
+    /// <c>Steam_&lt;steam64&gt;</c> forms are the same player. Every operation takes the savedir explicitly so the
     /// service holds no global state and is fully testable.
     /// </summary>
     public interface IPlayerAccessListService
     {
         /// <summary>
         /// The content (ID) lines of a list file -- comment (<c>//</c>) and blank lines excluded. Empty when
-        /// the file is missing. Read once per list and passed to <see cref="Contains"/> to compute row
-        /// membership in bulk without re-reading per player.
+        /// the file is missing.
         /// </summary>
         IReadOnlyList<string> ReadEntries(string saveDataFolder, PlayerAccessList list);
 
-        /// <summary>True if <paramref name="player"/> is present among <paramref name="entries"/> (game matching).</summary>
-        bool Contains(IReadOnlyList<string> entries, PlayerInfo player);
-
-        /// <summary>Convenience: reads the file and tests membership in one call.</summary>
-        bool Contains(string saveDataFolder, PlayerAccessList list, PlayerInfo player);
-
         /// <summary>
-        /// Adds the player to the list (Steam written canonically as <c>Steam_&lt;id&gt;</c>, non-Steam as
-        /// <c>&lt;RawPlatform&gt;_&lt;id&gt;</c>), creating the file with the game's header if needed. Returns
-        /// true if the file changed; false if the player was already present in any recognized form.
+        /// Rewrites all three list files in <paramref name="saveDataFolder"/> from the given player roles and the
+        /// <paramref name="usePermittedList"/> flag, per <see cref="PlayerAccessListRules"/>, without ever losing an
+        /// entry VSG did not write itself:
+        /// <list type="bullet">
+        /// <item>Comment lines and entries VSG cannot resolve to a player are carried through verbatim.</item>
+        /// <item>A file that would lose an entry absent from <paramref name="baseline"/> (VSG's previous write) is
+        /// copied to a backup first. With no baseline, every entry counts as external.</item>
+        /// <item>If any needed backup cannot be made, nothing is written and <see cref="PlayerListBackupException"/>
+        /// is thrown.</item>
+        /// </list>
+        /// Returns what was written (the next baseline) and the backups made.
         /// </summary>
-        bool Add(string saveDataFolder, PlayerAccessList list, PlayerInfo player);
-
-        /// <summary>
-        /// Removes every entry matching the player (both bare and prefixed Steam forms). Returns true if the
-        /// file changed; false if nothing matched (or the file did not exist).
-        /// </summary>
-        bool Remove(string saveDataFolder, PlayerAccessList list, PlayerInfo player);
-
-        /// <summary>
-        /// Regenerates all three list files in <paramref name="saveDataFolder"/> from the given player roles
-        /// and the <paramref name="usePermittedList"/> flag, per <see cref="PlayerAccessListRules"/>. Each file
-        /// is <b>overwritten</b> (header-only when it has no members). This is the profile→files projection run
-        /// at server start; it is the counterpart to the <see cref="ReadEntries"/>/<see cref="Add"/>/<see cref="Remove"/>
-        /// low-level API that a later import/conflict pass will build on.
-        /// </summary>
-        void GenerateFiles(
+        PlayerListWriteResult WriteLists(
             string saveDataFolder,
             IEnumerable<(PlayerInfo player, PlayerRole role)> roles,
-            bool usePermittedList);
+            bool usePermittedList,
+            PlayerListBaseline? baseline);
+    }
+
+    /// <summary>The outcome of <see cref="IPlayerAccessListService.WriteLists"/>.</summary>
+    /// <param name="Written">The entries now in each file — the baseline for the next write.</param>
+    /// <param name="Backups">Backup copies made because entries VSG did not write were about to be dropped.</param>
+    public record PlayerListWriteResult(PlayerListBaseline Written, IReadOnlyList<FileInfo> Backups);
+
+    /// <summary>A list file had to be backed up before being rewritten, and the backup failed; nothing was written.</summary>
+    public class PlayerListBackupException : IOException
+    {
+        public PlayerListBackupException(string filePath)
+            : base($"Could not back up {filePath} before rewriting it; no list files were changed.")
+        {
+            FilePath = filePath;
+        }
+
+        public string FilePath { get; }
     }
 
     public class PlayerAccessListService : IPlayerAccessListService
@@ -89,73 +92,85 @@ namespace ValheimServerGUI.Game
                 .ToList();
         }
 
-        public bool Contains(IReadOnlyList<string> entries, PlayerInfo player)
-            => entries.Any(entry => Matches(entry, player));
-
-        public bool Contains(string saveDataFolder, PlayerAccessList list, PlayerInfo player)
-            => Contains(ReadEntries(saveDataFolder, list), player);
-
-        public bool Add(string saveDataFolder, PlayerAccessList list, PlayerInfo player)
-        {
-            if (string.IsNullOrWhiteSpace(player.PlayerId)) return false;
-
-            var file = ResolveFile(saveDataFolder, list);
-            var lines = file.Exists
-                ? File.ReadAllLines(file.FullName).ToList()
-                : new List<string> { DefaultHeaders[list] };
-
-            // Already present in any recognized form (bare or prefixed for Steam) -> no change.
-            if (lines.Any(line => Matches(line.Trim(), player))) return false;
-
-            lines.Add(CanonicalEntry(player));
-            AtomicWrite(file, lines);
-            return true;
-        }
-
-        public bool Remove(string saveDataFolder, PlayerAccessList list, PlayerInfo player)
-        {
-            if (string.IsNullOrWhiteSpace(player.PlayerId)) return false;
-
-            var file = ResolveFile(saveDataFolder, list);
-            if (!file.Exists) return false;
-
-            var lines = File.ReadAllLines(file.FullName).ToList();
-            // Drop every matching entry (removes both the bare and prefixed Steam forms if both exist).
-            var removed = lines.RemoveAll(line => Matches(line.Trim(), player));
-            if (removed == 0) return false;
-
-            AtomicWrite(file, lines);
-            return true;
-        }
-
-        public void GenerateFiles(
+        public PlayerListWriteResult WriteLists(
             string saveDataFolder,
             IEnumerable<(PlayerInfo player, PlayerRole role)> roles,
-            bool usePermittedList)
+            bool usePermittedList,
+            PlayerListBaseline? baseline)
         {
             var assignments = roles.ToList();
 
-            foreach (var list in new[] { PlayerAccessList.Admin, PlayerAccessList.Banned, PlayerAccessList.Permitted })
+            // Plan every file before touching any, so a failed backup leaves all three exactly as they were.
+            var plans = AllLists.Select(list => PlanFile(saveDataFolder, list, assignments, usePermittedList, baseline)).ToList();
+
+            var backups = new List<FileInfo>();
+            foreach (var plan in plans.Where(p => p.NeedsBackup))
             {
-                // Canonical tokens of every player whose role routes into this file for the current mode.
-                // A HashSet dedupes players who happen to share a token (canonical form is deterministic).
-                var seen = new HashSet<string>(StringComparer.Ordinal);
-                var tokens = new List<string>();
-                foreach (var (player, role) in assignments)
-                {
-                    if (string.IsNullOrWhiteSpace(player.PlayerId)) continue;
-                    if (!PlayerAccessListRules.TargetLists(role, usePermittedList).Contains(list)) continue;
-
-                    var token = CanonicalEntry(player);
-                    if (seen.Add(token)) tokens.Add(token);
-                }
-
-                // Header + members, overwritten unconditionally (header-only when there are no members).
-                var lines = new List<string> { DefaultHeaders[list] };
-                lines.AddRange(tokens);
-                AtomicWrite(ResolveFile(saveDataFolder, list), lines);
+                var backup = ValheimPathExtensions.CopyListFileToBackup(plan.File)
+                    ?? throw new PlayerListBackupException(plan.File.FullName);
+                backups.Add(backup);
             }
+
+            foreach (var plan in plans.Where(p => p.Changed)) AtomicWrite(plan.File, plan.Lines);
+
+            var written = plans.ToDictionary(p => p.List, p => (IReadOnlyList<string>)p.Entries);
+            return new PlayerListWriteResult(new PlayerListBaseline(written), backups);
         }
+
+        private sealed record FilePlan(
+            PlayerAccessList List, FileInfo File, List<string> Lines, List<string> Entries, bool NeedsBackup, bool Changed);
+
+        private static FilePlan PlanFile(
+            string saveDataFolder,
+            PlayerAccessList list,
+            IReadOnlyList<(PlayerInfo player, PlayerRole role)> assignments,
+            bool usePermittedList,
+            PlayerListBaseline? baseline)
+        {
+            var file = ResolveFile(saveDataFolder, list);
+            var existing = file.Exists ? File.ReadAllLines(file.FullName) : Array.Empty<string>();
+            var existingEntries = existing.Select(l => l.Trim()).Where(IsEntryLine).ToList();
+
+            // Canonical tokens of every player whose role routes into this file for the current mode. A HashSet
+            // dedupes players who happen to share a token (canonical form is deterministic).
+            var tokens = new List<string>();
+            var seen = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var (player, role) in assignments)
+            {
+                if (string.IsNullOrWhiteSpace(player.PlayerId)) continue;
+                if (!PlayerAccessListRules.TargetLists(role, usePermittedList).Contains(list)) continue;
+
+                var token = CanonicalEntry(player);
+                if (seen.Add(token)) tokens.Add(token);
+            }
+
+            // Lines VSG doesn't manage are kept verbatim: comments (or the game's header for a new file), and entries
+            // that don't resolve to a player VSG understands.
+            var comments = existing.Where(l => l.Trim().StartsWith(CommentPrefix, StringComparison.Ordinal)).ToList();
+            if (comments.Count == 0) comments.Add(DefaultHeaders[list]);
+            var unrecognized = existingEntries.Where(e => Identity(e) is null).Distinct(StringComparer.Ordinal).ToList();
+
+            var entries = unrecognized.Concat(tokens).ToList();
+            var lines = comments.Concat(entries).ToList();
+
+            // An existing entry the new content drops, which VSG didn't write last time, is someone else's: back the
+            // file up before it goes. (Bare vs prefixed Steam forms are the same player, so that's not a drop.)
+            var keptIds = tokens.Select(Identity).ToHashSet();
+            var baselineIds = baseline?.For(list).Select(Identity).ToHashSet();
+            var needsBackup = existingEntries
+                .Select(Identity)
+                .Any(id => id is not null && !keptIds.Contains(id) && (baselineIds is null || !baselineIds.Contains(id)));
+
+            var changed = !file.Exists || !existing.SequenceEqual(lines);
+            return new FilePlan(list, file, lines, entries, needsBackup, changed);
+        }
+
+        private static readonly PlayerAccessList[] AllLists =
+            { PlayerAccessList.Admin, PlayerAccessList.Banned, PlayerAccessList.Permitted };
+
+        /// <summary>The player an entry names (<c>Platform:PlayerId</c>), or null when VSG can't resolve it.</summary>
+        private static string? Identity(string entry)
+            => PlayerListToken.TryResolve(entry, out var platform, out _, out var playerId) ? $"{platform}:{playerId}" : null;
 
         #region Non-public
 
@@ -189,23 +204,6 @@ namespace ValheimServerGUI.Game
             => IsSteam(player)
                 ? $"{PlayerPlatforms.Steam}_{player.PlayerId}"
                 : $"{WriteToken(player)}_{player.PlayerId}";
-
-        /// <summary>Game matching semantics (<c>ZNet.ListContainsId</c>).</summary>
-        private static bool Matches(string entry, PlayerInfo player)
-        {
-            var id = player.PlayerId;
-            if (string.IsNullOrWhiteSpace(id)) return false;
-
-            if (IsSteam(player))
-            {
-                // Steam: bare <id> (exact) or Steam_<id> (prefix, casing-lenient on the token).
-                return entry == id
-                    || string.Equals(entry, $"{PlayerPlatforms.Steam}_{id}", StringComparison.OrdinalIgnoreCase);
-            }
-
-            // Non-Steam: exact, case-sensitive <Platform>_<id>, matching what we would write.
-            return entry == $"{WriteToken(player)}_{id}";
-        }
 
         /// <summary>
         /// Writes the file via a temp file + rename so a reader (the running game re-reads every ~5s) never

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -40,7 +41,10 @@ namespace ValheimServerGUI.Core.Tests.Game
             var repo = new PlayerDataRepository(context, new FakeRuneberryApiClient(), resolver);
 
             _processProvider = new MockProcessProvider();
-            _server = new ValheimServer(_processProvider, repo, new FakeApplicationLogger(), resolver, new PlayerAccessListService());
+            var accessLists = new PlayerAccessListService();
+            var baselines = new InMemoryBaselineStore();
+            _server = new ValheimServer(_processProvider, repo, new FakeApplicationLogger(), resolver, accessLists,
+                new PlayerListImportService(accessLists, baselines), baselines);
         }
 
         public void Dispose()
@@ -267,74 +271,144 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Null(_server.StartedAt);
         }
 
-        // The start path projects the profile's roles onto the three gating files (one hook covers manual /
-        // auto / restart). Here: permitted-list mode puts the admin on both adminlist and permittedlist, and
-        // the ban list is regenerated header-only (ignored in this mode).
+        private static Dictionary<string, PlayerRoleEntry> Overrides(params (string id, PlayerRole role)[] roles)
+        {
+            var result = new Dictionary<string, PlayerRoleEntry>();
+            foreach (var (id, role) in roles) result[$"Steam:{id}"] = new PlayerRoleEntry(role, "Steam");
+            return result;
+        }
+
+        private string[] ListLines(string file) => File.ReadAllLines(Path.Join(_saveDir, file));
+
+        // The start path writes the profile's roles to the three gating files (one hook covers manual / auto /
+        // restart). Here: permitted-list mode puts the admin on both adminlist and permittedlist, and the ban list
+        // is header-only (ignored in this mode).
         [Fact]
-        public void Start_GeneratesAccessListsFromOptions()
+        public void Start_WritesAccessListsFromOptions()
         {
             _server.Start(Options(o =>
             {
                 o.UsePermittedList = true;
-                o.PlayerRoles = new[]
+                o.RoleOverrides = Overrides(("111", PlayerRole.Admin), ("222", PlayerRole.Banned));
+            }));
+
+            Assert.Contains("Steam_111", ListLines("adminlist.txt"));
+            Assert.Contains("Steam_111", ListLines("permittedlist.txt")); // admin must also be permitted to join
+            Assert.DoesNotContain("Steam_222", ListLines("bannedlist.txt")); // ban list unused in permitted mode
+            Assert.Single(ListLines("bannedlist.txt"));                      // header only
+        }
+
+        // Effective roles are resolved from the overrides over the global defaults: a default reaches the files
+        // unless this server overrides it.
+        [Fact]
+        public void Start_ResolvesOverridesOverDefaults()
+        {
+            _server.Start(Options(o =>
+            {
+                o.RoleOverrides = Overrides(("111", PlayerRole.Permitted));
+                o.RoleDefaults = new Dictionary<string, PlayerDefaultEntry>
                 {
-                    new PlayerRoleAssignment(PlayerPlatforms.Steam, PlayerPlatforms.Steam, "111", PlayerRole.Admin),
-                    new PlayerRoleAssignment(PlayerPlatforms.Steam, PlayerPlatforms.Steam, "222", PlayerRole.Banned),
+                    ["Steam:111"] = new(PlayerRole.Admin, "Steam"),
+                    ["Steam:222"] = new(PlayerRole.Admin, "Steam"),
                 };
             }));
 
-            var admin = File.ReadAllLines(Path.Join(_saveDir, "adminlist.txt"));
-            var permitted = File.ReadAllLines(Path.Join(_saveDir, "permittedlist.txt"));
-            var banned = File.ReadAllLines(Path.Join(_saveDir, "bannedlist.txt"));
-
-            Assert.Contains("Steam_111", admin);
-            Assert.Contains("Steam_111", permitted);          // admin must also be permitted to join
-            Assert.DoesNotContain("Steam_222", banned);       // ban list unused in permitted mode
-            Assert.Single(banned);                            // header only
+            Assert.DoesNotContain("Steam_111", ListLines("adminlist.txt")); // overridden
+            Assert.Contains("Steam_222", ListLines("adminlist.txt"));       // default applies
         }
 
-        // SkipAccessListGeneration (set by the start-time "use roles from file" choice) leaves whatever is on
-        // disk untouched, whereas the default regenerates. A/B over the same seeded file proves the flag gates
-        // generation rather than the probe never reaching the write.
+        // An entry the profile doesn't have is dropped from the file, but only after the file is backed up.
         [Fact]
-        public void Start_SkipAccessListGeneration_LeavesFilesUntouched()
+        public void Start_EntryNotInTheProfile_IsBackedUpBeforeItIsDropped()
         {
-            var adminPath = Path.Join(_saveDir, "adminlist.txt");
-            File.WriteAllText(adminPath, "// header\nSteam_999\n"); // a manual entry not in any role
+            File.WriteAllText(Path.Join(_saveDir, "adminlist.txt"), "// header\nSteam_76561198000000999\n");
 
-            _server.Start(Options(o => o.SkipAccessListGeneration = true));
+            _server.Start(Options());
 
-            Assert.Contains("Steam_999", File.ReadAllLines(adminPath)); // preserved verbatim
+            Assert.DoesNotContain("Steam_76561198000000999", ListLines("adminlist.txt"));
+            Assert.Contains("Steam_76561198000000999", ListLines("adminlist.bak.txt"));
         }
 
+        // The live carve-out: applying roles to an already-running server rewrites the files now AND updates the
+        // live options, so a restart (which reuses Options) keeps the change instead of reverting.
         [Fact]
-        public void Start_WithoutSkip_RegeneratesAndOverwritesFiles()
-        {
-            var adminPath = Path.Join(_saveDir, "adminlist.txt");
-            File.WriteAllText(adminPath, "// header\nSteam_999\n"); // manual entry, no matching role
-
-            _server.Start(Options()); // SkipAccessListGeneration defaults false → header-only regeneration
-
-            Assert.DoesNotContain("Steam_999", File.ReadAllLines(adminPath)); // overwritten
-        }
-
-        // The live carve-out: applying roles to an already-running server regenerates the files now AND
-        // updates the live options, so a restart (which reuses Options) keeps the change instead of reverting.
-        [Fact]
-        public void ApplyPlayerRoles_RegeneratesFiles_AndUpdatesLiveOptions()
+        public void ApplyPlayerRoles_RewritesFiles_AndUpdatesLiveOptions()
         {
             _server.Start(Options()); // started with no roles -> header-only files
-            Assert.Single(File.ReadAllLines(Path.Join(_saveDir, "adminlist.txt")));
+            Assert.Single(ListLines("adminlist.txt"));
 
-            var roles = new[]
-            {
-                new PlayerRoleAssignment(PlayerPlatforms.Steam, PlayerPlatforms.Steam, "500", PlayerRole.Admin),
-            };
-            _server.ApplyPlayerRoles(roles, usePermittedList: false);
+            var overrides = Overrides(("500", PlayerRole.Admin));
+            _server.ApplyPlayerRoles(overrides, new Dictionary<string, PlayerDefaultEntry>(), usePermittedList: false);
 
-            Assert.Contains("Steam_500", File.ReadAllLines(Path.Join(_saveDir, "adminlist.txt")));
-            // Options updated so a subsequent restart regenerates from the new roles, not the start-time ones.
-            Assert.Same(roles, _server.Options.PlayerRoles);
+            Assert.Contains("Steam_500", ListLines("adminlist.txt"));
+            Assert.Same(overrides, _server.Options.RoleOverrides);
+        }
+
+        // A change made to the files during play (here: an in-game ban) is adopted before a live role change
+        // rewrites them, and the owner is told so it can save the adopted roles to the profile.
+        [Fact]
+        public void ApplyPlayerRoles_AdoptsChangesMadeDuringPlay_AndRaisesPlayerRolesAdopted()
+        {
+            _server.Start(Options());
+            FeedLog("Game server connected");
+            File.AppendAllText(Path.Join(_saveDir, "bannedlist.txt"), "Steam_76561198000000777\n");
+            ReconcileResult? adopted = null;
+            _server.PlayerRolesAdopted += (_, r) => adopted = r;
+
+            _server.ApplyPlayerRoles(Overrides(("500", PlayerRole.Admin)), new Dictionary<string, PlayerDefaultEntry>(), false);
+
+            Assert.Contains("Steam_76561198000000777", ListLines("bannedlist.txt"));
+            Assert.NotNull(adopted);
+            Assert.Equal(PlayerRole.Banned, adopted!.Overrides["Steam:76561198000000777"].Role);
+            Assert.Equal(PlayerRole.Admin, adopted.Overrides["Steam:500"].Role); // the live change itself is kept
+        }
+
+        [Fact]
+        public void Restart_AdoptsChangesMadeDuringPlay()
+        {
+            _server.Start(Options());
+            FeedLog("Game server connected");
+            File.AppendAllText(Path.Join(_saveDir, "bannedlist.txt"), "Steam_76561198000000777\n");
+            ReconcileResult? adopted = null;
+            _server.PlayerRolesAdopted += (_, r) => adopted = r;
+
+            _server.Restart();
+            _processProvider.SimulateExit();
+            WaitFor(() => _server.Status == ServerStatus.Starting);
+
+            Assert.Contains("Steam_76561198000000777", ListLines("bannedlist.txt"));
+            Assert.NotNull(adopted);
+            Assert.Equal(PlayerRole.Banned, _server.Options.RoleOverrides["Steam:76561198000000777"].Role);
+        }
+
+        // A plain start does NOT adopt (the view-model reconciles first, asking the user about conflicts): an
+        // unknown entry is dropped, backed up — the profile wins.
+        [Fact]
+        public void Start_DoesNotAdopt_ItBacksUpInstead()
+        {
+            File.WriteAllText(Path.Join(_saveDir, "bannedlist.txt"), "// header\nSteam_76561198000000777\n");
+            var raised = false;
+            _server.PlayerRolesAdopted += (_, _) => raised = true;
+
+            _server.Start(Options());
+
+            Assert.False(raised);
+            Assert.DoesNotContain("Steam_76561198000000777", ListLines("bannedlist.txt"));
+            Assert.Contains("Steam_76561198000000777", ListLines("bannedlist.bak.txt"));
+        }
+
+        // A list backup that fails stops the launch before anything starts.
+        [Fact]
+        public void Start_WhenAListBackupFails_DoesNotStart()
+        {
+            File.WriteAllText(Path.Join(_saveDir, "adminlist.txt"), "// header\nSteam_76561198000000999\n");
+            Directory.CreateDirectory(Path.Join(_saveDir, "adminlist.bak.txt"));
+            for (var i = 2; i <= 5; i++) Directory.CreateDirectory(Path.Join(_saveDir, $"adminlist.bak.{i}.txt"));
+
+            Assert.Throws<PlayerListBackupException>(() => _server.Start(Options()));
+
+            Assert.Equal(ServerStatus.Stopped, _server.Status);
+            Assert.True(_server.CanStart);
         }
 
         [Fact]

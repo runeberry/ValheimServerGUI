@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ValheimServerGUI.Core.Tests.Fakes;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
@@ -10,19 +11,21 @@ namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
     /// Reconciliation of on-disk list files with a profile's roles: the wholesale <see cref="IPlayerListImportService.BuildImport"/>
-    /// and the one-directional start-time <see cref="IPlayerListImportService.CheckConflicts"/>.
+    /// and <see cref="IPlayerListImportService.Reconcile"/>, which adopts only what changed since VSG's last write.
     /// </summary>
     public class PlayerListImportServiceTests : IDisposable
     {
         private readonly DirectoryInfo _dir;
         private readonly string _savedir;
-        private readonly PlayerListImportService _svc = new(new PlayerAccessListService());
+        private readonly InMemoryBaselineStore _baselines = new();
+        private readonly PlayerListImportService _svc;
 
         public PlayerListImportServiceTests()
         {
             _dir = new DirectoryInfo(Path.Join(Path.GetTempPath(), "vsg_import_" + Guid.NewGuid().ToString("N")));
             _dir.Create();
             _savedir = _dir.FullName;
+            _svc = new PlayerListImportService(new PlayerAccessListService(), _baselines);
         }
 
         public void Dispose()
@@ -46,7 +49,6 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false);
 
-            Assert.True(plan.Success);
             Assert.False(plan.AnyFilesPresent);
             Assert.Equal(0, plan.UpdateCount);
         }
@@ -58,7 +60,6 @@ namespace ValheimServerGUI.Core.Tests.Game
 
             var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false);
 
-            Assert.True(plan.Success);
             Assert.True(plan.UsePermittedList);
             Assert.Equal(PlayerRole.Permitted, plan.Roles[$"Steam:{SteamA}"].Role);
         }
@@ -131,14 +132,14 @@ namespace ValheimServerGUI.Core.Tests.Game
         }
 
         [Fact]
-        public void BuildImport_UnresolvableToken_FailsClosed()
+        public void BuildImport_UnrecognizedEntry_IsSkipped_AndTheRestImports()
         {
-            Seed("adminlist.txt", "not-a-valid-token");
+            Seed("adminlist.txt", "not-a-valid-token", SteamA);
 
             var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false);
 
-            Assert.False(plan.Success);
-            Assert.NotNull(plan.FailureReason);
+            Assert.Equal(PlayerRole.Admin, plan.Roles[$"Steam:{SteamA}"].Role);
+            Assert.Equal("adminlist.txt: not-a-valid-token", Assert.Single(plan.Unrecognized));
         }
 
         // ---- BuildImport with global defaults ----
@@ -196,111 +197,186 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.False(plan.Roles.ContainsKey($"Steam:{SteamB}"));
         }
 
-        // ---- CheckConflicts ----
+        // ---- Reconcile ----
+
+        private static readonly Dictionary<string, PlayerDefaultEntry> NoDefaults = new();
+
+        // VSG's previous write: the files as they were when it last wrote them.
+        private void LastWrote(params (PlayerAccessList list, string[] entries)[] lists)
+            => _baselines.Save(_savedir, new PlayerListBaseline(
+                lists.ToDictionary(l => l.list, l => (IReadOnlyList<string>)l.entries)));
+
+        private ReconcileResult Reconcile(
+            Dictionary<string, PlayerRoleEntry> overrides, bool externalWins,
+            Dictionary<string, PlayerDefaultEntry>? defaults = null)
+            => _svc.Reconcile(_savedir, overrides, defaults ?? NoDefaults, externalWins);
 
         [Fact]
-        public void CheckConflicts_WrongRole_IsConflict_WithConflictingFile()
-        {
-            Seed("adminlist.txt", SteamA);
-            var current = Roles(($"Steam:{SteamA}", PlayerRole.Banned, "Steam")); // config says banned, file says admin
-
-            var report = _svc.CheckConflicts(_savedir, current, currentFlag: false);
-
-            Assert.True(report.Success);
-            Assert.Equal(1, report.ConflictCount);
-            Assert.Contains(PlayerAccessList.Admin, report.ConflictingFiles);
-            Assert.Empty(report.Additions);
-        }
-
-        [Fact]
-        public void CheckConflicts_MissingPlayer_IsAddition_NotConflict()
+        public void Reconcile_NoBaseline_EveryEntryCountsAsAdded()
         {
             Seed("bannedlist.txt", SteamA);
 
-            var report = _svc.CheckConflicts(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false);
+            var result = Reconcile(new(), externalWins: false);
 
-            Assert.Equal(0, report.ConflictCount);
-            var add = Assert.Single(report.Additions);
-            Assert.Equal($"Steam:{SteamA}", add.Key);
-            Assert.Equal(PlayerRole.Banned, add.Entry.Role);
-            Assert.Single(report.NewPlayers);
+            Assert.Equal(PlayerRole.Banned, result.Overrides[$"Steam:{SteamA}"].Role);
+            Assert.Single(result.NewPlayers);
+            Assert.Empty(result.Conflicts);
         }
 
         [Fact]
-        public void CheckConflicts_PermittedList_AcceptsAdminOrPermitted()
-        {
-            Seed("permittedlist.txt", SteamA, SteamB);
-            var current = Roles(
-                ($"Steam:{SteamA}", PlayerRole.Admin, "Steam"),
-                ($"Steam:{SteamB}", PlayerRole.Permitted, "Steam"));
-
-            var report = _svc.CheckConflicts(_savedir, current, currentFlag: true);
-
-            Assert.Equal(0, report.ConflictCount);
-            Assert.Empty(report.Additions);
-        }
-
-        [Fact]
-        public void CheckConflicts_ComparesAgainstEffectiveRole_FromDefaults()
-        {
-            Seed("adminlist.txt", SteamA, SteamB);
-            var defaults = Defaults(
-                ($"Steam:{SteamA}", PlayerRole.Admin),   // satisfied by default
-                ($"Steam:{SteamB}", PlayerRole.Permitted)); // default disagrees
-
-            var report = _svc.CheckConflicts(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false, defaults);
-
-            Assert.Equal(1, report.ConflictCount);
-            Assert.Empty(report.Additions);
-        }
-
-        [Fact]
-        public void CheckConflicts_OverrideWinsOverDefault()
+        public void Reconcile_EntriesVsgWroteItself_AreNotChanges()
         {
             Seed("adminlist.txt", SteamA);
-            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Permitted));
-            var current = Roles(($"Steam:{SteamA}", PlayerRole.Admin, "Steam"));
+            LastWrote((PlayerAccessList.Admin, new[] { $"Steam_{SteamA}" })); // bare vs prefixed: same player
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Permitted, "Steam")); // changed in VSG since
 
-            var report = _svc.CheckConflicts(_savedir, current, currentFlag: false, defaults);
+            var result = Reconcile(overrides, externalWins: false);
 
-            Assert.Equal(0, report.ConflictCount);
+            Assert.False(result.Changed);
+            Assert.Empty(result.Conflicts); // VSG's own stale entry is not a conflict
         }
 
         [Fact]
-        public void CheckConflicts_NeverUnsets_ConfigPlayerAbsentFromFilesIsUntouched()
+        public void Reconcile_AddedEntryForAPlayerWithNoRole_IsAdopted_EvenWhenTheProfileWins()
+        {
+            Seed("bannedlist.txt", SteamA);
+            LastWrote();
+
+            var result = Reconcile(new(), externalWins: false);
+
+            Assert.Equal(PlayerRole.Banned, result.Overrides[$"Steam:{SteamA}"].Role);
+            Assert.Empty(result.Conflicts);
+        }
+
+        [Fact]
+        public void Reconcile_AddedEntryThatDisagrees_IsAConflict_AndTheProfileKeepsItsRole()
+        {
+            Seed("bannedlist.txt", SteamA);
+            LastWrote();
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Admin, "Steam"));
+
+            var result = Reconcile(overrides, externalWins: false);
+
+            var conflict = Assert.Single(result.Conflicts);
+            Assert.Equal((PlayerAccessList.Banned, PlayerRole.Banned, PlayerRole.Admin), (conflict.List, conflict.FileRole, conflict.ProfileRole));
+            Assert.Equal(PlayerRole.Admin, result.Overrides[$"Steam:{SteamA}"].Role);
+            Assert.False(result.Changed);
+        }
+
+        [Fact]
+        public void Reconcile_AddedEntryThatDisagrees_WinsWhenExternalChangesWin()
+        {
+            Seed("bannedlist.txt", SteamA); // e.g. an admin banned in-game
+            LastWrote();
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Admin, "Steam"));
+
+            var result = Reconcile(overrides, externalWins: true);
+
+            Assert.Equal(PlayerRole.Banned, result.Overrides[$"Steam:{SteamA}"].Role);
+            Assert.True(result.Changed);
+        }
+
+        [Fact]
+        public void Reconcile_PlayerAddedToSeveralLists_TakesBannedOverAdminOverPermitted()
         {
             Seed("adminlist.txt", SteamA);
-            var current = Roles(($"Steam:{SteamB}", PlayerRole.Permitted, "Steam")); // B not in files
-
-            var report = _svc.CheckConflicts(_savedir, current, currentFlag: false);
-
-            // A is missing → addition; B is never referenced (no removal exists in the conflict model).
-            Assert.Equal(0, report.ConflictCount);
-            Assert.Single(report.Additions);
-            Assert.DoesNotContain(report.Additions, a => a.Key == $"Steam:{SteamB}");
-        }
-
-        [Fact]
-        public void CheckConflicts_UnresolvableToken_FailsClosed()
-        {
-            Seed("bannedlist.txt", "garbage");
-
-            var report = _svc.CheckConflicts(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false);
-
-            Assert.False(report.Success);
-            Assert.NotNull(report.FailureReason);
-        }
-
-        // ---- HasEntries ----
-
-        [Fact]
-        public void HasEntries_TrueOnlyWhenContentLinesPresent()
-        {
-            Assert.False(_svc.HasEntries(_savedir, PlayerAccessList.Permitted)); // no file
-            File.WriteAllText(Path.Join(_savedir, "permittedlist.txt"), "// header only\n");
-            Assert.False(_svc.HasEntries(_savedir, PlayerAccessList.Permitted)); // header-only
+            Seed("bannedlist.txt", SteamA);
             Seed("permittedlist.txt", SteamA);
-            Assert.True(_svc.HasEntries(_savedir, PlayerAccessList.Permitted));
+            LastWrote();
+
+            var result = Reconcile(new(), externalWins: true);
+
+            Assert.Equal(PlayerRole.Banned, result.Overrides[$"Steam:{SteamA}"].Role);
+        }
+
+        [Fact]
+        public void Reconcile_PermittedList_IsSatisfiedByAnAdmin()
+        {
+            Seed("permittedlist.txt", SteamA);
+            LastWrote();
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Admin, "Steam"));
+
+            var result = Reconcile(overrides, externalWins: true);
+
+            Assert.False(result.Changed);
+            Assert.Empty(result.Conflicts);
+        }
+
+        [Fact]
+        public void Reconcile_ComparesAgainstTheEffectiveRole_FromDefaults()
+        {
+            Seed("adminlist.txt", SteamA);
+            LastWrote();
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Admin));
+
+            var result = Reconcile(new(), externalWins: false, defaults);
+
+            Assert.False(result.Changed); // the default already puts A on the admin list
+        }
+
+        [Fact]
+        public void Reconcile_RemovedEntry_RemovesTheServerOverride()
+        {
+            Seed("bannedlist.txt"); // in-game unban: A is gone
+            LastWrote((PlayerAccessList.Banned, new[] { $"Steam_{SteamA}" }));
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Banned, "Steam"));
+
+            var result = Reconcile(overrides, externalWins: true);
+
+            Assert.False(result.Overrides.ContainsKey($"Steam:{SteamA}"));
+            Assert.True(result.Changed);
+        }
+
+        [Fact]
+        public void Reconcile_RemovedEntry_FallsBackToTheDefault_NotTheOldOverride()
+        {
+            // An admin (by default) was banned in-game, then unbanned in-game: the ban override goes, the default
+            // admin comes back. Only an admin OVERRIDE would have been lost to the ban.
+            Seed("bannedlist.txt");
+            LastWrote((PlayerAccessList.Banned, new[] { $"Steam_{SteamA}" }));
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Banned, "Steam"));
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Admin));
+
+            var result = Reconcile(overrides, externalWins: true, defaults);
+
+            Assert.Equal(PlayerRole.Admin, PlayerRoleResolver.Resolve($"Steam:{SteamA}", result.Overrides, defaults).Effective);
+        }
+
+        [Fact]
+        public void Reconcile_RemovedEntry_LeavesAGlobalBanAlone()
+        {
+            Seed("bannedlist.txt");
+            LastWrote((PlayerAccessList.Banned, new[] { $"Steam_{SteamA}" }));
+            var defaults = Defaults(($"Steam:{SteamA}", PlayerRole.Banned));
+
+            var result = Reconcile(new(), externalWins: true, defaults);
+
+            Assert.False(result.Changed);
+            Assert.Contains(result.LogLines, l => l.Contains("global default"));
+        }
+
+        [Fact]
+        public void Reconcile_RemovedEntry_ForARoleThePlayerNoLongerHas_IsIgnored()
+        {
+            // VSG wrote A to the ban list, then the user unbanned A in VSG and the file still has... nothing: A was
+            // also removed on disk. With no ban role left, there is nothing to undo.
+            Seed("bannedlist.txt");
+            LastWrote((PlayerAccessList.Banned, new[] { $"Steam_{SteamA}" }));
+            var overrides = Roles(($"Steam:{SteamA}", PlayerRole.Permitted, "Steam"));
+
+            var result = Reconcile(overrides, externalWins: true);
+
+            Assert.False(result.Changed);
+        }
+
+        [Fact]
+        public void Reconcile_SkipsUnrecognizedEntries()
+        {
+            Seed("bannedlist.txt", "PlayFab_1A2B", SteamA);
+
+            var result = Reconcile(new(), externalWins: true);
+
+            Assert.Single(result.Overrides);
         }
     }
 }

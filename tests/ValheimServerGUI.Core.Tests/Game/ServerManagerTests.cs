@@ -51,7 +51,10 @@ public sealed class ServerManagerTests : IDisposable
             _lastProcessProvider = new MockProcessProvider();
             var context = new DataFileRepositoryContext(new MockDataFileProvider(), serilog);
             var repo = new PlayerDataRepository(context, new FakeRuneberryApiClient(), _resolver);
-            return new ValheimServer(_lastProcessProvider, repo, new FakeApplicationLogger(), _resolver, new PlayerAccessListService());
+            var accessLists = new PlayerAccessListService();
+            var baselines = new InMemoryBaselineStore();
+            return new ValheimServer(_lastProcessProvider, repo, new FakeApplicationLogger(), _resolver, accessLists,
+                new PlayerListImportService(accessLists, baselines), baselines);
         }
 
         return new ServerManager(Factory, serilog);

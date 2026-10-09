@@ -121,6 +121,9 @@ public partial class MainWindowViewModel : ViewModelBase
         // Saving the Manage Players defaults re-resolves every running server's roles (live-apply).
         _userPrefs.PreferencesSaved += OnUserPreferencesSaved;
 
+        // A running server adopted list-file changes made during play (in-game bans, hand edits): persist them.
+        _serverManager.PlayerRolesAdopted += OnPlayerRolesAdopted;
+
         // The "choose an existing world" gate depends on the world list being non-empty.
         Form.Worlds.CollectionChanged += (_, _) => OnPropertyChanged(nameof(CanSelectExistingWorld));
 
@@ -579,14 +582,11 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        // List-file safety runs BEFORE Core generation: adopt/import files into roles, detect conflicts, and
-        // guard a stray permitted-list file. It may mutate the form (adopted roles) and set
-        // SkipAccessListGeneration, so rebuild options afterwards — preserving that skip flag — so both the
-        // launch and save-on-start reflect the merged config.
+        // List-file safety runs BEFORE Core writes the files: adopt changes made to them since VSG's last write,
+        // resolve conflicts, and guard a stray permitted-list file. It may change the form's roles, so rebuild the
+        // options afterwards so both the launch and save-on-start reflect the merged config.
         if (!await ResolveListSafetyBeforeStartAsync(options, isManual)) return;
-        var skipGeneration = options.SkipAccessListGeneration;
         options = BuildOptions();
-        options.SkipAccessListGeneration = skipGeneration;
 
         _logger.Information("Starting {mode} server for profile '{profile}' on port {port} (world: {world})",
             isManual ? "manual" : "auto-start", CurrentProfile?.ProfileName, port, worldName);
@@ -639,10 +639,11 @@ public partial class MainWindowViewModel : ViewModelBase
             // Lines land in the profile's server-owned buffer regardless of which window started the server.
             LogMessageHandler = _serverManager.GetLogAppender(
                 CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName),
-            // Access-list generation inputs: the mode flag + the profile's roles. Core projects these onto the
-            // three gating files at start.
+            // Access-list inputs: the mode flag, the profile's role overrides, and the global defaults they layer
+            // over. Core resolves and writes these to the three gating files.
             UsePermittedList = serverPrefs.UsePermittedList,
-            PlayerRoles = BuildRoleAssignments(serverPrefs, userPrefs.PlayerDefaults),
+            RoleOverrides = new Dictionary<string, PlayerRoleEntry>(serverPrefs.PlayerRoles),
+            RoleDefaults = new Dictionary<string, PlayerDefaultEntry>(userPrefs.PlayerDefaults),
         };
 
         var worldName = serverPrefs.WorldName;
@@ -662,12 +663,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return options;
     }
-
-    // The resolved role assignments (profile overrides over the app-global defaults) the list files are
-    // generated from. Shared by the start-options build and both live-apply paths.
-    private static IReadOnlyList<PlayerRoleAssignment> BuildRoleAssignments(
-        ServerPreferences prefs, IReadOnlyDictionary<string, PlayerDefaultEntry> defaults)
-        => PlayerRoleResolver.BuildAssignments(prefs.PlayerRoles, defaults);
 
     private IReadOnlyDictionary<string, PlayerDefaultEntry> LoadPlayerDefaults()
         => _userPrefs.LoadPreferences().PlayerDefaults;
@@ -713,19 +708,25 @@ public partial class MainWindowViewModel : ViewModelBase
         _logger.Information("Player-list import: checking {admin}, {banned}, {permitted}.",
             dir.GetAdminListFile().FullName, dir.GetBannedListFile().FullName, dir.GetPermittedListFile().FullName);
 
-        var plan = _import.BuildImport(savedir, Form.PlayerRoles, Form.UsePermittedList, LoadPlayerDefaults());
+        ImportPlan plan;
+        try
+        {
+            plan = _import.BuildImport(savedir, Form.PlayerRoles, Form.UsePermittedList, LoadPlayerDefaults());
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Player-list import failed: {message}", ex.Message);
+            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportFailedMessage);
+            return;
+        }
+
+        foreach (var entry in plan.Unrecognized)
+            _logger.Warning("Player-list import: skipped unrecognized entry {entry} (it stays in the file).", entry);
 
         if (!plan.AnyFilesPresent)
         {
             _logger.Information("Player-list import: no list files present in {folder}.", savedir);
             if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoFilesMessage);
-            return;
-        }
-
-        if (!plan.Success)
-        {
-            _logger.Error("Player-list import failed: {reason}", plan.FailureReason);
-            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportFailedMessage);
             return;
         }
 
@@ -767,11 +768,12 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Guards the on-disk list files before Core generation overwrites them at start. Returns false to abort
-    /// the start. Three steps: (1) back up a stray non-empty permittedlist.txt in open mode (abort if it can't
-    /// be moved); (2) adopt files when the profile has no roles yet, else detect conflicts; (3) on a conflict,
-    /// let the user keep the profile (regenerate, backing up the files), keep the files (skip generation), or
-    /// cancel. Non-interactive (auto-start or an unwired prompt) defaults to keeping the profile.
+    /// Reconciles the on-disk list files with the profile before Core writes them at start. Returns false to abort
+    /// the start. Three steps: (1) back up a stray non-empty permittedlist.txt in open mode (abort if it can't be
+    /// moved); (2) adopt the files wholesale when no roles exist yet, else adopt what changed in them since VSG's
+    /// last write; (3) on a conflict (a changed entry that disagrees with the profile), let the user keep the
+    /// profile (Core backs the file up before overwriting it), keep the files' roles, or cancel. Non-interactive
+    /// (auto-start or an unwired prompt) keeps the profile.
     /// </summary>
     private async Task<bool> ResolveListSafetyBeforeStartAsync(ValheimServerOptions options, bool isManual)
     {
@@ -792,8 +794,7 @@ public partial class MainWindowViewModel : ViewModelBase
             _logger.Warning("Open-mode start: backed up existing permitted list {src} to {dst}.", permittedFile.FullName, backup.FullName);
         }
 
-        // (2) No roles configured at all (no overrides, no global defaults) → adopt whatever the files say
-        // (silent). Otherwise reconcile one-directionally against the effective roles.
+        // (2) No roles configured at all (no overrides, no global defaults) → adopt whatever the files say (silent).
         var defaults = LoadPlayerDefaults();
         if (Form.PlayerRoles.Count == 0 && defaults.Count == 0)
         {
@@ -801,28 +802,24 @@ public partial class MainWindowViewModel : ViewModelBase
             return true;
         }
 
-        var report = _import.CheckConflicts(savedir, Form.PlayerRoles, Form.UsePermittedList, defaults);
-        if (!report.Success)
+        ReconcileResult report;
+        try
         {
-            _logger.Error("Player-list conflict check failed: {reason}. Proceeding with the current profile config.", report.FailureReason);
-            return true;
+            report = _import.Reconcile(savedir, Form.PlayerRoles, defaults, externalWins: false);
+        }
+        catch (Exception ex)
+        {
+            _logger.Error("Cannot start: reading the player list files failed: {message}", ex.Message);
+            return false;
         }
 
-        // Fold in any roles the files require that the profile is missing (never unsets), then look them up.
-        if (report.Additions.Count > 0)
-        {
-            var merged = new Dictionary<string, PlayerRoleEntry>(Form.PlayerRoles);
-            foreach (var add in report.Additions) merged[add.Key] = add.Entry;
-            ApplyImportPlan(merged, Form.UsePermittedList, report.NewPlayers);
-            _logger.Information("Adopted {count} missing role(s) from player list files at start.", report.Additions.Count);
-        }
+        foreach (var line in report.LogLines) _logger.Information("{line}", line);
+        if (report.Changed) ApplyImportPlan(report.Overrides, Form.UsePermittedList, report.NewPlayers);
 
-        if (report.ConflictCount == 0) return true;
-
-        foreach (var line in report.LogLines) _logger.Warning("{line}", line);
+        if (report.Conflicts.Count == 0) return true;
 
         var choice = (isManual && ConflictPrompt is not null)
-            ? await ConflictPrompt(RoleConflictMessage.Replace("{n}", report.ConflictCount.ToString()))
+            ? await ConflictPrompt(RoleConflictMessage.Replace("{n}", report.Conflicts.Count.ToString()))
             : RoleConflictChoice.UseServerProfile; // non-interactive / unwired: the profile wins
 
         switch (choice)
@@ -832,31 +829,17 @@ public partial class MainWindowViewModel : ViewModelBase
                 return false;
 
             case RoleConflictChoice.UseRolesFromFile:
-                options.SkipAccessListGeneration = true;
-                _logger.Information("Role conflict resolved: keeping the list files as-is (generation skipped).");
+                var fromFiles = _import.Reconcile(savedir, Form.PlayerRoles, defaults, externalWins: true);
+                foreach (var line in fromFiles.LogLines) _logger.Information("{line}", line);
+                ApplyImportPlan(fromFiles.Overrides, Form.UsePermittedList, fromFiles.NewPlayers);
+                _logger.Information("Role conflict resolved: adopted the list files' roles into the profile.");
                 return true;
 
-            default: // UseServerProfile — back up each conflicting file, then let generation overwrite.
-                foreach (var list in report.ConflictingFiles)
-                {
-                    var file = ResolveListFile(dir, list);
-                    var backup = ValheimPathExtensions.BackupListFile(file);
-                    if (backup is not null)
-                        _logger.Warning("Role conflict resolved (profile wins): backed up {src} to {dst}.", file.FullName, backup.FullName);
-                    else
-                        _logger.Error("Role conflict: failed to back up {src}; it will be overwritten by generation.", file.FullName);
-                }
+            default: // UseServerProfile — Core backs up each file before dropping entries VSG didn't write.
+                _logger.Information("Role conflict resolved: keeping the profile's roles (conflicting files are backed up).");
                 return true;
         }
     }
-
-    private static FileInfo ResolveListFile(DirectoryInfo savedir, PlayerAccessList list) => list switch
-    {
-        PlayerAccessList.Admin => savedir.GetAdminListFile(),
-        PlayerAccessList.Banned => savedir.GetBannedListFile(),
-        PlayerAccessList.Permitted => savedir.GetPermittedListFile(),
-        _ => throw new ArgumentOutOfRangeException(nameof(list), list, null),
-    };
 
     /// <summary>GetPrefsFromFormState — merged onto the existing/new profile prefs.</summary>
     public ServerPreferences BuildPreferences()
@@ -949,7 +932,10 @@ public partial class MainWindowViewModel : ViewModelBase
         // its live options in step so a later restart preserves the change.
         try
         {
-            _currentServer?.ApplyPlayerRoles(BuildRoleAssignments(prefs, LoadPlayerDefaults()), prefs.UsePermittedList);
+            _currentServer?.ApplyPlayerRoles(
+                new Dictionary<string, PlayerRoleEntry>(prefs.PlayerRoles),
+                new Dictionary<string, PlayerDefaultEntry>(LoadPlayerDefaults()),
+                prefs.UsePermittedList);
         }
         catch (Exception ex)
         {
@@ -1080,6 +1066,24 @@ public partial class MainWindowViewModel : ViewModelBase
     // profile + the new defaults and regenerate its list files — but only when the resolved assignments actually
     // differ from what it runs with, so unrelated user-preference saves (e.g. LastActiveProfile) are no-ops and
     // a second window reacting to the same save finds nothing left to do.
+    // Changes made to a running server's list files during play win (they are newer than the profile), so the
+    // roles the server adopted become the profile's roles: saved to that profile, and shown if it is this window's.
+    private void OnPlayerRolesAdopted(object? sender, PlayerRolesAdoptedEventArgs e) => RunOnUi(() =>
+    {
+        var prefs = _serverPrefs.LoadPreferences(e.ProfileName) ?? new ServerPreferences { ProfileName = e.ProfileName };
+        prefs.PlayerRoles.Clear();
+        foreach (var (key, entry) in e.Result.Overrides) prefs.PlayerRoles[key] = entry;
+        _serverPrefs.SavePreferences(prefs);
+
+        if (string.Equals(CurrentProfile?.ProfileName, e.ProfileName, StringComparison.OrdinalIgnoreCase))
+            Form.ReplaceRoles(e.Result.Overrides);
+
+        foreach (var np in e.Result.NewPlayers)
+            _ = _api.RequestPlayerInfoAsync(np.Platform ?? string.Empty, np.PlayerId ?? string.Empty);
+        _logger.Information("Saved {count} player role change(s) made in the list files during play to profile '{profile}'.",
+            e.Result.LogLines.Count, e.ProfileName);
+    });
+
     private void OnUserPreferencesSaved(object? sender, UserPreferences userPrefs)
         => RunOnUi(() => ApplyDefaultsToRunningServers(userPrefs));
 
@@ -1090,12 +1094,15 @@ public partial class MainWindowViewModel : ViewModelBase
             if (!_serverManager.TryGet(profile.ProfileName, out var server)) continue;
             if (server.Status == ServerStatus.Stopped) continue;
 
-            var assignments = BuildRoleAssignments(profile, userPrefs.PlayerDefaults);
+            var assignments = PlayerRoleResolver.BuildAssignments(profile.PlayerRoles, userPrefs.PlayerDefaults);
             if (assignments.SequenceEqual(server.Options.PlayerRoles)) continue;
 
             try
             {
-                server.ApplyPlayerRoles(assignments, server.Options.UsePermittedList);
+                server.ApplyPlayerRoles(
+                    new Dictionary<string, PlayerRoleEntry>(profile.PlayerRoles),
+                    new Dictionary<string, PlayerDefaultEntry>(userPrefs.PlayerDefaults),
+                    server.Options.UsePermittedList);
             }
             catch (Exception ex)
             {
@@ -1146,6 +1153,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _updateProvider.UpdateCheckFinished -= OnUpdateCheckFinished;
         _serverPrefs.PreferencesSaved -= OnServerPreferencesSaved;
         _userPrefs.PreferencesSaved -= OnUserPreferencesSaved;
+        _serverManager.PlayerRolesAdopted -= OnPlayerRolesAdopted;
         Details.Dispose();
         Players.Dispose();
         Logs.Dispose();

@@ -50,9 +50,11 @@ namespace ValheimServerGUI.Game
 
         public bool UsePermittedList { get; set; }
 
-        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; set; } = Array.Empty<PlayerRoleAssignment>();
+        public IReadOnlyDictionary<string, PlayerRoleEntry> RoleOverrides { get; set; } = new Dictionary<string, PlayerRoleEntry>();
 
-        public bool SkipAccessListGeneration { get; set; }
+        public IReadOnlyDictionary<string, PlayerDefaultEntry> RoleDefaults { get; set; } = new Dictionary<string, PlayerDefaultEntry>();
+
+        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles => PlayerRoleResolver.BuildAssignments(RoleOverrides, RoleDefaults);
 
         public void Validate()
         {
@@ -165,15 +167,15 @@ namespace ValheimServerGUI.Game
         /// <summary>Whether the server should run in permitted-list mode (drives access-list generation).</summary>
         public bool UsePermittedList { get; }
 
-        /// <summary>The player roles the three gating files are generated from at <see cref="ValheimServer.Start"/>.</summary>
-        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; }
+        /// <summary>This server's role overrides (the profile's player roles), keyed by <c>Platform:PlayerId</c>.</summary>
+        public IReadOnlyDictionary<string, PlayerRoleEntry> RoleOverrides { get; }
 
-        /// <summary>
-        /// When true, <see cref="ValheimServer.Start"/> does NOT regenerate the three access-list files, leaving
-        /// whatever is on disk untouched. Set by the start-time conflict flow's "use roles from file" choice so
-        /// the user's own list files win over the profile's roles for that launch.
-        /// </summary>
-        public bool SkipAccessListGeneration { get; }
+        /// <summary>The app-global player default roles the overrides layer over.</summary>
+        public IReadOnlyDictionary<string, PlayerDefaultEntry> RoleDefaults { get; }
+
+        /// <summary>The effective player roles the three gating files are written from, resolved from
+        /// <see cref="RoleOverrides"/> over <see cref="RoleDefaults"/>.</summary>
+        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; }
     }
 
     /// <summary>

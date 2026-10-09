@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -47,14 +48,20 @@ namespace ValheimServerGUI.Game
             => new(Path.Join(saveDataFolder.FullName, fileName));
 
         /// <summary>
-        /// Moves a list file aside to the first free increment, preserving any manual entries before generation
-        /// overwrites the original: <c>permittedlist.txt</c> → <c>permittedlist.bak.txt</c>, then
-        /// <c>permittedlist.bak.2.txt</c>, <c>permittedlist.bak.3.txt</c>, …. Returns the destination it moved
-        /// to, or <c>null</c> when the file does not exist or the move fails (an <see cref="IOException"/>, e.g.
-        /// the path is locked or occupied), leaving the caller to decide how to react. Generic over any of the
-        /// three list files.
+        /// Moves a list file aside to the first free increment: <c>permittedlist.txt</c> → <c>permittedlist.bak.txt</c>,
+        /// then <c>permittedlist.bak.2.txt</c>, <c>permittedlist.bak.3.txt</c>, …. Returns the destination, or
+        /// <c>null</c> when the file does not exist or the move fails (the path is locked, occupied, or not
+        /// writable), leaving the caller to decide how to react.
         /// </summary>
-        public static FileInfo? BackupListFile(FileInfo file)
+        public static FileInfo? BackupListFile(FileInfo file) => BackupListFile(file, move: true);
+
+        /// <summary>
+        /// Copies a list file to the first free backup increment (same naming as <see cref="BackupListFile(FileInfo)"/>),
+        /// leaving the original in place. Returns the copy, or <c>null</c> when the file does not exist or the copy fails.
+        /// </summary>
+        public static FileInfo? CopyListFileToBackup(FileInfo file) => BackupListFile(file, move: false);
+
+        private static FileInfo? BackupListFile(FileInfo file, bool move)
         {
             if (!file.Exists) return null;
 
@@ -71,10 +78,11 @@ namespace ValheimServerGUI.Game
 
                 try
                 {
-                    File.Move(file.FullName, dest.FullName);
+                    if (move) File.Move(file.FullName, dest.FullName);
+                    else File.Copy(file.FullName, dest.FullName);
                     return dest;
                 }
-                catch (IOException)
+                catch (Exception e) when (e is IOException or UnauthorizedAccessException)
                 {
                     return null;
                 }

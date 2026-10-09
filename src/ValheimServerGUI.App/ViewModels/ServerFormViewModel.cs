@@ -112,6 +112,18 @@ public partial class ServerFormViewModel : ObservableObject
     }
 
     /// <summary>
+    /// Replaces the override map with roles the running server adopted from its list files (changes made during
+    /// play). They are already applied and persisted, so this is not an edit: the form is not dirtied and
+    /// <see cref="PlayerRolesEdited"/> is not raised; only <see cref="RoleStateChanged"/> refreshes the views.
+    /// </summary>
+    public void ReplaceRoles(IReadOnlyDictionary<string, PlayerRoleEntry> roles)
+    {
+        _playerRoles.Clear();
+        foreach (var (key, entry) in roles) _playerRoles[key] = entry;
+        RoleStateChanged?.Invoke(this, EventArgs.Empty);
+    }
+
+    /// <summary>
     /// Sets (or clears, when <paramref name="role"/> is null) a player's override on this server. A real change trips
     /// <see cref="IsDirty"/> (unless under <see cref="RunClean"/>) and raises <see cref="RoleStateChanged"/>.
     /// </summary>

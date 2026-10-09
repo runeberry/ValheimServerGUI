@@ -64,6 +64,9 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         var serverPrefs = new FakeServerPreferencesProvider(
             profiles.Select(p => new ServerPreferences { ProfileName = p }));
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
+        var baselines = new InMemoryBaselineStore();
+        var accessLists = Core.GetRequiredService<IPlayerAccessListService>();
+        var import = new PlayerListImportService(accessLists, baselines);
 
         // Each server is built over its own headless process provider so it can be driven to Running.
         var manager = new ServerManager(
@@ -72,7 +75,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
                 Core.GetRequiredService<IPlayerDataRepository>(),
                 Core.GetRequiredService<IApplicationLogger>(),
                 Core.GetRequiredService<IValheimPathResolver>(),
-                Core.GetRequiredService<IPlayerAccessListService>()),
+                accessLists, import, baselines),
             Core.GetRequiredService<Serilog.ILogger>());
 
         var vm = new MainWindowViewModel(
@@ -87,7 +90,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
             new FakeSoftwareUpdateProvider(),
             shell,
             Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(),
+            import,
             Core.GetRequiredService<IRuneberryApiClient>());
 
         return (vm, manager, serverPrefs);

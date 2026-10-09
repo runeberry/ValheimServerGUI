@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
@@ -9,6 +10,6 @@ public class OpenButton : IconButton
     public OpenButton()
     {
         IconName = "OpenFolder_16x";
-        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, "Open folder");
+        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, Strings.Controls_OpenFolder_Tip);
     }
 }

@@ -2,6 +2,7 @@ using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
 using ValheimServerGUI.App.Infrastructure;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
@@ -19,7 +20,7 @@ public class CopyButton : IconButton
     {
         IconName = "Copy_16x";
         ConfirmIconName = "StatusOK_16x";
-        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, "Copy");
+        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, Strings.Controls_Copy_Tip);
     }
 
     /// <summary>The text copied to the clipboard when the button is clicked.</summary>

@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
@@ -9,6 +10,6 @@ public class SettingsButton : IconButton
     public SettingsButton()
     {
         IconName = "Settings_16x";
-        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, "Settings");
+        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, Strings.Controls_Settings_Tip);
     }
 }

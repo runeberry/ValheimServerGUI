@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
@@ -10,6 +11,6 @@ public class EditButton : IconButton
     {
         IconName = "Edit_16x";
         ConfirmIconName = "StatusOK_16x";
-        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, "Edit");
+        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, Strings.Controls_Edit_Tip);
     }
 }

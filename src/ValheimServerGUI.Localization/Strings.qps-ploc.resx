@@ -620,4 +620,35 @@
   <data name="About_BuildDate" xml:space="preserve">
     <value>⟦About_BuildDate {0}⟧</value>
   </data>
+  <!-- Controls -->
+  <data name="Controls_Browse" xml:space="preserve">
+    <value>⟦Controls_Browse⟧</value>
+  </data>
+  <data name="Controls_Browse_Tip" xml:space="preserve">
+    <value>⟦Controls_Browse_Tip⟧</value>
+  </data>
+  <data name="Controls_OpenThisFolder_Tip" xml:space="preserve">
+    <value>⟦Controls_OpenThisFolder_Tip⟧</value>
+  </data>
+  <data name="Controls_LogViewer_Copy" xml:space="preserve">
+    <value>⟦Controls_LogViewer_Copy⟧</value>
+  </data>
+  <data name="Controls_LogViewer_SelectAll" xml:space="preserve">
+    <value>⟦Controls_LogViewer_SelectAll⟧</value>
+  </data>
+  <data name="Controls_OpenFolder_Tip" xml:space="preserve">
+    <value>⟦Controls_OpenFolder_Tip⟧</value>
+  </data>
+  <data name="Controls_Refresh_Tip" xml:space="preserve">
+    <value>⟦Controls_Refresh_Tip⟧</value>
+  </data>
+  <data name="Controls_Edit_Tip" xml:space="preserve">
+    <value>⟦Controls_Edit_Tip⟧</value>
+  </data>
+  <data name="Controls_Settings_Tip" xml:space="preserve">
+    <value>⟦Controls_Settings_Tip⟧</value>
+  </data>
+  <data name="Controls_Copy_Tip" xml:space="preserve">
+    <value>⟦Controls_Copy_Tip⟧</value>
+  </data>
 </root>

@@ -1,4 +1,5 @@
 using Avalonia.Controls;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
@@ -10,6 +11,6 @@ public class RefreshButton : IconButton
     {
         IconName = "Restart_16x";
         ConfirmIconName = "StatusOK_16x";
-        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, "Refresh");
+        if (ToolTip.GetTip(this) is null) ToolTip.SetTip(this, Strings.Controls_Refresh_Tip);
     }
 }

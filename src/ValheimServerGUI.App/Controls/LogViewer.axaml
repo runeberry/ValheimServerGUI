@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
              x:Class="ValheimServerGUI.App.Controls.LogViewer"
              x:Name="Root" x:CompileBindings="False">
     <Border BorderThickness="1" BorderBrush="{DynamicResource AppBorderBrush}">
@@ -16,8 +17,8 @@
                                  Foreground="{DynamicResource TextControlForeground}">
                 <SelectableTextBlock.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Copy" Click="CopySelection" />
-                        <MenuItem Header="Select All" Click="SelectAllText" />
+                        <MenuItem Header="{x:Static loc:Strings.Controls_LogViewer_Copy}" Click="CopySelection" />
+                        <MenuItem Header="{x:Static loc:Strings.Controls_LogViewer_SelectAll}" Click="SelectAllText" />
                     </ContextMenu>
                 </SelectableTextBlock.ContextMenu>
             </SelectableTextBlock>

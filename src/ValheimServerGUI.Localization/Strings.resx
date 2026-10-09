@@ -648,4 +648,35 @@ Of course, we will never share this information with any third parties. (I don't
   <data name="About_BuildDate" xml:space="preserve">
     <value>Build Date: {0}</value>
   </data>
+  <!-- Controls -->
+  <data name="Controls_Browse" xml:space="preserve">
+    <value>Browse…</value>
+  </data>
+  <data name="Controls_Browse_Tip" xml:space="preserve">
+    <value>Browse for a location</value>
+  </data>
+  <data name="Controls_OpenThisFolder_Tip" xml:space="preserve">
+    <value>Open this folder in your file manager</value>
+  </data>
+  <data name="Controls_LogViewer_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Controls_LogViewer_SelectAll" xml:space="preserve">
+    <value>Select All</value>
+  </data>
+  <data name="Controls_OpenFolder_Tip" xml:space="preserve">
+    <value>Open folder</value>
+  </data>
+  <data name="Controls_Refresh_Tip" xml:space="preserve">
+    <value>Refresh</value>
+  </data>
+  <data name="Controls_Edit_Tip" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="Controls_Settings_Tip" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="Controls_Copy_Tip" xml:space="preserve">
+    <value>Copy</value>
+  </data>
 </root>

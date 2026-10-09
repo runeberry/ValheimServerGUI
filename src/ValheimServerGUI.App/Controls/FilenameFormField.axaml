@@ -1,5 +1,6 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
              xmlns:c="using:ValheimServerGUI.App.Controls"
              x:Class="ValheimServerGUI.App.Controls.FilenameFormField"
              x:Name="Root" x:CompileBindings="False">
@@ -11,13 +12,13 @@
                 <TextBox Grid.Column="0" Classes="chromeless" VerticalAlignment="Stretch"
                          VerticalContentAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
-                    <Button Classes="affix" Content="Browse…"
+                    <Button Classes="affix" Content="{x:Static loc:Strings.Controls_Browse}"
                             IsVisible="{Binding #Root.ShowBrowse}"
-                            ToolTip.Tip="Browse for a location" Click="Browse" />
+                            ToolTip.Tip="{x:Static loc:Strings.Controls_Browse_Tip}" Click="Browse" />
                     <Button Classes="affix"
                             IsVisible="{Binding #Root.ShowOpenFolder}"
                             Command="{Binding #Root.OpenFolderCommand}"
-                            ToolTip.Tip="Open this folder in your file manager">
+                            ToolTip.Tip="{x:Static loc:Strings.Controls_OpenThisFolder_Tip}">
                         <c:IconImage IconName="OpenFolder_16x" />
                     </Button>
                 </StackPanel>

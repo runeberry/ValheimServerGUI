@@ -3,6 +3,7 @@ using Avalonia.Controls;
 using Avalonia.Interactivity;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.App.ViewModels.Dialogs;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
@@ -29,8 +30,8 @@ public partial class PlayerDetailsWindow : DialogWindow
 
     private async Task EditNameAsync()
     {
-        var name = await new TextPromptWindow("Edit Player Name",
-            "Enter a display name for this player (leave blank to clear):",
+        var name = await new TextPromptWindow(Strings.Prompt_EditPlayerName_Title,
+            Strings.Prompt_EditPlayerName_Message,
             Vm.DisplayName, maxLength: 64).ShowDialog<string?>(this);
         // A null result is Cancel (leave unchanged); a blank result clears the override back to "(unknown)".
         if (name is not null) Vm.DisplayName = name.Trim();

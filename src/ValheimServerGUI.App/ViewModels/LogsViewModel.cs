@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
 
@@ -82,7 +83,7 @@ public partial class LogsViewModel : ViewModelBase
         var lines = CurrentLines.ToList();
         if (lines.Count == 0)
         {
-            Warning?.Invoke("No logs to save!");
+            Warning?.Invoke(Strings.Logs_NothingToSave);
             return;
         }
 

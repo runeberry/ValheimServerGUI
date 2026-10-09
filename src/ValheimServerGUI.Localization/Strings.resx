@@ -34,6 +34,9 @@
   <data name="Common_Save" xml:space="preserve">
     <value>Save</value>
   </data>
+  <data name="Common_Continue" xml:space="preserve">
+    <value>Continue</value>
+  </data>
   <!-- Main window -->
   <data name="MainWindow_Profile_Label" xml:space="preserve">
     <value>Profile</value>
@@ -392,6 +395,136 @@ TIP: You can also connect to "localhost", which is a little easier than typing "
   <data name="Logs_ClearLogs" xml:space="preserve">
     <value>Clear Logs</value>
   </data>
+  <!-- Prompts -->
+  <data name="Prompt_UnsavedChanges_Title" xml:space="preserve">
+    <value>Unsaved changes</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_DiscardMessage" xml:space="preserve">
+    <value>You have unsaved changes. Discard them?</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_SaveMessage" xml:space="preserve">
+    <value>You have unsaved changes. Save them before closing?</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_Save" xml:space="preserve">
+    <value>Save Changes</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_Discard" xml:space="preserve">
+    <value>Discard Changes</value>
+  </data>
+  <data name="Prompt_Warning_Title" xml:space="preserve">
+    <value>Warning</value>
+  </data>
+  <data name="Prompt_ErrorStartingServer_Title" xml:space="preserve">
+    <value>Error starting server</value>
+  </data>
+  <data name="Prompt_CheckForUpdates_Title" xml:space="preserve">
+    <value>Check for Updates</value>
+  </data>
+  <data name="Prompt_ForceStopped_Title" xml:space="preserve">
+    <value>Server force-stopped</value>
+  </data>
+  <data name="Prompt_ForceStopped_Message" xml:space="preserve">
+    <value>The server did not shut down in time and was force-stopped. Recent world changes may not have been saved.</value>
+  </data>
+  <data name="Prompt_RoleConflict_UseServerProfile" xml:space="preserve">
+    <value>Use server profile</value>
+  </data>
+  <data name="Prompt_RoleConflict_UseRolesFromFile" xml:space="preserve">
+    <value>Use roles from file</value>
+  </data>
+  <data name="Prompt_ProfileName_Title" xml:space="preserve">
+    <value>Server Profile Name</value>
+  </data>
+  <data name="Prompt_ProfileName_Message" xml:space="preserve">
+    <value>Enter a server profile name:</value>
+  </data>
+  <data name="Prompt_ProfileName_Invalid" xml:space="preserve">
+    <value>Profile name must be 1-30 characters, and must not match an existing profile name.</value>
+  </data>
+  <data name="Prompt_ProfileName_CopyOf" xml:space="preserve">
+    <value>Copy of {0}</value>
+  </data>
+  <data name="Prompt_RemoveProfile_Title" xml:space="preserve">
+    <value>Remove Profile</value>
+  </data>
+  <data name="Prompt_RemoveProfile_Message" xml:space="preserve">
+    <value>Remove server profile '{0}'?</value>
+  </data>
+  <data name="Prompt_WorldNameMissing_Title" xml:space="preserve">
+    <value>World Name Missing</value>
+  </data>
+  <data name="Prompt_WorldNameMissing_NewWorld" xml:space="preserve">
+    <value>Please enter a new world name before changing modifier settings.</value>
+  </data>
+  <data name="Prompt_WorldNameMissing_NoWorld" xml:space="preserve">
+    <value>Unable to change modifier settings. No world is selected.</value>
+  </data>
+  <data name="Prompt_ServerExeNotFound_Title" xml:space="preserve">
+    <value>File Not Found</value>
+  </data>
+  <data name="Prompt_ServerExeNotFound_Message" xml:space="preserve">
+    <value>{0}
+
+This may occur if you do not have Valheim Dedicated Server installed, or if you have installed it in a different directory. See Help for more info.
+
+Would you like to change your directories now?</value>
+  </data>
+  <data name="Prompt_CloudImport_Title" xml:space="preserve">
+    <value>Import cloud world</value>
+  </data>
+  <data name="Prompt_CloudImport_Message" xml:space="preserve">
+    <value>Host the cloud world '{0}'?
+
+This world is saved to Steam Cloud and must be brought into the server's local save folder to be hosted.
+
+Move: bring the world over and remove the Steam Cloud copy.
+Copy: bring a copy over and leave the Steam Cloud copy in place.</value>
+  </data>
+  <data name="Prompt_CloudImport_Move" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="Prompt_CloudImport_Copy" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="Prompt_PathNotFound_Title" xml:space="preserve">
+    <value>Path not found</value>
+  </data>
+  <data name="Prompt_PathNotFound_Message" xml:space="preserve">
+    <value>{0}
+
+Save anyway?</value>
+  </data>
+  <data name="Prompt_AddCharacter_Title" xml:space="preserve">
+    <value>Add Character</value>
+  </data>
+  <data name="Prompt_AddCharacter_Message" xml:space="preserve">
+    <value>Add a Valheim character name for this player:</value>
+  </data>
+  <data name="Prompt_EditCharacter_Title" xml:space="preserve">
+    <value>Edit Character</value>
+  </data>
+  <data name="Prompt_EditCharacter_Message" xml:space="preserve">
+    <value>Edit the name for character '{0}'</value>
+  </data>
+  <data name="Prompt_EditPlayerName_Title" xml:space="preserve">
+    <value>Edit Player Name</value>
+  </data>
+  <data name="Prompt_EditPlayerName_Message" xml:space="preserve">
+    <value>Enter a display name for this player (leave blank to clear):</value>
+  </data>
+  <!-- Tray -->
+  <data name="Tray_Profile" xml:space="preserve">
+    <value>Profile: {0}</value>
+  </data>
+  <data name="Tray_NoProfile" xml:space="preserve">
+    <value>No Profile Selected</value>
+  </data>
+  <data name="Logs_SaveDialog_Title" xml:space="preserve">
+    <value>Save Logs</value>
+  </data>
+  <data name="Logs_NothingToSave" xml:space="preserve">
+    <value>No logs to save!</value>
+  </data>
   <!-- Roles -->
   <data name="Role_None" xml:space="preserve">
     <value>None</value>
@@ -632,6 +765,16 @@ Of course, we will never share this information with any third parties. (I don't
   <data name="BugReport_Submit" xml:space="preserve">
     <value>Submit</value>
   </data>
+  <data name="BugReport_Submitting" xml:space="preserve">
+    <value>Submitting bug report...</value>
+  </data>
+  <data name="BugReport_Submitted" xml:space="preserve">
+    <value>Bug report submitted. Thank you!</value>
+  </data>
+  <data name="BugReport_Failed" xml:space="preserve">
+    <value>Failed to submit bug report.
+Contact Runeberry Software for further support.</value>
+  </data>
   <!-- About dialog -->
   <data name="About_Title" xml:space="preserve">
     <value>About</value>
@@ -678,5 +821,9 @@ Of course, we will never share this information with any third parties. (I don't
   </data>
   <data name="Controls_Copy_Tip" xml:space="preserve">
     <value>Copy</value>
+  </data>
+  <!-- Async operation dialog -->
+  <data name="AsyncOperation_Failure" xml:space="preserve">
+    <value>{0}: {1}</value>
   </data>
 </root>

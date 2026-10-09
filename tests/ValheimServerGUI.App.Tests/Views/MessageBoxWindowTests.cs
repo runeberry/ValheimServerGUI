@@ -4,6 +4,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Interactivity;
 using Avalonia.VisualTree;
 using ValheimServerGUI.App.Views.Dialogs;
+using ValheimServerGUI.Localization;
 using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
@@ -71,9 +72,9 @@ public class MessageBoxWindowTests
         var pending = DialogGuards.ConfirmSaveDiscardCancelAsync(owner);
         var box = Assert.IsType<MessageBoxWindow>(Assert.Single(owner.OwnedWindows));
         var captions = box.GetVisualDescendants().OfType<Button>().Select(b => (string?)b.Content).ToArray();
-        Assert.Equal(new[] { "Save Changes", "Discard Changes", "Cancel" }, captions);
+        Assert.Equal(new[] { Strings.Prompt_UnsavedChanges_Save, Strings.Prompt_UnsavedChanges_Discard, Strings.Common_Cancel }, captions);
 
-        ButtonNamed(box, "Discard Changes").RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+        ButtonNamed(box, Strings.Prompt_UnsavedChanges_Discard).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
         Assert.Equal(UnsavedChangesChoice.Discard, await pending);
     }
 }

@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ValheimServerGUI.App.ViewModels.Dialogs;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
@@ -27,7 +28,7 @@ public partial class DirectoriesWindow : DialogWindow
     {
         if (Vm.MissingPathDescription is { } missing)
         {
-            var proceed = await MessageBox.ConfirmAsync(this, "Path not found", $"{missing}\n\nSave anyway?");
+            var proceed = await MessageBox.ConfirmAsync(this, Strings.Prompt_PathNotFound_Title, string.Format(Strings.Prompt_PathNotFound_Message, missing));
             if (!proceed) return;
         }
 

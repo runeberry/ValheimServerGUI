@@ -5,6 +5,7 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Threading;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Views.Dialogs;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.Services;
@@ -40,8 +41,8 @@ internal sealed class DialogUserPrompt : IUserPrompt
         var owner = WindowLocator.ActiveWindow;
         var dialog = new MessageBoxWindow(title, message, new[]
         {
-            new MessageBoxButton("Yes", true, isDefault: true),
-            new MessageBoxButton("No", false, isCancel: true),
+            new MessageBoxButton(Strings.Common_Yes, true, isDefault: true),
+            new MessageBoxButton(Strings.Common_No, false, isCancel: true),
         });
 
         var frame = new DispatcherFrame();

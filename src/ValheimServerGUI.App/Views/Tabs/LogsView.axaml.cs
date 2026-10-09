@@ -6,6 +6,7 @@ using Avalonia.Markup.Xaml;
 using Avalonia.Platform.Storage;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views.Dialogs;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Views.Tabs;
 
@@ -45,7 +46,7 @@ public partial class LogsView : UserControl
 
         var file = await topLevel.StorageProvider.SaveFilePickerAsync(new FilePickerSaveOptions
         {
-            Title = "Save Logs",
+            Title = Strings.Logs_SaveDialog_Title,
             SuggestedFileName = $"{viewName}Logs.txt",
             DefaultExtension = "txt",
         });
@@ -59,7 +60,7 @@ public partial class LogsView : UserControl
     }
 
     private async void OnWarning(string message)
-        => await MessageBox.ShowAsync(GetWindow(), "Save Logs", message);
+        => await MessageBox.ShowAsync(GetWindow(), Strings.Logs_SaveDialog_Title, message);
 
     private Window GetWindow() => (Window)TopLevel.GetTopLevel(this)!;
 }

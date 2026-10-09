@@ -15,6 +15,7 @@ using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
 
@@ -124,7 +125,7 @@ public partial class App : Application
         try
         {
             decision = await CloseDecider.DecideAsync(
-                statuses, message => MessageBox.ConfirmAsync(window, "Warning", message));
+                statuses, message => MessageBox.ConfirmAsync(window, Strings.Prompt_Warning_Title, message));
         }
         finally
         {

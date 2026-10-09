@@ -5,6 +5,7 @@ using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views.Dialogs;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Views;
 
@@ -72,7 +73,7 @@ public partial class KnownCharactersView : UserControl
     private async Task AddCharacterAsync()
     {
         if (Vm is not { } vm || OwnerWindow is not { } owner) return;
-        var name = await new TextPromptWindow("Add Character", "Add a Valheim character name for this player:",
+        var name = await new TextPromptWindow(Strings.Prompt_AddCharacter_Title, Strings.Prompt_AddCharacter_Message,
             maxLength: 64).ShowDialog<string?>(owner);
         if (!string.IsNullOrWhiteSpace(name)) vm.AddCharacter(name);
     }
@@ -81,7 +82,7 @@ public partial class KnownCharactersView : UserControl
     {
         if (Vm is not { } vm || OwnerWindow is not { } owner) return;
         if (vm.SelectedCharacter?.CharacterName is not { } current) return;
-        var name = await new TextPromptWindow("Edit Character", $"Edit the name for character '{current}'",
+        var name = await new TextPromptWindow(Strings.Prompt_EditCharacter_Title, string.Format(Strings.Prompt_EditCharacter_Message, current),
             current, maxLength: 64).ShowDialog<string?>(owner);
         if (!string.IsNullOrWhiteSpace(name)) vm.RenameCharacter(current, name);
     }

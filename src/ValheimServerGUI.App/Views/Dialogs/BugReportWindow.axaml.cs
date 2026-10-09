@@ -1,6 +1,7 @@
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ValheimServerGUI.App.ViewModels.Dialogs;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
@@ -21,9 +22,9 @@ public partial class BugReportWindow : DialogWindow
     private async void OnSubmit(object? sender, RoutedEventArgs e)
     {
         var op = new AsyncOperationViewModel(
-            "Submitting bug report...",
-            "Bug report submitted. Thank you!",
-            "Failed to submit bug report.\nContact Runeberry Software for further support.");
+            Strings.BugReport_Submitting,
+            Strings.BugReport_Submitted,
+            Strings.BugReport_Failed);
         var dialog = new AsyncOperationWindow(op, Vm.SubmitAsync);
         await dialog.ShowDialog(this);
         Close();

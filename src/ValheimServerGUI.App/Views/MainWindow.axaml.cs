@@ -12,6 +12,7 @@ using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.Views;
@@ -36,11 +37,11 @@ public partial class MainWindow : Window
         // Closing the last window exits the app: App asks about running servers before this window goes away.
         Closing += (_, e) => App.Instance.OnMainWindowClosing(this, e);
         viewModel.CloudImportPrompt = ShowCloudImportAsync;
-        viewModel.ErrorReported = msg => _ = ShowMessageAsync("Error starting server", msg);
-        viewModel.UpdateResultPrompt = msg => MessageBox.ConfirmAsync(this, "Check for Updates", msg);
+        viewModel.ErrorReported = msg => _ = ShowMessageAsync(Strings.Prompt_ErrorStartingServer_Title, msg);
+        viewModel.UpdateResultPrompt = msg => MessageBox.ConfirmAsync(this, Strings.Prompt_CheckForUpdates_Title, msg);
         viewModel.StopTimedOutWarning += () =>
-            _ = ShowMessageAsync("Server force-stopped",
-                "The server did not shut down in time and was force-stopped. Recent world changes may not have been saved.");
+            _ = ShowMessageAsync(Strings.Prompt_ForceStopped_Title,
+                Strings.Prompt_ForceStopped_Message);
         viewModel.MenuActionRequested += a => _ = HandleMenuActionAsync(a);
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
         viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
@@ -49,12 +50,12 @@ public partial class MainWindow : Window
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
         viewModel.MessagePrompt = ShowMessageAsync;
         viewModel.ImportConfirmPrompt = body =>
-            MessageBox.ConfirmAsync(this, MainWindowViewModel.ImportDialogTitle, body, "Continue", "Cancel");
+            MessageBox.ConfirmAsync(this, MainWindowViewModel.ImportDialogTitle, body, Strings.Common_Continue, Strings.Common_Cancel);
         viewModel.ConflictPrompt = body => MessageBox.ChooseAsync<RoleConflictChoice>(
             this, MainWindowViewModel.RoleConflictTitle, body,
-            new MessageBoxButton("Use server profile", RoleConflictChoice.UseServerProfile, isDefault: true),
-            new MessageBoxButton("Use roles from file", RoleConflictChoice.UseRolesFromFile),
-            new MessageBoxButton("Cancel", RoleConflictChoice.Cancel, isCancel: true));
+            new MessageBoxButton(Strings.Prompt_RoleConflict_UseServerProfile, RoleConflictChoice.UseServerProfile, isDefault: true),
+            new MessageBoxButton(Strings.Prompt_RoleConflict_UseRolesFromFile, RoleConflictChoice.UseRolesFromFile),
+            new MessageBoxButton(Strings.Common_Cancel, RoleConflictChoice.Cancel, isCancel: true));
 
         Opened += OnOpened;
         SetUpTrayIcon();
@@ -137,11 +138,11 @@ public partial class MainWindow : Window
         if (!await ViewModel.ConfirmDiscardCurrentAsync()) return;
 
         var serverPrefs = Svc<IServerPreferencesProvider>();
-        var prefill = fromForm ? $"Copy of {ViewModel.CurrentProfile?.ProfileName}" : null;
-        var name = await new TextPromptWindow("Server Profile Name", "Enter a server profile name:",
+        var prefill = fromForm ? string.Format(Strings.Prompt_ProfileName_CopyOf, ViewModel.CurrentProfile?.ProfileName) : null;
+        var name = await new TextPromptWindow(Strings.Prompt_ProfileName_Title, Strings.Prompt_ProfileName_Message,
             prefill, maxLength: 30,
             validator: n => string.IsNullOrWhiteSpace(n) || n.Length > 30 || serverPrefs.LoadPreferences(n) is not null
-                ? "Profile name must be 1-30 characters, and must not match an existing profile name."
+                ? Strings.Prompt_ProfileName_Invalid
                 : null).ShowDialog<string?>(this);
 
         if (string.IsNullOrWhiteSpace(name)) return;
@@ -155,8 +156,8 @@ public partial class MainWindow : Window
 
     private async Task HandleRemoveProfileAsync(string profileName)
     {
-        var confirm = await MessageBox.ConfirmAsync(this, "Remove Profile",
-            $"Remove server profile '{profileName}'?");
+        var confirm = await MessageBox.ConfirmAsync(this, Strings.Prompt_RemoveProfile_Title,
+            string.Format(Strings.Prompt_RemoveProfile_Message, profileName));
         if (!confirm) return;
 
         Svc<IServerPreferencesProvider>().RemovePreferences(profileName);
@@ -169,9 +170,9 @@ public partial class MainWindow : Window
         if (string.IsNullOrWhiteSpace(worldName))
         {
             var message = ViewModel?.Form.UseNewWorld == true
-                ? "Please enter a new world name before changing modifier settings."
-                : "Unable to change modifier settings. No world is selected.";
-            await ShowMessageAsync("World Name Missing", message);
+                ? Strings.Prompt_WorldNameMissing_NewWorld
+                : Strings.Prompt_WorldNameMissing_NoWorld;
+            await ShowMessageAsync(Strings.Prompt_WorldNameMissing_Title, message);
             return;
         }
 
@@ -211,11 +212,8 @@ public partial class MainWindow : Window
         if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime) return;
         if (ViewModel?.GetMissingServerExeError() is not { } error) return;
 
-        var body = $"{error}\n\n" +
-            "This may occur if you do not have Valheim Dedicated Server installed, or if you have installed " +
-            "it in a different directory. See Help for more info.\n\n" +
-            "Would you like to change your directories now?";
-        if (await MessageBox.ConfirmAsync(this, "File Not Found", body))
+        var body = string.Format(Strings.Prompt_ServerExeNotFound_Message, error);
+        if (await MessageBox.ConfirmAsync(this, Strings.Prompt_ServerExeNotFound_Title, body))
             await HandleMenuActionAsync(MenuAction.SetDirectories);
     }
 
@@ -229,15 +227,11 @@ public partial class MainWindow : Window
 
     private Task<CloudImportChoice> ShowCloudImportAsync(string worldName)
     {
-        var message =
-            $"Host the cloud world '{worldName}'?\n\n" +
-            "This world is saved to Steam Cloud and must be brought into the server's local save folder to be hosted.\n\n" +
-            "Move: bring the world over and remove the Steam Cloud copy.\n" +
-            "Copy: bring a copy over and leave the Steam Cloud copy in place.";
-        return MessageBox.ChooseAsync<CloudImportChoice>(this, "Import cloud world", message,
-            new MessageBoxButton("Move", CloudImportChoice.Move),
-            new MessageBoxButton("Copy", CloudImportChoice.Copy, isDefault: true),
-            new MessageBoxButton("Cancel", CloudImportChoice.Cancel, isCancel: true));
+        var message = string.Format(Strings.Prompt_CloudImport_Message, worldName);
+        return MessageBox.ChooseAsync<CloudImportChoice>(this, Strings.Prompt_CloudImport_Title, message,
+            new MessageBoxButton(Strings.Prompt_CloudImport_Move, CloudImportChoice.Move),
+            new MessageBoxButton(Strings.Prompt_CloudImport_Copy, CloudImportChoice.Copy, isDefault: true),
+            new MessageBoxButton(Strings.Common_Cancel, CloudImportChoice.Cancel, isCancel: true));
     }
 
     private Task ShowMessageAsync(string title, string message)
@@ -256,7 +250,7 @@ public partial class MainWindow : Window
     // Tray header + tooltip wording (WinForms parity): compact "ValheimServerGUI" tooltip, "Profile: {name}"
     // header, distinct from the window title.
     private static string TrayHeader(MainWindowViewModel vm)
-        => vm.CurrentProfile is { } p ? $"Profile: {p.ProfileName}" : "No Profile Selected";
+        => vm.CurrentProfile is { } p ? string.Format(Strings.Tray_Profile, p.ProfileName) : Strings.Tray_NoProfile;
 
     private static string TrayTooltip(MainWindowViewModel vm)
         => vm.CurrentProfile is { } p ? $"ValheimServerGUI - {p.ProfileName}" : "ValheimServerGUI";
@@ -279,11 +273,11 @@ public partial class MainWindow : Window
             // Restore the WinForms control icons (header + Close stay icon-less). NativeMenuItem.Icon is a
             // Bitmap, which AppIcons.Get already returns; native disabled rendering is the OS's, so no
             // grayscale hook here.
-            menu.Add(new NativeMenuItem { Header = "Start Server", Command = ViewModel.StartCommand, Icon = AppIcons.Get("Run_16x") });
-            menu.Add(new NativeMenuItem { Header = "Restart Server", Command = ViewModel.RestartCommand, Icon = AppIcons.Get("Restart_16x") });
-            menu.Add(new NativeMenuItem { Header = "Stop Server", Command = ViewModel.StopCommand, Icon = AppIcons.Get("Stop_16x") });
+            menu.Add(new NativeMenuItem { Header = Strings.ServerAction_Start, Command = ViewModel.StartCommand, Icon = AppIcons.Get("Run_16x") });
+            menu.Add(new NativeMenuItem { Header = Strings.ServerAction_Restart, Command = ViewModel.RestartCommand, Icon = AppIcons.Get("Restart_16x") });
+            menu.Add(new NativeMenuItem { Header = Strings.ServerAction_Stop, Command = ViewModel.StopCommand, Icon = AppIcons.Get("Stop_16x") });
             menu.Add(new NativeMenuItemSeparator());
-            menu.Add(new NativeMenuItem { Header = "Close", Command = ViewModel.CloseCommand });
+            menu.Add(new NativeMenuItem { Header = Strings.Common_Close, Command = ViewModel.CloseCommand });
 
             _trayIcon = new TrayIcon
             {

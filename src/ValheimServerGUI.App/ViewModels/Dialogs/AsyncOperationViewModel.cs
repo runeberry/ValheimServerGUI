@@ -1,6 +1,7 @@
 using System;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
@@ -42,7 +43,7 @@ public partial class AsyncOperationViewModel : ObservableObject
         catch (Exception ex)
         {
             State = OpState.Failure;
-            Message = $"{_failureMessage}: {ex.Message}";
+            Message = string.Format(Strings.AsyncOperation_Failure, _failureMessage, ex.Message);
         }
     }
 }

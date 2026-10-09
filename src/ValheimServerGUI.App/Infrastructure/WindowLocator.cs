@@ -24,4 +24,19 @@ internal static class WindowLocator
                    ?? desktop.Windows.FirstOrDefault();
         }
     }
+
+    /// <summary>
+    /// The app window a dialog that has no owner should appear over: the active window other than the dialog itself,
+    /// else the main window, else any other open window; null when it is the only window.
+    /// </summary>
+    public static Window? AnchorFor(Window dialog)
+    {
+        if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop)
+            return null;
+
+        var others = desktop.Windows.Where(w => w != dialog && w.IsVisible).ToList();
+        return others.FirstOrDefault(w => w.IsActive)
+               ?? (desktop.MainWindow is { } main && main != dialog && main.IsVisible ? main : null)
+               ?? others.FirstOrDefault();
+    }
 }

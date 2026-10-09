@@ -1,6 +1,6 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Avalonia;
 using Avalonia.Controls;
@@ -13,6 +13,7 @@ using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Startup;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views;
+using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
@@ -64,52 +65,86 @@ public partial class App : Application
     }
 
     private bool _shutdownApproved;
+    private bool _exitPromptOpen;
 
-    // §2.4 "safe shutdowns", now aggregated over every running server. On the first request, decide via
-    // CloseDecider; if servers are running, cancel, stop them all with the graceful save-flush (blocking off
-    // the UI thread until each reports Stopped), then re-trigger — the second pass is pre-approved.
+    // §2.4 "safe shutdowns", aggregated over every running server. Two entry points:
+    //
+    // 1. OnMainWindowClosing — the user closes the last main window (title-bar X, tray Close). The question is asked
+    //    HERE, while the window still exists: the close is cancelled, the prompt is owned by (and centered on) that
+    //    window, and Yes stops every server before exiting while No simply leaves the window open.
+    // 2. OnShutdownRequested — Avalonia's app-level shutdown. On a window close it only fires AFTER the last window has
+    //    been destroyed, so it must never prompt: with no window left, a prompt has no owner, and closing that prompt
+    //    is itself "the last window closed", which re-raises this event (an endless prompt loop). It only flushes
+    //    saves: an OS shutdown / logoff, or any exit that bypassed the window prompt, stops servers gracefully first.
     private void OnShutdownRequested(object? sender, ShutdownRequestedEventArgs e)
     {
         if (_shutdownApproved) return;
         if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
 
         var manager = Services.GetRequiredService<IServerManager>();
-        var prompt = Services.GetRequiredService<IUserPrompt>();
-        var statuses = manager.All.Select(s => s.Status).ToList();
-
-        switch (CloseDecider.Decide(statuses, IsOsShutdown(e), prompt, "Warning"))
+        if (manager.All.All(s => s.Status == ServerStatus.Stopped))
         {
-            case CloseDecision.Proceed:
-                Services.GetRequiredService<IApplicationLogger>().Information("Shutting down application");
-                manager.StopAllAndDispose(); // all Stopped already → returns immediately
-                _shutdownApproved = true;
-                return;
+            Services.GetRequiredService<IApplicationLogger>().Information("Shutting down application");
+            manager.StopAllAndDispose(); // all Stopped already → returns immediately
+            _shutdownApproved = true;
+            return;
+        }
 
+        e.Cancel = true;
+        _ = StopAllThenShutdownAsync(desktop, manager);
+    }
+
+    /// <summary>
+    /// Called from a main window's <see cref="Window.Closing"/>. When it is the last main window and a server is still
+    /// running or stopping, cancels the close and asks what to do (see <see cref="OnShutdownRequested"/>).
+    /// </summary>
+    internal void OnMainWindowClosing(Window window, WindowClosingEventArgs e)
+    {
+        if (_shutdownApproved) return;
+        if (e.CloseReason is WindowCloseReason.ApplicationShutdown or WindowCloseReason.OSShutdown) return;
+        if (ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime desktop) return;
+
+        // Another main window stays open: closing this one doesn't exit the app, and servers outlive windows.
+        if (desktop.Windows.OfType<MainWindow>().Any(w => w != window)) return;
+
+        var manager = Services.GetRequiredService<IServerManager>();
+        var statuses = manager.All.Select(s => s.Status).ToList();
+        if (statuses.All(s => s == ServerStatus.Stopped)) return; // nothing to flush: close normally
+
+        e.Cancel = true;
+        if (_exitPromptOpen) return; // a second close click while the prompt is already up
+        _ = ConfirmExitAsync(window, desktop, manager, statuses);
+    }
+
+    private async Task ConfirmExitAsync(
+        Window window, IClassicDesktopStyleApplicationLifetime desktop, IServerManager manager, IReadOnlyCollection<ServerStatus> statuses)
+    {
+        _exitPromptOpen = true;
+        CloseDecision decision;
+        try
+        {
+            decision = await CloseDecider.DecideAsync(
+                statuses, message => MessageBox.ConfirmAsync(window, "Warning", message));
+        }
+        finally
+        {
+            _exitPromptOpen = false;
+        }
+
+        switch (decision)
+        {
             case CloseDecision.Cancel:
-                e.Cancel = true;
+                return; // the close was cancelled; the window stays open
+
+            case CloseDecision.Proceed: // "exit anyway" while a server is still shutting down
+                Services.GetRequiredService<IApplicationLogger>().Information("Shutting down application");
+                _shutdownApproved = true;
+                desktop.Shutdown();
                 return;
 
             case CloseDecision.StopThenClose:
-                e.Cancel = true;
-                _ = StopAllThenShutdownAsync(desktop, manager);
+                await StopAllThenShutdownAsync(desktop, manager);
                 return;
-        }
-    }
-
-    // ShutdownRequestedEventArgs.IsOSShutdown is internal in Avalonia 12.1, so read it reflectively: on an OS
-    // shutdown / logoff we flush saves silently rather than popping a modal nobody can answer. Any failure
-    // falls back to false → the normal prompt path, which is the safe default.
-    private static bool IsOsShutdown(ShutdownRequestedEventArgs e)
-    {
-        try
-        {
-            var prop = e.GetType().GetProperty(
-                "IsOSShutdown", BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
-            return prop?.GetValue(e) is true;
-        }
-        catch
-        {
-            return false;
         }
     }
 

@@ -33,6 +33,8 @@ public partial class MainWindow : Window
 
         viewModel.NewWindowRequested += OnNewWindowRequested;
         viewModel.CloseRequested += Close;
+        // Closing the last window exits the app: App asks about running servers before this window goes away.
+        Closing += (_, e) => App.Instance.OnMainWindowClosing(this, e);
         viewModel.CloudImportPrompt = ShowCloudImportAsync;
         viewModel.ErrorReported = msg => _ = ShowMessageAsync("Error starting server", msg);
         viewModel.UpdateResultPrompt = msg => MessageBox.ConfirmAsync(this, "Check for Updates", msg);
@@ -247,9 +249,9 @@ public partial class MainWindow : Window
     private void OnNewWindowRequested()
         => App.Instance.Services.GetRequiredService<ShellCoordinator>().OpenNewWindow();
 
-    // A per-window close never stops the server — servers are shared app-wide and outlive their windows
-    // (WindowManager disposes this window's view-model on Closed, which only unsubscribes it). The graceful
-    // save-flush now happens once, at app shutdown (App.OnShutdownRequested), over every running server.
+    // Closing one of several windows never stops a server — servers are shared app-wide and outlive their windows
+    // (WindowManager disposes this window's view-model on Closed, which only unsubscribes it). Closing the LAST
+    // window exits the app, so App.OnMainWindowClosing asks about running servers first (see App.OnShutdownRequested).
 
     // Tray header + tooltip wording (WinForms parity): compact "ValheimServerGUI" tooltip, "Profile: {name}"
     // header, distinct from the window title.

@@ -2,6 +2,7 @@ using System;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Threading;
+using ValheimServerGUI.App.Infrastructure;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
@@ -9,7 +10,9 @@ namespace ValheimServerGUI.App.Views.Dialogs;
 /// Shared base for the app's modal dialogs. Its one job is reliable owner-centering: Avalonia's
 /// <see cref="WindowStartupLocation.CenterOwner"/> computes the position before a
 /// <c>SizeToContent="WidthAndHeight"</c> window has been measured, so the dialog lands offset by half its own
-/// size. Every dialog sizes to content, so they all re-center here once the real size is known.
+/// size. Every dialog sizes to content, so they all re-center here once the real size is known. A dialog shown
+/// without an owner centers over the app's active window instead of the screen, so it never opens on a monitor
+/// away from the app.
 /// </summary>
 public class DialogWindow : Window
 {
@@ -28,7 +31,7 @@ public class DialogWindow : Window
     private void CenterOverOwner()
     {
         if (WindowStartupLocation != WindowStartupLocation.CenterOwner) return;
-        if (Owner is not Window owner) return;
+        if ((Owner as Window ?? WindowLocator.AnchorFor(this)) is not { } owner) return;
 
         // Positions are in physical pixels; sizes are in DIPs — convert with the (shared-screen) owner scaling.
         var scaling = owner.RenderScaling;

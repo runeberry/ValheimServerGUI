@@ -1,7 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using ValheimServerGUI.Game;
-using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.Infrastructure;
 
@@ -19,15 +20,22 @@ public enum CloseDecision
 }
 
 /// <summary>
-/// Pure port of the v2.4 "safe shutdowns" logic (§2.4), now an <em>aggregate</em> over every running server:
-/// servers are shared app-wide and outlive individual windows, so the save-flush guard applies at app
-/// shutdown, not per-window close. Side-effect-free (the caller performs the actual Stop / Shutdown) so every
-/// branch is unit-testable with a recording <see cref="IUserPrompt"/>.
+/// The user's exit decision when they close the last window (§2.4 "safe shutdowns"; an OS shutdown never asks, see
+/// <c>App.OnShutdownRequested</c>), as an <em>aggregate</em> over every running server:
+/// servers are shared app-wide and outlive individual windows, so the save-flush guard applies when the app exits,
+/// not per-window close. Side-effect-free (the caller performs the actual Stop / Shutdown) so every branch is
+/// unit-testable with a recording confirm.
 /// </summary>
 public static class CloseDecider
 {
-    public static CloseDecision Decide(
-        IReadOnlyCollection<ServerStatus> statuses, bool isOsShutdown, IUserPrompt prompt, string title)
+    public const string RunningMessage = "A Valheim server is still running. Do you want to stop it and exit?";
+
+    public const string StoppingMessage =
+        "A Valheim server is currently shutting down. Exit anyway?\nThis could result in a loss of save data!";
+
+    /// <param name="confirm">Asks the user a yes/no question; true means yes.</param>
+    public static async Task<CloseDecision> DecideAsync(
+        IReadOnlyCollection<ServerStatus> statuses, Func<string, Task<bool>> confirm)
     {
         var anyActive = statuses.Any(s => s is ServerStatus.Starting or ServerStatus.Running);
         var anyStopping = statuses.Any(s => s == ServerStatus.Stopping);
@@ -36,23 +44,10 @@ public static class CloseDecider
         if (!anyActive && !anyStopping)
             return CloseDecision.Proceed;
 
-        // OS shutdown / logoff: never prompt — flush the saves by stopping gracefully, then let it proceed.
-        if (isOsShutdown)
-            return CloseDecision.StopThenClose;
-
         if (anyActive)
-        {
-            return prompt.Confirm(
-                "A Valheim server is still running. Do you want to stop it and exit?", title)
-                ? CloseDecision.StopThenClose
-                : CloseDecision.Cancel;
-        }
+            return await confirm(RunningMessage) ? CloseDecision.StopThenClose : CloseDecision.Cancel;
 
         // Only server(s) mid-shutdown remain.
-        return prompt.Confirm(
-            "A Valheim server is currently shutting down. Exit anyway?\n" +
-            "This could result in a loss of save data!", title)
-            ? CloseDecision.Proceed
-            : CloseDecision.Cancel;
+        return await confirm(StoppingMessage) ? CloseDecision.Proceed : CloseDecision.Cancel;
     }
 }

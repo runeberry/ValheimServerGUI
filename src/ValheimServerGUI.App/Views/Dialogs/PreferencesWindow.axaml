@@ -12,7 +12,7 @@
         <c:CheckBoxFormField LabelText="Automatically check for updates" Value="{Binding CheckForUpdates}"
                              HelpText="If enabled, ValheimServerGUI will check for updates automatically when the app starts up, and again every 24 hours.&#10;&#10;If disabled, you can check for updates anytime from Help &gt; Check for updates." />
         <c:CheckBoxFormField LabelText="Start with the operating system" Value="{Binding StartWithWindows}"
-                             HelpText="To start your server(s) on system startup, enable this setting along with &quot;Start this server when ValheimServerGUI starts&quot; under Advanced Controls for each server." />
+                             HelpText="To start your server(s) on system startup, enable this setting along with &quot;Start this server with ValheimServerGUI&quot; under Advanced Controls for each server." />
         <c:CheckBoxFormField LabelText="Start ValheimServerGUI minimized" Value="{Binding StartMinimized}"
                              HelpText="Enable this setting to minimize VSG to the system tray when it starts up." />
         <c:CheckBoxFormField LabelText="Auto save profile when starting server" Value="{Binding SaveProfileOnStart}"

@@ -23,7 +23,7 @@
 
                 <c:GroupBox Header="Other Settings">
                     <StackPanel Spacing="4">
-                        <c:CheckBoxFormField LabelText="Start this server when ValheimServerGUI starts"
+                        <c:CheckBoxFormField LabelText="Start this server with ValheimServerGUI"
                                              HelpText="Automatically start up this server when you open ValheimServerGUI. If you want to restart your server whenever you restart your computer, enable this setting, along with the corresponding setting under File &gt; Preferences."
                                              Value="{Binding Form.AutoStart}" IsEnabled="{Binding AllowServerChanges}" />
                         <c:CheckBoxFormField LabelText="Write server logs to file"

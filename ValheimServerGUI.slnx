@@ -6,5 +6,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/ValheimServerGUI.App.Tests/ValheimServerGUI.App.Tests.csproj" />
     <Project Path="tests/ValheimServerGUI.Core.Tests/ValheimServerGUI.Core.Tests.csproj" />
+    <Project Path="tests/ValheimServerGUI.Integration.Tests/ValheimServerGUI.Integration.Tests.csproj" />
   </Folder>
 </Solution>

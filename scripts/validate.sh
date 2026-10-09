@@ -106,7 +106,7 @@ if [[ $RUN_TEST -eq 1 && "$build_status" != "fail" ]]; then
       >"$TEST_LOG" 2>&1
   test_code=$?
 
-  grep -E 'Passed!|Failed!' "$TEST_LOG"
+  grep -E 'Passed!|Failed!|Skipped!' "$TEST_LOG"
   if [[ $test_code -eq 0 ]]; then
     ok "all tests passed"
     test_status="pass"

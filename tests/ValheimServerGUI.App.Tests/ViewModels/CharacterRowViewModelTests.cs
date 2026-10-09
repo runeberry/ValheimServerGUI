@@ -2,6 +2,7 @@ using System;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
 using Xunit;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Tests.ViewModels;
 
@@ -21,7 +22,7 @@ public class CharacterRowViewModelTests
         row.Refresh(Player(PlayerStatus.Online, "Odin"), new DateTimeOffset(2026, 9, 15, 12, 5, 0, TimeSpan.Zero));
 
         Assert.Equal(PlayerStatus.Online, row.Status);
-        Assert.Equal("5 minutes ago", row.SinceText);
+        Assert.Equal(string.Format(Strings.RelativeTime_Past, string.Format(Strings.RelativeTime_Minutes_Other, 5)), row.SinceText);
     }
 
     [Fact]

@@ -3,6 +3,7 @@ using System.Globalization;
 using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools.Models;
 using Xunit;
 
@@ -13,18 +14,20 @@ public class ConverterTests
     private static readonly DateTimeOffset Now = new(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
 
     [Theory]
-    [InlineData(0, "just now")]
-    [InlineData(5, "just now")]
-    [InlineData(30, "30 seconds ago")]
-    [InlineData(60, "1 minute ago")]
-    [InlineData(120, "2 minutes ago")]
-    [InlineData(3600, "1 hour ago")]
-    [InlineData(7200, "2 hours ago")]
-    [InlineData(86400, "1 day ago")]
-    [InlineData(172800, "2 days ago")]
-    public void RelativeTime_past(int secondsAgo, string expected)
+    [InlineData(0, nameof(Strings.RelativeTime_JustNow), null)]
+    [InlineData(5, nameof(Strings.RelativeTime_JustNow), null)]
+    [InlineData(30, nameof(Strings.RelativeTime_Seconds_Other), 30)]
+    [InlineData(60, nameof(Strings.RelativeTime_Minutes_One), null)]
+    [InlineData(120, nameof(Strings.RelativeTime_Minutes_Other), 2)]
+    [InlineData(3600, nameof(Strings.RelativeTime_Hours_One), null)]
+    [InlineData(7200, nameof(Strings.RelativeTime_Hours_Other), 2)]
+    [InlineData(86400, nameof(Strings.RelativeTime_Days_One), null)]
+    [InlineData(172800, nameof(Strings.RelativeTime_Days_Other), 2)]
+    public void RelativeTime_past(int secondsAgo, string unitKey, int? count)
     {
         var when = Now - TimeSpan.FromSeconds(secondsAgo);
+        var unit = string.Format(Strings.ResourceManager.GetString(unitKey)!, count);
+        var expected = unitKey == nameof(Strings.RelativeTime_JustNow) ? unit : string.Format(Strings.RelativeTime_Past, unit);
         Assert.Equal(expected, RelativeTimeConverter.Format(when, Now));
     }
 
@@ -32,7 +35,8 @@ public class ConverterTests
     public void RelativeTime_future_uses_in_prefix()
     {
         var when = Now + TimeSpan.FromMinutes(5);
-        Assert.Equal("in 5 minutes", RelativeTimeConverter.Format(when, Now));
+        Assert.Equal(string.Format(Strings.RelativeTime_Future, string.Format(Strings.RelativeTime_Minutes_Other, 5)),
+            RelativeTimeConverter.Format(when, Now));
     }
 
     [Fact]
@@ -40,7 +44,7 @@ public class ConverterTests
     {
         var conv = new RelativeTimeConverter { NowProvider = () => Now };
         var result = conv.Convert(Now - TimeSpan.FromMinutes(3), typeof(string), null, CultureInfo.InvariantCulture);
-        Assert.Equal("3 minutes ago", result);
+        Assert.Equal(string.Format(Strings.RelativeTime_Past, string.Format(Strings.RelativeTime_Minutes_Other, 3)), result);
     }
 
     [Theory]

@@ -1223,4 +1223,38 @@ Please shut down any UDP applications using these ports, or choose a different p
 
 See application logs for more details.</value>
   </data>
+  <!-- Relative time -->
+  <data name="RelativeTime_JustNow" xml:space="preserve">
+    <value>just now</value>
+  </data>
+  <data name="RelativeTime_Seconds_One" xml:space="preserve">
+    <value>1 second</value>
+  </data>
+  <data name="RelativeTime_Seconds_Other" xml:space="preserve">
+    <value>{0} seconds</value>
+  </data>
+  <data name="RelativeTime_Minutes_One" xml:space="preserve">
+    <value>1 minute</value>
+  </data>
+  <data name="RelativeTime_Minutes_Other" xml:space="preserve">
+    <value>{0} minutes</value>
+  </data>
+  <data name="RelativeTime_Hours_One" xml:space="preserve">
+    <value>1 hour</value>
+  </data>
+  <data name="RelativeTime_Hours_Other" xml:space="preserve">
+    <value>{0} hours</value>
+  </data>
+  <data name="RelativeTime_Days_One" xml:space="preserve">
+    <value>1 day</value>
+  </data>
+  <data name="RelativeTime_Days_Other" xml:space="preserve">
+    <value>{0} days</value>
+  </data>
+  <data name="RelativeTime_Past" xml:space="preserve">
+    <value>{0} ago</value>
+  </data>
+  <data name="RelativeTime_Future" xml:space="preserve">
+    <value>in {0}</value>
+  </data>
 </root>

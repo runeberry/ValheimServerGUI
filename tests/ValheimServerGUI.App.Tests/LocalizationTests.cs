@@ -65,6 +65,40 @@ public class LocalizationTests
         });
     }
 
+    // XAML attributes that carry user-facing text.
+    private static readonly HashSet<string> TextAttributes = new()
+    {
+        "Header", "LabelText", "HelpText", "ToolTip.Tip", "Content", "Text", "Title", "Watermark", "PlaceholderText",
+        "EmptyText",
+    };
+
+    // Literal values that are not copy: the help glyph and brand names.
+    private static readonly HashSet<string> AllowedLiterals = new() { "?", "GitHub", "Discord", "Valheim Server GUI" };
+
+    private static readonly Regex LiteralStringFormat = new(@"StringFormat\s*=\s*'?[^{'\s]");
+
+    [Fact]
+    public void Xaml_has_no_literal_copy()
+    {
+        var files = Directory.GetFiles(Path.Combine(RepoRoot(), "src"), "*.axaml", SearchOption.AllDirectories);
+        Assert.NotEmpty(files);
+
+        var literals = new List<string>();
+        foreach (var file in files)
+        {
+            foreach (var attribute in XDocument.Load(file).Descendants().SelectMany(e => e.Attributes()))
+            {
+                var value = attribute.Value;
+                var isLiteralText = TextAttributes.Contains(attribute.Name.LocalName)
+                    && value.Length > 0 && !value.StartsWith('{') && !AllowedLiterals.Contains(value);
+                if (isLiteralText || LiteralStringFormat.IsMatch(value))
+                    literals.Add($"{Path.GetFileName(file)}: {attribute.Name.LocalName}=\"{value}\"");
+            }
+        }
+
+        Assert.Empty(literals); // move the text to Strings.resx and bind {x:Static loc:Strings.Key}
+    }
+
     private static void WithUiCulture(string name, Action body)
     {
         var previous = CultureInfo.CurrentUICulture;

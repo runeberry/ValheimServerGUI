@@ -729,42 +729,17 @@
   <data name="ManagePlayers_NoKnownCharacters" xml:space="preserve">
     <value>⟦ManagePlayers_NoKnownCharacters⟧</value>
   </data>
-  <!-- Player Details dialog -->
-  <data name="PlayerDetails_Title" xml:space="preserve">
-    <value>⟦PlayerDetails_Title⟧</value>
+  <data name="ManagePlayers_Menu_EditName" xml:space="preserve">
+    <value>⟦ManagePlayers_Menu_EditName⟧</value>
   </data>
-  <data name="PlayerDetails_Name_Label" xml:space="preserve">
-    <value>⟦PlayerDetails_Name_Label⟧</value>
+  <data name="ManagePlayers_Menu_CopyId" xml:space="preserve">
+    <value>⟦ManagePlayers_Menu_CopyId⟧</value>
   </data>
-  <data name="PlayerDetails_Name_Help" xml:space="preserve">
-    <value>⟦PlayerDetails_Name_Help⟧</value>
+  <data name="ManagePlayers_EditName_Tip" xml:space="preserve">
+    <value>⟦ManagePlayers_EditName_Tip⟧</value>
   </data>
-  <data name="PlayerDetails_EditName_Tip" xml:space="preserve">
-    <value>⟦PlayerDetails_EditName_Tip⟧</value>
-  </data>
-  <data name="PlayerDetails_PlatformId_Help" xml:space="preserve">
-    <value>⟦PlayerDetails_PlatformId_Help⟧</value>
-  </data>
-  <data name="PlayerDetails_CopyId_Tip" xml:space="preserve">
-    <value>⟦PlayerDetails_CopyId_Tip⟧</value>
-  </data>
-  <data name="PlayerDetails_ZdoId_Label" xml:space="preserve">
-    <value>⟦PlayerDetails_ZdoId_Label⟧</value>
-  </data>
-  <data name="PlayerDetails_ZdoId_Help" xml:space="preserve">
-    <value>⟦PlayerDetails_ZdoId_Help⟧</value>
-  </data>
-  <data name="PlayerDetails_Refresh_Tip" xml:space="preserve">
-    <value>⟦PlayerDetails_Refresh_Tip⟧</value>
-  </data>
-  <data name="PlayerDetails_UnknownName" xml:space="preserve">
-    <value>⟦PlayerDetails_UnknownName⟧</value>
-  </data>
-  <data name="PlayerDetails_XboxId_Label" xml:space="preserve">
-    <value>⟦PlayerDetails_XboxId_Label⟧</value>
-  </data>
-  <data name="PlayerDetails_SteamId_Label" xml:space="preserve">
-    <value>⟦PlayerDetails_SteamId_Label⟧</value>
+  <data name="ManagePlayers_CopyId_Tip" xml:space="preserve">
+    <value>⟦ManagePlayers_CopyId_Tip⟧</value>
   </data>
   <!-- Add Player dialog -->
   <data name="AddPlayer_Title" xml:space="preserve">

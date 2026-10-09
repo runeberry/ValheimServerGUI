@@ -136,7 +136,7 @@ public partial class PlayersViewModel : ViewModelBase
         OnPropertyChanged(nameof(ServerRoleDefaultLabel));
     }
 
-    /// <summary>Raised for View Player Details.</summary>
+    /// <summary>Raised for View Player Details (opens Manage Players focused on the player).</summary>
     public event Action<PlayerInfo>? ViewDetailsRequested;
 
     /// <summary>Raised for Manage Players (the app-global player lists).</summary>

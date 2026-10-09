@@ -8,21 +8,25 @@
              x:Class="ValheimServerGUI.App.Views.Dialogs.PlayerListSectionView"
              x:DataType="vm:PlayerListSectionViewModel">
 
-    <!-- One Manage Players tab (Player Accounts / Banned). The accounts table fills whatever the Known Characters
-         table (absent on Banned) leaves, so both tabs are the same height and the window never resizes. -->
+    <!-- One Manage Players tab (Player Accounts / Banned): the accounts table, with the selected account's Known
+         Characters below it. -->
     <DockPanel Margin="8">
-        <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0" IsVisible="{Binding HasKnownCharacters}">
-            <TextBlock Text="{x:Static loc:Strings.KnownCharacters_Header}" FontWeight="SemiBold" />
+        <StackPanel DockPanel.Dock="Bottom" Spacing="6" Margin="0,8,0,0">
+            <StackPanel Orientation="Horizontal" Spacing="4">
+                <TextBlock Text="{x:Static loc:Strings.KnownCharacters_Header}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                <c:HelpLabel HelpText="{x:Static loc:Strings.KnownCharacters_Help}" />
+            </StackPanel>
             <v:KnownCharactersView DataContext="{Binding KnownCharacters}" Height="120" />
         </StackPanel>
 
         <c:DataListView x:Name="AccountsList" ItemsSource="{Binding Accounts}"
                         SelectedItem="{Binding SelectedAccount}"
                         EmptyText="{Binding AccountsEmptyText}"
-                        RowInvokeCommand="{Binding ViewDetailsCommand}">
+                        RowInvokeCommand="{Binding EditNameCommand}">
             <c:DataListView.RowContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_ViewDetails}" Command="{Binding ViewDetailsCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.ManagePlayers_Menu_EditName}" Command="{Binding EditNameCommand}" />
+                    <MenuItem x:Name="CopyIdMenuItem" Header="{x:Static loc:Strings.ManagePlayers_Menu_CopyId}" />
                     <!-- Radio items read/write the selected row's default role (see PlayerListSectionViewModel). -->
                     <MenuItem Header="{x:Static loc:Strings.ManagePlayers_Menu_SetDefaultRole}">
                         <MenuItem Header="{x:Static loc:Strings.Role_Admin}" ToggleType="Radio" GroupName="DefaultRole"
@@ -79,8 +83,11 @@
                 </DataGridTemplateColumn>
             </c:DataListView.Columns>
             <c:DataListView.FooterLeft>
-                <c:IconButton IconName="User_16x" ToolTip.Tip="{x:Static loc:Strings.Players_ViewDetails_Tip}"
-                              Command="{Binding ViewDetailsCommand}" />
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <c:EditButton ToolTip.Tip="{x:Static loc:Strings.ManagePlayers_EditName_Tip}" Command="{Binding EditNameCommand}" />
+                    <c:CopyButton Text="{Binding SelectedAccount.PlatformId}" IsEnabled="{Binding HasSelection}"
+                                  ToolTip.Tip="{x:Static loc:Strings.ManagePlayers_CopyId_Tip}" />
+                </StackPanel>
             </c:DataListView.FooterLeft>
             <c:DataListView.FooterRight>
                 <StackPanel Orientation="Horizontal" Spacing="4">

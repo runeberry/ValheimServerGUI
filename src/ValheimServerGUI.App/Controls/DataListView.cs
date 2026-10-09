@@ -8,17 +8,19 @@ using Avalonia.Controls.Primitives;
 using Avalonia.Data;
 using Avalonia.Input;
 using Avalonia.Interactivity;
+using Avalonia.Threading;
 using Avalonia.VisualTree;
 
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
 /// The app's one shared data table (the WinForms <c>DataListView</c> equivalent), used by both the Players
-/// grid and the Player Details name list. It wraps a <see cref="DataGrid"/> carrying the shared styling —
+/// grid and the Known Characters table. It wraps a <see cref="DataGrid"/> carrying the shared styling —
 /// LayerBase background, dark header, no gridlines, read-only / no-column-reorder defaults, a 1px frame —
 /// and adds an optional compact <b>footer</b> hosting action controls (icon buttons) anchored left and/or
 /// right. It also offers row interactions: <see cref="RowInvokeCommand"/> on double-click and a
-/// <see cref="RowContextMenu"/> on right-click. The consumer declares its columns via
+/// <see cref="RowContextMenu"/> on right-click. A selection set from code is scrolled into view (the inner grid
+/// only does that for clicks and keyboard navigation). The consumer declares its columns via
 /// <c>&lt;DataListView.Columns&gt;</c> and its footer via <see cref="FooterLeft"/>/<see cref="FooterRight"/>;
 /// the ViewModel owns the data (<see cref="ItemsSource"/>/<see cref="SelectedItem"/>). Any row styling the
 /// consumer sets through <c>&lt;DataListView.Styles&gt;</c> still cascades to the inner grid's rows.
@@ -161,6 +163,18 @@ public class DataListView : TemplatedControl
         _grid.DoubleTapped += OnGridDoubleTapped;
         _grid.AddHandler(ContextRequestedEvent, OnGridContextRequested, RoutingStrategies.Tunnel);
         if (RowContextMenu is { } menu) _grid.ContextMenu = menu;
+
+        ScrollSelectedIntoView();
+    }
+
+    // Deferred to after layout, so it also works for a selection made before the grid was first shown.
+    private void ScrollSelectedIntoView()
+    {
+        if (_grid is null || SelectedItem is null) return;
+        Dispatcher.UIThread.Post(() =>
+        {
+            if (_grid is { } grid && SelectedItem is { } item) grid.ScrollIntoView(item, null);
+        }, DispatcherPriority.Loaded);
     }
 
     private void OnGridDoubleTapped(object? sender, TappedEventArgs e)
@@ -193,6 +207,8 @@ public class DataListView : TemplatedControl
             HasFooter = FooterLeft is not null || FooterRight is not null;
         else if (change.Property == RowContextMenuProperty && _grid is not null)
             _grid.ContextMenu = RowContextMenu;
+        else if (change.Property == SelectedItemProperty)
+            ScrollSelectedIntoView();
     }
 
     private void OnColumnsChanged(object? sender, NotifyCollectionChangedEventArgs e)

@@ -1,21 +1,17 @@
-using System;
-using System.Threading.Tasks;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
 using ValheimServerGUI.App.ViewModels.Dialogs;
-using ValheimServerGUI.Game;
-using ValheimServerGUI.Tools;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>
-/// Manage Players: every known player's app-global default role, on a Player Accounts tab and a Banned tab. Save commits the staged defaults and
-/// player records; Cancel (or closing without saving) discards them, guarded by the shared unsaved-changes prompt.
+/// Manage Players: every known player's app-global default role, on a Player Accounts tab and a Banned tab, with
+/// each account's name and Known Characters. Save commits the staged defaults and player records; Cancel (or
+/// closing without saving) discards them, guarded by the shared unsaved-changes prompt.
 /// </summary>
 public partial class ManagePlayersWindow : DialogWindow
 {
-    private readonly IPlayerDataRepository? _repo;
-    private readonly IRuneberryApiClient? _api;
     private bool _confirmedClose;
 
     // Parameterless ctor for the Avalonia runtime loader / designer; the real entry point is the overload below.
@@ -25,28 +21,17 @@ public partial class ManagePlayersWindow : DialogWindow
         Closing += OnClosingGuard;
     }
 
-    public ManagePlayersWindow(ManagePlayersViewModel viewModel, IPlayerDataRepository repo, IRuneberryApiClient? api)
-        : this()
+    public ManagePlayersWindow(ManagePlayersViewModel viewModel) : this()
     {
-        _repo = repo;
-        _api = api;
         DataContext = viewModel;
 
         viewModel.AddPlayerPrompt = options => new AddPlayerWindow(options).ShowDialog<AddPlayerResult?>(this);
-        viewModel.DetailsRequested += key => _ = ShowDetailsAsync(key);
+        viewModel.EditNamePrompt = current => new TextPromptWindow(Strings.Prompt_EditPlayerName_Title,
+            Strings.Prompt_EditPlayerName_Message, current, maxLength: 64).ShowDialog<string?>(this);
         Closed += (_, _) => viewModel.Dispose();
     }
 
     private ManagePlayersViewModel Vm => (ManagePlayersViewModel)DataContext!;
-
-    // Player Details edits the dialog's staged records, so its OK is only kept if this dialog is saved.
-    private async Task ShowDetailsAsync(string key)
-    {
-        if (_repo is null) return;
-        var saved = await new PlayerDetailsWindow(new PlayerDetailsViewModel(_repo, key, _api, Vm.Records))
-            .ShowDialog<bool>(this);
-        if (saved) Vm.OnDetailsSaved(key);
-    }
 
     private void OnSave(object? sender, RoutedEventArgs e)
     {

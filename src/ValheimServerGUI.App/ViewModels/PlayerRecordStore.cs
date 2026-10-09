@@ -5,9 +5,8 @@ using ValheimServerGUI.Game;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// Where an editor reads and writes a player's cached record (name + known characters). The live repository
-/// is the default; the Manage Players dialog substitutes a staged copy so its outer Save/Cancel stays
-/// authoritative over edits made in nested dialogs.
+/// Where an editor reads and writes a player's cached record (name + known characters). The Players tab writes
+/// to the live repository; the Manage Players dialog uses a staged copy so its Save/Cancel stays authoritative.
 /// </summary>
 public interface IPlayerRecordStore
 {

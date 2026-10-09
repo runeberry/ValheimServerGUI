@@ -6,7 +6,7 @@ using ValheimServerGUI.Game;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// One row in the Player Details "Known Characters" table (§7.4): the character's name plus a derived
+/// One row in the Manage Players "Known Characters" table (§7.4): the character's name plus a derived
 /// Status and "Since". Only the player's currently-active character (<see cref="PlayerInfo.LastStatusCharacter"/>)
 /// carries the live status; every other character is Offline. "Since" comes from the optional per-character
 /// <see cref="PlayerInfo.CharacterInfo.LastSeen"/> and is blank for characters recorded before that field

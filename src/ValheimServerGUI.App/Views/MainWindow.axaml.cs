@@ -44,7 +44,7 @@ public partial class MainWindow : Window
                 Strings.Prompt_ForceStopped_Message);
         viewModel.MenuActionRequested += a => _ = HandleMenuActionAsync(a);
         viewModel.RemoveProfileRequested += name => _ = HandleRemoveProfileAsync(name);
-        viewModel.Players.ViewDetailsRequested += player => _ = ShowPlayerDetailsAsync(player);
+        viewModel.Players.ViewDetailsRequested += player => _ = ShowManagePlayersAsync(player.Key);
         viewModel.Players.ManagePlayersRequested += () => _ = ShowManagePlayersAsync();
         viewModel.Players.AddPlayerPrompt = options => new AddPlayerWindow(options).ShowDialog<AddPlayerResult?>(this);
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
@@ -181,17 +181,13 @@ public partial class MainWindow : Window
             .ShowDialog(this);
     }
 
-    private async Task ShowPlayerDetailsAsync(ValheimServerGUI.Game.PlayerInfo player)
-        => await new PlayerDetailsWindow(
-                new PlayerDetailsViewModel(Svc<IPlayerDataRepository>(), player.Key, Svc<IRuneberryApiClient>()))
-            .ShowDialog(this);
-
-    private async Task ShowManagePlayersAsync()
+    // Player details live in Manage Players: "View Player Details" opens it focused on that player.
+    private async Task ShowManagePlayersAsync(string? focusPlayerKey = null)
     {
-        var repo = Svc<IPlayerDataRepository>();
-        var api = Svc<IRuneberryApiClient>();
-        await new ManagePlayersWindow(new ManagePlayersViewModel(Svc<IUserPreferencesProvider>(), repo, api), repo, api)
-            .ShowDialog(this);
+        var vm = new ManagePlayersViewModel(
+            Svc<IUserPreferencesProvider>(), Svc<IPlayerDataRepository>(), Svc<IRuneberryApiClient>());
+        if (focusPlayerKey is not null) vm.FocusPlayer(focusPlayerKey);
+        await new ManagePlayersWindow(vm).ShowDialog(this);
     }
 
     private async void OnOpened(object? sender, EventArgs e)

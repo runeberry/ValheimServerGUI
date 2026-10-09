@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
+using CommunityToolkit.Mvvm.ComponentModel;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
@@ -13,16 +14,18 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 /// Manage Players dialog: every known player (the same cache the Players tab reads) with their app-global
 /// <b>default role</b>, applied on every server unless a server overrides it (see <see cref="PlayerRoleResolver"/>).
 /// Players whose default role is Banned sit on the <b>Banned</b> tab; everyone else on <b>Player Accounts</b>.
-/// Everything is staged — the default roles and any player-record edits/removals (<see cref="StagedPlayerRecords"/>)
-/// — until <see cref="Save"/>; Cancel writes nothing.
+/// Each tab shows its selected account's Known Characters, and the account name can be edited here. This is
+/// also where a single player's details open (<see cref="FocusPlayer"/>). Everything is staged — the default
+/// roles and any player-record edits/removals (<see cref="StagedPlayerRecords"/>) — until <see cref="Save"/>;
+/// Cancel writes nothing.
 /// </summary>
-public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
+public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDisposable
 {
     private readonly IUserPreferencesProvider _prefs;
     private readonly IPlayerDataRepository _repo;
     private readonly IRuneberryApiClient? _api;
     private readonly Dictionary<string, PlayerDefaultEntry> _defaults;
-    private string? _knownCharactersKey;
+    private readonly StagedPlayerRecords _records;
 
     public ManagePlayersViewModel(IUserPreferencesProvider prefs, IPlayerDataRepository repo, IRuneberryApiClient? api)
     {
@@ -30,12 +33,11 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         _repo = repo;
         _api = api;
         _defaults = new Dictionary<string, PlayerDefaultEntry>(prefs.LoadPreferences().PlayerDefaults);
-        Records = new StagedPlayerRecords(repo);
+        _records = new StagedPlayerRecords(repo);
 
-        var knownCharacters = new KnownCharactersViewModel(Strings.ManagePlayers_NoAccountSelected, Strings.ManagePlayers_NoKnownCharacters);
-        knownCharacters.Edited += OnKnownCharactersEdited;
-        PlayerAccounts = new PlayerListSectionViewModel(this, isBanned: false, knownCharacters);
-        Banned = new PlayerListSectionViewModel(this, isBanned: true, knownCharacters: null);
+        PlayerAccounts = new PlayerListSectionViewModel(this, isBanned: false, NewKnownCharacters());
+        Banned = new PlayerListSectionViewModel(this, isBanned: true, NewKnownCharacters());
+        IgnoreForDirty(nameof(SelectedTabIndex));
 
         // The tables follow the live cache: players joining/leaving/renamed while the dialog is open.
         _repo.EntityUpdated += OnRepoPlayerChanged;
@@ -55,14 +57,27 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
 
     private IEnumerable<PlayerListSectionViewModel> Sections => new[] { PlayerAccounts, Banned };
 
-    /// <summary>Staged player records; Player Details opened from here edits through this store.</summary>
-    public StagedPlayerRecords Records { get; }
+    /// <summary>The shown tab: 0 = Player Accounts, 1 = Banned. View state (never marks the dialog dirty).</summary>
+    [ObservableProperty]
+    private int _selectedTabIndex;
 
     /// <summary>Shows the Add Player dialog with the given options; null on cancel. Wired by the window.</summary>
     public Func<AddPlayerOptions, Task<AddPlayerResult?>>? AddPlayerPrompt { get; set; }
 
-    /// <summary>Raised for View Player Details (player key). The window opens it over <see cref="Records"/>.</summary>
-    public event Action<string>? DetailsRequested;
+    /// <summary>Prompts for a player name, given the current one (empty when unknown); null on cancel. Wired by
+    /// the window.</summary>
+    public Func<string, Task<string?>>? EditNamePrompt { get; set; }
+
+    /// <summary>Opens the tab holding <paramref name="key"/> and selects that player (the "View Player Details"
+    /// entry point). Does nothing for a player this dialog doesn't list.</summary>
+    public void FocusPlayer(string key)
+    {
+        var section = SectionFor(key);
+        if (section.Accounts.FirstOrDefault(r => r.Key == key) is not { } row) return;
+
+        SelectedTabIndex = section.IsBanned ? 1 : 0;
+        section.SelectedAccount = row;
+    }
 
     public override void ApplyDefaults() { /* Manage Players has no defaults to restore. */ }
 
@@ -73,7 +88,7 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
     /// </summary>
     public void Save()
     {
-        var created = Records.CommitTo(_repo);
+        var created = _records.CommitTo(_repo);
 
         var prefs = _prefs.LoadPreferences();
         prefs.PlayerDefaults = new Dictionary<string, PlayerDefaultEntry>(_defaults);
@@ -94,7 +109,7 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         if (result is null) return;
 
         // The same routine the Players tab uses, over this dialog's staged records + default roles.
-        var outcome = AddPlayerFlow.Apply(result, Records, _defaults, setServerOverride: null);
+        var outcome = AddPlayerFlow.Apply(result, _records, _defaults, setServerOverride: null);
         if (outcome is null) return;
 
         IsDirty = true;
@@ -105,7 +120,7 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
     internal void RemoveAccount(string key)
     {
         // Forget the player entirely: the cached record and its default role.
-        Records.Remove(key);
+        _records.Remove(key);
         _defaults.Remove(key);
         IsDirty = true;
         RebuildAll();
@@ -121,7 +136,7 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         if (role == PlayerRole.None)
             _defaults.Remove(key);
         else
-            _defaults[key] = new PlayerDefaultEntry(role, entry?.PlatformRaw ?? Records.FindById(key)?.PlatformRaw);
+            _defaults[key] = new PlayerDefaultEntry(role, entry?.PlatformRaw ?? _records.FindById(key)?.PlatformRaw);
         IsDirty = true;
 
         var section = SectionFor(key);
@@ -137,42 +152,41 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         }
     }
 
-    internal void RequestDetails(string key)
+    /// <summary>Prompts for a new account name. Cancel leaves it unchanged; a blank name clears it back to
+    /// unknown (so a later lookup can fill it in).</summary>
+    internal async Task EditNameAsync(string key)
     {
-        // Player Details edits an existing record; give a defaulted player with no cached record a staged stub.
-        if (Records.FindById(key) is null && EditableRecord(key) is { } stub)
-            Records.Upsert(stub);
+        if (EditNamePrompt is null || EditableRecord(key) is not { } record) return;
 
-        DetailsRequested?.Invoke(key);
-    }
+        var name = await EditNamePrompt(record.PlayerName ?? string.Empty);
+        if (name is null) return;
 
-    /// <summary>Called after Player Details saved into <see cref="Records"/>: refresh the row and characters.</summary>
-    public void OnDetailsSaved(string key)
-    {
+        record.PlayerName = string.IsNullOrWhiteSpace(name) ? null : name.Trim();
+        _records.Upsert(record);
         IsDirty = true;
         RefreshRow(key);
-        if (PlayerAccounts.SelectedAccount?.Key == key)
-            PlayerAccounts.KnownCharacters!.Load(Records.FindById(key));
     }
 
     internal void OnSelectionChanged(PlayerListSectionViewModel section)
-    {
-        if (section.KnownCharacters is not { } kc) return;
-
-        _knownCharactersKey = section.SelectedAccount?.Key;
-        kc.Load(_knownCharactersKey is null ? null : EditableRecord(_knownCharactersKey));
-    }
+        => section.KnownCharacters.Load(section.SelectedAccount is { } row ? EditableRecord(row.Key) : null);
 
     // ===== Non-public =====
+
+    private KnownCharactersViewModel NewKnownCharacters()
+    {
+        var knownCharacters = new KnownCharactersViewModel(Strings.ManagePlayers_NoAccountSelected, Strings.ManagePlayers_NoKnownCharacters);
+        knownCharacters.Edited += OnKnownCharactersEdited;
+        return knownCharacters;
+    }
 
     // A character edit writes straight into the staged record for the account the table shows.
     private void OnKnownCharactersEdited(object? sender, EventArgs e)
     {
-        if (sender is not KnownCharactersViewModel kc || _knownCharactersKey is not { } key) return;
-        if (EditableRecord(key) is not { } record) return;
+        var section = Sections.First(s => ReferenceEquals(s.KnownCharacters, sender));
+        if (section.SelectedAccount?.Key is not { } key || EditableRecord(key) is not { } record) return;
 
-        kc.WriteTo(record);
-        Records.Upsert(record);
+        section.KnownCharacters.WriteTo(record);
+        _records.Upsert(record);
         IsDirty = true;
         RefreshRow(key);
     }
@@ -191,11 +205,11 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
 
     // Known players (live cache + staged adds − staged removals), plus any default role whose player has no cached
     // record yet, so a default is never invisible.
-    private bool IsListed(string key) => Records.FindById(key) is not null || _defaults.ContainsKey(key);
+    private bool IsListed(string key) => _records.FindById(key) is not null || _defaults.ContainsKey(key);
 
     private void RebuildAll()
     {
-        var keys = Records.KnownKeys.Union(_defaults.Keys).ToList();
+        var keys = _records.KnownKeys.Union(_defaults.Keys).ToList();
         foreach (var section in Sections) Rebuild(section, keys);
     }
 
@@ -220,12 +234,12 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         section.SelectedAccount = section.Accounts.FirstOrDefault(r => r.Key == selectedKey);
     }
 
-    private PlayerInfo? DisplayRecord(string key) => Records.FindForDisplay(key);
+    private PlayerInfo? DisplayRecord(string key) => _records.FindForDisplay(key);
 
     // The record an editor works on: the staged/cloned record, or a stub for a defaulted player with no cached
-    // record yet (writing it back through Records creates the record on Save).
+    // record yet (writing it back through _records creates the record on Save).
     private PlayerInfo? EditableRecord(string key)
-        => Records.FindById(key) ?? (_defaults.ContainsKey(key) ? Stub(key) : null);
+        => _records.FindById(key) ?? (_defaults.ContainsKey(key) ? Stub(key) : null);
 
     // A defaulted player with no cached record.
     private PlayerInfo Stub(string key)
@@ -247,10 +261,12 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         else Dispatcher.UIThread.Post(action);
     }
 
-    // Updates a row in place; a player new to (or gone from) the tables rebuilds them instead.
+    // Updates a row (and, when it is selected, its characters' Status/Since) in place; a player new to (or gone
+    // from) the tables rebuilds them instead.
     private void RefreshRow(string key)
     {
-        var row = SectionFor(key).Accounts.FirstOrDefault(r => r.Key == key);
+        var section = SectionFor(key);
+        var row = section.Accounts.FirstOrDefault(r => r.Key == key);
         var listed = IsListed(key);
 
         if (row is null || !listed)
@@ -258,7 +274,10 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
             if ((row is not null) != listed) RebuildAll();
             return;
         }
-        if (DisplayRecord(key) is { } record) row.Update(record);
+        if (DisplayRecord(key) is not { } record) return;
+
+        row.Update(record);
+        if (ReferenceEquals(section.SelectedAccount, row)) section.KnownCharacters.Refresh(record);
     }
 
     public void Dispose()

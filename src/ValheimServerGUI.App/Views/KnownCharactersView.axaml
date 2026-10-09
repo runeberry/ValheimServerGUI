@@ -8,12 +8,11 @@
              x:DataType="vm:KnownCharactersViewModel"
              x:Name="Root">
 
-    <!-- The shared Known Characters table (Player Details + Manage Players). Add/Rename open a text prompt
-         owned by the hosting window, so those commands are wired in code-behind; Remove is a VM command. -->
+    <!-- The Known Characters table (one per Manage Players tab). Add/Rename open a text prompt owned by the
+         hosting window, so those commands are wired in code-behind; Remove is a VM command. -->
     <c:DataListView x:Name="CharactersListView" ItemsSource="{Binding Characters}"
                     SelectedItem="{Binding SelectedCharacter, Mode=TwoWay}"
-                    EmptyText="{Binding EmptyText}"
-                    FooterRight="{Binding #Root.FooterRight}">
+                    EmptyText="{Binding EmptyText}">
         <c:DataListView.RowContextMenu>
             <ContextMenu>
                 <MenuItem x:Name="RenameCharacterMenuItem" Header="{x:Static loc:Strings.KnownCharacters_Menu_Rename}" />

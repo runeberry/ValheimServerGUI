@@ -763,42 +763,17 @@ If a name appears with a (!), it means that name may not be matched to the corre
   <data name="ManagePlayers_NoKnownCharacters" xml:space="preserve">
     <value>No known characters for this account.</value>
   </data>
-  <!-- Player Details dialog -->
-  <data name="PlayerDetails_Title" xml:space="preserve">
-    <value>Player Info</value>
+  <data name="ManagePlayers_Menu_EditName" xml:space="preserve">
+    <value>Edit player name…</value>
   </data>
-  <data name="PlayerDetails_Name_Label" xml:space="preserve">
-    <value>Player Name:</value>
-  </data>
-  <data name="PlayerDetails_Name_Help" xml:space="preserve">
-    <value>The player's Steam/Xbox username. This will be determined automatically, but in case it doesn't work, you may edit the player's name manually.</value>
-  </data>
-  <data name="PlayerDetails_EditName_Tip" xml:space="preserve">
-    <value>Edit player name</value>
-  </data>
-  <data name="PlayerDetails_PlatformId_Help" xml:space="preserve">
-    <value>The ID associated with the player's Steam or Xbox account. You can use this ID to allow or ban players, or add players as admins.</value>
-  </data>
-  <data name="PlayerDetails_CopyId_Tip" xml:space="preserve">
+  <data name="ManagePlayers_Menu_CopyId" xml:space="preserve">
     <value>Copy ID to clipboard</value>
   </data>
-  <data name="PlayerDetails_ZdoId_Label" xml:space="preserve">
-    <value>ZDO ID:</value>
+  <data name="ManagePlayers_EditName_Tip" xml:space="preserve">
+    <value>Edit player name</value>
   </data>
-  <data name="PlayerDetails_ZdoId_Help" xml:space="preserve">
-    <value>The player's object ID in game. This changes with each game session.</value>
-  </data>
-  <data name="PlayerDetails_Refresh_Tip" xml:space="preserve">
-    <value>Refresh player data</value>
-  </data>
-  <data name="PlayerDetails_UnknownName" xml:space="preserve">
-    <value>(unknown)</value>
-  </data>
-  <data name="PlayerDetails_XboxId_Label" xml:space="preserve">
-    <value>Xbox ID:</value>
-  </data>
-  <data name="PlayerDetails_SteamId_Label" xml:space="preserve">
-    <value>Steam ID:</value>
+  <data name="ManagePlayers_CopyId_Tip" xml:space="preserve">
+    <value>Copy ID to clipboard</value>
   </data>
   <!-- Add Player dialog -->
   <data name="AddPlayer_Title" xml:space="preserve">

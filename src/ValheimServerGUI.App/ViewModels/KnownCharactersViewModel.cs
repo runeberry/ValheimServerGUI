@@ -10,7 +10,7 @@ namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
 /// The editable "Known Characters" table for one player (name + derived Status/Since; added names are flagged
-/// <c>matchConfident=true</c>). Shared by Player Details and the Manage Players account lists. The owner loads a
+/// <c>matchConfident=true</c>), one per Manage Players tab. The owner loads a
 /// player, listens to <see cref="Edited"/> to mark itself dirty, and flushes with <see cref="WriteTo"/>.
 /// </summary>
 public partial class KnownCharactersViewModel : ObservableObject

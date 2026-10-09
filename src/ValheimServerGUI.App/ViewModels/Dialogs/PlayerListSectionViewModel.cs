@@ -9,15 +9,15 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
 /// One Manage Players tab: <b>Player Accounts</b> (every known player whose default role is not Banned) or
-/// <b>Banned</b> (default role Banned). Holds the rows, the selection, the selected account's Known Characters
-/// (Player Accounts only), and the row commands. All state changes route through the owning
+/// <b>Banned</b> (default role Banned). Holds the rows, the selection, the selected account's Known Characters,
+/// and the row commands. All state changes route through the owning
 /// <see cref="ManagePlayersViewModel"/>, which holds the staged data and the dirty flag.
 /// </summary>
 public partial class PlayerListSectionViewModel : ObservableObject
 {
     private readonly ManagePlayersViewModel _owner;
 
-    internal PlayerListSectionViewModel(ManagePlayersViewModel owner, bool isBanned, KnownCharactersViewModel? knownCharacters)
+    internal PlayerListSectionViewModel(ManagePlayersViewModel owner, bool isBanned, KnownCharactersViewModel knownCharacters)
     {
         _owner = owner;
         IsBanned = isBanned;
@@ -33,15 +33,13 @@ public partial class PlayerListSectionViewModel : ObservableObject
     /// <summary>The accounts table's empty-state hint, or null when it has rows.</summary>
     public string? AccountsEmptyText => Accounts.Count == 0 ? Strings.ManagePlayers_NoAccounts : null;
 
-    /// <summary>The selected account's known characters; null on the Banned tab.</summary>
-    public KnownCharactersViewModel? KnownCharacters { get; }
-
-    public bool HasKnownCharacters => KnownCharacters is not null;
+    /// <summary>The selected account's known characters.</summary>
+    public KnownCharactersViewModel KnownCharacters { get; }
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DefaultIsAdmin), nameof(DefaultIsPermitted), nameof(DefaultIsBanned),
         nameof(DefaultIsNone), nameof(HasSelection))]
-    [NotifyCanExecuteChangedFor(nameof(RemoveCommand), nameof(ViewDetailsCommand))]
+    [NotifyCanExecuteChangedFor(nameof(RemoveCommand), nameof(EditNameCommand))]
     private PlayerRowViewModel? _selectedAccount;
 
     public bool HasSelection => SelectedAccount is not null;
@@ -85,8 +83,5 @@ public partial class PlayerListSectionViewModel : ObservableObject
     }
 
     [RelayCommand(CanExecute = nameof(HasSelection))]
-    private void ViewDetails()
-    {
-        if (SelectedAccount is { } row) _owner.RequestDetails(row.Key);
-    }
+    private Task EditName() => SelectedAccount is { } row ? _owner.EditNameAsync(row.Key) : Task.CompletedTask;
 }

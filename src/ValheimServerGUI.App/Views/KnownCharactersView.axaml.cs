@@ -1,6 +1,5 @@
 using System.ComponentModel;
 using System.Threading.Tasks;
-using Avalonia;
 using Avalonia.Controls;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.App.ViewModels;
@@ -11,14 +10,10 @@ namespace ValheimServerGUI.App.Views;
 
 /// <summary>
 /// The Known Characters table bound to a <see cref="KnownCharactersViewModel"/>. Add/Rename prompt for a name
-/// with a <see cref="TextPromptWindow"/> owned by the hosting window. <see cref="FooterRight"/> lets the host add
-/// its own trailing footer action (e.g. Player Details' Refresh).
+/// with a <see cref="TextPromptWindow"/> owned by the hosting window.
 /// </summary>
 public partial class KnownCharactersView : UserControl
 {
-    public static readonly StyledProperty<object?> FooterRightProperty =
-        AvaloniaProperty.Register<KnownCharactersView, object?>(nameof(FooterRight));
-
     private readonly AsyncRelayCommand _addCharacter;
     private readonly AsyncRelayCommand _renameCharacter;
     private KnownCharactersViewModel? _wired;
@@ -37,12 +32,6 @@ public partial class KnownCharactersView : UserControl
         RenameCharacterMenuItem.Command = _renameCharacter;
 
         DataContextChanged += (_, _) => Wire();
-    }
-
-    public object? FooterRight
-    {
-        get => GetValue(FooterRightProperty);
-        set => SetValue(FooterRightProperty, value);
     }
 
     private KnownCharactersViewModel? Vm => DataContext as KnownCharactersViewModel;

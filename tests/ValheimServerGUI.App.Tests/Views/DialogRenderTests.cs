@@ -12,6 +12,7 @@ using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Models;
 using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
@@ -49,11 +50,6 @@ public class DialogRenderTests
             Core.GetRequiredService<IWorldPreferencesProvider>(), "TestWorld", new RecordingShellLauncher())));
 
     [AvaloniaFact]
-    public void PlayerDetailsWindow_realizes()
-        => Realize(new PlayerDetailsWindow(new PlayerDetailsViewModel(
-            Core.GetRequiredService<IPlayerDataRepository>(), "steam-1")));
-
-    [AvaloniaFact]
     public void AddPlayerWindow_realizes()
         => Realize(new AddPlayerWindow(ValheimServerGUI.App.ViewModels.Dialogs.AddPlayerOptions.ForServer(usePermittedList: true)));
 
@@ -62,8 +58,61 @@ public class DialogRenderTests
     {
         var repo = Core.GetRequiredService<IPlayerDataRepository>();
         Realize(new ManagePlayersWindow(
-            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null),
-            repo, null));
+            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null)));
+    }
+
+    // "View Player Details" opens Manage Players focused on one player: the window shows that player's tab, and the
+    // row is scrolled into view even far down a long list (the inner DataGrid only scrolls for clicks/keys).
+    [AvaloniaFact]
+    public void ManagePlayers_focus_shows_the_players_tab_and_scrolls_the_row_into_view()
+    {
+        var repo = new FakePlayerDataRepository();
+        var prefs = new FakeUserPreferencesProvider();
+        var defaults = new UserPreferences();
+        for (var i = 0; i < 60; i++)
+        {
+            var id = i.ToString("D2");
+            repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlatformRaw = "Steam", PlayerId = id, PlayerName = "Banned" + id });
+            defaults.PlayerDefaults["Steam:" + id] = new PlayerDefaultEntry(PlayerRole.Banned, "Steam");
+        }
+        prefs.SavePreferences(defaults);
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(prefs, repo, null);
+        vm.FocusPlayer("Steam:59");
+
+        var window = new ManagePlayersWindow(vm);
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+
+        Assert.Equal(1, window.GetVisualDescendants().OfType<TabControl>().Single().SelectedIndex);
+        var realized = window.GetVisualDescendants().OfType<DataGridRow>()
+            .Select(r => r.DataContext).OfType<ValheimServerGUI.App.ViewModels.PlayerRowViewModel>();
+        Assert.Contains(realized, r => r.Key == "Steam:59");
+        window.Close();
+    }
+
+    // Both tabs carry the Known Characters table, and the account row menu offers edit-name and copy-ID.
+    [AvaloniaFact]
+    public void ManagePlayers_tabs_have_known_characters_and_the_name_and_id_actions()
+    {
+        var repo = Core.GetRequiredService<IPlayerDataRepository>();
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null);
+
+        foreach (var section in new[] { vm.PlayerAccounts, vm.Banned })
+        {
+            var view = new PlayerListSectionView { DataContext = section };
+            var window = new Window { Content = view };
+            window.Show();
+            Dispatcher.UIThread.RunJobs();
+
+            var characters = view.GetVisualDescendants().OfType<ValheimServerGUI.App.Views.KnownCharactersView>().Single();
+            Assert.True(characters.IsEffectivelyVisible);
+            var menu = view.GetLogicalDescendants().OfType<ValheimServerGUI.App.Controls.DataListView>()
+                .First(l => l.Name == "AccountsList").RowContextMenu!;
+            var headers = menu.Items.OfType<MenuItem>().Select(m => m.Header as string).ToList();
+            Assert.Contains(Strings.ManagePlayers_Menu_EditName, headers);
+            Assert.Contains(Strings.ManagePlayers_Menu_CopyId, headers);
+            window.Close();
+        }
     }
 
     // Banned entries are always Banned, so that tab drops the Default Role column; the other tabs keep it last.

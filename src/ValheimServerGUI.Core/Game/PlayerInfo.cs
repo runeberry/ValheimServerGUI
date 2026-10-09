@@ -94,7 +94,7 @@ namespace ValheimServerGUI.Game
 
         /// <summary>
         /// Records the time a specific character was last active (login or session end). No-op if the
-        /// character isn't in the list. Backs the per-character "Since" column in Player Details.
+        /// character isn't in the list. Backs the per-character "Since" column in Known Characters.
         /// </summary>
         public void TouchCharacterLastSeen(string? characterName, DateTimeOffset timestamp)
         {

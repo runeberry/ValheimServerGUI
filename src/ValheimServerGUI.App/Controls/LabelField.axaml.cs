@@ -10,7 +10,7 @@ namespace ValheimServerGUI.App.Controls;
 /// The app's read-only caption + value row (the WinForms <c>LabelField</c> equivalent): a right-aligned
 /// <see cref="FormFieldBase.LabelText"/> caption, a selectable read-only <see cref="Value"/>, the help glyph,
 /// and an optional <see cref="TrailingContent"/> slot (e.g. a <see cref="CopyButton"/>). Replaces the raw
-/// caption/value grids in the Server Details and Player Details surfaces.
+/// caption/value grids in the Server Details surface.
 /// </summary>
 public partial class LabelField : FormFieldBase, IFormField<string>
 {
@@ -25,10 +25,6 @@ public partial class LabelField : FormFieldBase, IFormField<string>
     /// <summary>Optional control rendered after the value (e.g. a copy button).</summary>
     public static readonly StyledProperty<object?> TrailingContentProperty =
         AvaloniaProperty.Register<LabelField, object?>(nameof(TrailingContent));
-
-    /// <summary>Optional 16×16 glyph rendered before the value (e.g. the platform or status icon).</summary>
-    public static readonly StyledProperty<Avalonia.Media.IImage?> ValueIconProperty =
-        AvaloniaProperty.Register<LabelField, Avalonia.Media.IImage?>(nameof(ValueIcon));
 
     public LabelField() => AvaloniaXamlLoader.Load(this);
 
@@ -48,12 +44,6 @@ public partial class LabelField : FormFieldBase, IFormField<string>
     {
         get => GetValue(TrailingContentProperty);
         set => SetValue(TrailingContentProperty, value);
-    }
-
-    public Avalonia.Media.IImage? ValueIcon
-    {
-        get => GetValue(ValueIconProperty);
-        set => SetValue(ValueIconProperty, value);
     }
 
     /// <inheritdoc />

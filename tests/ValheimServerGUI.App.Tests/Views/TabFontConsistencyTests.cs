@@ -56,8 +56,7 @@ public class TabFontConsistencyTests
     {
         var repo = Core.GetRequiredService<IPlayerDataRepository>();
         var window = new ValheimServerGUI.App.Views.Dialogs.ManagePlayersWindow(
-            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null),
-            repo, null);
+            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null));
         window.Show();
         Dispatcher.UIThread.RunJobs();
 

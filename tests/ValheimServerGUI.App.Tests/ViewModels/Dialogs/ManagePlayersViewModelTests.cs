@@ -214,7 +214,7 @@ public class ManagePlayersViewModelTests
         _repo.PushUpdate(withChars);
         _repo.PushUpdate(Player("2", "Thor"));
         var vm = NewVm();
-        var kc = vm.PlayerAccounts.KnownCharacters!;
+        var kc = vm.PlayerAccounts.KnownCharacters;
 
         Assert.Equal(Strings.ManagePlayers_NoAccountSelected, kc.EmptyText);
 
@@ -224,7 +224,60 @@ public class ManagePlayersViewModelTests
         vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:2");
         Assert.Equal(Strings.ManagePlayers_NoKnownCharacters, kc.EmptyText);
         Assert.False(vm.IsDirty);
-        Assert.Null(vm.Banned.KnownCharacters);
+    }
+
+    [AvaloniaFact]
+    public void The_banned_tab_has_its_own_known_characters()
+    {
+        var loki = Player("3", "Loki");
+        loki.Characters = new() { new() { CharacterName = "Trickster", MatchConfident = true } };
+        _repo.PushUpdate(loki);
+        var vm = NewVm(("Steam:3", PlayerRole.Banned));
+
+        vm.Banned.SelectedAccount = vm.Banned.Accounts[0];
+        Assert.Equal("Trickster", Assert.Single(vm.Banned.KnownCharacters.Characters).CharacterName);
+        Assert.Equal(Strings.ManagePlayers_NoAccountSelected, vm.PlayerAccounts.KnownCharacters.EmptyText);
+
+        vm.Banned.KnownCharacters.AddCharacter("Shapeshifter");
+        Assert.True(vm.IsDirty);
+        vm.Save();
+        Assert.Contains(_repo.FindById("Steam:3")!.Characters!, c => c.CharacterName == "Shapeshifter");
+    }
+
+    [AvaloniaFact]
+    public void Selecting_a_character_does_not_mark_dirty()
+    {
+        var odin = Player("1", "Odin");
+        odin.Characters = new() { new() { CharacterName = "Thor", MatchConfident = true } };
+        _repo.PushUpdate(odin);
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+
+        vm.PlayerAccounts.KnownCharacters.SelectedCharacter = vm.PlayerAccounts.KnownCharacters.Characters[0];
+
+        Assert.False(vm.IsDirty);
+    }
+
+    [AvaloniaFact]
+    public void A_live_status_change_re_derives_character_status_and_keeps_unsaved_edits()
+    {
+        var online = Player("1", "Odin", PlayerStatus.Online);
+        online.LastStatusCharacter = "Thor";
+        online.Characters = new() { new() { CharacterName = "Thor", MatchConfident = true } };
+        _repo.PushUpdate(online);
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+        var kc = vm.PlayerAccounts.KnownCharacters;
+        kc.AddCharacter("Ragnar");
+        var thor = kc.Characters.First(c => c.CharacterName == "Thor");
+        Assert.Equal(PlayerStatus.Online, thor.Status);
+
+        var offline = Player("1", "Odin", PlayerStatus.Offline);
+        offline.LastStatusCharacter = "Thor";
+        _repo.PushUpdate(offline);
+
+        Assert.Equal(PlayerStatus.Offline, thor.Status);
+        Assert.Contains(kc.Characters, c => c.CharacterName == "Ragnar");
     }
 
     [AvaloniaFact]
@@ -234,7 +287,7 @@ public class ManagePlayersViewModelTests
         var vm = NewVm();
         vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
 
-        vm.PlayerAccounts.KnownCharacters!.AddCharacter("Ragnar");
+        vm.PlayerAccounts.KnownCharacters.AddCharacter("Ragnar");
         Assert.True(vm.IsDirty);
         Assert.Null(_repo.FindById("Steam:1")!.Characters);
 
@@ -245,27 +298,113 @@ public class ManagePlayersViewModelTests
         Assert.Equal(PlayerStatus.Online, saved.PlayerStatus); // live fields kept
     }
 
+    // ---- edit name ----
+
+    // Makes the next Edit Player Name prompt return the given text (null = Cancel), recording the current name.
+    private readonly List<string> _namePrompts = new();
+
+    private void NextName(ManagePlayersViewModel vm, string? result)
+        => vm.EditNamePrompt = current =>
+        {
+            _namePrompts.Add(current);
+            return Task.FromResult(result);
+        };
+
     [AvaloniaFact]
-    public void Player_details_opened_from_here_edits_the_staged_record()
+    public async Task Edit_name_is_staged_until_save()
     {
         _repo.PushUpdate(Player("1", "Odin"));
         var vm = NewVm();
-        string? requested = null;
-        vm.DetailsRequested += key => requested = key;
         vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+        NextName(vm, "  Allfather ");
 
-        vm.PlayerAccounts.ViewDetailsCommand.Execute(null);
-        Assert.Equal("Steam:1", requested);
+        await vm.PlayerAccounts.EditNameCommand.ExecuteAsync(null);
 
-        var details = new PlayerDetailsViewModel(_repo, "Steam:1", store: vm.Records) { DisplayName = "Allfather" };
-        details.Save();
-        vm.OnDetailsSaved("Steam:1");
-
+        Assert.Equal(new[] { "Odin" }, _namePrompts);
         Assert.Equal("Allfather", vm.PlayerAccounts.Accounts[0].AccountName);
-        Assert.Equal("Odin", _repo.FindById("Steam:1")!.PlayerName); // outer Save still authoritative
+        Assert.True(vm.IsDirty);
+        Assert.Equal("Odin", _repo.FindById("Steam:1")!.PlayerName);
 
         vm.Save();
         Assert.Equal("Allfather", _repo.FindById("Steam:1")!.PlayerName);
+    }
+
+    [AvaloniaFact]
+    public async Task Edit_name_cancel_changes_nothing_and_blank_clears_the_name()
+    {
+        _repo.PushUpdate(Player("1", "Odin"));
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+
+        NextName(vm, null);
+        await vm.PlayerAccounts.EditNameCommand.ExecuteAsync(null);
+        Assert.Equal("Odin", vm.PlayerAccounts.Accounts[0].AccountName);
+        Assert.False(vm.IsDirty);
+
+        NextName(vm, "   ");
+        await vm.PlayerAccounts.EditNameCommand.ExecuteAsync(null);
+        Assert.False(vm.PlayerAccounts.Accounts[0].HasAccountName);
+        vm.Save();
+        Assert.Null(_repo.FindById("Steam:1")!.PlayerName);
+    }
+
+    [AvaloniaFact]
+    public async Task Edit_name_keeps_staged_character_edits()
+    {
+        _repo.PushUpdate(Player("1", "Odin"));
+        var vm = NewVm();
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+        vm.PlayerAccounts.KnownCharacters.AddCharacter("Ragnar");
+        NextName(vm, "Allfather");
+
+        await vm.PlayerAccounts.EditNameCommand.ExecuteAsync(null);
+        vm.Save();
+
+        var saved = _repo.FindById("Steam:1")!;
+        Assert.Equal("Allfather", saved.PlayerName);
+        Assert.Contains(saved.Characters!, c => c.CharacterName == "Ragnar");
+    }
+
+    [AvaloniaFact]
+    public void Edit_name_needs_a_selection()
+    {
+        _repo.PushUpdate(Player("1", "Odin"));
+        var vm = NewVm();
+        Assert.False(vm.PlayerAccounts.EditNameCommand.CanExecute(null));
+
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+        Assert.True(vm.PlayerAccounts.EditNameCommand.CanExecute(null));
+    }
+
+    // ---- focus (View Player Details) ----
+
+    [AvaloniaFact]
+    public void Focus_player_opens_the_right_tab_and_selects_the_row_without_dirtying()
+    {
+        _repo.PushUpdate(Player("1", "Odin"));
+        _repo.PushUpdate(Player("3", "Loki"));
+        var vm = NewVm(("Steam:3", PlayerRole.Banned));
+
+        vm.FocusPlayer("Steam:3");
+        Assert.Equal(1, vm.SelectedTabIndex);
+        Assert.Equal("Steam:3", vm.Banned.SelectedAccount?.Key);
+
+        vm.FocusPlayer("Steam:1");
+        Assert.Equal(0, vm.SelectedTabIndex);
+        Assert.Equal("Steam:1", vm.PlayerAccounts.SelectedAccount?.Key);
+        Assert.False(vm.IsDirty);
+    }
+
+    [AvaloniaFact]
+    public void Focus_player_ignores_an_unknown_player()
+    {
+        _repo.PushUpdate(Player("1", "Odin"));
+        var vm = NewVm();
+
+        vm.FocusPlayer("Steam:404");
+
+        Assert.Equal(0, vm.SelectedTabIndex);
+        Assert.Null(vm.PlayerAccounts.SelectedAccount);
     }
 
     // ---- save / cancel / copy ----

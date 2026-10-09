@@ -19,7 +19,7 @@
     </Window.Resources>
 
     <StackPanel Margin="12" Spacing="12">
-        <TabControl>
+        <TabControl SelectedIndex="{Binding SelectedTabIndex}">
             <TabItem Header="{x:Static loc:Strings.ManagePlayers_Tab_Accounts}">
                 <local:PlayerListSectionView DataContext="{Binding PlayerAccounts}" Height="420" />
             </TabItem>

@@ -93,16 +93,16 @@ namespace ValheimServerGUI.Game
             // World generation settings
             if (WorldPreset != null)
             {
-                if (!WorldGenPresets.All.Contains(WorldPreset)) throw new ArgumentException($"World preset value '${WorldPreset}' is not allowed. Supported values are: ${string.Join(", ", WorldGenPresets.All)}");
+                if (!WorldGenPresets.All.Contains(WorldPreset)) throw new ArgumentException($"World preset value '{WorldPreset}' is not allowed. Supported values are: {string.Join(", ", WorldGenPresets.All)}");
                 if (WorldModifiers != null && WorldModifiers.Count > 0) throw new ArgumentException($"World modifiers may not be set when a world preset is selected.");
             }
             else if (WorldModifiers != null)
             {
                 foreach (var (key, value) in WorldModifiers)
                 {
-                    if (!WorldGenModifiers.All.Contains(key)) throw new ArgumentException($"World modifier key '${key}' is not allowed. Supported values are: ${string.Join(", ", WorldGenModifiers.All)}");
+                    if (!WorldGenModifiers.All.Contains(key)) throw new ArgumentException($"World modifier key '{key}' is not allowed. Supported values are: {string.Join(", ", WorldGenModifiers.All)}");
                     var allowedValues = WorldGenModifiers.AllowedValues[key];
-                    if (!allowedValues.Contains(value)) throw new ArgumentException($"World modifier value '${value}' is not allowed for key '${key}'. Supported values are: ${string.Join(", ", allowedValues)}");
+                    if (!allowedValues.Contains(value)) throw new ArgumentException($"World modifier value '{value}' is not allowed for key '{key}'. Supported values are: {string.Join(", ", allowedValues)}");
                 }
             }
 
@@ -110,7 +110,7 @@ namespace ValheimServerGUI.Game
             {
                 foreach (var key in WorldKeys)
                 {
-                    if (!WorldGenKeys.All.Contains(key)) throw new ArgumentException($"World key value '${key}' is not allowed. Supported values are: ${string.Join(", ", WorldGenKeys.All)}");
+                    if (!WorldGenKeys.All.Contains(key)) throw new ArgumentException($"World key value '{key}' is not allowed. Supported values are: {string.Join(", ", WorldGenKeys.All)}");
                 }
             }
 

@@ -72,17 +72,21 @@ namespace ValheimServerGUI.Core.Tests.Game.Paths
             Assert.Equal("valheim_server.exe", resolver.ServerBinaryName);
         }
 
+        // The OS boundary (environment-variable expansion) is injected, so the exact Windows paths are pinned on
+        // every OS rather than only when the suite happens to run on Windows.
         [Fact]
         public void Windows_Paths_AreUnderRuneberryLocalLow()
         {
-            Assert.SkipUnless(System.OperatingSystem.IsWindows(),
-                "Windows path resolution depends on %USERPROFILE% expansion; only meaningful on Windows.");
+            static string Expand(string template) => template
+                .Replace("%USERPROFILE%", @"C:\Users\Viking")
+                .Replace("%ProgramFiles(x86)%", @"C:\Program Files (x86)");
+            var resolver = new WindowsValheimPathResolver(Expand);
 
-            var resolver = new WindowsValheimPathResolver();
-
-            Assert.EndsWith(Join("Valheim dedicated server", "valheim_server.exe"), resolver.DefaultServerPath);
-            Assert.EndsWith(Join("IronGate", "Valheim"), resolver.DefaultSaveDataFolder);
-            Assert.EndsWith(Join("Runeberry", "ValheimServerGUI", "userprefs.json"), resolver.UserPrefsFilePath);
+            Assert.Equal(@"C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe",
+                resolver.DefaultServerPath);
+            Assert.Equal(@"C:\Users\Viking\AppData\LocalLow\IronGate\Valheim", resolver.DefaultSaveDataFolder);
+            Assert.Equal(Path.Join(@"C:\Users\Viking\AppData\LocalLow\Runeberry\ValheimServerGUI", "userprefs.json"),
+                resolver.UserPrefsFilePath);
         }
     }
 }

@@ -8,15 +8,25 @@ namespace ValheimServerGUI.Game
     /// </summary>
     public class WindowsValheimPathResolver : ValheimPathResolver
     {
+        private readonly Func<string, string> _expand;
+
+        public WindowsValheimPathResolver() : this(Environment.ExpandEnvironmentVariables)
+        {
+        }
+
+        /// <summary>Test seam: inject the OS boundary (environment-variable expansion).</summary>
+        internal WindowsValheimPathResolver(Func<string, string> expandEnvironmentVariables)
+        {
+            _expand = expandEnvironmentVariables;
+        }
+
         public override string ServerBinaryName => "valheim_server.exe";
 
-        public override string DefaultServerPath => Environment.ExpandEnvironmentVariables(
-            @"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe");
+        public override string DefaultServerPath =>
+            _expand(@"%ProgramFiles(x86)%\Steam\steamapps\common\Valheim dedicated server\valheim_server.exe");
 
-        public override string DefaultSaveDataFolder => Environment.ExpandEnvironmentVariables(
-            @"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim");
+        public override string DefaultSaveDataFolder => _expand(@"%USERPROFILE%\AppData\LocalLow\IronGate\Valheim");
 
-        protected override string AppDataRoot => Environment.ExpandEnvironmentVariables(
-            @"%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI");
+        protected override string AppDataRoot => _expand(@"%USERPROFILE%\AppData\LocalLow\Runeberry\ValheimServerGUI");
     }
 }

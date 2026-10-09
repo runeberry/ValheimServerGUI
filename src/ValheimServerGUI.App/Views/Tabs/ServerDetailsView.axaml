@@ -8,7 +8,7 @@
 
     <ScrollViewer>
         <StackPanel Margin="8" Spacing="4">
-            <c:GroupBox Header="Connection Details">
+            <c:GroupBox Header="Connection Details" HorizontalAlignment="Left" Width="350">
                 <StackPanel Spacing="2">
                     <c:LabelField LabelText="External IP Address:" Value="{Binding Details.ExternalIp}"
                                   HelpText="This is the address that players from outside your home network will use to connect to your server. Give this address to your friends for standard online play.">
@@ -48,12 +48,17 @@
                 </StackPanel>
             </c:GroupBox>
 
-            <c:GroupBox Header="Statistics">
+            <c:GroupBox Header="Statistics" HorizontalAlignment="Left" Width="350">
                 <StackPanel Spacing="2">
                     <c:LabelField LabelText="Server Uptime:" Value="{Binding Details.Uptime}" />
                     <c:LabelField LabelText="Last World Save:" Value="{Binding Details.LastWorldSave}" />
                     <c:LabelField LabelText="Avg. World Save:" Value="{Binding Details.AverageWorldSave}"
-                                  HelpText="The average amount of time it has taken to save your game world, over the past 10 saves." />
+                                  HelpText="The average amount of time it has taken to save your game world, over the past 10 saves.">
+                        <c:LabelField.TrailingContent>
+                            <!-- Empty, invisible icon slot so this help glyph lines up with the ones above it. -->
+                            <c:IconButton Opacity="0" IsHitTestVisible="False" Focusable="False" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
                 </StackPanel>
             </c:GroupBox>
         </StackPanel>

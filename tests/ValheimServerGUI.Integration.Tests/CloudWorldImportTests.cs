@@ -31,16 +31,14 @@ namespace ValheimServerGUI.Integration.Tests
         [Fact]
         public void ImportCloudWorld_CopyRoundTrip_ListsLocally()
         {
-            IntegrationConfig.SkipIfSteamUnconfigured();
-
             ILogger logger = new LoggerConfiguration().CreateLogger();
-            var provider = new SteamCloudWorldProvider(logger, new FixedSteamPathResolver(IntegrationConfig.SteamRoot!));
+            var provider = new SteamCloudWorldProvider(logger, new FixedSteamPathResolver(IntegrationConfig.Current.SteamRoot));
 
             var cloudNames = provider.GetCloudWorldNames().ToList();
             Assert.Contains(CloudWorld, cloudNames);
 
             // Fresh dest under the mochi-owned savedir; copy-only so the Steam Cloud source is never deleted.
-            var dest = new DirectoryInfo(Path.Join(IntegrationConfig.SaveDir, "cloud-import-" + Guid.NewGuid().ToString("n")[..6]));
+            var dest = new DirectoryInfo(Path.Join(IntegrationConfig.Current.SaveDir, "cloud-import-" + Guid.NewGuid().ToString("n")[..6]));
             dest.Create();
             Assert.True(dest.IsWorldNameAvailable(CloudWorld), "Dest should start without the world.");
 

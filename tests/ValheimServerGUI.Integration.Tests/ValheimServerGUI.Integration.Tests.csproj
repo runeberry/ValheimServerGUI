@@ -2,10 +2,11 @@
 
   <!--
     Live (tier-4) integration tests against a REAL Valheim dedicated server (docs/V3_TARGET_STATE.md
-    §13, matrix E9). Deliberately NOT listed in ValheimServerGUI.slnx, so `dotnet test` on the solution
-    (scripts/validate.sh) never runs it. It is driven only by scripts/integration.sh, and every test is
-    env-gated (Assert.Skip) so an accidental direct `dotnet test` here no-ops instead of launching a
-    server. See CLAUDE.local.md "Integration testing".
+    §13, matrix E9). The project always builds with the solution, but it is only a TEST project when asked
+    for explicitly: `dotnet test -p:Integration=true` runs the complete suite (unit + integration), while a
+    plain `dotnet test` runs unit tests only. scripts/integration.sh is the usual way to pass the flag (it
+    loads the machine config). Once asked for, a misconfiguration is a failure, never a skip: see
+    IntegrationConfig. See CLAUDE.local.md "Integration testing".
   -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
@@ -14,7 +15,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <IsTestProject>true</IsTestProject>
+    <IsTestProject>false</IsTestProject>
+    <IsTestProject Condition="'$(Integration)' == 'true'">true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>

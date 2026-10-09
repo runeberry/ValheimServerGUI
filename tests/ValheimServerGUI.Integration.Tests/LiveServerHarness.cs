@@ -102,7 +102,7 @@ namespace ValheimServerGUI.Integration.Tests
             Backups = 1,
             BackupShort = 7200,
             BackupLong = 43200,
-            ServerExePath = IntegrationConfig.ServerExe,
+            ServerExePath = IntegrationConfig.Current.ServerExe,
             SaveDataFolderPath = SaveDir,
             LogToFile = false,
             LogMessageHandler = line => { lock (_lock) Log.Add(line); },

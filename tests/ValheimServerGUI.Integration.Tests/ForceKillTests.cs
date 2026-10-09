@@ -18,10 +18,8 @@ namespace ValheimServerGUI.Integration.Tests
         [Fact]
         public async Task ForceKill_DoesNotFlushSave()
         {
-            IntegrationConfig.SkipIfServerUnconfigured();
-
             var worldName = "ITKill" + Guid.NewGuid().ToString("n")[..6];
-            using var harness = new LiveServerHarness(IntegrationConfig.SaveDir, worldName);
+            using var harness = new LiveServerHarness(IntegrationConfig.Current.SaveDir, worldName);
 
             var running = await harness.BootToRunningAsync(BootTimeout);
             Assert.True(running, "Precondition: server must reach Running before the force-kill A/B is meaningful.");

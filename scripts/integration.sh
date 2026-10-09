@@ -1,8 +1,9 @@
 #!/usr/bin/env bash
 #
-# integration.sh — tier-4 LIVE smoke against a real Valheim dedicated server (docs/V3_TARGET_STATE.md
-# §13, matrix E9). Mirrors scripts/validate.sh in shape: a terse per-phase [ OK ]/[FAIL]/[SKIP], a temp
-# run-log dir printed at the end, and a non-zero exit if anything failed.
+# integration.sh — the COMPLETE test suite: unit tests plus the tier-4 LIVE smoke against a real Valheim
+# dedicated server (docs/V3_TARGET_STATE.md §13, matrix E9). It runs `dotnet test -p:Integration=true` on
+# the solution (a plain `dotnet test` runs unit tests only). Mirrors scripts/validate.sh in shape: a terse
+# per-phase [ OK ]/[FAIL], a temp run-log dir printed at the end, and a non-zero exit if anything failed.
 #
 # What it proves (all against the REAL binary, no game client):
 #   - the server boots to Running off the real "Game server connected" line;
@@ -10,8 +11,9 @@
 #   - a Steam Cloud world imports into a local savedir and lists;
 #   - the live log still matches the ServerLogParser patterns (fixture-drift guard), captured as an artifact.
 #
-# Machine-specific Steam paths come from scripts/integration.local.env (gitignored). If that file is
-# absent this script SKIPS (exit 0) with instructions — it never fails just because the box isn't set up.
+# Machine-specific Steam paths come from scripts/integration.local.env (gitignored). Running this script
+# means "test against a real server", so a missing env file is a failure, and the tests themselves fail on
+# any misconfiguration (validated once, in IntegrationConfig) — nothing is ever skipped.
 #
 # Network dependency: reaching Running needs outbound connectivity to Steam. If Steam is unreachable the
 # boot test fails loudly within the timeout (it does not hang silently).
@@ -34,7 +36,7 @@ esac
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 ENV_FILE="$REPO_ROOT/scripts/integration.local.env"
 ENV_EXAMPLE="$REPO_ROOT/scripts/integration.local.env.example"
-TEST_PROJECT="$REPO_ROOT/tests/ValheimServerGUI.Integration.Tests"
+SOLUTION="$REPO_ROOT/ValheimServerGUI.slnx"
 ARTIFACT_DIR="$REPO_ROOT/dist/integration"
 
 # Hang guard (mirrors validate.sh). The live tests self-bound every await with a finite timeout, so
@@ -46,19 +48,16 @@ TEST_HARD_TIMEOUT=1200   # outer wall-clock backstop if the hang guard itself we
 section() { printf '\n=== %s ===\n' "$1"; }
 ok()   { printf '[ OK ] %s\n' "$1"; }
 fail() { printf '[FAIL] %s\n' "$1"; }
-skip() { printf '[SKIP] %s\n' "$1"; }
 
 # ---- 0. config ------------------------------------------------------------------------------
 section "Config"
 if [[ ! -f "$ENV_FILE" ]]; then
-  skip "no scripts/integration.local.env — this machine isn't set up for the live smoke"
+  fail "no scripts/integration.local.env — this machine isn't set up for the live smoke"
   echo
-  echo "  To enable it, create the config from the template and fill in this box's Steam paths:"
+  echo "  Create the config from the template and fill in this box's Steam paths:"
   echo "    cp $ENV_EXAMPLE $ENV_FILE"
   echo "    \$EDITOR $ENV_FILE"
-  echo
-  echo "Nothing run (not a failure)."
-  exit 0
+  exit 1
 fi
 
 # set -a so every var the file defines is exported to the dotnet test child process (the env file is
@@ -69,20 +68,10 @@ source "$ENV_FILE"
 set +a
 ok "sourced $(basename "$ENV_FILE")"
 
-# ---- 1. validate the server binary ----------------------------------------------------------
-section "Server binary"
-if [[ -z "${VSG_IT_SERVER_EXE:-}" ]]; then
-  fail "VSG_IT_SERVER_EXE is not set in $ENV_FILE"
-  exit 1
-fi
-if [[ ! -x "$VSG_IT_SERVER_EXE" ]]; then
-  fail "server binary not found or not executable: $VSG_IT_SERVER_EXE"
-  exit 1
-fi
-SERVER_DIR="$(dirname "$VSG_IT_SERVER_EXE")"
-ok "found $(basename "$VSG_IT_SERVER_EXE")"
+# The values themselves are validated by the tests (IntegrationConfig), so a bad path fails the run with
+# one message listing every problem.
 
-# ---- 2. isolated savedir + artifact/log dirs ------------------------------------------------
+# ---- 1. isolated savedir + artifact/log dirs ------------------------------------------------
 RUNLOG="$(mktemp -d "${TMPDIR:-/tmp}/vsg-integration.XXXXXX")"
 SAVEDIR="$(mktemp -d "${TMPDIR:-/tmp}/vsg-it-savedir.XXXXXX")"
 TEST_LOG="$RUNLOG/test.log"
@@ -90,9 +79,9 @@ mkdir -p "$ARTIFACT_DIR"
 
 cleanup() {
   # Never leave a live server or orphaned testhost behind, even if a test bailed mid-boot or the run
-  # was force-killed by the hang guard. The server pattern is anchored to argv[0], so a shell whose command
-  # line merely mentions the server binary (e.g. the caller's own shell) is never matched.
-  pkill -f '^[^ ]*valheim_server\.x86_64( |$)' 2>/dev/null || true
+  # was force-killed by the hang guard. Only servers writing to THIS run's savedir are matched, so a real
+  # server the user has running on this machine is never touched.
+  pkill -f "valheim_server\.x86_64 .*-savedir $SAVEDIR( |$)" 2>/dev/null || true
   pkill -f "valheim-server-gui/artifacts/bin/ValheimServerGUI.Integration.Tests" 2>/dev/null || true
   if [[ $KEEP -eq 0 ]]; then
     rm -rf "$SAVEDIR" 2>/dev/null || true
@@ -103,13 +92,9 @@ trap cleanup EXIT INT TERM
 # Point every live test at the mochi-owned savedir + the persistent artifact dir.
 export VSG_IT_SAVEDIR="$SAVEDIR"
 export VSG_IT_ARTIFACT_DIR="$ARTIFACT_DIR"
-# Belt-and-suspenders: the Core launch fix already sets these on the child process, but exporting them
-# here too means even an older Core build would resolve steamclient.so for the live server.
-export SteamAppId=892970
-export LD_LIBRARY_PATH="${SERVER_DIR}:${SERVER_DIR}/linux64${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 
-# ---- 3. run the live integration tests ------------------------------------------------------
-section "Live integration tests"
+# ---- 2. run the complete suite --------------------------------------------------------------
+section "Complete test suite (unit + live integration)"
 echo "savedir : $SAVEDIR"
 echo "artifacts: $ARTIFACT_DIR"
 echo "(booting a real server; first boot does world-gen + Steam connect — allow a couple of minutes)"
@@ -120,7 +105,7 @@ BLAME_DIR="$RUNLOG/blame"
 
 # --blame-hang bounds + diagnoses a wedged test (dump + sequence file); outer `timeout` is the backstop.
 timeout --kill-after=30 "$TEST_HARD_TIMEOUT" \
-  dotnet test "$TEST_PROJECT" \
+  dotnet test "$SOLUTION" -p:Integration=true \
     --blame-hang --blame-hang-timeout "${TEST_HANG_TIMEOUT}s" --blame-hang-dump-type mini \
     --results-directory "$BLAME_DIR" \
     >"$TEST_LOG" 2>&1
@@ -128,7 +113,7 @@ test_code=$?
 
 grep -E 'Passed!|Failed!|Skipped!' "$TEST_LOG"
 if [[ $test_code -eq 0 ]]; then
-  ok "all live integration tests passed"
+  ok "all tests passed (unit + live integration)"
   test_status="pass"
 elif [[ $test_code -eq 124 || $test_code -eq 137 ]]; then
   fail "live tests hit the ${TEST_HARD_TIMEOUT}s hard timeout — the hang guard did not abort in time"
@@ -139,7 +124,7 @@ else
   # real hang. (Same classification as validate.sh.)
   hangseq="$(grep -rlZ 'Completed="False"' "$BLAME_DIR" 2>/dev/null | tr '\0' '\n' | grep -iE 'sequence' | head -1)"
   if grep -qE 'Failed:  *[1-9]' "$TEST_LOG"; then
-    fail "one or more live integration tests failed"
+    fail "one or more tests failed"
     # Surface the failing tests + assertion messages inline so the failure is readable without re-running.
     grep -E '\[FAIL\]|Failed |Error Message|Assert\.' "$TEST_LOG" | head -40
   elif [[ -n "$hangseq" ]]; then
@@ -149,8 +134,8 @@ else
   elif grep -qiE 'Test host process crashed|Sequence file will not be generated|inactivity time' "$TEST_LOG"; then
     fail "test host aborted with NO stuck test — likely blame-hang's watchdog on a load-slowed host, not a real hang. Re-run."
   else
-    fail "live integration tests failed (exit $test_code)"
-    grep -E '\[FAIL\]|Failed |Error Message|Skipped ' "$TEST_LOG" | head -40
+    fail "tests failed (exit $test_code)"
+    grep -E '\[FAIL\]|Failed |Error Message' "$TEST_LOG" | head -40
   fi
   echo "  (full output: $TEST_LOG)"
 fi

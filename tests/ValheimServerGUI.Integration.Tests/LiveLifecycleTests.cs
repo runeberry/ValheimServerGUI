@@ -24,7 +24,6 @@ namespace ValheimServerGUI.Integration.Tests
         private static readonly TimeSpan SettleAfterRunning = TimeSpan.FromSeconds(3);
         private static readonly TimeSpan DrainAfterStop = TimeSpan.FromSeconds(2);
 
-        public bool Skipped { get; private set; }
         public bool ReachedRunning { get; private set; }
         public bool StoppedCleanly { get; private set; }
         public DateTime? SaveTimeBeforeStopUtc { get; private set; }
@@ -36,15 +35,8 @@ namespace ValheimServerGUI.Integration.Tests
 
         public async ValueTask InitializeAsync()
         {
-            // Mirror the test-level gate: no server configured → do nothing, and every fact will Assert.Skip.
-            if (string.IsNullOrWhiteSpace(IntegrationConfig.ServerExe) || !File.Exists(IntegrationConfig.ServerExe))
-            {
-                Skipped = true;
-                return;
-            }
-
             var worldName = "ITLife" + Guid.NewGuid().ToString("n")[..6];
-            using var harness = new LiveServerHarness(IntegrationConfig.SaveDir, worldName);
+            using var harness = new LiveServerHarness(IntegrationConfig.Current.SaveDir, worldName);
 
             ReachedRunning = await harness.BootToRunningAsync(BootTimeout);
 
@@ -73,7 +65,7 @@ namespace ValheimServerGUI.Integration.Tests
 
         private static string WriteArtifact(string worldName, IReadOnlyList<string> log)
         {
-            var path = Path.Join(IntegrationConfig.ArtifactDir,
+            var path = Path.Join(IntegrationConfig.Current.ArtifactDir,
                 $"live-server-{worldName}-{DateTime.UtcNow:yyyyMMdd-HHmmss}.log");
             File.WriteAllLines(path, log);
             return path;
@@ -95,8 +87,6 @@ namespace ValheimServerGUI.Integration.Tests
         [Fact]
         public void Boot_ReachesRunning()
         {
-            IntegrationConfig.SkipIfServerUnconfigured();
-
             Assert.True(_fixture.ReachedRunning,
                 $"Server never reached Running within the boot timeout. Check Steam connectivity. Log tail:{Environment.NewLine}{Tail(_fixture.CapturedLog)}");
         }
@@ -108,8 +98,6 @@ namespace ValheimServerGUI.Integration.Tests
         [Fact]
         public void GracefulStop_FlushesWorldSave()
         {
-            IntegrationConfig.SkipIfServerUnconfigured();
-
             Assert.True(_fixture.ReachedRunning, "Precondition failed: server never reached Running.");
             Assert.True(_fixture.StoppedCleanly, "Server did not reach Stopped within the graceful-stop timeout.");
 
@@ -130,8 +118,6 @@ namespace ValheimServerGUI.Integration.Tests
         [Fact]
         public void CapturedLog_StillMatchesParserPatterns()
         {
-            IntegrationConfig.SkipIfServerUnconfigured();
-
             Assert.NotNull(_fixture.ArtifactPath);
             Assert.True(File.Exists(_fixture.ArtifactPath), $"Captured-log artifact missing: {_fixture.ArtifactPath}");
             Assert.NotEmpty(_fixture.CapturedLog);

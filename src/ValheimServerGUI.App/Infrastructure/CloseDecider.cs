@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Infrastructure;
 
@@ -28,11 +29,6 @@ public enum CloseDecision
 /// </summary>
 public static class CloseDecider
 {
-    public const string RunningMessage = "A Valheim server is still running. Do you want to stop it and exit?";
-
-    public const string StoppingMessage =
-        "A Valheim server is currently shutting down. Exit anyway?\nThis could result in a loss of save data!";
-
     /// <param name="confirm">Asks the user a yes/no question; true means yes.</param>
     public static async Task<CloseDecision> DecideAsync(
         IReadOnlyCollection<ServerStatus> statuses, Func<string, Task<bool>> confirm)
@@ -45,9 +41,9 @@ public static class CloseDecider
             return CloseDecision.Proceed;
 
         if (anyActive)
-            return await confirm(RunningMessage) ? CloseDecision.StopThenClose : CloseDecision.Cancel;
+            return await confirm(Strings.Prompt_ExitWhileRunning) ? CloseDecision.StopThenClose : CloseDecision.Cancel;
 
         // Only server(s) mid-shutdown remain.
-        return await confirm(StoppingMessage) ? CloseDecision.Proceed : CloseDecision.Cancel;
+        return await confirm(Strings.Prompt_ExitWhileStopping) ? CloseDecision.Proceed : CloseDecision.Cancel;
     }
 }

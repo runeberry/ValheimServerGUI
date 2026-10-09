@@ -37,6 +37,12 @@
   <data name="Common_Continue" xml:space="preserve">
     <value>⟦Common_Continue⟧</value>
   </data>
+  <data name="Common_NotAvailable" xml:space="preserve">
+    <value>⟦Common_NotAvailable⟧</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>⟦Common_Loading⟧</value>
+  </data>
   <!-- Main window -->
   <data name="MainWindow_Profile_Label" xml:space="preserve">
     <value>⟦MainWindow_Profile_Label⟧</value>
@@ -311,6 +317,18 @@
   <data name="ServerDetails_AvgWorldSave_Help" xml:space="preserve">
     <value>⟦ServerDetails_AvgWorldSave_Help⟧</value>
   </data>
+  <data name="ServerDetails_Uptime_OneDay" xml:space="preserve">
+    <value>⟦ServerDetails_Uptime_OneDay {0}⟧</value>
+  </data>
+  <data name="ServerDetails_Uptime_Days" xml:space="preserve">
+    <value>⟦ServerDetails_Uptime_Days {0} {1}⟧</value>
+  </data>
+  <data name="ServerDetails_LastWorldSave_Value" xml:space="preserve">
+    <value>⟦ServerDetails_LastWorldSave_Value {0:G} {1:F0}⟧</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Value" xml:space="preserve">
+    <value>⟦ServerDetails_AvgWorldSave_Value {0:F0}⟧</value>
+  </data>
   <!-- Players tab -->
   <data name="Players_ManagePlayers" xml:space="preserve">
     <value>⟦Players_ManagePlayers⟧</value>
@@ -371,6 +389,15 @@
   </data>
   <data name="Players_RemovePlayer_Tip" xml:space="preserve">
     <value>⟦Players_RemovePlayer_Tip⟧</value>
+  </data>
+  <data name="Players_EmptyText" xml:space="preserve">
+    <value>⟦Players_EmptyText⟧</value>
+  </data>
+  <data name="Players_Menu_DefaultRole" xml:space="preserve">
+    <value>⟦Players_Menu_DefaultRole {0}⟧</value>
+  </data>
+  <data name="Players_UnknownName" xml:space="preserve">
+    <value>⟦Players_UnknownName⟧</value>
   </data>
   <!-- Server status -->
   <data name="ServerStatus_Stopped" xml:space="preserve">
@@ -549,6 +576,12 @@
   <data name="Prompt_EditPlayerName_Message" xml:space="preserve">
     <value>⟦Prompt_EditPlayerName_Message⟧</value>
   </data>
+  <data name="Prompt_ExitWhileRunning" xml:space="preserve">
+    <value>⟦Prompt_ExitWhileRunning⟧</value>
+  </data>
+  <data name="Prompt_ExitWhileStopping" xml:space="preserve">
+    <value>⟦Prompt_ExitWhileStopping⟧</value>
+  </data>
   <!-- Tray -->
   <data name="Tray_Profile" xml:space="preserve">
     <value>⟦Tray_Profile {0}⟧</value>
@@ -622,6 +655,12 @@
   <data name="Directories_SaveData_Help" xml:space="preserve">
     <value>⟦Directories_SaveData_Help⟧</value>
   </data>
+  <data name="Directories_MissingServerExe" xml:space="preserve">
+    <value>⟦Directories_MissingServerExe {0}⟧</value>
+  </data>
+  <data name="Directories_MissingSaveData" xml:space="preserve">
+    <value>⟦Directories_MissingSaveData {0}⟧</value>
+  </data>
   <!-- Known characters -->
   <data name="KnownCharacters_Header" xml:space="preserve">
     <value>⟦KnownCharacters_Header⟧</value>
@@ -678,6 +717,15 @@
   <data name="ManagePlayers_Column_DefaultRole" xml:space="preserve">
     <value>⟦ManagePlayers_Column_DefaultRole⟧</value>
   </data>
+  <data name="ManagePlayers_NoAccounts" xml:space="preserve">
+    <value>⟦ManagePlayers_NoAccounts⟧</value>
+  </data>
+  <data name="ManagePlayers_NoAccountSelected" xml:space="preserve">
+    <value>⟦ManagePlayers_NoAccountSelected⟧</value>
+  </data>
+  <data name="ManagePlayers_NoKnownCharacters" xml:space="preserve">
+    <value>⟦ManagePlayers_NoKnownCharacters⟧</value>
+  </data>
   <!-- Player Details dialog -->
   <data name="PlayerDetails_Title" xml:space="preserve">
     <value>⟦PlayerDetails_Title⟧</value>
@@ -706,6 +754,15 @@
   <data name="PlayerDetails_Refresh_Tip" xml:space="preserve">
     <value>⟦PlayerDetails_Refresh_Tip⟧</value>
   </data>
+  <data name="PlayerDetails_UnknownName" xml:space="preserve">
+    <value>⟦PlayerDetails_UnknownName⟧</value>
+  </data>
+  <data name="PlayerDetails_XboxId_Label" xml:space="preserve">
+    <value>⟦PlayerDetails_XboxId_Label⟧</value>
+  </data>
+  <data name="PlayerDetails_SteamId_Label" xml:space="preserve">
+    <value>⟦PlayerDetails_SteamId_Label⟧</value>
+  </data>
   <!-- Add Player dialog -->
   <data name="AddPlayer_Title" xml:space="preserve">
     <value>⟦AddPlayer_Title⟧</value>
@@ -733,6 +790,15 @@
   </data>
   <data name="AddPlayer_Submit" xml:space="preserve">
     <value>⟦AddPlayer_Submit⟧</value>
+  </data>
+  <data name="AddPlayer_DefaultRole_Help" xml:space="preserve">
+    <value>⟦AddPlayer_DefaultRole_Help⟧</value>
+  </data>
+  <data name="AddPlayer_ServerRole_Help" xml:space="preserve">
+    <value>⟦AddPlayer_ServerRole_Help⟧</value>
+  </data>
+  <data name="AddPlayer_SetAsDefault_Help" xml:space="preserve">
+    <value>⟦AddPlayer_SetAsDefault_Help⟧</value>
   </data>
   <!-- World Settings dialog -->
   <data name="WorldPreferences_Preset_Label" xml:space="preserve">
@@ -809,6 +875,12 @@
   <data name="About_BuildDate" xml:space="preserve">
     <value>⟦About_BuildDate {0}⟧</value>
   </data>
+  <data name="About_License" xml:space="preserve">
+    <value>⟦About_License⟧</value>
+  </data>
+  <data name="About_Disclaimer" xml:space="preserve">
+    <value>⟦About_Disclaimer⟧</value>
+  </data>
   <!-- Controls -->
   <data name="Controls_Browse" xml:space="preserve">
     <value>⟦Controls_Browse⟧</value>
@@ -843,5 +915,108 @@
   <!-- Async operation dialog -->
   <data name="AsyncOperation_Failure" xml:space="preserve">
     <value>⟦AsyncOperation_Failure {0} {1}⟧</value>
+  </data>
+  <!-- Startup -->
+  <data name="Startup_Starting" xml:space="preserve">
+    <value>⟦Startup_Starting⟧</value>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>⟦Update_Checking⟧</value>
+  </data>
+  <data name="Startup_LoadingPlayerData" xml:space="preserve">
+    <value>⟦Startup_LoadingPlayerData⟧</value>
+  </data>
+  <data name="Startup_Ready" xml:space="preserve">
+    <value>⟦Startup_Ready⟧</value>
+  </data>
+  <!-- Update check -->
+  <data name="Update_StatusFailed" xml:space="preserve">
+    <value>⟦Update_StatusFailed⟧</value>
+  </data>
+  <data name="Update_StatusAvailable" xml:space="preserve">
+    <value>⟦Update_StatusAvailable {0}⟧</value>
+  </data>
+  <data name="Update_StatusUpToDate" xml:space="preserve">
+    <value>⟦Update_StatusUpToDate {0}⟧</value>
+  </data>
+  <data name="Update_StatusPreRelease" xml:space="preserve">
+    <value>⟦Update_StatusPreRelease {0}⟧</value>
+  </data>
+  <data name="Update_StatusUnparsable" xml:space="preserve">
+    <value>⟦Update_StatusUnparsable {0}⟧</value>
+  </data>
+  <data name="Update_ManualPrompt" xml:space="preserve">
+    <value>⟦Update_ManualPrompt {0}⟧</value>
+  </data>
+  <data name="Update_ManualFailed" xml:space="preserve">
+    <value>⟦Update_ManualFailed {0}⟧</value>
+  </data>
+  <data name="Update_ManualAvailable" xml:space="preserve">
+    <value>⟦Update_ManualAvailable⟧</value>
+  </data>
+  <data name="Update_ManualUpToDate" xml:space="preserve">
+    <value>⟦Update_ManualUpToDate⟧</value>
+  </data>
+  <data name="Update_ManualPreRelease" xml:space="preserve">
+    <value>⟦Update_ManualPreRelease {0}⟧</value>
+  </data>
+  <data name="Update_ManualUnparsable" xml:space="preserve">
+    <value>⟦Update_ManualUnparsable {0}⟧</value>
+  </data>
+  <!-- Start server validation -->
+  <data name="Validation_OpenSaveFolderFailed" xml:space="preserve">
+    <value>⟦Validation_OpenSaveFolderFailed {0}⟧</value>
+  </data>
+  <data name="Validation_OpenServerFolderFailed" xml:space="preserve">
+    <value>⟦Validation_OpenServerFolderFailed {0}⟧</value>
+  </data>
+  <data name="Validation_CloudImportFailed" xml:space="preserve">
+    <value>⟦Validation_CloudImportFailed {0} {1}⟧</value>
+  </data>
+  <data name="Validation_PortInUse" xml:space="preserve">
+    <value>⟦Validation_PortInUse {0} {1}⟧</value>
+  </data>
+  <data name="Validation_WorldNameRequired" xml:space="preserve">
+    <value>⟦Validation_WorldNameRequired⟧</value>
+  </data>
+  <data name="Validation_WorldNameLength" xml:space="preserve">
+    <value>⟦Validation_WorldNameLength⟧</value>
+  </data>
+  <data name="Validation_WorldNameTaken" xml:space="preserve">
+    <value>⟦Validation_WorldNameTaken {0}⟧</value>
+  </data>
+  <data name="Validation_WorldNotFound" xml:space="preserve">
+    <value>⟦Validation_WorldNotFound {0}⟧</value>
+  </data>
+  <!-- Player list import -->
+  <data name="Import_Title" xml:space="preserve">
+    <value>⟦Import_Title⟧</value>
+  </data>
+  <data name="Import_NoFiles" xml:space="preserve">
+    <value>⟦Import_NoFiles⟧</value>
+  </data>
+  <data name="Import_NoRoles" xml:space="preserve">
+    <value>⟦Import_NoRoles⟧</value>
+  </data>
+  <data name="Import_Confirm" xml:space="preserve">
+    <value>⟦Import_Confirm {0}⟧</value>
+  </data>
+  <data name="Import_Updated" xml:space="preserve">
+    <value>⟦Import_Updated {0}⟧</value>
+  </data>
+  <data name="Import_Failed" xml:space="preserve">
+    <value>⟦Import_Failed⟧</value>
+  </data>
+  <data name="Import_PermittedFileError_Title" xml:space="preserve">
+    <value>⟦Import_PermittedFileError_Title⟧</value>
+  </data>
+  <data name="Import_PermittedFileError_Message" xml:space="preserve">
+    <value>⟦Import_PermittedFileError_Message {0}⟧</value>
+  </data>
+  <data name="Import_RoleConflict_Title" xml:space="preserve">
+    <value>⟦Import_RoleConflict_Title⟧</value>
+  </data>
+  <data name="Import_RoleConflict_Message" xml:space="preserve">
+    <value>⟦Import_RoleConflict_Message {0}⟧</value>
   </data>
 </root>

@@ -11,6 +11,7 @@ using ValheimServerGUI.App.Tests.Services;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using Xunit;
 
@@ -148,10 +149,10 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         await h.Vm.RunImportAsync(interactive: true);
 
-        Assert.Contains(MainWindowViewModel.ImportConfirmMessage.Replace("{n}", "1"), h.ConfirmBodies);
+        Assert.Contains(string.Format(Strings.Import_Confirm, 1), h.ConfirmBodies);
         Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetOverride($"Steam:{SteamA}"));
         Assert.True(h.Vm.Form.IsDirty);
-        Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportUpdatedMessage.Replace("{n}", "1"));
+        Assert.Contains(h.Messages, m => m.Body == string.Format(Strings.Import_Updated, 1));
         Assert.Equal(1, h.Api.RequestPlayerInfoCallCount); // name lookup for the new player
     }
 
@@ -162,7 +163,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         await h.Vm.RunImportAsync(interactive: true);
 
-        Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportNoFilesMessage);
+        Assert.Contains(h.Messages, m => m.Body == Strings.Import_NoFiles);
         Assert.Empty(h.ConfirmBodies);
     }
 
@@ -176,7 +177,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         await h.Vm.RunImportAsync(interactive: true);
 
-        Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportNoRolesMessage);
+        Assert.Contains(h.Messages, m => m.Body == Strings.Import_NoRoles);
         Assert.Empty(h.ConfirmBodies);
     }
 
@@ -188,8 +189,8 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         await h.Vm.RunImportAsync(interactive: true);
 
-        Assert.DoesNotContain(h.Messages, m => m.Body == MainWindowViewModel.ImportFailedMessage);
-        Assert.Contains(h.Messages, m => m.Body == MainWindowViewModel.ImportNoRolesMessage); // nothing else to import
+        Assert.DoesNotContain(h.Messages, m => m.Body == Strings.Import_Failed);
+        Assert.Contains(h.Messages, m => m.Body == Strings.Import_NoRoles); // nothing else to import
     }
 
     [Fact]
@@ -260,7 +261,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
         await h.Vm.StartServerAsync(isManual: true);
 
         Assert.Empty(h.Started); // aborted
-        Assert.Contains(h.Messages, m => m.Title == MainWindowViewModel.PermittedFileErrorTitle);
+        Assert.Contains(h.Messages, m => m.Title == Strings.Import_PermittedFileError_Title);
     }
 
     [Fact]

@@ -37,6 +37,12 @@
   <data name="Common_Continue" xml:space="preserve">
     <value>Continue</value>
   </data>
+  <data name="Common_NotAvailable" xml:space="preserve">
+    <value>N/A</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>Loading…</value>
+  </data>
   <!-- Main window -->
   <data name="MainWindow_Profile_Label" xml:space="preserve">
     <value>Profile</value>
@@ -321,6 +327,18 @@ TIP: You can also connect to "localhost", which is a little easier than typing "
   <data name="ServerDetails_AvgWorldSave_Help" xml:space="preserve">
     <value>The average amount of time it has taken to save your game world, over the past 10 saves.</value>
   </data>
+  <data name="ServerDetails_Uptime_OneDay" xml:space="preserve">
+    <value>1 day + {0}</value>
+  </data>
+  <data name="ServerDetails_Uptime_Days" xml:space="preserve">
+    <value>{0} days + {1}</value>
+  </data>
+  <data name="ServerDetails_LastWorldSave_Value" xml:space="preserve">
+    <value>{0:G} ({1:F0}ms)</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Value" xml:space="preserve">
+    <value>{0:F0}ms</value>
+  </data>
   <!-- Players tab -->
   <data name="Players_ManagePlayers" xml:space="preserve">
     <value>Manage Players…</value>
@@ -381,6 +399,15 @@ TIP: You can also connect to "localhost", which is a little easier than typing "
   </data>
   <data name="Players_RemovePlayer_Tip" xml:space="preserve">
     <value>Remove player</value>
+  </data>
+  <data name="Players_EmptyText" xml:space="preserve">
+    <value>Players will appear here as they join your server.</value>
+  </data>
+  <data name="Players_Menu_DefaultRole" xml:space="preserve">
+    <value>Default role ({0})</value>
+  </data>
+  <data name="Players_UnknownName" xml:space="preserve">
+    <value>[unknown]</value>
   </data>
   <!-- Server status -->
   <data name="ServerStatus_Stopped" xml:space="preserve">
@@ -570,6 +597,13 @@ Save anyway?</value>
   <data name="Prompt_EditPlayerName_Message" xml:space="preserve">
     <value>Enter a display name for this player (leave blank to clear):</value>
   </data>
+  <data name="Prompt_ExitWhileRunning" xml:space="preserve">
+    <value>A Valheim server is still running. Do you want to stop it and exit?</value>
+  </data>
+  <data name="Prompt_ExitWhileStopping" xml:space="preserve">
+    <value>A Valheim server is currently shutting down. Exit anyway?
+This could result in a loss of save data!</value>
+  </data>
   <!-- Tray -->
   <data name="Tray_Profile" xml:space="preserve">
     <value>Profile: {0}</value>
@@ -651,6 +685,14 @@ NOTE: You must have Valheim Dedicated Server installed in order to use this appl
   <data name="Directories_SaveData_Help" xml:space="preserve">
     <value>The location of the save data for your Valheim server, including the "worlds" folder, admin lists, etc.</value>
   </data>
+  <data name="Directories_MissingServerExe" xml:space="preserve">
+    <value>The server executable does not exist:
+{0}</value>
+  </data>
+  <data name="Directories_MissingSaveData" xml:space="preserve">
+    <value>The save data folder does not exist:
+{0}</value>
+  </data>
   <!-- Known characters -->
   <data name="KnownCharacters_Header" xml:space="preserve">
     <value>Known Characters</value>
@@ -709,6 +751,15 @@ If a name appears with a (!), it means that name may not be matched to the corre
   <data name="ManagePlayers_Column_DefaultRole" xml:space="preserve">
     <value>Default Role</value>
   </data>
+  <data name="ManagePlayers_NoAccounts" xml:space="preserve">
+    <value>Add an account using the button below.</value>
+  </data>
+  <data name="ManagePlayers_NoAccountSelected" xml:space="preserve">
+    <value>Select an account to see known characters.</value>
+  </data>
+  <data name="ManagePlayers_NoKnownCharacters" xml:space="preserve">
+    <value>No known characters for this account.</value>
+  </data>
   <!-- Player Details dialog -->
   <data name="PlayerDetails_Title" xml:space="preserve">
     <value>Player Info</value>
@@ -737,6 +788,15 @@ If a name appears with a (!), it means that name may not be matched to the corre
   <data name="PlayerDetails_Refresh_Tip" xml:space="preserve">
     <value>Refresh player data</value>
   </data>
+  <data name="PlayerDetails_UnknownName" xml:space="preserve">
+    <value>(unknown)</value>
+  </data>
+  <data name="PlayerDetails_XboxId_Label" xml:space="preserve">
+    <value>Xbox ID:</value>
+  </data>
+  <data name="PlayerDetails_SteamId_Label" xml:space="preserve">
+    <value>Steam ID:</value>
+  </data>
   <!-- Add Player dialog -->
   <data name="AddPlayer_Title" xml:space="preserve">
     <value>Add Player</value>
@@ -764,6 +824,15 @@ If a name appears with a (!), it means that name may not be matched to the corre
   </data>
   <data name="AddPlayer_Submit" xml:space="preserve">
     <value>Add Player</value>
+  </data>
+  <data name="AddPlayer_DefaultRole_Help" xml:space="preserve">
+    <value>Set the default role that this player will receive on all servers that you host.</value>
+  </data>
+  <data name="AddPlayer_ServerRole_Help" xml:space="preserve">
+    <value>Set the role for this player when they join this server.</value>
+  </data>
+  <data name="AddPlayer_SetAsDefault_Help" xml:space="preserve">
+    <value>Apply this role to this player for all servers that you host, unless a server-specific role is set as an override.</value>
   </data>
   <!-- World Settings dialog -->
   <data name="WorldPreferences_Preset_Label" xml:space="preserve">
@@ -849,6 +918,12 @@ Contact Runeberry Software for further support.</value>
   <data name="About_BuildDate" xml:space="preserve">
     <value>Build Date: {0}</value>
   </data>
+  <data name="About_License" xml:space="preserve">
+    <value>Licensed under GNU GPLv3</value>
+  </data>
+  <data name="About_Disclaimer" xml:space="preserve">
+    <value>This is a fan-made project. Runeberry Software is not affiliated with Valheim or Iron Gate Studio. We are not responsible for the loss of any save data. Use at your own risk!</value>
+  </data>
   <!-- Controls -->
   <data name="Controls_Browse" xml:space="preserve">
     <value>Browse…</value>
@@ -883,5 +958,113 @@ Contact Runeberry Software for further support.</value>
   <!-- Async operation dialog -->
   <data name="AsyncOperation_Failure" xml:space="preserve">
     <value>{0}: {1}</value>
+  </data>
+  <!-- Startup -->
+  <data name="Startup_Starting" xml:space="preserve">
+    <value>Starting…</value>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>Checking for updates…</value>
+  </data>
+  <data name="Startup_LoadingPlayerData" xml:space="preserve">
+    <value>Loading player data…</value>
+  </data>
+  <data name="Startup_Ready" xml:space="preserve">
+    <value>Ready</value>
+  </data>
+  <!-- Update check -->
+  <data name="Update_StatusFailed" xml:space="preserve">
+    <value>Update check failed</value>
+  </data>
+  <data name="Update_StatusAvailable" xml:space="preserve">
+    <value>Update available ({0})</value>
+  </data>
+  <data name="Update_StatusUpToDate" xml:space="preserve">
+    <value>Up to date ({0})</value>
+  </data>
+  <data name="Update_StatusPreRelease" xml:space="preserve">
+    <value>Pre-release build ({0})</value>
+  </data>
+  <data name="Update_StatusUnparsable" xml:space="preserve">
+    <value>Unable to parse version ({0})</value>
+  </data>
+  <data name="Update_ManualPrompt" xml:space="preserve">
+    <value>{0}
+Would you like to go to the download page?</value>
+  </data>
+  <data name="Update_ManualFailed" xml:space="preserve">
+    <value>Update check failed: {0}.</value>
+  </data>
+  <data name="Update_ManualAvailable" xml:space="preserve">
+    <value>A newer version of ValheimServerGUI is available.</value>
+  </data>
+  <data name="Update_ManualUpToDate" xml:space="preserve">
+    <value>You are running the latest version of ValheimServerGUI.</value>
+  </data>
+  <data name="Update_ManualPreRelease" xml:space="preserve">
+    <value>You are currently running a pre-release version of ValheimServerGUI. The latest stable version is ({0}).</value>
+  </data>
+  <data name="Update_ManualUnparsable" xml:space="preserve">
+    <value>Update check failed: Unable to parse version ({0}).</value>
+  </data>
+  <!-- Start server validation -->
+  <data name="Validation_OpenSaveFolderFailed" xml:space="preserve">
+    <value>Unable to open the save folder: {0}</value>
+  </data>
+  <data name="Validation_OpenServerFolderFailed" xml:space="preserve">
+    <value>Unable to open the server folder: {0}</value>
+  </data>
+  <data name="Validation_CloudImportFailed" xml:space="preserve">
+    <value>Failed to import cloud world '{0}': {1}</value>
+  </data>
+  <data name="Validation_PortInUse" xml:space="preserve">
+    <value>Port {0} or {1} is already in use.
+Valheim requires two adjacent ports to run a dedicated server.
+Please shut down any UDP applications using these ports, or choose a different port for your server.</value>
+  </data>
+  <data name="Validation_WorldNameRequired" xml:space="preserve">
+    <value>You must enter a world name, or choose an existing world.</value>
+  </data>
+  <data name="Validation_WorldNameLength" xml:space="preserve">
+    <value>World name must be 5-20 characters long.</value>
+  </data>
+  <data name="Validation_WorldNameTaken" xml:space="preserve">
+    <value>A world named '{0}' already exists.</value>
+  </data>
+  <data name="Validation_WorldNotFound" xml:space="preserve">
+    <value>No world exists with name '{0}'.</value>
+  </data>
+  <!-- Player list import -->
+  <data name="Import_Title" xml:space="preserve">
+    <value>Import player lists</value>
+  </data>
+  <data name="Import_NoFiles" xml:space="preserve">
+    <value>No files to import.</value>
+  </data>
+  <data name="Import_NoRoles" xml:space="preserve">
+    <value>No roles to update.</value>
+  </data>
+  <data name="Import_Confirm" xml:space="preserve">
+    <value>{0} role(s) will be updated from player list files.</value>
+  </data>
+  <data name="Import_Updated" xml:space="preserve">
+    <value>Updated {0} role(s).</value>
+  </data>
+  <data name="Import_Failed" xml:space="preserve">
+    <value>Failed to import player lists. See application logs for details.</value>
+  </data>
+  <data name="Import_PermittedFileError_Title" xml:space="preserve">
+    <value>Permitted List File Error</value>
+  </data>
+  <data name="Import_PermittedFileError_Message" xml:space="preserve">
+    <value>The server is set to launch without a permitted players list, but {0} is present on disk, and could not be moved. Please move or delete this file, or change the server configuration to use the permitted list.</value>
+  </data>
+  <data name="Import_RoleConflict_Title" xml:space="preserve">
+    <value>Player Role Conflicts</value>
+  </data>
+  <data name="Import_RoleConflict_Message" xml:space="preserve">
+    <value>{0} player(s) are present in player list files with conflicting roles. What would you like to do?
+
+See application logs for more details.</value>
   </data>
 </root>

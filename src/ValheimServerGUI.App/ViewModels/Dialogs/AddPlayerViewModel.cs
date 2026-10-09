@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
@@ -42,12 +43,6 @@ public sealed record AddPlayerOptions(AddPlayerTarget Target, PlayerRole Initial
 /// </summary>
 public partial class AddPlayerViewModel : ObservableObject
 {
-    // ===== User copy (EXACT — do not paraphrase); asserted verbatim by a test. =====
-    public const string DefaultRoleHelp = "Set the default role that this player will receive on all servers that you host.";
-    public const string ServerRoleHelp = "Set the role for this player when they join this server.";
-    public const string SetAsDefaultHelp =
-        "Apply this role to this player for all servers that you host, unless a server-specific role is set as an override.";
-
     private readonly AddPlayerTarget _target;
 
     public AddPlayerViewModel(AddPlayerOptions options)

@@ -12,6 +12,7 @@ using ValheimServerGUI.App.Tests.Services;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
 using Xunit;
@@ -49,7 +50,7 @@ public class FooterReadoutTests
 
         Assert.False(vm.UpdateIsLink); // "up to date" is not a link
         var readout = window.GetVisualDescendants().OfType<TextBlock>()
-            .First(t => t.Text != null && t.Text.StartsWith("Up to date") && t.IsVisible);
+            .First(t => t.Text != null && t.Text == string.Format(Strings.Update_StatusUpToDate, current) && t.IsVisible);
         var color = (readout.Foreground as ISolidColorBrush)!.Color;
         Assert.Equal(255, color.A); // fully opaque, not the dimmed disabled colour
     }
@@ -77,6 +78,6 @@ public class FooterReadoutTests
         Assert.True(vm.UpdateIsLink); // a newer version is a link
         var link = window.GetVisualDescendants().OfType<HyperlinkLabel>()
             .First(l => l.IsVisible);
-        Assert.StartsWith("Update available", link.Text!);
+        Assert.Equal(string.Format(Strings.Update_StatusAvailable, "999.0.0"), link.Text);
     }
 }

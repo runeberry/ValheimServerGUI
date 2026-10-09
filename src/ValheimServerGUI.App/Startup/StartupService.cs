@@ -2,6 +2,7 @@ using System;
 using System.Threading.Tasks;
 using Serilog;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.Startup;
@@ -27,13 +28,13 @@ public sealed class StartupService
 
     public async Task RunAsync(IProgress<StartupProgress>? progress = null)
     {
-        progress?.Report(new StartupProgress("Checking for updates…", 0.15));
+        progress?.Report(new StartupProgress(Strings.Update_Checking, 0.15));
         await RunSafelyAsync("update check", () => _updateProvider.CheckForUpdatesAsync(isManualCheck: false));
 
-        progress?.Report(new StartupProgress("Loading player data…", 0.6));
+        progress?.Report(new StartupProgress(Strings.Startup_LoadingPlayerData, 0.6));
         await RunSafelyAsync("player-data load", () => _playerData.LoadAsync());
 
-        progress?.Report(new StartupProgress("Ready", 1.0));
+        progress?.Report(new StartupProgress(Strings.Startup_Ready, 1.0));
     }
 
     private async Task RunSafelyAsync(string what, Func<Task> task)

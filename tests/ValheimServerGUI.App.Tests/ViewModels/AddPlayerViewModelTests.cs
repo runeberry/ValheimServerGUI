@@ -102,15 +102,4 @@ public class AddPlayerViewModelTests
         Assert.Equal(PlayerPlatforms.All, vm.Platforms.ToArray());
         Assert.Equal(PlayerPlatforms.Steam, vm.SelectedPlatform);
     }
-
-    [Fact]
-    public void Help_copy_is_verbatim()
-    {
-        Assert.Equal("Set the default role that this player will receive on all servers that you host.",
-            AddPlayerViewModel.DefaultRoleHelp);
-        Assert.Equal("Set the role for this player when they join this server.", AddPlayerViewModel.ServerRoleHelp);
-        Assert.Equal(
-            "Apply this role to this player for all servers that you host, unless a server-specific role is set as an override.",
-            AddPlayerViewModel.SetAsDefaultHelp);
-    }
 }

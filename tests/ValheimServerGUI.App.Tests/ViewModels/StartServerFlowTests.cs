@@ -9,6 +9,7 @@ using ValheimServerGUI.App.Services;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using Xunit;
 
@@ -135,7 +136,7 @@ public sealed class StartServerFlowTests : IDisposable
 
         await h.Vm.StartServerAsync(isManual: true);
 
-        Assert.Contains(h.Errors, e => e.Contains("5-20"));
+        Assert.Contains(Strings.Validation_WorldNameLength, h.Errors);
         Assert.Empty(h.Started);
     }
 
@@ -149,7 +150,7 @@ public sealed class StartServerFlowTests : IDisposable
 
         await h.Vm.StartServerAsync(isManual: true);
 
-        Assert.Contains(h.Errors, e => e.Contains("already exists"));
+        Assert.Contains(string.Format(Strings.Validation_WorldNameTaken, "Existingworld"), h.Errors);
         Assert.False(h.Vm.Form.UseNewWorld); // switched back to Existing
         Assert.Equal("Existingworld", h.Vm.Form.ExistingWorld);
         Assert.Empty(h.Started);
@@ -164,7 +165,7 @@ public sealed class StartServerFlowTests : IDisposable
 
         await h.Vm.StartServerAsync(isManual: true);
 
-        Assert.Contains(h.Errors, e => e.Contains("No world exists"));
+        Assert.Contains(string.Format(Strings.Validation_WorldNotFound, "Ghostworld"), h.Errors);
         Assert.Empty(h.Started);
     }
 
@@ -183,7 +184,7 @@ public sealed class StartServerFlowTests : IDisposable
 
         await h.Vm.StartServerAsync(isManual: true);
 
-        Assert.Contains(h.Errors, e => e.Contains("already in use"));
+        Assert.Contains(string.Format(Strings.Validation_PortInUse, port, port + 1), h.Errors);
         Assert.Empty(h.Started);
     }
 

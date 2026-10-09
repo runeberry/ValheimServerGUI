@@ -50,9 +50,9 @@ public partial class MainWindow : Window
         viewModel.UnsavedChangesPrompt = () => DialogGuards.ConfirmSaveDiscardCancelAsync(this);
         viewModel.MessagePrompt = ShowMessageAsync;
         viewModel.ImportConfirmPrompt = body =>
-            MessageBox.ConfirmAsync(this, MainWindowViewModel.ImportDialogTitle, body, Strings.Common_Continue, Strings.Common_Cancel);
+            MessageBox.ConfirmAsync(this, Strings.Import_Title, body, Strings.Common_Continue, Strings.Common_Cancel);
         viewModel.ConflictPrompt = body => MessageBox.ChooseAsync<RoleConflictChoice>(
-            this, MainWindowViewModel.RoleConflictTitle, body,
+            this, Strings.Import_RoleConflict_Title, body,
             new MessageBoxButton(Strings.Prompt_RoleConflict_UseServerProfile, RoleConflictChoice.UseServerProfile, isDefault: true),
             new MessageBoxButton(Strings.Prompt_RoleConflict_UseRolesFromFile, RoleConflictChoice.UseRolesFromFile),
             new MessageBoxButton(Strings.Common_Cancel, RoleConflictChoice.Cancel, isCancel: true));

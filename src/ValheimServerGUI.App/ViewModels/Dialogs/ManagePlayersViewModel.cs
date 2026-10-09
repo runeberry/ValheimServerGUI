@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Avalonia.Threading;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
@@ -17,11 +18,6 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 /// </summary>
 public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
 {
-    // ===== User copy (EXACT — do not paraphrase); asserted verbatim by a test. =====
-    public const string NoAccountsText = "Add an account using the button below.";
-    public const string NoAccountSelectedText = "Select an account to see known characters.";
-    public const string NoKnownCharactersText = "No known characters for this account.";
-
     private readonly IUserPreferencesProvider _prefs;
     private readonly IPlayerDataRepository _repo;
     private readonly IRuneberryApiClient? _api;
@@ -36,7 +32,7 @@ public sealed class ManagePlayersViewModel : ModalEditViewModel, IDisposable
         _defaults = new Dictionary<string, PlayerDefaultEntry>(prefs.LoadPreferences().PlayerDefaults);
         Records = new StagedPlayerRecords(repo);
 
-        var knownCharacters = new KnownCharactersViewModel(NoAccountSelectedText, NoKnownCharactersText);
+        var knownCharacters = new KnownCharactersViewModel(Strings.ManagePlayers_NoAccountSelected, Strings.ManagePlayers_NoKnownCharacters);
         knownCharacters.Edited += OnKnownCharactersEdited;
         PlayerAccounts = new PlayerListSectionViewModel(this, isBanned: false, knownCharacters);
         Banned = new PlayerListSectionViewModel(this, isBanned: true, knownCharacters: null);

@@ -2,6 +2,7 @@ using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
@@ -44,9 +45,9 @@ public partial class DirectoriesViewModel : ModalEditViewModel
         get
         {
             if (!string.IsNullOrWhiteSpace(ServerExePath) && !File.Exists(ServerExePath))
-                return $"The server executable does not exist:\n{ServerExePath}";
+                return string.Format(Strings.Directories_MissingServerExe, ServerExePath);
             if (!string.IsNullOrWhiteSpace(SaveDataFolderPath) && !Directory.Exists(SaveDataFolderPath))
-                return $"The save data folder does not exist:\n{SaveDataFolderPath}";
+                return string.Format(Strings.Directories_MissingSaveData, SaveDataFolderPath);
             return null;
         }
     }

@@ -1,5 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
@@ -29,11 +30,9 @@ public partial class AboutViewModel : ObservableObject
 
     public string Copyright => "© 2023 Runeberry Software, LLC";
 
-    public string License => "Licensed under GNU GPLv3";
+    public string License => Strings.About_License;
 
-    public string Disclaimer =>
-        "This is a fan-made project. Runeberry Software is not affiliated with Valheim or Iron Gate Studio. " +
-        "We are not responsible for the loss of any save data. Use at your own risk!";
+    public string Disclaimer => Strings.About_Disclaimer;
 
     public string Version { get; }
 

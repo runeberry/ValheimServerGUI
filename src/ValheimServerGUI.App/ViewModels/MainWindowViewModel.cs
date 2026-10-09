@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Logging;
 
@@ -158,24 +159,6 @@ public partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>Shows the Save Changes / Discard Changes / Cancel unsaved-changes prompt (§13.3). Wired by the window.</summary>
     public Func<Task<UnsavedChangesChoice>>? UnsavedChangesPrompt { get; set; }
-
-    // ===== Player-list import / conflict user copy (EXACT — do not paraphrase) =====
-    // These strings are user-facing and asserted verbatim by a test. {n}/{filepath} are literal placeholders
-    // substituted at display time. Substitutions and titles all live here so there is one source of truth.
-    public const string ImportDialogTitle = "Import player lists";
-    public const string ImportNoFilesMessage = "No files to import.";
-    public const string ImportNoRolesMessage = "No roles to update.";
-    public const string ImportConfirmMessage = "{n} role(s) will be updated from player list files.";
-    public const string ImportUpdatedMessage = "Updated {n} role(s).";
-    public const string ImportFailedMessage = "Failed to import player lists. See application logs for details.";
-
-    public const string PermittedFileErrorTitle = "Permitted List File Error";
-    public const string PermittedFileErrorMessage =
-        "The server is set to launch without a permitted players list, but {filepath} is present on disk, and could not be moved. Please move or delete this file, or change the server configuration to use the permitted list.";
-
-    public const string RoleConflictTitle = "Player Role Conflicts";
-    public const string RoleConflictMessage =
-        "{n} player(s) are present in player list files with conflicting roles. What would you like to do?\n\nSee application logs for more details.";
 
     /// <summary>Shows a single-OK informational modal (title, body). Wired by the window; no-op if unset.</summary>
     public Func<string, string, Task>? MessagePrompt { get; set; }
@@ -331,7 +314,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ErrorReported?.Invoke($"Unable to open the save folder: {ex.Message}");
+            ErrorReported?.Invoke(string.Format(Strings.Validation_OpenSaveFolderFailed, ex.Message));
         }
     }
 
@@ -345,7 +328,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            ErrorReported?.Invoke($"Unable to open the server folder: {ex.Message}");
+            ErrorReported?.Invoke(string.Format(Strings.Validation_OpenServerFolderFailed, ex.Message));
         }
     }
 
@@ -523,7 +506,7 @@ public partial class MainWindowViewModel : ViewModelBase
             }
             catch (Exception ex)
             {
-                Error($"Failed to import cloud world '{cloudName}': {ex.Message}");
+                Error(string.Format(Strings.Validation_CloudImportFailed, cloudName, ex.Message));
                 return;
             }
 
@@ -547,9 +530,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var port = options.Port;
         if (!_ipProvider.IsLocalUdpPortAvailable(port, port + 1))
         {
-            Error($"Port {port} or {port + 1} is already in use.\n" +
-                  "Valheim requires two adjacent ports to run a dedicated server.\n" +
-                  "Please shut down any UDP applications using these ports, or choose a different port for your server.");
+            Error(string.Format(Strings.Validation_PortInUse, port, port + 1));
             return;
         }
 
@@ -561,17 +542,17 @@ public partial class MainWindowViewModel : ViewModelBase
         {
             if (string.IsNullOrWhiteSpace(worldName))
             {
-                Error("You must enter a world name, or choose an existing world.");
+                Error(Strings.Validation_WorldNameRequired);
                 return;
             }
             if (worldName.Length < 5 || worldName.Length > 20)
             {
-                Error("World name must be 5-20 characters long.");
+                Error(Strings.Validation_WorldNameLength);
                 return;
             }
             if (!saveFolder.IsWorldNameAvailable(worldName))
             {
-                Error($"A world named '{worldName}' already exists.");
+                Error(string.Format(Strings.Validation_WorldNameTaken, worldName));
                 Form.UseNewWorld = false;
                 Form.ExistingWorld = worldName;
                 return;
@@ -579,7 +560,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
         else if (saveFolder.IsWorldNameAvailable(worldName))
         {
-            Error($"No world exists with name '{worldName}'.");
+            Error(string.Format(Strings.Validation_WorldNotFound, worldName));
             return;
         }
 
@@ -700,7 +681,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (savedir is null)
         {
             _logger.Warning("Player-list import skipped for profile '{profile}': no save folder configured.", CurrentProfile?.ProfileName);
-            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoFilesMessage);
+            if (interactive) await ShowMessageAsync(Strings.Import_Title, Strings.Import_NoFiles);
             return;
         }
 
@@ -717,7 +698,7 @@ public partial class MainWindowViewModel : ViewModelBase
         catch (Exception ex)
         {
             _logger.Error("Player-list import failed: {message}", ex.Message);
-            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportFailedMessage);
+            if (interactive) await ShowMessageAsync(Strings.Import_Title, Strings.Import_Failed);
             return;
         }
 
@@ -727,21 +708,21 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!plan.AnyFilesPresent)
         {
             _logger.Information("Player-list import: no list files present in {folder}.", savedir);
-            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoFilesMessage);
+            if (interactive) await ShowMessageAsync(Strings.Import_Title, Strings.Import_NoFiles);
             return;
         }
 
         if (plan.UpdateCount == 0)
         {
             _logger.Information("Player-list import: files already match the profile; no role changes.");
-            if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportNoRolesMessage);
+            if (interactive) await ShowMessageAsync(Strings.Import_Title, Strings.Import_NoRoles);
             return;
         }
 
         if (interactive)
         {
             var proceed = ImportConfirmPrompt is not null
-                && await ImportConfirmPrompt(ImportConfirmMessage.Replace("{n}", plan.UpdateCount.ToString()));
+                && await ImportConfirmPrompt(string.Format(Strings.Import_Confirm, plan.UpdateCount));
             if (!proceed)
             {
                 _logger.Information("Player-list import cancelled by user.");
@@ -753,7 +734,7 @@ public partial class MainWindowViewModel : ViewModelBase
         _logger.Information("Player-list import applied: {count} role change(s), usePermittedList={mode}.",
             plan.UpdateCount, plan.UsePermittedList);
 
-        if (interactive) await ShowMessageAsync(ImportDialogTitle, ImportUpdatedMessage.Replace("{n}", plan.UpdateCount.ToString()));
+        if (interactive) await ShowMessageAsync(Strings.Import_Title, string.Format(Strings.Import_Updated, plan.UpdateCount));
     }
 
     // Applies a role map + flag to the form as one batched edit, then fires a name lookup for each new player
@@ -789,7 +770,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (backup is null)
             {
                 _logger.Error("Cannot start: permitted list file {file} is present in open mode and could not be moved.", permittedFile.FullName);
-                await ShowMessageAsync(PermittedFileErrorTitle, PermittedFileErrorMessage.Replace("{filepath}", permittedFile.FullName));
+                await ShowMessageAsync(Strings.Import_PermittedFileError_Title, string.Format(Strings.Import_PermittedFileError_Message, permittedFile.FullName));
                 return false;
             }
             _logger.Warning("Open-mode start: backed up existing permitted list {src} to {dst}.", permittedFile.FullName, backup.FullName);
@@ -820,7 +801,7 @@ public partial class MainWindowViewModel : ViewModelBase
         if (report.Conflicts.Count == 0) return true;
 
         var choice = (isManual && ConflictPrompt is not null)
-            ? await ConflictPrompt(RoleConflictMessage.Replace("{n}", report.Conflicts.Count.ToString()))
+            ? await ConflictPrompt(string.Format(Strings.Import_RoleConflict_Message, report.Conflicts.Count))
             : RoleConflictChoice.UseServerProfile; // non-interactive / unwired: the profile wins
 
         switch (choice)
@@ -966,7 +947,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnUpdateCheckStarted(object? sender, EventArgs e)
         => RunOnUi(() =>
         {
-            UpdateStatusText = "Checking for updates…";
+            UpdateStatusText = Strings.Update_Checking;
             UpdateStatus = UpdateCheckStatus.Checking;
             UpdateIsLink = false;
             _updateLinkTarget = null;
@@ -984,7 +965,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (UpdateResultPrompt is null) return;
 
-        var body = $"{BuildManualUpdateMessage(e)}\nWould you like to go to the download page?";
+        var body = string.Format(Strings.Update_ManualPrompt, BuildManualUpdateMessage(e));
         if (await UpdateResultPrompt(body))
             _shell.OpenWebAddress(AppConstants.UrlReleases);
     }
@@ -992,15 +973,14 @@ public partial class MainWindowViewModel : ViewModelBase
     private static string BuildManualUpdateMessage(SoftwareUpdateEventArgs e)
     {
         if (!e.IsSuccessful)
-            return $"Update check failed: {e.Exception?.GetPrimaryException().Message}.";
+            return string.Format(Strings.Update_ManualFailed, e.Exception?.GetPrimaryException().Message);
 
         return AssemblyHelper.CompareVersion(e.LatestVersion!) switch
         {
-            > 0 => "A newer version of ValheimServerGUI is available.",
-            0 => "You are running the latest version of ValheimServerGUI.",
-            -1 => "You are currently running a pre-release version of ValheimServerGUI. " +
-                  $"The latest stable version is ({e.LatestVersion}).",
-            _ => $"Update check failed: Unable to parse version ({e.LatestVersion}).",
+            > 0 => Strings.Update_ManualAvailable,
+            0 => Strings.Update_ManualUpToDate,
+            -1 => string.Format(Strings.Update_ManualPreRelease, e.LatestVersion),
+            _ => string.Format(Strings.Update_ManualUnparsable, e.LatestVersion),
         };
     }
 
@@ -1024,7 +1004,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         if (!e.IsSuccessful)
         {
-            UpdateStatusText = "Update check failed";
+            UpdateStatusText = Strings.Update_StatusFailed;
             UpdateStatus = UpdateCheckStatus.Error;
             _updateLinkTarget = AppConstants.UrlReleases;
             UpdateIsLink = true;
@@ -1034,25 +1014,25 @@ public partial class MainWindowViewModel : ViewModelBase
         switch (AssemblyHelper.CompareVersion(e.LatestVersion!))
         {
             case > 0:
-                UpdateStatusText = $"Update available ({e.LatestVersion})";
+                UpdateStatusText = string.Format(Strings.Update_StatusAvailable, e.LatestVersion);
                 UpdateStatus = UpdateCheckStatus.Available;
                 _updateLinkTarget = AppConstants.UrlReleases;
                 UpdateIsLink = true;
                 break;
             case 0:
-                UpdateStatusText = $"Up to date ({e.LatestVersion})";
+                UpdateStatusText = string.Format(Strings.Update_StatusUpToDate, e.LatestVersion);
                 UpdateStatus = UpdateCheckStatus.UpToDate;
                 _updateLinkTarget = null;
                 UpdateIsLink = false;
                 break;
             case -1:
-                UpdateStatusText = $"Pre-release build ({AssemblyHelper.GetApplicationVersion()})";
+                UpdateStatusText = string.Format(Strings.Update_StatusPreRelease, AssemblyHelper.GetApplicationVersion());
                 UpdateStatus = UpdateCheckStatus.PreRelease;
                 _updateLinkTarget = null;
                 UpdateIsLink = false;
                 break;
             default:
-                UpdateStatusText = $"Unable to parse version ({e.LatestVersion})";
+                UpdateStatusText = string.Format(Strings.Update_StatusUnparsable, e.LatestVersion);
                 UpdateStatus = UpdateCheckStatus.Error;
                 _updateLinkTarget = AppConstants.UrlReleases;
                 UpdateIsLink = true;

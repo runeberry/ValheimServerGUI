@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.Game;
 using Xunit;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Tests.Infrastructure;
 
@@ -38,7 +39,7 @@ public class CloseDeciderTests
     public async Task Any_active_and_confirmed_stops_then_closes(ServerStatus active)
     {
         Assert.Equal(CloseDecision.StopThenClose, await Decide(answer: true, ServerStatus.Stopped, active));
-        Assert.Equal(new[] { CloseDecider.RunningMessage }, _asked);
+        Assert.Equal(new[] { Strings.Prompt_ExitWhileRunning }, _asked);
     }
 
     [Fact]
@@ -51,7 +52,7 @@ public class CloseDeciderTests
     public async Task Only_stopping_and_confirmed_proceeds()
     {
         Assert.Equal(CloseDecision.Proceed, await Decide(answer: true, ServerStatus.Stopping));
-        Assert.Equal(new[] { CloseDecider.StoppingMessage }, _asked);
+        Assert.Equal(new[] { Strings.Prompt_ExitWhileStopping }, _asked);
     }
 
     [Fact]
@@ -66,6 +67,6 @@ public class CloseDeciderTests
     public async Task Active_wins_over_stopping_for_the_question()
     {
         Assert.Equal(CloseDecision.StopThenClose, await Decide(answer: true, ServerStatus.Stopping, ServerStatus.Running));
-        Assert.Equal(new[] { CloseDecider.RunningMessage }, _asked);
+        Assert.Equal(new[] { Strings.Prompt_ExitWhileRunning }, _asked);
     }
 }

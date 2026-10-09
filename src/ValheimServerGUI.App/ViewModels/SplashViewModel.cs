@@ -1,6 +1,7 @@
 using System;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ValheimServerGUI.App.Startup;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels;
@@ -12,7 +13,7 @@ public partial class SplashViewModel : ViewModelBase, IProgress<StartupProgress>
     public string Version { get; } = "v" + AssemblyHelper.GetApplicationVersion();
 
     [ObservableProperty]
-    private string _statusText = "Starting…";
+    private string _statusText = Strings.Startup_Starting;
 
     /// <summary>Progress as a percentage (0–100) for a determinate <c>ProgressBar</c>.</summary>
     [ObservableProperty]

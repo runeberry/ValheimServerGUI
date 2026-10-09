@@ -216,13 +216,13 @@ public class ManagePlayersViewModelTests
         var vm = NewVm();
         var kc = vm.PlayerAccounts.KnownCharacters!;
 
-        Assert.Equal("Select an account to see known characters.", kc.EmptyText);
+        Assert.Equal(Strings.ManagePlayers_NoAccountSelected, kc.EmptyText);
 
         vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:1");
         Assert.Equal("Ragnar", Assert.Single(kc.Characters).CharacterName);
 
         vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts.First(r => r.Key == "Steam:2");
-        Assert.Equal("No known characters for this account.", kc.EmptyText);
+        Assert.Equal(Strings.ManagePlayers_NoKnownCharacters, kc.EmptyText);
         Assert.False(vm.IsDirty);
         Assert.Null(vm.Banned.KnownCharacters);
     }
@@ -306,15 +306,7 @@ public class ManagePlayersViewModelTests
     public void Empty_tabs_show_the_add_hint()
     {
         var vm = NewVm();
-        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.PlayerAccounts.AccountsEmptyText);
-        Assert.Equal(ManagePlayersViewModel.NoAccountsText, vm.Banned.AccountsEmptyText);
-    }
-
-    [Fact]
-    public void Manage_players_copy_is_verbatim()
-    {
-        Assert.Equal("Add an account using the button below.", ManagePlayersViewModel.NoAccountsText);
-        Assert.Equal("Select an account to see known characters.", ManagePlayersViewModel.NoAccountSelectedText);
-        Assert.Equal("No known characters for this account.", ManagePlayersViewModel.NoKnownCharactersText);
+        Assert.Equal(Strings.ManagePlayers_NoAccounts, vm.PlayerAccounts.AccountsEmptyText);
+        Assert.Equal(Strings.ManagePlayers_NoAccounts, vm.Banned.AccountsEmptyText);
     }
 }

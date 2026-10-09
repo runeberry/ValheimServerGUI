@@ -26,17 +26,17 @@
         <!-- One role field shows at a time: the player's default role (Manage Players) or this server's role
              (Players tab). Both edit the same SelectedRole. -->
         <c:DropdownFormField LabelText="{x:Static loc:Strings.AddPlayer_DefaultRole_Label}" IsVisible="{Binding ShowDefaultRole}"
-                             HelpText="{x:Static vm:AddPlayerViewModel.DefaultRoleHelp}"
+                             HelpText="{x:Static loc:Strings.AddPlayer_DefaultRole_Help}"
                              ItemsSource="{Binding Roles}"
                              Value="{Binding SelectedRole}" />
 
         <c:DropdownFormField LabelText="{x:Static loc:Strings.AddPlayer_ServerRole_Label}" IsVisible="{Binding ShowServerRole}"
-                             HelpText="{x:Static vm:AddPlayerViewModel.ServerRoleHelp}"
+                             HelpText="{x:Static loc:Strings.AddPlayer_ServerRole_Help}"
                              ItemsSource="{Binding Roles}"
                              Value="{Binding SelectedRole}" />
 
         <c:CheckBoxFormField LabelText="{x:Static loc:Strings.AddPlayer_SetAsDefault_Label}"
-                             HelpText="{x:Static vm:AddPlayerViewModel.SetAsDefaultHelp}"
+                             HelpText="{x:Static loc:Strings.AddPlayer_SetAsDefault_Help}"
                              IsVisible="{Binding ShowServerRole}"
                              IsEnabled="{Binding CanSetAsDefault}"
                              Value="{Binding SetAsDefault}" />

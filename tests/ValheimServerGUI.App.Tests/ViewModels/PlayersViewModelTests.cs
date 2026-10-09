@@ -177,7 +177,7 @@ public class PlayersViewModelTests
     {
         var repo = new FakePlayerDataRepository();
         var vm = NewVm(repo);
-        Assert.Equal("Players will appear here as they join your server.", vm.EmptyText);
+        Assert.Equal(Strings.Players_EmptyText, vm.EmptyText);
 
         repo.PushUpdate(Player("1", PlayerStatus.Online));
 
@@ -282,13 +282,13 @@ public class PlayersViewModelTests
         repo.PushUpdate(Player("2", PlayerStatus.Offline));
 
         vm.SelectedPlayer = RowFor(vm, "Steam:1");
-        Assert.Equal("Default role (Admin)", vm.ServerRoleDefaultLabel);
+        Assert.Equal(string.Format(Strings.Players_Menu_DefaultRole, Strings.Role_Admin), vm.ServerRoleDefaultLabel);
 
         vm.SelectedPlayer = RowFor(vm, "Steam:2");
-        Assert.Equal("None", vm.ServerRoleDefaultLabel);
+        Assert.Equal(Strings.Role_None, vm.ServerRoleDefaultLabel);
 
         SaveDefaults(("Steam:2", PlayerRole.Permitted)); // follows saved defaults
-        Assert.Equal("Default role (Permitted)", vm.ServerRoleDefaultLabel);
+        Assert.Equal(string.Format(Strings.Players_Menu_DefaultRole, Strings.Role_Permitted), vm.ServerRoleDefaultLabel);
     }
 
     [AvaloniaFact]

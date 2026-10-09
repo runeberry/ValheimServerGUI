@@ -2,6 +2,7 @@ using Avalonia.Headless.XUnit;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using Xunit;
 
@@ -24,7 +25,7 @@ public class ServerDetailsViewModelTests
     {
         var vm = Build(CoreConstants.DefaultServerPort);
         Assert.Equal("127.0.0.1", vm.LocalIp);
-        Assert.Equal("N/A", vm.InviteCode);
+        Assert.Equal(Strings.Common_NotAvailable, vm.InviteCode);
         Assert.False(vm.InviteCodeCopyable);
     }
 

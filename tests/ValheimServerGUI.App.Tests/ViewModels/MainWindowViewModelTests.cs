@@ -7,6 +7,7 @@ using ValheimServerGUI.App.Services;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using Xunit;
 
@@ -146,7 +147,7 @@ public class MainWindowViewModelTests
         var vm = Build(out var update);
         update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", isManualCheck: true));
 
-        Assert.Contains("9.9.9", vm.UpdateStatusText);
+        Assert.Equal(string.Format(Strings.Update_StatusAvailable, "9.9.9"), vm.UpdateStatusText);
         Assert.True(vm.UpdateIsLink);
         Assert.True(vm.UpdateLinkCommand.CanExecute(null));
     }
@@ -157,7 +158,7 @@ public class MainWindowViewModelTests
         var vm = Build(out var update);
         update.RaiseFinished(new SoftwareUpdateEventArgs(new Exception("no net"), isManualCheck: true));
 
-        Assert.Contains("failed", vm.UpdateStatusText, StringComparison.OrdinalIgnoreCase);
+        Assert.Equal(Strings.Update_StatusFailed, vm.UpdateStatusText);
         Assert.True(vm.UpdateIsLink);
     }
 
@@ -168,7 +169,7 @@ public class MainWindowViewModelTests
         var current = AssemblyHelper.GetApplicationVersion();
         update.RaiseFinished(new SoftwareUpdateEventArgs(current, isManualCheck: true));
 
-        Assert.Equal($"Up to date ({current})", vm.UpdateStatusText); // version shown, WinForms-style
+        Assert.Equal(string.Format(Strings.Update_StatusUpToDate, current), vm.UpdateStatusText); // version shown, WinForms-style
         Assert.Equal(UpdateCheckStatus.UpToDate, vm.UpdateStatus);
         Assert.False(vm.UpdateIsLink);
         Assert.False(vm.UpdateLinkCommand.CanExecute(null));
@@ -181,8 +182,7 @@ public class MainWindowViewModelTests
         // A latest older than the running (pre-release) build → "Pre-release build (<current>)".
         update.RaiseFinished(new SoftwareUpdateEventArgs("0.0.1", isManualCheck: true));
 
-        Assert.StartsWith("Pre-release build", vm.UpdateStatusText);
-        Assert.Contains(AssemblyHelper.GetApplicationVersion(), vm.UpdateStatusText);
+        Assert.Equal(string.Format(Strings.Update_StatusPreRelease, AssemblyHelper.GetApplicationVersion()), vm.UpdateStatusText);
         Assert.Equal(UpdateCheckStatus.PreRelease, vm.UpdateStatus);
         Assert.False(vm.UpdateIsLink);
     }
@@ -193,7 +193,7 @@ public class MainWindowViewModelTests
         var vm = Build(out var update);
         update.RaiseFinished(new SoftwareUpdateEventArgs("not-a-version", isManualCheck: true));
 
-        Assert.Contains("Unable to parse", vm.UpdateStatusText);
+        Assert.Equal(string.Format(Strings.Update_StatusUnparsable, "not-a-version"), vm.UpdateStatusText);
         Assert.Equal(UpdateCheckStatus.Error, vm.UpdateStatus);
         Assert.True(vm.UpdateIsLink);
     }
@@ -207,7 +207,7 @@ public class MainWindowViewModelTests
         update.RaiseFinished(new SoftwareUpdateEventArgs("9.9.9", isManualCheck: false)); // sets LastResult
 
         var vm = Build(update);
-        Assert.Contains("9.9.9", vm.UpdateStatusText);
+        Assert.Equal(string.Format(Strings.Update_StatusAvailable, "9.9.9"), vm.UpdateStatusText);
         Assert.Equal(UpdateCheckStatus.Available, vm.UpdateStatus);
     }
 

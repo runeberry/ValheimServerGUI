@@ -4,6 +4,7 @@ using System.Linq;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels;
@@ -15,8 +16,6 @@ namespace ValheimServerGUI.App.ViewModels;
 /// </summary>
 public partial class ServerDetailsViewModel : ViewModelBase
 {
-    private const string LoadingText = "Loading…";
-
     private ValheimServer? _server;
     private readonly IIpAddressProvider _ip;
     private readonly Func<int> _portProvider;
@@ -71,21 +70,21 @@ public partial class ServerDetailsViewModel : ViewModelBase
 
         // Reset the per-server derived state and reseed from the new server.
         _worldSaveTimes.Clear();
-        LastWorldSave = "N/A";
-        AverageWorldSave = "N/A";
+        LastWorldSave = Strings.Common_NotAvailable;
+        AverageWorldSave = Strings.Common_NotAvailable;
         SetInviteCode(null); // the invite code only arrives via an event; a re-target has missed it
         _startedAt = _server.StartedAt;
         RefreshUptime();
     }
 
-    [ObservableProperty] private string _externalIp = LoadingText;
-    [ObservableProperty] private string _internalIp = LoadingText;
+    [ObservableProperty] private string _externalIp = Strings.Common_Loading;
+    [ObservableProperty] private string _internalIp = Strings.Common_Loading;
     [ObservableProperty] private string _localIp = "127.0.0.1";
-    [ObservableProperty] private string _inviteCode = "N/A";
+    [ObservableProperty] private string _inviteCode = Strings.Common_NotAvailable;
     [ObservableProperty] private bool _inviteCodeCopyable;
     [ObservableProperty] private string _uptime = "00:00:00";
-    [ObservableProperty] private string _lastWorldSave = "N/A";
-    [ObservableProperty] private string _averageWorldSave = "N/A";
+    [ObservableProperty] private string _lastWorldSave = Strings.Common_NotAvailable;
+    [ObservableProperty] private string _averageWorldSave = Strings.Common_NotAvailable;
 
     /// <summary>Called by the view when the tab becomes visible/hidden — drives the lazy 1s refresh.</summary>
     public void SetActive(bool active)
@@ -116,8 +115,8 @@ public partial class ServerDetailsViewModel : ViewModelBase
 
         var elapsed = DateTimeOffset.Now - _startedAt.Value;
         var text = elapsed.ToServerElapsedFormat();
-        if (elapsed.Days == 1) text = $"1 day + {text}";
-        else if (elapsed.Days > 1) text = $"{elapsed.Days} days + {text}";
+        if (elapsed.Days == 1) text = string.Format(Strings.ServerDetails_Uptime_OneDay, text);
+        else if (elapsed.Days > 1) text = string.Format(Strings.ServerDetails_Uptime_Days, elapsed.Days, text);
         Uptime = text;
     }
 
@@ -130,7 +129,7 @@ public partial class ServerDetailsViewModel : ViewModelBase
 
     private string FormatIp(string? ip)
     {
-        if (string.IsNullOrWhiteSpace(ip)) return LoadingText;
+        if (string.IsNullOrWhiteSpace(ip)) return Strings.Common_Loading;
         var port = _portProvider();
         return port == CoreConstants.DefaultServerPort ? ip : $"{ip}:{port}";
     }
@@ -151,16 +150,16 @@ public partial class ServerDetailsViewModel : ViewModelBase
         if (status == ServerStatus.Stopped)
             SetInviteCode(null);
         else if (status == ServerStatus.Starting)
-            SetInviteCode("Loading…", copyable: false);
+            SetInviteCode(Strings.Common_Loading, copyable: false);
     });
 
     private void OnWorldSaved(object? sender, decimal durationMs) => RunOnUi(() =>
     {
-        LastWorldSave = $"{DateTime.Now:G} ({durationMs:F0}ms)";
+        LastWorldSave = string.Format(Strings.ServerDetails_LastWorldSave_Value, DateTime.Now, durationMs);
 
         if (_worldSaveTimes.Count >= 10) _worldSaveTimes.Dequeue();
         _worldSaveTimes.Enqueue(durationMs);
-        AverageWorldSave = $"{_worldSaveTimes.Average():F0}ms";
+        AverageWorldSave = string.Format(Strings.ServerDetails_AvgWorldSave_Value, _worldSaveTimes.Average());
     });
 
     private void OnInviteCodeReady(object? sender, string code) => RunOnUi(() => SetInviteCode(code));
@@ -181,7 +180,7 @@ public partial class ServerDetailsViewModel : ViewModelBase
     {
         if (string.IsNullOrWhiteSpace(code))
         {
-            InviteCode = "N/A";
+            InviteCode = Strings.Common_NotAvailable;
             InviteCodeCopyable = false;
             return;
         }

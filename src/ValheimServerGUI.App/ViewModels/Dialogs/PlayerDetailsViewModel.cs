@@ -3,7 +3,9 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
+using ValheimServerGUI.Tools.Models;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
@@ -46,13 +48,13 @@ public partial class PlayerDetailsViewModel : ModalEditViewModel
     /// <summary>The editable known-characters table.</summary>
     public KnownCharactersViewModel KnownCharacters { get; } = new();
 
-    /// <summary>The display name for the read-only Player Name row; "(unknown)" when none is set.</summary>
+    /// <summary>The display name for the read-only Player Name row; Strings.PlayerDetails_UnknownName when none is set.</summary>
     public string DisplayNameOrUnknown =>
-        string.IsNullOrWhiteSpace(DisplayName) ? "(unknown)" : DisplayName;
+        string.IsNullOrWhiteSpace(DisplayName) ? Strings.PlayerDetails_UnknownName : DisplayName;
 
     /// <summary>Caption for the platform-id row — "Steam ID" or "Xbox ID" per the player's platform.</summary>
     public string PlatformIdLabel =>
-        string.Equals(Platform, "Xbox", StringComparison.OrdinalIgnoreCase) ? "Xbox ID:" : "Steam ID:";
+        string.Equals(Platform, PlayerPlatforms.Xbox, StringComparison.OrdinalIgnoreCase) ? Strings.PlayerDetails_XboxId_Label : Strings.PlayerDetails_SteamId_Label;
 
     private void Load() => LoadClean(() =>
     {

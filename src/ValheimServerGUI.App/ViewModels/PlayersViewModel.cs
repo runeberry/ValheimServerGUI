@@ -7,8 +7,10 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using ValheimServerGUI.App.Converters;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools;
 using ValheimServerGUI.Tools.Models;
 
@@ -82,11 +84,8 @@ public partial class PlayersViewModel : ViewModelBase
 
     partial void OnShowBannedPlayersChanged(bool value) => SyncVisibleRows();
 
-    // User copy (EXACT — do not paraphrase); asserted verbatim by a test.
-    public const string NoPlayersText = "Players will appear here as they join your server.";
-
     /// <summary>The table's empty-state hint, or null when it has rows.</summary>
-    public string? EmptyText => Players.Count == 0 ? NoPlayersText : null;
+    public string? EmptyText => Players.Count == 0 ? Strings.Players_EmptyText : null;
 
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(CanViewDetails), nameof(CanRemove))]
@@ -117,8 +116,8 @@ public partial class PlayersViewModel : ViewModelBase
     /// <summary>The fourth item's label: "Default role (Admin)" when there is a default to fall back on, else "None".</summary>
     public string ServerRoleDefaultLabel
         => SelectedPlayer is { } row && _defaults.TryGetValue(row.Key, out var entry)
-            ? $"Default role ({entry.DefaultRole})"
-            : "None";
+            ? string.Format(Strings.Players_Menu_DefaultRole, EnumDisplayConverter.ToText(entry.DefaultRole))
+            : Strings.Role_None;
 
     private bool HasOverride(PlayerRole role) => SelectedPlayer is { } row && _form.GetOverride(row.Key) == role;
 

@@ -106,7 +106,7 @@ public class MainWindowRenderTests
             Dispatcher.UIThread.RunJobs();
         }
 
-        var file = menu.Items.OfType<MenuItem>().First(m => (m.Header as string)?.Contains("File") == true);
+        var file = menu.Items.OfType<MenuItem>().First(m => (m.Header as string) == Strings.MainWindow_Menu_File);
         file.Open();
         Dispatcher.UIThread.RunJobs();
 
@@ -187,7 +187,7 @@ public class MainWindowRenderTests
         var setRole = menu.Items.OfType<MenuItem>().First(m => (string?)m.Header == Strings.Players_Menu_SetServerRole);
         var items = setRole.Items.OfType<MenuItem>().ToList();
 
-        Assert.Equal(new[] { Strings.Role_Admin, Strings.Role_Permitted, Strings.Role_Banned, "Default role (Permitted)" }, items.Select(m => (string?)m.Header));
+        Assert.Equal(new[] { Strings.Role_Admin, Strings.Role_Permitted, Strings.Role_Banned, string.Format(Strings.Players_Menu_DefaultRole, Strings.Role_Permitted) }, items.Select(m => (string?)m.Header));
         Assert.True(items[3].IsChecked); // no override yet
 
         items[0].IsChecked = true;       // what a click on a radio item does

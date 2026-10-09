@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
@@ -30,7 +31,7 @@ public partial class PlayerListSectionViewModel : ObservableObject
     public ObservableCollection<PlayerRowViewModel> Accounts { get; } = new();
 
     /// <summary>The accounts table's empty-state hint, or null when it has rows.</summary>
-    public string? AccountsEmptyText => Accounts.Count == 0 ? ManagePlayersViewModel.NoAccountsText : null;
+    public string? AccountsEmptyText => Accounts.Count == 0 ? Strings.ManagePlayers_NoAccounts : null;
 
     /// <summary>The selected account's known characters; null on the Banned tab.</summary>
     public KnownCharactersViewModel? KnownCharacters { get; }

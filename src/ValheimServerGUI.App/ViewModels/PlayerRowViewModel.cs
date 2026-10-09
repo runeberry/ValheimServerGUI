@@ -94,7 +94,7 @@ public partial class PlayerRowViewModel : ObservableObject
     /// <summary>The placeholder shown for a player with no known name: the last four ID characters.</summary>
     public static string FallbackName(string? playerId)
     {
-        if (string.IsNullOrEmpty(playerId)) return "[unknown]";
+        if (string.IsNullOrEmpty(playerId)) return Strings.Players_UnknownName;
         var last4 = playerId.Length <= 4 ? playerId : playerId[^4..];
         return $"[…{last4}]";
     }

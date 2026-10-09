@@ -6,6 +6,7 @@ using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.Game;
 using Xunit;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Tests.ViewModels.Dialogs;
 
@@ -235,7 +236,7 @@ public class DialogViewModelTests
             },
         };
         var vm = new PlayerDetailsViewModel(repo, "Steam:1", api);
-        Assert.Equal("(unknown)", vm.DisplayNameOrUnknown);
+        Assert.Equal(Strings.PlayerDetails_UnknownName, vm.DisplayNameOrUnknown);
 
         await vm.RefreshCommand.ExecuteAsync(null);
 
@@ -292,13 +293,13 @@ public class DialogViewModelTests
         repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlayerId = "1" });
         var vm = new PlayerDetailsViewModel(repo, "Steam:1");
 
-        Assert.Equal("(unknown)", vm.DisplayNameOrUnknown);
+        Assert.Equal(Strings.PlayerDetails_UnknownName, vm.DisplayNameOrUnknown);
 
         vm.DisplayName = "Ragnar";
         Assert.Equal("Ragnar", vm.DisplayNameOrUnknown);
 
         vm.DisplayName = "   ";
-        Assert.Equal("(unknown)", vm.DisplayNameOrUnknown);
+        Assert.Equal(Strings.PlayerDetails_UnknownName, vm.DisplayNameOrUnknown);
     }
 
     [Fact]

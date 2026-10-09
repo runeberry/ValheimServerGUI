@@ -69,6 +69,12 @@ public partial class KnownCharactersViewModel : ObservableObject
         foreach (var row in Characters) row.Refresh(player, now);
     }
 
+    /// <summary>Re-formats each row's Since column against <paramref name="now"/> (the owner's 1s tick).</summary>
+    public void RefreshSince(DateTimeOffset now)
+    {
+        foreach (var row in Characters) row.RefreshSince(now);
+    }
+
     /// <summary>Writes the table back onto <paramref name="player"/>'s character list.</summary>
     public void WriteTo(PlayerInfo player)
         => player.Characters = Characters

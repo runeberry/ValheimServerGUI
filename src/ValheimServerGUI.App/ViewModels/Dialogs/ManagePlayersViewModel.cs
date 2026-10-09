@@ -26,6 +26,7 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
     private readonly IRuneberryApiClient? _api;
     private readonly Dictionary<string, PlayerDefaultEntry> _defaults;
     private readonly StagedPlayerRecords _records;
+    private readonly DispatcherTimer _sinceTimer;
 
     public ManagePlayersViewModel(IUserPreferencesProvider prefs, IPlayerDataRepository repo, IRuneberryApiClient? api)
     {
@@ -47,6 +48,11 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
         _repo.DataReady += OnRepoDataChanged;
 
         LoadClean(RebuildAll);
+
+        // Keep the Known Characters "Since" column current while the dialog is open.
+        _sinceTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+        _sinceTimer.Tick += (_, _) => RefreshSince(DateTimeOffset.Now);
+        _sinceTimer.Start();
     }
 
     /// <summary>Every known player whose default role is not Banned.</summary>
@@ -167,6 +173,12 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
         RefreshRow(key);
     }
 
+    /// <summary>Re-formats both tabs' Known Characters "Since" column against <paramref name="now"/>.</summary>
+    internal void RefreshSince(DateTimeOffset now)
+    {
+        foreach (var section in Sections) section.KnownCharacters.RefreshSince(now);
+    }
+
     internal void OnSelectionChanged(PlayerListSectionViewModel section)
         => section.KnownCharacters.Load(section.SelectedAccount is { } row ? EditableRecord(row.Key) : null);
 
@@ -282,6 +294,7 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
 
     public void Dispose()
     {
+        _sinceTimer.Stop();
         _repo.EntityUpdated -= OnRepoPlayerChanged;
         _repo.PlayerStatusChanged -= OnRepoPlayerChanged;
         _repo.EntityRemoved -= OnRepoPlayerChanged;

@@ -201,7 +201,8 @@ public partial class PlayersViewModel : ViewModelBase
 
     private void RefreshSince()
     {
-        foreach (var row in Players) row.RefreshSince();
+        var now = DateTimeOffset.Now;
+        foreach (var row in Players) row.RefreshSince(now);
     }
 
     // The effective role shown under the current mode (null = blank cell). Admin shows in both modes;

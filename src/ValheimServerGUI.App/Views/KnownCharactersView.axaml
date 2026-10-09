@@ -41,7 +41,7 @@
                 </DataGridTemplateColumn.CellTemplate>
             </DataGridTemplateColumn>
             <!-- Blank for characters recorded before the last-seen field existed. -->
-            <DataGridTemplateColumn Header="{x:Static loc:Strings.KnownCharacters_Column_Since}" Width="Auto" SortMemberPath="SinceText">
+            <DataGridTemplateColumn Header="{x:Static loc:Strings.KnownCharacters_Column_Since}" Width="Auto" SortMemberPath="LastSeen">
                 <DataGridTemplateColumn.CellTemplate>
                     <DataTemplate x:DataType="vm:CharacterRowViewModel">
                         <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />

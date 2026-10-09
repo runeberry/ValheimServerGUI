@@ -30,7 +30,8 @@ public partial class CharacterRowViewModel : ObservableObject
     /// <summary>Preserved from the cache so a save doesn't drop the low-confidence flag.</summary>
     public bool MatchConfident { get; set; }
 
-    /// <summary>Preserved from the cache so a save doesn't drop the last-seen timestamp.</summary>
+    /// <summary>Preserved from the cache so a save doesn't drop the last-seen timestamp. The "Since" column
+    /// sorts on this, not on its display text.</summary>
     public DateTimeOffset? LastSeen { get; set; }
 
     /// <summary>Re-derives the Status/Since columns from the owning player's current state.</summary>
@@ -39,6 +40,10 @@ public partial class CharacterRowViewModel : ObservableObject
         var isActive = CharacterName == player.LastStatusCharacter && player.PlayerStatus != PlayerStatus.Offline;
         Status = isActive ? player.PlayerStatus : PlayerStatus.Offline;
         StatusText = EnumDisplayConverter.ToText(Status);
-        SinceText = LastSeen is { } seen ? RelativeTimeConverter.Format(seen, now) : string.Empty;
+        RefreshSince(now);
     }
+
+    /// <summary>Re-formats the Since column against <paramref name="now"/>.</summary>
+    public void RefreshSince(DateTimeOffset now)
+        => SinceText = LastSeen is { } seen ? RelativeTime.Format(seen, now) : string.Empty;
 }

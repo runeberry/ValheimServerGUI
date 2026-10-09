@@ -81,15 +81,18 @@ public partial class PlayerRowViewModel : ObservableObject
         Status = player.PlayerStatus;
         StatusText = EnumDisplayConverter.ToText(player.PlayerStatus);
         IsOffline = player.PlayerStatus == PlayerStatus.Offline;
-        PlatformIcon = PlatformToIconConverter.ForPlatform(player.Platform);
-        RefreshSince();
+        PlatformIcon = PlatformIcons.ForPlatform(player.Platform);
+        RefreshSince(DateTimeOffset.Now);
     }
 
+    /// <summary>When the status last changed; the "Since" column sorts on this, not on its display text.</summary>
+    public DateTimeOffset LastStatusChange => Player.LastStatusChange;
+
     // Blank when the status was never recorded (e.g. a Manage Players account that has never joined).
-    public void RefreshSince()
+    public void RefreshSince(DateTimeOffset now)
         => SinceText = Player.LastStatusChange == default
             ? string.Empty
-            : RelativeTimeConverter.Format(Player.LastStatusChange, DateTimeOffset.Now);
+            : RelativeTime.Format(Player.LastStatusChange, now);
 
     /// <summary>The placeholder shown for a player with no known name: the last four ID characters.</summary>
     public static string FallbackName(string? playerId)

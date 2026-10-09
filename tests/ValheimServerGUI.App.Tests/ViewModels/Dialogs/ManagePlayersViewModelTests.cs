@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -296,6 +297,28 @@ public class ManagePlayersViewModelTests
         var saved = _repo.FindById("Steam:1")!;
         Assert.Contains(saved.Characters!, c => c.CharacterName == "Ragnar");
         Assert.Equal(PlayerStatus.Online, saved.PlayerStatus); // live fields kept
+    }
+
+    [AvaloniaFact]
+    public void The_since_tick_re_formats_known_characters_on_both_tabs()
+    {
+        var seen = DateTimeOffset.Now;
+        var odin = Player("1", "Odin");
+        odin.Characters = new() { new() { CharacterName = "Thor", MatchConfident = true, LastSeen = seen } };
+        var loki = Player("3", "Loki");
+        loki.Characters = new() { new() { CharacterName = "Trickster", MatchConfident = true, LastSeen = seen } };
+        _repo.PushUpdate(odin);
+        _repo.PushUpdate(loki);
+        var vm = NewVm(("Steam:3", PlayerRole.Banned));
+        vm.PlayerAccounts.SelectedAccount = vm.PlayerAccounts.Accounts[0];
+        vm.Banned.SelectedAccount = vm.Banned.Accounts[0];
+
+        vm.RefreshSince(seen + TimeSpan.FromMinutes(5));
+
+        var fiveMinutesAgo = string.Format(Strings.RelativeTime_Past, string.Format(Strings.RelativeTime_Minutes_Other, 5));
+        Assert.Equal(fiveMinutesAgo, vm.PlayerAccounts.KnownCharacters.Characters[0].SinceText);
+        Assert.Equal(fiveMinutesAgo, vm.Banned.KnownCharacters.Characters[0].SinceText);
+        Assert.False(vm.IsDirty);
     }
 
     // ---- edit name ----

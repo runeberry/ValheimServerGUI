@@ -103,7 +103,7 @@
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Since}" Width="Auto" SortMemberPath="SinceText">
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Since}" Width="Auto" SortMemberPath="LastStatusChange">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">
                             <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />

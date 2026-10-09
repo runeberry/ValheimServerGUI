@@ -1,3 +1,5 @@
+using ValheimServerGUI.Localization;
+
 namespace ValheimServerGUI.App;
 
 /// <summary>Shell-level constants (product identity used by the OS-integration seams).</summary>
@@ -12,8 +14,9 @@ internal static class AppConstants
     /// <summary>
     /// View-only marker for a world that lives only in Steam Cloud. Applied and stripped exclusively by the
     /// world-select surface — it never reaches saved prefs, server options, or validation (§ locked decisions).
+    /// Localized, so it is read from Strings rather than being a compile-time constant.
     /// </summary>
-    public const string CloudWorldSuffix = " (cloud)";
+    public static string CloudWorldSuffix => Strings.ServerControls_CloudWorldSuffix;
 
     // External links (parity with the v2.4 Resources URLs).
     public const string UrlHelp = "https://github.com/runeberry/ValheimServerGUI/wiki";

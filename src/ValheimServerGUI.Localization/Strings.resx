@@ -199,6 +199,9 @@ NOTE: It usually takes 1-2 minutes for your server to appear in the list in-game
 
 You may need to provide other players an Invite Code, which appears in game and in the server logs.</value>
   </data>
+  <data name="ServerControls_CloudWorldSuffix" xml:space="preserve">
+    <value> (cloud)</value>
+  </data>
   <!-- Advanced Controls tab -->
   <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
     <value>Directory Overrides (for just this Profile)</value>
@@ -863,6 +866,159 @@ If you select a preset and change any individual settings, then the preset will 
   </data>
   <data name="WorldPreferences_Title" xml:space="preserve">
     <value>World Settings - {0}</value>
+  </data>
+  <data name="WorldGen_Preset_Custom" xml:space="preserve">
+    <value>Custom (No Preset)</value>
+  </data>
+  <data name="WorldGen_Preset_Easy" xml:space="preserve">
+    <value>Easy</value>
+  </data>
+  <data name="WorldGen_Preset_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="WorldGen_Preset_Hard" xml:space="preserve">
+    <value>Hard</value>
+  </data>
+  <data name="WorldGen_Preset_Hardcore" xml:space="preserve">
+    <value>Hardcore</value>
+  </data>
+  <data name="WorldGen_Preset_Casual" xml:space="preserve">
+    <value>Casual</value>
+  </data>
+  <data name="WorldGen_Preset_Hammer" xml:space="preserve">
+    <value>Hammer Mode (Creative)</value>
+  </data>
+  <data name="WorldGen_Preset_Immersive" xml:space="preserve">
+    <value>Immersive</value>
+  </data>
+  <data name="WorldGen_Value_Normal" xml:space="preserve">
+    <value>Normal</value>
+  </data>
+  <data name="WorldGen_Combat_Name" xml:space="preserve">
+    <value>Combat</value>
+  </data>
+  <data name="WorldGen_Combat_Help" xml:space="preserve">
+    <value>Governs how much damage you give and take. Also governs how likely you are to encounter higher leveled enemies, and how dangerous they are.</value>
+  </data>
+  <data name="WorldGen_Combat_VeryEasy" xml:space="preserve">
+    <value>Very Easy</value>
+  </data>
+  <data name="WorldGen_Combat_Easy" xml:space="preserve">
+    <value>Easy</value>
+  </data>
+  <data name="WorldGen_Combat_Hard" xml:space="preserve">
+    <value>Hard</value>
+  </data>
+  <data name="WorldGen_Combat_VeryHard" xml:space="preserve">
+    <value>Very Hard</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Name" xml:space="preserve">
+    <value>Death Penalty</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Help" xml:space="preserve">
+    <value>Governs what happens when you die. See the wiki for an explanation of the different options.</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Casual" xml:space="preserve">
+    <value>Casual</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_VeryEasy" xml:space="preserve">
+    <value>Very Easy</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Easy" xml:space="preserve">
+    <value>Easy</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Hard" xml:space="preserve">
+    <value>Hard</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Hardcore" xml:space="preserve">
+    <value>Hardcore</value>
+  </data>
+  <data name="WorldGen_Resources_Name" xml:space="preserve">
+    <value>Resource Rate</value>
+  </data>
+  <data name="WorldGen_Resources_Help" xml:space="preserve">
+    <value>Governs the amount of resources you gain from the world and from enemies.</value>
+  </data>
+  <data name="WorldGen_Resources_MuchLess" xml:space="preserve">
+    <value>Much Less (0.5x)</value>
+  </data>
+  <data name="WorldGen_Resources_Less" xml:space="preserve">
+    <value>Less (0.75x)</value>
+  </data>
+  <data name="WorldGen_Resources_More" xml:space="preserve">
+    <value>More (1.5x)</value>
+  </data>
+  <data name="WorldGen_Resources_MuchMore" xml:space="preserve">
+    <value>Much More (2x)</value>
+  </data>
+  <data name="WorldGen_Resources_Most" xml:space="preserve">
+    <value>Most (3x)</value>
+  </data>
+  <data name="WorldGen_Raids_Name" xml:space="preserve">
+    <value>Raids</value>
+  </data>
+  <data name="WorldGen_Raids_Help" xml:space="preserve">
+    <value>Governs how often enemies may raid your base.</value>
+  </data>
+  <data name="WorldGen_Raids_None" xml:space="preserve">
+    <value>None</value>
+  </data>
+  <data name="WorldGen_Raids_MuchLess" xml:space="preserve">
+    <value>Much Less</value>
+  </data>
+  <data name="WorldGen_Raids_Less" xml:space="preserve">
+    <value>Less</value>
+  </data>
+  <data name="WorldGen_Raids_More" xml:space="preserve">
+    <value>More</value>
+  </data>
+  <data name="WorldGen_Raids_MuchMore" xml:space="preserve">
+    <value>Much More</value>
+  </data>
+  <data name="WorldGen_Portals_Name" xml:space="preserve">
+    <value>Portals</value>
+  </data>
+  <data name="WorldGen_Portals_Help" xml:space="preserve">
+    <value>Changes how portals work in the game.</value>
+  </data>
+  <data name="WorldGen_Portals_Casual" xml:space="preserve">
+    <value>Casual (Portal items)</value>
+  </data>
+  <data name="WorldGen_Portals_Hard" xml:space="preserve">
+    <value>Hard (No boss portals)</value>
+  </data>
+  <data name="WorldGen_Portals_VeryHard" xml:space="preserve">
+    <value>Very Hard (No portals)</value>
+  </data>
+  <data name="WorldGen_NoBuildCost_Name" xml:space="preserve">
+    <value>No build cost</value>
+  </data>
+  <data name="WorldGen_NoBuildCost_Help" xml:space="preserve">
+    <value>Build pieces require no materials to build. You still need to discover recipes as per usual.</value>
+  </data>
+  <data name="WorldGen_PlayerEvents_Name" xml:space="preserve">
+    <value>Player based raids</value>
+  </data>
+  <data name="WorldGen_PlayerEvents_Help" xml:space="preserve">
+    <value>Raids are based on the progress of each individual player, rather than on which bosses have been killed on the server. This setting is recommended if you want the game to be slightly friendlier to players with different progress.</value>
+  </data>
+  <data name="WorldGen_PassiveMobs_Name" xml:space="preserve">
+    <value>Passive enemies</value>
+  </data>
+  <data name="WorldGen_PassiveMobs_Help" xml:space="preserve">
+    <value>Enemies won't attack until you provoke them.</value>
+  </data>
+  <data name="WorldGen_NoMap_Name" xml:space="preserve">
+    <value>No map</value>
+  </data>
+  <data name="WorldGen_NoMap_Help" xml:space="preserve">
+    <value>You will not have access to the map or the minimap. This makes the game harder than intended.</value>
+  </data>
+  <data name="WorldGen_Fire_Name" xml:space="preserve">
+    <value>Fire hazards</value>
+  </data>
+  <data name="WorldGen_Fire_Help" xml:space="preserve">
+    <value>Wood can catch fire and spread throughout the whole world, not just in the Ashlands.</value>
   </data>
   <!-- Bug Report dialog -->
   <data name="BugReport_Title" xml:space="preserve">

@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using ValheimServerGUI.Game;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
@@ -8,113 +9,117 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 /// UI display names + help text for the raw world-gen CLI tokens (presets, modifiers, modifier values, and
 /// keys). The Core model stores only the tokens Valheim's command line expects (e.g. <c>deathpenalty</c> =
 /// <c>veryhard</c>); this maps them to the friendly names and descriptions the WinForms app showed, and back,
-/// so the World Preferences dialog never surfaces raw tokens. Sentinels: a modifier set to "Normal" persists
-/// as no value (omitted); the preset set to <see cref="WorldPreferencesViewModel.CustomPreset"/> persists as
-/// no preset.
+/// so the World Preferences dialog never surfaces raw tokens. Each mapping is one token↔display table used in
+/// both directions; the tables are built on each call so they always read the current UI culture's text.
+/// Sentinels: a modifier set to "Normal" is the null token and persists as no value (omitted); the preset set
+/// to <see cref="WorldPreferencesViewModel.CustomPreset"/> persists as no preset.
 /// </summary>
 internal static class WorldGenDisplay
 {
-    /// <summary>The "unset" display shown for a modifier with no override (persists as null).</summary>
-    public const string NormalModifier = "Normal";
+    /// <summary>The "unset" display shown for a modifier with no override (the null token).</summary>
+    public static string NormalModifier => Strings.WorldGen_Value_Normal;
 
     // --- Presets (ordered as shown; display <-> token) ---
-    private static readonly (string Display, string Token)[] PresetPairs =
+    private static (string Display, string Token)[] PresetPairs() => new[]
     {
-        ("Custom (No Preset)", WorldPreferencesViewModel.CustomPreset),
-        ("Easy", WorldGenPresets.Easy),
-        ("Normal", WorldGenPresets.Normal),
-        ("Hard", WorldGenPresets.Hard),
-        ("Hardcore", WorldGenPresets.Hardcore),
-        ("Casual", WorldGenPresets.Casual),
-        ("Hammer Mode (Creative)", WorldGenPresets.Hammer),
-        ("Immersive", WorldGenPresets.Immersive),
+        (Strings.WorldGen_Preset_Custom, WorldPreferencesViewModel.CustomPreset),
+        (Strings.WorldGen_Preset_Easy, WorldGenPresets.Easy),
+        (Strings.WorldGen_Preset_Normal, WorldGenPresets.Normal),
+        (Strings.WorldGen_Preset_Hard, WorldGenPresets.Hard),
+        (Strings.WorldGen_Preset_Hardcore, WorldGenPresets.Hardcore),
+        (Strings.WorldGen_Preset_Casual, WorldGenPresets.Casual),
+        (Strings.WorldGen_Preset_Hammer, WorldGenPresets.Hammer),
+        (Strings.WorldGen_Preset_Immersive, WorldGenPresets.Immersive),
     };
 
-    public static IReadOnlyList<string> PresetDisplays { get; } = PresetPairs.Select(p => p.Display).ToList();
+    public static IReadOnlyList<string> PresetDisplays => PresetPairs().Select(p => p.Display).ToList();
 
-    public static string PresetDisplay(string token) =>
-        PresetPairs.FirstOrDefault(p => p.Token == token).Display ?? PresetPairs[0].Display;
+    public static string PresetDisplay(string token)
+    {
+        var pairs = PresetPairs();
+        return pairs.FirstOrDefault(p => p.Token == token).Display ?? pairs[0].Display;
+    }
 
     public static string PresetToken(string display) =>
-        PresetPairs.FirstOrDefault(p => p.Display == display).Token ?? WorldPreferencesViewModel.CustomPreset;
+        PresetPairs().FirstOrDefault(p => p.Display == display).Token ?? WorldPreferencesViewModel.CustomPreset;
 
     // --- Modifier names + help ---
-    private static readonly Dictionary<string, string> ModifierNames = new()
+    public static string ModifierName(string key) => key switch
     {
-        [WorldGenModifiers.Combat] = "Combat",
-        [WorldGenModifiers.DeathPenalty] = "Death Penalty",
-        [WorldGenModifiers.Resources] = "Resource Rate",
-        [WorldGenModifiers.Raids] = "Raids",
-        [WorldGenModifiers.Portals] = "Portals",
+        WorldGenModifiers.Combat => Strings.WorldGen_Combat_Name,
+        WorldGenModifiers.DeathPenalty => Strings.WorldGen_DeathPenalty_Name,
+        WorldGenModifiers.Resources => Strings.WorldGen_Resources_Name,
+        WorldGenModifiers.Raids => Strings.WorldGen_Raids_Name,
+        WorldGenModifiers.Portals => Strings.WorldGen_Portals_Name,
+        _ => key,
     };
 
-    private static readonly Dictionary<string, string> ModifierHelps = new()
+    public static string ModifierHelp(string key) => key switch
     {
-        [WorldGenModifiers.Combat] = "Governs how much damage you give and take. Also governs how likely you are to encounter higher leveled enemies, and how dangerous they are.",
-        [WorldGenModifiers.DeathPenalty] = "Governs what happens when you die. See the wiki for an explanation of the different options.",
-        [WorldGenModifiers.Resources] = "Governs the amount of resources you gain from the world and from enemies.",
-        [WorldGenModifiers.Raids] = "Governs how often enemies may raid your base.",
-        [WorldGenModifiers.Portals] = "Changes how portals work in the game.",
+        WorldGenModifiers.Combat => Strings.WorldGen_Combat_Help,
+        WorldGenModifiers.DeathPenalty => Strings.WorldGen_DeathPenalty_Help,
+        WorldGenModifiers.Resources => Strings.WorldGen_Resources_Help,
+        WorldGenModifiers.Raids => Strings.WorldGen_Raids_Help,
+        WorldGenModifiers.Portals => Strings.WorldGen_Portals_Help,
+        _ => string.Empty,
     };
-
-    public static string ModifierName(string key) => ModifierNames.TryGetValue(key, out var v) ? v : key;
-    public static string ModifierHelp(string key) => ModifierHelps.TryGetValue(key, out var v) ? v : string.Empty;
 
     // --- Modifier values (ordered per modifier, with the "Normal" sentinel positioned as in WinForms).
     //     A null token is the "Normal" (omitted) value. ---
-    private static readonly Dictionary<string, (string Display, string? Token)[]> ModifierValues = new()
+    private static (string Display, string? Token)[] ModifierValues(string key) => key switch
     {
-        [WorldGenModifiers.Combat] = new (string, string?)[]
+        WorldGenModifiers.Combat => new (string, string?)[]
         {
-            ("Very Easy", WorldGenModifiers.Values.CombatVeryEasy),
-            ("Easy", WorldGenModifiers.Values.CombatEasy),
+            (Strings.WorldGen_Combat_VeryEasy, WorldGenModifiers.Values.CombatVeryEasy),
+            (Strings.WorldGen_Combat_Easy, WorldGenModifiers.Values.CombatEasy),
             (NormalModifier, null),
-            ("Hard", WorldGenModifiers.Values.CombatHard),
-            ("Very Hard", WorldGenModifiers.Values.CombatVeryHard),
+            (Strings.WorldGen_Combat_Hard, WorldGenModifiers.Values.CombatHard),
+            (Strings.WorldGen_Combat_VeryHard, WorldGenModifiers.Values.CombatVeryHard),
         },
-        [WorldGenModifiers.DeathPenalty] = new (string, string?)[]
+        WorldGenModifiers.DeathPenalty => new (string, string?)[]
         {
-            ("Casual", WorldGenModifiers.Values.DeathPenaltyCasual),
-            ("Very Easy", WorldGenModifiers.Values.DeathPenaltyVeryEasy),
-            ("Easy", WorldGenModifiers.Values.DeathPenaltyEasy),
+            (Strings.WorldGen_DeathPenalty_Casual, WorldGenModifiers.Values.DeathPenaltyCasual),
+            (Strings.WorldGen_DeathPenalty_VeryEasy, WorldGenModifiers.Values.DeathPenaltyVeryEasy),
+            (Strings.WorldGen_DeathPenalty_Easy, WorldGenModifiers.Values.DeathPenaltyEasy),
             (NormalModifier, null),
-            ("Hard", WorldGenModifiers.Values.DeathPenaltyHard),
-            ("Hardcore", WorldGenModifiers.Values.DeathPenaltyHardcore),
+            (Strings.WorldGen_DeathPenalty_Hard, WorldGenModifiers.Values.DeathPenaltyHard),
+            (Strings.WorldGen_DeathPenalty_Hardcore, WorldGenModifiers.Values.DeathPenaltyHardcore),
         },
-        [WorldGenModifiers.Resources] = new (string, string?)[]
+        WorldGenModifiers.Resources => new (string, string?)[]
         {
-            ("Much Less (0.5x)", WorldGenModifiers.Values.ResourcesMuchLess),
-            ("Less (0.75x)", WorldGenModifiers.Values.ResourcesLess),
+            (Strings.WorldGen_Resources_MuchLess, WorldGenModifiers.Values.ResourcesMuchLess),
+            (Strings.WorldGen_Resources_Less, WorldGenModifiers.Values.ResourcesLess),
             (NormalModifier, null),
-            ("More (1.5x)", WorldGenModifiers.Values.ResourcesMore),
-            ("Much More (2x)", WorldGenModifiers.Values.ResourcesMuchMore),
-            ("Most (3x)", WorldGenModifiers.Values.ResourcesMost),
+            (Strings.WorldGen_Resources_More, WorldGenModifiers.Values.ResourcesMore),
+            (Strings.WorldGen_Resources_MuchMore, WorldGenModifiers.Values.ResourcesMuchMore),
+            (Strings.WorldGen_Resources_Most, WorldGenModifiers.Values.ResourcesMost),
         },
-        [WorldGenModifiers.Raids] = new (string, string?)[]
+        WorldGenModifiers.Raids => new (string, string?)[]
         {
-            ("None", WorldGenModifiers.Values.RaidsNone),
-            ("Much Less", WorldGenModifiers.Values.RaidsMuchLess),
-            ("Less", WorldGenModifiers.Values.RaidsLess),
+            (Strings.WorldGen_Raids_None, WorldGenModifiers.Values.RaidsNone),
+            (Strings.WorldGen_Raids_MuchLess, WorldGenModifiers.Values.RaidsMuchLess),
+            (Strings.WorldGen_Raids_Less, WorldGenModifiers.Values.RaidsLess),
             (NormalModifier, null),
-            ("More", WorldGenModifiers.Values.RaidsMore),
-            ("Much More", WorldGenModifiers.Values.RaidsMuchMore),
+            (Strings.WorldGen_Raids_More, WorldGenModifiers.Values.RaidsMore),
+            (Strings.WorldGen_Raids_MuchMore, WorldGenModifiers.Values.RaidsMuchMore),
         },
-        [WorldGenModifiers.Portals] = new (string, string?)[]
+        WorldGenModifiers.Portals => new (string, string?)[]
         {
-            ("Casual (Portal items)", WorldGenModifiers.Values.PortalsCasual),
+            (Strings.WorldGen_Portals_Casual, WorldGenModifiers.Values.PortalsCasual),
             (NormalModifier, null),
-            ("Hard (No boss portals)", WorldGenModifiers.Values.PortalsHard),
-            ("Very Hard (No portals)", WorldGenModifiers.Values.PortalsVeryHard),
+            (Strings.WorldGen_Portals_Hard, WorldGenModifiers.Values.PortalsHard),
+            (Strings.WorldGen_Portals_VeryHard, WorldGenModifiers.Values.PortalsVeryHard),
         },
+        _ => throw new KeyNotFoundException(key),
     };
 
     public static IReadOnlyList<string> ModifierValueDisplays(string key) =>
-        ModifierValues[key].Select(v => v.Display).ToList();
+        ModifierValues(key).Select(v => v.Display).ToList();
 
     /// <summary>Maps a stored token (or null for "Normal") to its display name for the given modifier.</summary>
     public static string ModifierValueDisplay(string key, string? token)
     {
-        foreach (var (display, t) in ModifierValues[key])
+        foreach (var (display, t) in ModifierValues(key))
             if (t == token) return display;
         return NormalModifier;
     }
@@ -122,30 +127,29 @@ internal static class WorldGenDisplay
     /// <summary>Maps a display name back to its stored token (null for "Normal") for the given modifier.</summary>
     public static string? ModifierValueToken(string key, string display)
     {
-        foreach (var (d, token) in ModifierValues[key])
+        foreach (var (d, token) in ModifierValues(key))
             if (d == display) return token;
         return null;
     }
 
     // --- Keys: display names + help ---
-    private static readonly Dictionary<string, string> KeyNames = new()
+    public static string KeyName(string key) => key switch
     {
-        [WorldGenKeys.NoBuildCost] = "No build cost",
-        [WorldGenKeys.PlayerEvents] = "Player based raids",
-        [WorldGenKeys.PassiveMobs] = "Passive enemies",
-        [WorldGenKeys.NoMap] = "No map",
-        [WorldGenKeys.Fire] = "Fire hazards",
+        WorldGenKeys.NoBuildCost => Strings.WorldGen_NoBuildCost_Name,
+        WorldGenKeys.PlayerEvents => Strings.WorldGen_PlayerEvents_Name,
+        WorldGenKeys.PassiveMobs => Strings.WorldGen_PassiveMobs_Name,
+        WorldGenKeys.NoMap => Strings.WorldGen_NoMap_Name,
+        WorldGenKeys.Fire => Strings.WorldGen_Fire_Name,
+        _ => key,
     };
 
-    private static readonly Dictionary<string, string> KeyHelps = new()
+    public static string KeyHelp(string key) => key switch
     {
-        [WorldGenKeys.NoBuildCost] = "Build pieces require no materials to build. You still need to discover recipes as per usual.",
-        [WorldGenKeys.PlayerEvents] = "Raids are based on the progress of each individual player, rather than on which bosses have been killed on the server. This setting is recommended if you want the game to be slightly friendlier to players with different progress.",
-        [WorldGenKeys.PassiveMobs] = "Enemies won't attack until you provoke them.",
-        [WorldGenKeys.NoMap] = "You will not have access to the map or the minimap. This makes the game harder than intended.",
-        [WorldGenKeys.Fire] = "Wood can catch fire and spread throughout the whole world, not just in the Ashlands.",
+        WorldGenKeys.NoBuildCost => Strings.WorldGen_NoBuildCost_Help,
+        WorldGenKeys.PlayerEvents => Strings.WorldGen_PlayerEvents_Help,
+        WorldGenKeys.PassiveMobs => Strings.WorldGen_PassiveMobs_Help,
+        WorldGenKeys.NoMap => Strings.WorldGen_NoMap_Help,
+        WorldGenKeys.Fire => Strings.WorldGen_Fire_Help,
+        _ => string.Empty,
     };
-
-    public static string KeyName(string key) => KeyNames.TryGetValue(key, out var v) ? v : key;
-    public static string KeyHelp(string key) => KeyHelps.TryGetValue(key, out var v) ? v : string.Empty;
 }

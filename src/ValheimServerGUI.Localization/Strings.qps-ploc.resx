@@ -195,6 +195,9 @@
   <data name="ServerControls_Crossplay_Help" xml:space="preserve">
     <value>⟦ServerControls_Crossplay_Help⟧</value>
   </data>
+  <data name="ServerControls_CloudWorldSuffix" xml:space="preserve">
+    <value>⟦ServerControls_CloudWorldSuffix⟧</value>
+  </data>
   <!-- Advanced Controls tab -->
   <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
     <value>⟦AdvancedControls_DirectoryOverrides_Header⟧</value>
@@ -827,6 +830,159 @@
   </data>
   <data name="WorldPreferences_Title" xml:space="preserve">
     <value>⟦WorldPreferences_Title {0}⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Custom" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Custom⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Easy" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Easy⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Normal" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Normal⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Hard" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Hard⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Hardcore" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Hardcore⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Casual" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Casual⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Hammer" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Hammer⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Immersive" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Immersive⟧</value>
+  </data>
+  <data name="WorldGen_Value_Normal" xml:space="preserve">
+    <value>⟦WorldGen_Value_Normal⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Name" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Name⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Help" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Help⟧</value>
+  </data>
+  <data name="WorldGen_Combat_VeryEasy" xml:space="preserve">
+    <value>⟦WorldGen_Combat_VeryEasy⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Easy" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Easy⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Hard" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Hard⟧</value>
+  </data>
+  <data name="WorldGen_Combat_VeryHard" xml:space="preserve">
+    <value>⟦WorldGen_Combat_VeryHard⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Name" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Name⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Help" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Help⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Casual" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Casual⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_VeryEasy" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_VeryEasy⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Easy" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Easy⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Hard" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Hard⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Hardcore" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Hardcore⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Name" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Name⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Help" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Help⟧</value>
+  </data>
+  <data name="WorldGen_Resources_MuchLess" xml:space="preserve">
+    <value>⟦WorldGen_Resources_MuchLess⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Less" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Less⟧</value>
+  </data>
+  <data name="WorldGen_Resources_More" xml:space="preserve">
+    <value>⟦WorldGen_Resources_More⟧</value>
+  </data>
+  <data name="WorldGen_Resources_MuchMore" xml:space="preserve">
+    <value>⟦WorldGen_Resources_MuchMore⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Most" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Most⟧</value>
+  </data>
+  <data name="WorldGen_Raids_Name" xml:space="preserve">
+    <value>⟦WorldGen_Raids_Name⟧</value>
+  </data>
+  <data name="WorldGen_Raids_Help" xml:space="preserve">
+    <value>⟦WorldGen_Raids_Help⟧</value>
+  </data>
+  <data name="WorldGen_Raids_None" xml:space="preserve">
+    <value>⟦WorldGen_Raids_None⟧</value>
+  </data>
+  <data name="WorldGen_Raids_MuchLess" xml:space="preserve">
+    <value>⟦WorldGen_Raids_MuchLess⟧</value>
+  </data>
+  <data name="WorldGen_Raids_Less" xml:space="preserve">
+    <value>⟦WorldGen_Raids_Less⟧</value>
+  </data>
+  <data name="WorldGen_Raids_More" xml:space="preserve">
+    <value>⟦WorldGen_Raids_More⟧</value>
+  </data>
+  <data name="WorldGen_Raids_MuchMore" xml:space="preserve">
+    <value>⟦WorldGen_Raids_MuchMore⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Name" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Name⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Help" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Help⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Casual" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Casual⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Hard" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Hard⟧</value>
+  </data>
+  <data name="WorldGen_Portals_VeryHard" xml:space="preserve">
+    <value>⟦WorldGen_Portals_VeryHard⟧</value>
+  </data>
+  <data name="WorldGen_NoBuildCost_Name" xml:space="preserve">
+    <value>⟦WorldGen_NoBuildCost_Name⟧</value>
+  </data>
+  <data name="WorldGen_NoBuildCost_Help" xml:space="preserve">
+    <value>⟦WorldGen_NoBuildCost_Help⟧</value>
+  </data>
+  <data name="WorldGen_PlayerEvents_Name" xml:space="preserve">
+    <value>⟦WorldGen_PlayerEvents_Name⟧</value>
+  </data>
+  <data name="WorldGen_PlayerEvents_Help" xml:space="preserve">
+    <value>⟦WorldGen_PlayerEvents_Help⟧</value>
+  </data>
+  <data name="WorldGen_PassiveMobs_Name" xml:space="preserve">
+    <value>⟦WorldGen_PassiveMobs_Name⟧</value>
+  </data>
+  <data name="WorldGen_PassiveMobs_Help" xml:space="preserve">
+    <value>⟦WorldGen_PassiveMobs_Help⟧</value>
+  </data>
+  <data name="WorldGen_NoMap_Name" xml:space="preserve">
+    <value>⟦WorldGen_NoMap_Name⟧</value>
+  </data>
+  <data name="WorldGen_NoMap_Help" xml:space="preserve">
+    <value>⟦WorldGen_NoMap_Help⟧</value>
+  </data>
+  <data name="WorldGen_Fire_Name" xml:space="preserve">
+    <value>⟦WorldGen_Fire_Name⟧</value>
+  </data>
+  <data name="WorldGen_Fire_Help" xml:space="preserve">
+    <value>⟦WorldGen_Fire_Help⟧</value>
   </data>
   <!-- Bug Report dialog -->
   <data name="BugReport_Title" xml:space="preserve">

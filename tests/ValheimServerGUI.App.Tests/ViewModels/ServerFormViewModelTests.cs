@@ -51,7 +51,7 @@ public class ServerFormViewModelTests
     [Fact]
     public void Selected_world_strips_cloud_suffix()
     {
-        var form = new ServerFormViewModel { UseNewWorld = false, ExistingWorld = "Farlands (cloud)" };
+        var form = new ServerFormViewModel { UseNewWorld = false, ExistingWorld = "Farlands" + AppConstants.CloudWorldSuffix };
         Assert.Equal("Farlands", form.SelectedWorldName);
         Assert.True(form.IsSelectedWorldCloud);
     }

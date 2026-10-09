@@ -158,9 +158,9 @@ public class DialogViewModelTests
         var portals = vm.Modifiers[4]; // Combat, DeathPenalty, Resources, Raids, Portals
 
         Assert.Equal(WorldGenModifiers.Portals, portals.Key);
-        Assert.Equal("Portals", portals.DisplayName);
-        Assert.Contains("Very Hard (No portals)", portals.Options);   // friendly names, not raw tokens
-        Assert.Equal("Very Hard (No portals)", portals.Selected);     // loaded token -> friendly display
+        Assert.Equal(Strings.WorldGen_Portals_Name, portals.DisplayName);
+        Assert.Contains(Strings.WorldGen_Portals_VeryHard, portals.Options);   // friendly names, not raw tokens
+        Assert.Equal(Strings.WorldGen_Portals_VeryHard, portals.Selected);     // loaded token -> friendly display
         Assert.Equal(WorldGenModifiers.Values.PortalsVeryHard, portals.Value); // and maps back to the token
     }
 

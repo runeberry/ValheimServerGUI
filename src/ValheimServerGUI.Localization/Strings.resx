@@ -1190,6 +1190,63 @@ Please shut down any UDP applications using these ports, or choose a different p
   <data name="Validation_WorldNotFound" xml:space="preserve">
     <value>No world exists with name '{0}'.</value>
   </data>
+  <data name="Validation_ServerNameRequired" xml:space="preserve">
+    <value>Server name must be defined.</value>
+  </data>
+  <data name="Validation_WorldNameMissing" xml:space="preserve">
+    <value>World name must be defined.</value>
+  </data>
+  <data name="Validation_ServerNameMatchesWorld" xml:space="preserve">
+    <value>The server name cannot be the same as the world name ({0}).</value>
+  </data>
+  <data name="Validation_PasswordRequired" xml:space="preserve">
+    <value>A password is required for all public games. Either set a password or disable the Community Server option.</value>
+  </data>
+  <data name="Validation_PasswordLength" xml:space="preserve">
+    <value>Password must be at least 5 characters.</value>
+  </data>
+  <data name="Validation_PasswordContainsServerName" xml:space="preserve">
+    <value>Password cannot contain your server name ({0}).</value>
+  </data>
+  <data name="Validation_PasswordContainsWorldName" xml:space="preserve">
+    <value>Password cannot contain your world name ({0}).</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>Port must be between 1 - 65535</value>
+  </data>
+  <data name="Validation_SaveIntervalPositive" xml:space="preserve">
+    <value>Save interval must be greater than 0.</value>
+  </data>
+  <data name="Validation_ShortBackupPositive" xml:space="preserve">
+    <value>Short backup interval must be greater than 0.</value>
+  </data>
+  <data name="Validation_LongBackupPositive" xml:space="preserve">
+    <value>Long backup interval must be greater than 0.</value>
+  </data>
+  <data name="Validation_SaveIntervalOrder" xml:space="preserve">
+    <value>Save interval must be less than or equal to the backup intervals.</value>
+  </data>
+  <data name="Validation_BackupIntervalOrder" xml:space="preserve">
+    <value>Short backup interval must be less than or equal to the long backup interval.</value>
+  </data>
+  <data name="Validation_WorldPresetInvalid" xml:space="preserve">
+    <value>World preset value '{0}' is not allowed. Supported values are: {1}</value>
+  </data>
+  <data name="Validation_WorldModifiersWithPreset" xml:space="preserve">
+    <value>World modifiers may not be set when a world preset is selected.</value>
+  </data>
+  <data name="Validation_WorldModifierKeyInvalid" xml:space="preserve">
+    <value>World modifier key '{0}' is not allowed. Supported values are: {1}</value>
+  </data>
+  <data name="Validation_WorldModifierValueInvalid" xml:space="preserve">
+    <value>World modifier value '{0}' is not allowed for key '{1}'. Supported values are: {2}</value>
+  </data>
+  <data name="Validation_WorldKeyInvalid" xml:space="preserve">
+    <value>World key value '{0}' is not allowed. Supported values are: {1}</value>
+  </data>
+  <data name="Validation_LogFileArgument" xml:space="preserve">
+    <value>ValheimServerGUI does not support the '-logFile' server argument. Instead, enable writing server logs to file under Advanced Controls.</value>
+  </data>
   <!-- Player list import -->
   <data name="Import_Title" xml:space="preserve">
     <value>Import player lists</value>
@@ -1256,5 +1313,47 @@ See application logs for more details.</value>
   </data>
   <data name="RelativeTime_Future" xml:space="preserve">
     <value>in {0}</value>
+  </data>
+  <!-- Paths -->
+  <data name="Path_FileNotDefined" xml:space="preserve">
+    <value>Cannot open file, path is not defined.</value>
+  </data>
+  <data name="Path_FileWrongType" xml:space="preserve">
+    <value>Cannot open file, must point to a valid {0} file:
+{1}</value>
+  </data>
+  <data name="Path_FileNotFound" xml:space="preserve">
+    <value>File not found at path:
+{0}</value>
+  </data>
+  <data name="Path_DirectoryNotDefined" xml:space="preserve">
+    <value>Cannot open directory, path is not defined.</value>
+  </data>
+  <data name="Path_DirectoryNotFound" xml:space="preserve">
+    <value>Directory not found at path:
+{0}</value>
+  </data>
+  <!-- Steam Cloud worlds -->
+  <data name="CloudWorld_NotFound" xml:space="preserve">
+    <value>No Steam Cloud world folder found for '{0}'.</value>
+  </data>
+  <data name="CloudWorld_AlreadyExists" xml:space="preserve">
+    <value>A world named '{0}' already exists in the local save folder.</value>
+  </data>
+  <!-- Online services -->
+  <data name="Api_GitHubUnreachable" xml:space="preserve">
+    <value>Unable to reach GitHub.</value>
+  </data>
+  <data name="Api_RuneberryUnreachable" xml:space="preserve">
+    <value>Unable to reach Runeberry API</value>
+  </data>
+  <data name="Api_UnknownError" xml:space="preserve">
+    <value>Unknown error</value>
+  </data>
+  <!-- Crash report -->
+  <data name="CrashReport_Prompt" xml:space="preserve">
+    <value>A fatal error has occured: {0}
+
+Would you like to send an automated crash report to the developer?</value>
   </data>
 </root>

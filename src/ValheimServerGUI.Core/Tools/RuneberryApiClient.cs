@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Threading.Tasks;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Properties;
 using ValheimServerGUI.Tools.Http;
 using ValheimServerGUI.Tools.Models;
@@ -61,12 +62,12 @@ namespace ValheimServerGUI.Tools
                     }
                     else
                     {
-                        message = "Unable to reach Runeberry API";
+                        message = Strings.Api_RuneberryUnreachable;
                     }
                 }
                 catch
                 {
-                    message = "Unknown error";
+                    message = Strings.Api_UnknownError;
                 }
 
                 throw new Exception(message);

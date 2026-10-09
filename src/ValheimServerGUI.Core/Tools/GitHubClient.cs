@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools.Http;
 
 namespace ValheimServerGUI.Tools
@@ -26,7 +27,7 @@ namespace ValheimServerGUI.Tools
 
             if (releases == null)
             {
-                throw new Exception("Unable to reach GitHub.");
+                throw new Exception(Strings.Api_GitHubUnreachable);
             }
 
             return SelectLatestRelease(releases);

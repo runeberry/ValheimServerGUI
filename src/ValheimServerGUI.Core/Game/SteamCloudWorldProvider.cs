@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.Game
 {
@@ -89,14 +90,14 @@ namespace ValheimServerGUI.Game
         public DirectoryInfo ImportCloudWorld(string worldName, DirectoryInfo destSaveFolder, bool move)
         {
             var source = GetCloudWorldFolder(worldName)
-                ?? throw new DirectoryNotFoundException($"No Steam Cloud world folder found for '{worldName}'.");
+                ?? throw new DirectoryNotFoundException(string.Format(Strings.CloudWorld_NotFound, worldName));
 
             // Block only if a world by this name already exists locally (same check the dropdown uses).
             // The dest folder may still exist holding just Valheim's local minimap cache (cacheMinimap*)
             // for a cloud world that's been played in-game; that's safe to import the save files into.
             if (!destSaveFolder.IsWorldNameAvailable(worldName))
             {
-                throw new IOException($"A world named '{worldName}' already exists in the local save folder.");
+                throw new IOException(string.Format(Strings.CloudWorld_AlreadyExists, worldName));
             }
 
             var dest = new DirectoryInfo(Path.Join(destSaveFolder.FullName, "worlds_local", worldName));

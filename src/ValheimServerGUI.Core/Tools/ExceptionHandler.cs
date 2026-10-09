@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ValheimServerGUI.Localization;
 using ValheimServerGUI.Tools.Logging;
 using ValheimServerGUI.Tools.Models;
 
@@ -60,7 +61,7 @@ namespace ValheimServerGUI.Tools
                 "Encountered exception ({context}) - {typeName}: {message}{newline}{stackTrace}",
                 contextMessage, e.GetType().Name, e.Message, Environment.NewLine, e.StackTrace ?? string.Empty));
 
-            var userMessage = $"A fatal error has occured: {e.Message}{Environment.NewLine}{Environment.NewLine}Would you like to send an automated crash report to the developer?";
+            var userMessage = string.Format(Strings.CrashReport_Prompt, e.Message);
 
             if (UserPrompt.Confirm(userMessage, contextMessage))
             {

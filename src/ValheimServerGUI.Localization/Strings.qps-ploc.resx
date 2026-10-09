@@ -1144,6 +1144,63 @@
   <data name="Validation_WorldNotFound" xml:space="preserve">
     <value>⟦Validation_WorldNotFound {0}⟧</value>
   </data>
+  <data name="Validation_ServerNameRequired" xml:space="preserve">
+    <value>⟦Validation_ServerNameRequired⟧</value>
+  </data>
+  <data name="Validation_WorldNameMissing" xml:space="preserve">
+    <value>⟦Validation_WorldNameMissing⟧</value>
+  </data>
+  <data name="Validation_ServerNameMatchesWorld" xml:space="preserve">
+    <value>⟦Validation_ServerNameMatchesWorld {0}⟧</value>
+  </data>
+  <data name="Validation_PasswordRequired" xml:space="preserve">
+    <value>⟦Validation_PasswordRequired⟧</value>
+  </data>
+  <data name="Validation_PasswordLength" xml:space="preserve">
+    <value>⟦Validation_PasswordLength⟧</value>
+  </data>
+  <data name="Validation_PasswordContainsServerName" xml:space="preserve">
+    <value>⟦Validation_PasswordContainsServerName {0}⟧</value>
+  </data>
+  <data name="Validation_PasswordContainsWorldName" xml:space="preserve">
+    <value>⟦Validation_PasswordContainsWorldName {0}⟧</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>⟦Validation_PortRange⟧</value>
+  </data>
+  <data name="Validation_SaveIntervalPositive" xml:space="preserve">
+    <value>⟦Validation_SaveIntervalPositive⟧</value>
+  </data>
+  <data name="Validation_ShortBackupPositive" xml:space="preserve">
+    <value>⟦Validation_ShortBackupPositive⟧</value>
+  </data>
+  <data name="Validation_LongBackupPositive" xml:space="preserve">
+    <value>⟦Validation_LongBackupPositive⟧</value>
+  </data>
+  <data name="Validation_SaveIntervalOrder" xml:space="preserve">
+    <value>⟦Validation_SaveIntervalOrder⟧</value>
+  </data>
+  <data name="Validation_BackupIntervalOrder" xml:space="preserve">
+    <value>⟦Validation_BackupIntervalOrder⟧</value>
+  </data>
+  <data name="Validation_WorldPresetInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldPresetInvalid {0} {1}⟧</value>
+  </data>
+  <data name="Validation_WorldModifiersWithPreset" xml:space="preserve">
+    <value>⟦Validation_WorldModifiersWithPreset⟧</value>
+  </data>
+  <data name="Validation_WorldModifierKeyInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldModifierKeyInvalid {0} {1}⟧</value>
+  </data>
+  <data name="Validation_WorldModifierValueInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldModifierValueInvalid {0} {1} {2}⟧</value>
+  </data>
+  <data name="Validation_WorldKeyInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldKeyInvalid {0} {1}⟧</value>
+  </data>
+  <data name="Validation_LogFileArgument" xml:space="preserve">
+    <value>⟦Validation_LogFileArgument⟧</value>
+  </data>
   <!-- Player list import -->
   <data name="Import_Title" xml:space="preserve">
     <value>⟦Import_Title⟧</value>
@@ -1208,5 +1265,42 @@
   </data>
   <data name="RelativeTime_Future" xml:space="preserve">
     <value>⟦RelativeTime_Future {0}⟧</value>
+  </data>
+  <!-- Paths -->
+  <data name="Path_FileNotDefined" xml:space="preserve">
+    <value>⟦Path_FileNotDefined⟧</value>
+  </data>
+  <data name="Path_FileWrongType" xml:space="preserve">
+    <value>⟦Path_FileWrongType {0} {1}⟧</value>
+  </data>
+  <data name="Path_FileNotFound" xml:space="preserve">
+    <value>⟦Path_FileNotFound {0}⟧</value>
+  </data>
+  <data name="Path_DirectoryNotDefined" xml:space="preserve">
+    <value>⟦Path_DirectoryNotDefined⟧</value>
+  </data>
+  <data name="Path_DirectoryNotFound" xml:space="preserve">
+    <value>⟦Path_DirectoryNotFound {0}⟧</value>
+  </data>
+  <!-- Steam Cloud worlds -->
+  <data name="CloudWorld_NotFound" xml:space="preserve">
+    <value>⟦CloudWorld_NotFound {0}⟧</value>
+  </data>
+  <data name="CloudWorld_AlreadyExists" xml:space="preserve">
+    <value>⟦CloudWorld_AlreadyExists {0}⟧</value>
+  </data>
+  <!-- Online services -->
+  <data name="Api_GitHubUnreachable" xml:space="preserve">
+    <value>⟦Api_GitHubUnreachable⟧</value>
+  </data>
+  <data name="Api_RuneberryUnreachable" xml:space="preserve">
+    <value>⟦Api_RuneberryUnreachable⟧</value>
+  </data>
+  <data name="Api_UnknownError" xml:space="preserve">
+    <value>⟦Api_UnknownError⟧</value>
+  </data>
+  <!-- Crash report -->
+  <data name="CrashReport_Prompt" xml:space="preserve">
+    <value>⟦CrashReport_Prompt {0}⟧</value>
   </data>
 </root>

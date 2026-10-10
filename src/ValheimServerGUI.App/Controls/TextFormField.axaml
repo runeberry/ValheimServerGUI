@@ -5,7 +5,7 @@
              x:Class="ValheimServerGUI.App.Controls.TextFormField"
              x:Name="Root" x:CompileBindings="False">
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
-        <Grid ColumnDefinitions="*,Auto">
+        <Grid ColumnDefinitions="*,Auto" IsEnabled="{Binding #Root.IsEnabled}">
             <!-- Plain box (no affix): the default for every text field. -->
             <TextBox Grid.Column="0"
                      IsVisible="{Binding #Root.Affix, Converter={x:Static ObjectConverters.IsNull}}"

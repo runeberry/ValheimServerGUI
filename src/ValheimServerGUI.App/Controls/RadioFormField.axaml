@@ -166,7 +166,7 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-        <RadioButton Content="{Binding #Root.LabelText}"
+        <RadioButton IsEnabled="{Binding #Root.IsEnabled}" Content="{Binding #Root.LabelText}"
                      GroupName="{Binding #Root.GroupName}"
                      IsChecked="{Binding #Root.Value, Mode=TwoWay}" />
         <c:HelpLabel HelpText="{Binding #Root.HelpText}" />

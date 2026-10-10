@@ -10,14 +10,11 @@
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="Template">
             <ControlTemplate>
-                <!-- Help stays readable on a disabled field: ShowOnDisabled opens the tooltip even when an
-                     ancestor (the field) is disabled, and the fixed Foreground keeps the glyph from greying. -->
                 <TextBlock Text="?"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource HelpGlyphBrush}"
-                           ToolTip.Tip="{TemplateBinding HelpText}"
-                           ToolTip.ShowOnDisabled="True" />
+                           ToolTip.Tip="{TemplateBinding HelpText}" />
             </ControlTemplate>
         </Setter>
     </ControlTheme>

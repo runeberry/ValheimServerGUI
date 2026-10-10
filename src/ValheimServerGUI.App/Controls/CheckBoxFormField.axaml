@@ -279,7 +279,7 @@
     </UserControl.Resources>
 
     <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-        <CheckBox Content="{Binding #Root.LabelText}" IsChecked="{Binding #Root.Value, Mode=TwoWay}" />
+        <CheckBox IsEnabled="{Binding #Root.IsEnabled}" Content="{Binding #Root.LabelText}" IsChecked="{Binding #Root.Value, Mode=TwoWay}" />
         <c:HelpLabel HelpText="{Binding #Root.HelpText}" />
     </StackPanel>
 </UserControl>

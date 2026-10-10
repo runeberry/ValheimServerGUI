@@ -33,4 +33,12 @@ public abstract class FormFieldBase : UserControl, IFormField
         get => GetValue(HelpTextProperty);
         set => SetValue(HelpTextProperty, value);
     }
+
+    /// <summary>
+    /// A field's <c>IsEnabled</c> disables its input, never its "?" help glyph: help must stay hoverable on a
+    /// locked field (e.g. every server setting while the server runs). Avalonia disables a control's whole
+    /// subtree and routes pointer-over (cursor, tooltip) only to enabled elements, so the field root itself stays
+    /// enabled and each field template binds its input part(s) to <c>IsEnabled</c> instead.
+    /// </summary>
+    protected override bool IsEnabledCore => true;
 }

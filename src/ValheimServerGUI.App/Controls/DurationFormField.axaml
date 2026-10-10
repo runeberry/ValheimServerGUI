@@ -17,7 +17,7 @@
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <!-- One outlined shell: a borderless spinner (every state paints the shell colour via the palette,
              BorderThickness 0 drops its own outline) plus the unit dropdown as a connected end-cap. -->
-        <Border Classes="fieldShell">
+        <Border Classes="fieldShell" IsEnabled="{Binding #Root.IsEnabled}">
             <Grid ColumnDefinitions="*,Auto">
                 <NumericUpDown Grid.Column="0" BorderThickness="0"
                                Value="{Binding #Root.DisplayAmount, Mode=TwoWay}"

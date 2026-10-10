@@ -12,7 +12,7 @@
         </ResourceDictionary>
     </UserControl.Resources>
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
-        <ComboBox HorizontalAlignment="Stretch"
+        <ComboBox IsEnabled="{Binding #Root.IsEnabled}" HorizontalAlignment="Stretch"
                   ItemsSource="{Binding #Root.ItemsSource}"
                   DisplayMemberBinding="{Binding Converter={x:Static conv:EnumDisplayConverter.Instance}}"
                   PlaceholderText="{Binding #Root.PlaceholderText}"

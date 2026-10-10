@@ -14,7 +14,7 @@
     </UserControl.Resources>
 
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
-        <NumericUpDown Value="{Binding #Root.Value, Mode=TwoWay}"
+        <NumericUpDown IsEnabled="{Binding #Root.IsEnabled}" Value="{Binding #Root.Value, Mode=TwoWay}"
                        Minimum="{Binding #Root.Minimum}"
                        Maximum="{Binding #Root.Maximum}"
                        FormatString="0" />

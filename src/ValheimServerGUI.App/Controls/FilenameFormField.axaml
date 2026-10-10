@@ -7,7 +7,7 @@
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
         <!-- One outlined shell around a chromeless text box; the Browse / open-folder buttons are
              connected end-caps inside the same border (left divider only). See Styles/Compact.axaml. -->
-        <Border Classes="fieldShell">
+        <Border Classes="fieldShell" IsEnabled="{Binding #Root.IsEnabled}">
             <Grid ColumnDefinitions="*,Auto">
                 <TextBox Grid.Column="0" Classes="chromeless" VerticalAlignment="Stretch"
                          IsEnabled="{Binding #Root.IsInputEnabled}"

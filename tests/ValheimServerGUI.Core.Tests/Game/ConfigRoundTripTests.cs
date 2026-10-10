@@ -25,6 +25,18 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.True(prefs.WriteServerLogsToFile);
         }
 
+        // A new profile starts with crossplay on, but a saved profile without the key (e.g. written before
+        // crossplay existed) keeps it off: the new-profile default must never change an existing server.
+        [Fact]
+        public void ServerPreferences_NewProfile_EnablesCrossplay_ButAMissingKeyStaysOff()
+        {
+            var created = ServerPreferences.CreateNew("Fresh");
+            Assert.Equal("Fresh", created.ProfileName);
+            Assert.True(created.Crossplay);
+
+            Assert.False(ServerPreferences.FromFile(new ServerPreferencesFile { ProfileName = "Old" }).Crossplay);
+        }
+
         [Fact]
         public void ServerPreferences_FromNullFile_UsesDefaults()
         {

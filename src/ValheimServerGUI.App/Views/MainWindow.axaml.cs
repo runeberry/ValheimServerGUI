@@ -149,7 +149,7 @@ public partial class MainWindow : Window
 
         var prefs = fromForm
             ? ViewModel.Form.ToPreferences(new ServerPreferences { ProfileName = name })
-            : new ServerPreferences { ProfileName = name };
+            : ServerPreferences.CreateNew(name);
         serverPrefs.SavePreferences(prefs);
         ViewModel.LoadProfile(prefs);
     }

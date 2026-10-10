@@ -61,8 +61,9 @@ public class ShellCoordinatorTests
 
         Assert.True(window.IsVisible);
         Assert.Equal(CoreConstants.DefaultServerProfileName, window.ViewModel!.CurrentProfile!.ProfileName);
-        // The new Default profile was persisted.
-        Assert.NotNull(serverPrefs.LoadPreferences(CoreConstants.DefaultServerProfileName));
+        // The new Default profile was persisted, with the new-profile defaults (crossplay on).
+        Assert.True(serverPrefs.LoadPreferences(CoreConstants.DefaultServerProfileName)!.Crossplay);
+        Assert.True(window.ViewModel.Form.Crossplay);
     }
 
     [AvaloniaFact]

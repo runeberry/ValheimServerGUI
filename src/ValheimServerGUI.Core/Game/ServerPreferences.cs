@@ -57,6 +57,17 @@ namespace ValheimServerGUI.Game
         /// </summary>
         public Dictionary<string, PlayerRoleEntry> PlayerRoles { get; set; } = new();
 
+        /// <summary>
+        /// A brand-new profile's settings. Differs from the property defaults (which also fill keys missing from a
+        /// saved profile) only where a fresh profile should start differently: crossplay is on, since it avoids most
+        /// connection problems players hit joining a dedicated server.
+        /// </summary>
+        public static ServerPreferences CreateNew(string profileName) => new()
+        {
+            ProfileName = profileName,
+            Crossplay = true,
+        };
+
         public static ServerPreferences FromFile(ServerPreferencesFile? file)
         {
             var prefs = new ServerPreferences();

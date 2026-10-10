@@ -127,7 +127,7 @@ internal sealed class ShellCoordinator
 
     private ServerPreferences CreateDefaultProfile()
     {
-        var prefs = new ServerPreferences { ProfileName = CoreConstants.DefaultServerProfileName };
+        var prefs = ServerPreferences.CreateNew(CoreConstants.DefaultServerProfileName);
         _serverPrefs.SavePreferences(prefs); // stamps LastSaved
         return prefs;
     }

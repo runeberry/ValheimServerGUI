@@ -31,6 +31,9 @@ namespace ValheimServerGUI.Integration.Tests
         public int WorldSavesBeforeStop { get; private set; }
         public int WorldSavesAfterStop { get; private set; }
         public string? ArtifactPath { get; private set; }
+        public string? CommittedSaveAfterStop { get; private set; }
+        public IReadOnlyList<WorldPlayerHistoryEntry>? HistoryAfterStop { get; private set; }
+        public Exception? HistoryReadError { get; private set; }
         public IReadOnlyList<string> CapturedLog { get; private set; } = Array.Empty<string>();
 
         public async ValueTask InitializeAsync()
@@ -55,6 +58,11 @@ namespace ValheimServerGUI.Integration.Tests
 
                 SaveTimeAfterStopUtc = harness.LatestWorldSaveTimeUtc();
                 WorldSavesAfterStop = harness.WorldSaves.Count;
+
+                var worldFolder = new DirectoryInfo(harness.SaveDir).GetLocalWorldFolder(worldName);
+                CommittedSaveAfterStop = WorldPlayerHistory.FindLatestCompleteSave(worldFolder)?.FullName;
+                try { HistoryAfterStop = WorldPlayerHistory.ReadFromWorldFolder(worldFolder); }
+                catch (Exception e) { HistoryReadError = e; }
             }
 
             CapturedLog = harness.Log.ToArray();
@@ -109,6 +117,20 @@ namespace ValheimServerGUI.Integration.Tests
 
             Assert.True(_fixture.WorldSavesAfterStop > _fixture.WorldSavesBeforeStop,
                 $"No new 'World saved' event was parsed during the graceful stop (before={_fixture.WorldSavesBeforeStop}, after={_fixture.WorldSavesAfterStop}).");
+        }
+
+        // Save-format drift: the world save the real binary just wrote must still parse with the exact layout the
+        // player-name reader expects (it fails on any byte that does not line up). Nobody joined, so the history is
+        // empty. A Valheim save-format change surfaces here before it can misname players.
+        [Fact]
+        public void GracefulStop_WritesAWorldSaveThePlayerHistoryReaderParses()
+        {
+            Assert.True(_fixture.StoppedCleanly, "Precondition failed: server did not stop cleanly.");
+
+            Assert.NotNull(_fixture.CommittedSaveAfterStop);
+            Assert.Null(_fixture.HistoryReadError);
+            Assert.NotNull(_fixture.HistoryAfterStop);
+            Assert.Empty(_fixture.HistoryAfterStop!);
         }
 
         // Fixture-drift / capture: the captured real log is written as a run artifact, and we re-feed it

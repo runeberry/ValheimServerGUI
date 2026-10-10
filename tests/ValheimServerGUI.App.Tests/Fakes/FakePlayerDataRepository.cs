@@ -67,4 +67,5 @@ internal sealed class FakePlayerDataRepository : IPlayerDataRepository
     public PlayerInfo? SetPlayerOnline(string characterName, string zdoId) => null;
     public void SetPlayerLeaving(PlayerDataQuery query) { }
     public void SetPlayerOffline(PlayerDataQuery query) { }
+    public void ApplyWorldPlayerHistory(IEnumerable<WorldPlayerHistoryEntry> history) { }
 }

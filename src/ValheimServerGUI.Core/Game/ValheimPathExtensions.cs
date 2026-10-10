@@ -48,6 +48,13 @@ namespace ValheimServerGUI.Game
             => new(Path.Join(saveDataFolder.FullName, fileName));
 
         /// <summary>
+        /// The folder the dedicated server saves a world to: <c>worlds_local/&lt;WorldName&gt;</c> in the save-data root
+        /// (Valheim 1.0+ format; <c>World.GetSaveDirectory</c> for a local file source).
+        /// </summary>
+        public static DirectoryInfo GetLocalWorldFolder(this DirectoryInfo saveDataFolder, string worldName)
+            => new(Path.Join(saveDataFolder.FullName, "worlds_local", worldName));
+
+        /// <summary>
         /// Moves a list file aside to the first free increment: <c>permittedlist.txt</c> → <c>permittedlist.bak.txt</c>,
         /// then <c>permittedlist.bak.2.txt</c>, <c>permittedlist.bak.3.txt</c>, …. Returns the destination, or
         /// <c>null</c> when the file does not exist or the move fails (the path is locked, occupied, or not

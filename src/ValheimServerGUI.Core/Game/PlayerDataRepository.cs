@@ -70,6 +70,13 @@ namespace ValheimServerGUI.Game
 
         void SetPlayerOffline(PlayerDataQuery query);
 
+        /// <summary>
+        /// Updates known players' platform names from a world save's player history. The save holds the name each
+        /// client reported for itself, so it takes precedence over the name-lookup API. Entries for players VSG has
+        /// no record of, or with an empty name, are ignored.
+        /// </summary>
+        void ApplyWorldPlayerHistory(IEnumerable<WorldPlayerHistoryEntry> history);
+
         Task LoadAsync(); // todo: find a way to automatically load data without exposing this
     }
 
@@ -319,6 +326,17 @@ namespace ValheimServerGUI.Game
             }
         }
 
+        public void ApplyWorldPlayerHistory(IEnumerable<WorldPlayerHistoryEntry> history)
+        {
+            foreach (var entry in history)
+            {
+                // The history id is the game's PlatformUserID string, the same token the list files use.
+                if (!PlayerListToken.TryResolve(entry.PlatformUserId, out var platform, out _, out var playerId)) continue;
+
+                ApplyPlayerName(platform, playerId, entry.DisplayName, "world save");
+            }
+        }
+
         public override async Task LoadAsync()
         {
             await base.LoadAsync();
@@ -410,26 +428,34 @@ namespace ValheimServerGUI.Game
 
         private void OnPlayerInfoAvailable(object? sender, PlayerInfoResponse response)
         {
-            if (string.IsNullOrWhiteSpace(response.Id)
-                || string.IsNullOrWhiteSpace(response.Name)
-                || string.IsNullOrWhiteSpace(response.Platform))
+            ApplyPlayerName(response.Platform, response.Id, response.Name, "lookup");
+        }
+
+        // The one place a player's platform name is written, whichever source supplied it.
+        private void ApplyPlayerName(string? platform, string? playerId, string? name, string source)
+        {
+            if (string.IsNullOrWhiteSpace(platform)
+                || string.IsNullOrWhiteSpace(playerId)
+                || string.IsNullOrWhiteSpace(name))
             {
                 return;
             }
 
             var query = new PlayerDataQuery
             {
-                Platform = response.Platform,
-                PlayerId = response.Id,
+                Platform = platform,
+                PlayerId = playerId,
             };
 
-            var players = FindPlayersByQuery(query);
+            var players = FindPlayersByQuery(query)
+                .Where(p => p.PlayerName != name)
+                .ToList();
+            if (players.Count == 0) return;
+
             foreach (var player in players)
             {
-                if (player.PlayerName == response.Name) continue;
-
-                player.PlayerName = response.Name;
-                Logger.Information($"Player lookup successful: {player.Key}, {player.PlayerName}");
+                player.PlayerName = name;
+                Logger.Information("Player name from {source}: {key}, {name}", source, player.Key, player.PlayerName);
                 PlayerStatusChanged?.Invoke(this, player);
             }
 

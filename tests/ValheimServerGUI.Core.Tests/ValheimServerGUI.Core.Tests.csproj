@@ -17,6 +17,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Real game-written save files, with identities replaced by same-length fakes. -->
+    <None Include="Fixtures\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\..\src\ValheimServerGUI.Core\ValheimServerGUI.Core.csproj" />
   </ItemGroup>
 

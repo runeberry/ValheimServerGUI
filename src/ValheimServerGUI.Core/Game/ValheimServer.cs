@@ -73,6 +73,7 @@ namespace ValheimServerGUI.Game
         public bool CanRestart => IsAnyStatus(ServerStatus.Running) && ProcessKey != null;
 
         private readonly IProcessProvider ProcessProvider;
+        private readonly IPlayerDataRepository PlayerDataRepository;
         private readonly IApplicationLogger ApplicationLogger;
         private readonly IValheimPathResolver PathResolver;
         private readonly IPlayerAccessListService AccessLists;
@@ -95,6 +96,7 @@ namespace ValheimServerGUI.Game
             IPlayerListBaselineStore listBaselines)
         {
             ProcessProvider = processProvider;
+            PlayerDataRepository = playerDataRepository;
             ApplicationLogger = appLogger;
             PathResolver = pathResolver;
             AccessLists = accessLists;
@@ -106,7 +108,7 @@ namespace ValheimServerGUI.Game
             // startup guard applied in OnServerConnected.
             Parser = new ServerLogParser(playerDataRepository, appLogger);
             Parser.ServerConnected += OnServerConnected;
-            Parser.WorldSaved += (_, timeMs) => WorldSaved?.Invoke(this, timeMs);
+            Parser.WorldSaved += OnWorldSaved;
             Parser.InviteCodeReady += (_, code) => InviteCodeReady?.Invoke(this, code);
 
             InitializeStatusBasedActions();
@@ -176,6 +178,7 @@ namespace ValheimServerGUI.Game
 
             // Before anything launches: a failed list backup throws here and the server is not started.
             SyncAccessLists(options, adoptExternalChanges);
+            RefreshPlayerNamesFromWorldSave(options);
 
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
@@ -298,6 +301,13 @@ namespace ValheimServerGUI.Game
             Status = ServerStatus.Running;
         }
 
+        private void OnWorldSaved(object? sender, decimal timeMs)
+        {
+            // The completion line is logged after the save is committed, so the new history is on disk.
+            RefreshPlayerNamesFromWorldSave(Options);
+            WorldSaved?.Invoke(this, timeMs);
+        }
+
         private void Process_OnDataReceived(object obj, DataReceivedEventArgs e)
         {
             if (e.Data == null) return;
@@ -388,6 +398,23 @@ namespace ValheimServerGUI.Game
             }
 
             SyncAccessLists(Options, adoptExternalChanges: true);
+        }
+
+        // The world save records every player who has joined, with the platform name each client reported for itself
+        // (Steam persona, Xbox gamertag, ...). Reading it at start and after each save names known players without
+        // an API lookup. A missing or unreadable save is logged and never blocks the server.
+        private void RefreshPlayerNamesFromWorldSave(IValheimServerOptions options)
+        {
+            try
+            {
+                var worldFolder = options.GetValidatedSaveDataFolder().GetLocalWorldFolder(options.WorldName ?? string.Empty);
+                PlayerDataRepository.ApplyWorldPlayerHistory(WorldPlayerHistory.ReadFromWorldFolder(worldFolder));
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException)
+            {
+                ApplicationLogger.Warning(e, "Could not read player names from the save of world {world}: {message}",
+                    options.WorldName, e.Message);
+            }
         }
 
         private static string GenerateArgs(IValheimServerOptions options)

@@ -24,6 +24,8 @@ namespace ValheimServerGUI.Core.Tests.Game
         private readonly string _exe;
         private readonly string _saveDir;
         private readonly MockProcessProvider _processProvider;
+        private readonly PlayerDataRepository _repo;
+        private readonly FakeApplicationLogger _appLogger = new();
         private readonly ValheimServer _server;
 
         public ValheimServerTests()
@@ -38,12 +40,12 @@ namespace ValheimServerGUI.Core.Tests.Game
             ILogger serilog = new LoggerConfiguration().CreateLogger();
             var context = new DataFileRepositoryContext(fileProvider, serilog);
             var resolver = new LinuxValheimPathResolver("/tmp/vsg-test-home", xdgDataHome: null);
-            var repo = new PlayerDataRepository(context, new FakeRuneberryApiClient(), resolver);
+            _repo = new PlayerDataRepository(context, new FakeRuneberryApiClient(), resolver);
 
             _processProvider = new MockProcessProvider();
             var accessLists = new PlayerAccessListService();
             var baselines = new InMemoryBaselineStore();
-            _server = new ValheimServer(_processProvider, repo, new FakeApplicationLogger(), resolver, accessLists,
+            _server = new ValheimServer(_processProvider, _repo, _appLogger, resolver, accessLists,
                 new PlayerListImportService(accessLists, baselines), baselines);
         }
 
@@ -423,6 +425,70 @@ namespace ValheimServerGUI.Core.Tests.Game
             FeedLog("World saved ( 10.5ms )");
 
             Assert.Equal(10.5m, saved);
+        }
+
+        // Player names from the world save: read at start, reread after each save, and never a reason not to start.
+
+        private DirectoryInfo WorldFolder => new DirectoryInfo(_saveDir).GetLocalWorldFolder("MyWorld");
+
+        private static byte[] SaveNaming(params (string Id, string Name)[] players)
+            => WorldSaveFixtures.Build(players.Select(p => new WorldPlayerHistoryEntry(p.Id, p.Name, p.Name, "")));
+
+        private PlayerInfo KnownPlayer(string platform, string playerId)
+        {
+            var player = new PlayerInfo { Platform = platform, PlayerId = playerId };
+            _repo.Upsert(player);
+            return player;
+        }
+
+        [Fact]
+        public void Start_NamesKnownPlayersFromTheWorldSave()
+        {
+            var player = KnownPlayer(PlayerPlatforms.Steam, "76561198000000001");
+            WorldSaveFixtures.WriteSave(WorldFolder, 3, SaveNaming(("Steam_76561198000000001", "Viking")));
+
+            _server.Start(Options());
+
+            Assert.Equal("Viking", player.PlayerName);
+        }
+
+        [Fact]
+        public void WorldSaveCompleted_RereadsTheWorldSave()
+        {
+            var steam = KnownPlayer(PlayerPlatforms.Steam, "76561198000000001");
+            var xbox = KnownPlayer(PlayerPlatforms.Xbox, "2533274900000001");
+            WorldSaveFixtures.WriteSave(WorldFolder, 3, SaveNaming(("Steam_76561198000000001", "Viking")));
+            _server.Start(Options());
+            Assert.Null(xbox.PlayerName);
+
+            // The Xbox player joined mid-session; the next save records them.
+            WorldSaveFixtures.WriteSave(WorldFolder, 4, SaveNaming(
+                ("Steam_76561198000000001", "Viking"),
+                ("Xbox_2533274900000001", "Shieldmaiden1")));
+            FeedLog("World save (5/5) done. Total time [20ms]");
+
+            Assert.Equal("Viking", steam.PlayerName);
+            Assert.Equal("Shieldmaiden1", xbox.PlayerName);
+        }
+
+        [Fact]
+        public void Start_WithAnUnreadableWorldSave_StillStarts_AndLogsAWarning()
+        {
+            WorldSaveFixtures.WriteSave(WorldFolder, 3, new byte[] { 0xFF, 0xFF });
+
+            _server.Start(Options());
+
+            Assert.Equal(ServerStatus.Starting, _server.Status);
+            Assert.Contains(_appLogger.Messages, m => m.Contains("Could not read player names"));
+        }
+
+        [Fact]
+        public void Start_WithNoWorldSaveYet_StillStarts()
+        {
+            _server.Start(Options());
+
+            Assert.Equal(ServerStatus.Starting, _server.Status);
+            Assert.DoesNotContain(_appLogger.Messages, m => m.Contains("Could not read player names"));
         }
     }
 }

@@ -9,6 +9,7 @@
             <!-- Plain box (no affix): the default for every text field. -->
             <TextBox Grid.Column="0"
                      IsVisible="{Binding #Root.Affix, Converter={x:Static ObjectConverters.IsNull}}"
+                     IsEnabled="{Binding #Root.IsInputEnabled}"
                      VerticalAlignment="Center"
                      Text="{Binding #Root.Value, Mode=TwoWay}"
                      MaxLength="{Binding #Root.MaxLength}"
@@ -24,6 +25,7 @@
                     IsVisible="{Binding #Root.Affix, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBox Grid.Column="0" Classes="chromeless"
+                             IsEnabled="{Binding #Root.IsInputEnabled}"
                              VerticalAlignment="Stretch" VerticalContentAlignment="Center"
                              Text="{Binding #Root.Value, Mode=TwoWay}"
                              MaxLength="{Binding #Root.MaxLength}"

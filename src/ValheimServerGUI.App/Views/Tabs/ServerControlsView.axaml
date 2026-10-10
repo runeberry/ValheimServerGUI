@@ -23,7 +23,7 @@
             <c:TextFormField LabelText="{x:Static loc:Strings.ServerControls_Password_Label}"
                              HelpText="{x:Static loc:Strings.ServerControls_Password_Help}"
                              Value="{Binding Form.Password}" ShowValue="{Binding Form.ShowPassword}"
-                             IsEnabled="{Binding AllowServerChanges}">
+                             IsInputEnabled="{Binding AllowServerChanges}">
                 <c:TextFormField.Affix>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                         <!-- Eye toggle (left of copy): open eye when shown, struck-through when hidden. -->

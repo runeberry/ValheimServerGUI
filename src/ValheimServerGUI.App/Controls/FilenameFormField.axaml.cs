@@ -42,6 +42,13 @@ public partial class FilenameFormField : FormFieldBase, IFormField<string?>
     public static readonly StyledProperty<ICommand?> OpenFolderCommandProperty =
         AvaloniaProperty.Register<FilenameFormField, ICommand?>(nameof(OpenFolderCommand));
 
+    /// <summary>
+    /// Enables the path input: the text box and the Browse end-cap, which writes into it (default true). Unlike
+    /// <c>IsEnabled</c>, which disables the whole field, this leaves the open-folder end-cap usable.
+    /// </summary>
+    public static readonly StyledProperty<bool> IsInputEnabledProperty =
+        AvaloniaProperty.Register<FilenameFormField, bool>(nameof(IsInputEnabled), defaultValue: true);
+
     public FilenameFormField() => AvaloniaXamlLoader.Load(this);
 
     public string? Value
@@ -69,6 +76,12 @@ public partial class FilenameFormField : FormFieldBase, IFormField<string?>
     {
         get => GetValue(ShowOpenFolderProperty);
         set => SetValue(ShowOpenFolderProperty, value);
+    }
+
+    public bool IsInputEnabled
+    {
+        get => GetValue(IsInputEnabledProperty);
+        set => SetValue(IsInputEnabledProperty, value);
     }
 
     /// <summary>Command invoked by the open-folder end-cap (the owner keeps the shell dependency).</summary>

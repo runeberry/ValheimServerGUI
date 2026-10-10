@@ -43,6 +43,14 @@ public partial class TextFormField : FormFieldBase, IFormField<string?>
     public static readonly StyledProperty<double> InputHeightProperty =
         AvaloniaProperty.Register<TextFormField, double>(nameof(InputHeight), defaultValue: double.NaN);
 
+    /// <summary>
+    /// Enables just the text box (default true). Unlike <c>IsEnabled</c>, which disables the whole field, this
+    /// leaves the <see cref="Affix"/> and <see cref="TrailingContent"/> usable, e.g. a locked password that can
+    /// still be shown and copied.
+    /// </summary>
+    public static readonly StyledProperty<bool> IsInputEnabledProperty =
+        AvaloniaProperty.Register<TextFormField, bool>(nameof(IsInputEnabled), defaultValue: true);
+
     public TextFormField() => AvaloniaXamlLoader.Load(this);
 
     public string? Value
@@ -91,6 +99,12 @@ public partial class TextFormField : FormFieldBase, IFormField<string?>
     {
         get => GetValue(InputHeightProperty);
         set => SetValue(InputHeightProperty, value);
+    }
+
+    public bool IsInputEnabled
+    {
+        get => GetValue(IsInputEnabledProperty);
+        set => SetValue(IsInputEnabledProperty, value);
     }
 
     /// <inheritdoc />

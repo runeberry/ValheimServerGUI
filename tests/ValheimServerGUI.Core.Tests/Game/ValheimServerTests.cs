@@ -40,7 +40,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             ILogger serilog = new LoggerConfiguration().CreateLogger();
             var context = new DataFileRepositoryContext(fileProvider, serilog);
             var resolver = new LinuxValheimPathResolver("/tmp/vsg-test-home", xdgDataHome: null);
-            _repo = new PlayerDataRepository(context, new FakeRuneberryApiClient(), resolver);
+            _repo = new PlayerDataRepository(context, resolver);
 
             _processProvider = new MockProcessProvider();
             var accessLists = new PlayerAccessListService();

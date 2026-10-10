@@ -48,14 +48,12 @@ namespace ValheimServerGUI.Game
     /// <param name="UpdateCount">Count of real changes: players whose effective role changes + a permitted-list flag flip.</param>
     /// <param name="Roles">The full override map the import would apply (keyed by <c>Platform:PlayerId</c>).</param>
     /// <param name="UsePermittedList">The permitted-list flag derived from the files (permittedlist non-empty).</param>
-    /// <param name="NewPlayers">Players with neither an override nor a default before, as assignments for name lookups.</param>
     /// <param name="Unrecognized">Entries skipped because they don't resolve to a player (they stay in the files).</param>
     public record ImportPlan(
         bool AnyFilesPresent,
         int UpdateCount,
         IReadOnlyDictionary<string, PlayerRoleEntry> Roles,
         bool UsePermittedList,
-        IReadOnlyList<PlayerRoleAssignment> NewPlayers,
         IReadOnlyList<string> Unrecognized);
 
     /// <summary>An entry added to a file since VSG's last write that disagrees with the player's effective role.</summary>
@@ -65,13 +63,11 @@ namespace ValheimServerGUI.Game
     /// <param name="Overrides">The profile's override map with the changes applied.</param>
     /// <param name="Changed">True when <paramref name="Overrides"/> differs from the input.</param>
     /// <param name="Conflicts">Added entries that disagreed with the profile (adopted only when external changes win).</param>
-    /// <param name="NewPlayers">Players adopted from the files who had neither an override nor a default, for name lookups.</param>
     /// <param name="LogLines">One line per adoption, conflict, and kept role, for the application log.</param>
     public record ReconcileResult(
         IReadOnlyDictionary<string, PlayerRoleEntry> Overrides,
         bool Changed,
         IReadOnlyList<ListConflict> Conflicts,
-        IReadOnlyList<PlayerRoleAssignment> NewPlayers,
         IReadOnlyList<string> LogLines);
 
     public class PlayerListImportService : IPlayerListImportService
@@ -116,12 +112,11 @@ namespace ValheimServerGUI.Game
                 return new ImportPlan(
                     AnyFilesPresent: false, UpdateCount: 0,
                     Roles: new Dictionary<string, PlayerRoleEntry>(), UsePermittedList: currentFlag,
-                    NewPlayers: Array.Empty<PlayerRoleAssignment>(), Unrecognized: Array.Empty<string>());
+                    Unrecognized: Array.Empty<string>());
             }
 
             var permittedHasEntries = _accessLists.ReadEntries(saveDataFolder, PlayerAccessList.Permitted).Count > 0;
             var desired = new Dictionary<string, PlayerRoleEntry>();
-            var resolvedById = new Dictionary<string, ResolvedToken>();
             var unrecognized = new List<string>();
 
             foreach (var (list, role) in Precedence)
@@ -136,7 +131,6 @@ namespace ValheimServerGUI.Game
                     }
 
                     var key = $"{platform}:{playerId}";
-                    resolvedById[key] = new ResolvedToken(platform, platformRaw, playerId);
 
                     // Precedence order guarantees banned wins over admin wins over permitted: only take a role
                     // for a player we have not already assigned a higher-precedence one.
@@ -172,14 +166,9 @@ namespace ValheimServerGUI.Game
             }
             if (usePermittedList != currentFlag) updateCount++;
 
-            var newPlayers = desired.Keys
-                .Where(k => !currentRoles.ContainsKey(k) && !defaults.ContainsKey(k))
-                .Select(k => Assignment(resolvedById[k], desired[k].Role))
-                .ToList();
-
             return new ImportPlan(
                 AnyFilesPresent: true, UpdateCount: updateCount, Roles: overrides,
-                UsePermittedList: usePermittedList, NewPlayers: newPlayers, Unrecognized: unrecognized);
+                UsePermittedList: usePermittedList, Unrecognized: unrecognized);
         }
 
         public ReconcileResult Reconcile(
@@ -191,7 +180,6 @@ namespace ValheimServerGUI.Game
             var baseline = _baselines.Get(saveDataFolder);
             var result = new Dictionary<string, PlayerRoleEntry>(overrides);
             var conflicts = new List<ListConflict>();
-            var newPlayers = new List<PlayerRoleAssignment>();
             var log = new List<string>();
 
             // Per list: the players on disk now, and the players VSG wrote there last time.
@@ -233,7 +221,6 @@ namespace ValheimServerGUI.Game
                 log.Add(resolved.Effective == PlayerRole.None
                     ? $"Adopted {key} as {role} from {FileName(list)}."
                     : $"Adopted {key} as {role} from {FileName(list)} (was {resolved.Effective}).");
-                if (!resolved.HasOverride && !resolved.HasDefault) newPlayers.Add(Assignment(token, role));
             }
 
             // Removals: written by VSG last time but gone from disk now (e.g. an in-game unban). Undo the server's own
@@ -262,7 +249,7 @@ namespace ValheimServerGUI.Game
 
             var changed = result.Count != overrides.Count
                 || result.Any(kvp => !overrides.TryGetValue(kvp.Key, out var before) || before != kvp.Value);
-            return new ReconcileResult(result, changed, conflicts, newPlayers, log);
+            return new ReconcileResult(result, changed, conflicts, log);
         }
 
         // Resolvable entries keyed by Platform:PlayerId (bare and prefixed Steam forms collapse to one player).
@@ -291,9 +278,6 @@ namespace ValheimServerGUI.Game
             PlayerAccessList.Permitted => role is PlayerRole.Permitted or PlayerRole.Admin,
             _ => false,
         };
-
-        private static PlayerRoleAssignment Assignment(ResolvedToken t, PlayerRole role)
-            => new(t.Platform, t.PlatformRaw, t.PlayerId, role);
 
         private static string FileName(PlayerAccessList list) => list switch
         {

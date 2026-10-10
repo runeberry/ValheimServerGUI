@@ -71,9 +71,9 @@ namespace ValheimServerGUI.Game
         void SetPlayerOffline(PlayerDataQuery query);
 
         /// <summary>
-        /// Updates known players' platform names from a world save's player history. The save holds the name each
-        /// client reported for itself, so it takes precedence over the name-lookup API. Entries for players VSG has
-        /// no record of, or with an empty name, are ignored.
+        /// Updates known players' platform names from a world save's player history, the name each client reported
+        /// for itself. This is the only source of platform names. Entries for players VSG has no record of, or with an
+        /// empty name, are ignored.
         /// </summary>
         void ApplyWorldPlayerHistory(IEnumerable<WorldPlayerHistoryEntry> history);
 
@@ -84,19 +84,15 @@ namespace ValheimServerGUI.Game
     {
         public event EventHandler<PlayerInfo>? PlayerStatusChanged;
 
-        private readonly IRuneberryApiClient RuneberryApiClient;
         private readonly Dictionary<string, PlayerStatus> PlayerStatusMap = new();
         private readonly Dictionary<string, DateTimeOffset> LastOfflineCache = new();
 
         public PlayerDataRepository(
             IDataFileRepositoryContext context,
-            IRuneberryApiClient runeberryApiClient,
             IValheimPathResolver pathResolver)
             : base(context, pathResolver.PlayerListFilePath)
         {
             EntityUpdated += OnEntityUpdated;
-            RuneberryApiClient = runeberryApiClient;
-            RuneberryApiClient.PlayerInfoAvailable += OnPlayerInfoAvailable;
         }
 
         #region IPlayerDataRepository implementation
@@ -172,11 +168,6 @@ namespace ValheimServerGUI.Game
             if (!string.IsNullOrWhiteSpace(query.PlatformRaw)) player.PlatformRaw = query.PlatformRaw;
 
             Upsert(player);
-
-            if (string.IsNullOrWhiteSpace(player.PlayerName))
-            {
-                RuneberryApiClient.RequestPlayerInfoAsync(player.Platform ?? string.Empty, player.PlayerId ?? string.Empty);
-            }
 
             return player;
         }
@@ -333,7 +324,7 @@ namespace ValheimServerGUI.Game
                 // The history id is the game's PlatformUserID string, the same token the list files use.
                 if (!PlayerListToken.TryResolve(entry.PlatformUserId, out var platform, out _, out var playerId)) continue;
 
-                ApplyPlayerName(platform, playerId, entry.DisplayName, "world save");
+                ApplyPlayerName(platform, playerId, entry.DisplayName);
             }
         }
 
@@ -426,20 +417,9 @@ namespace ValheimServerGUI.Game
             }
         }
 
-        private void OnPlayerInfoAvailable(object? sender, PlayerInfoResponse response)
+        private void ApplyPlayerName(string platform, string playerId, string name)
         {
-            ApplyPlayerName(response.Platform, response.Id, response.Name, "lookup");
-        }
-
-        // The one place a player's platform name is written, whichever source supplied it.
-        private void ApplyPlayerName(string? platform, string? playerId, string? name, string source)
-        {
-            if (string.IsNullOrWhiteSpace(platform)
-                || string.IsNullOrWhiteSpace(playerId)
-                || string.IsNullOrWhiteSpace(name))
-            {
-                return;
-            }
+            if (string.IsNullOrWhiteSpace(name)) return;
 
             var query = new PlayerDataQuery
             {
@@ -455,7 +435,7 @@ namespace ValheimServerGUI.Game
             foreach (var player in players)
             {
                 player.PlayerName = name;
-                Logger.Information("Player name from {source}: {key}, {name}", source, player.Key, player.PlayerName);
+                Logger.Information("Player name from world save: {key}, {name}", player.Key, player.PlayerName);
                 PlayerStatusChanged?.Invoke(this, player);
             }
 

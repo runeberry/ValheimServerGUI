@@ -36,7 +36,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             var runeberry = new FakeRuneberryApiClient();
             var resolver = new LinuxValheimPathResolver("/tmp/vsg-test-home", xdgDataHome: null);
 
-            _repo = new PlayerDataRepository(context, runeberry, resolver);
+            _repo = new PlayerDataRepository(context, resolver);
             _parser = new ServerLogParser(_repo, new FakeApplicationLogger());
         }
 

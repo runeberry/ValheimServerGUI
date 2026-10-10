@@ -32,7 +32,6 @@ public partial class PlayersViewModel : ViewModelBase
 {
     private readonly IPlayerDataRepository _repo;
     private readonly ServerFormViewModel _form;
-    private readonly IRuneberryApiClient _api;
     private readonly IUserPreferencesProvider _userPrefs;
     // Every known player's row (keyed + in arrival order); Players is the visible, same-ordered subset.
     private readonly Dictionary<string, PlayerRowViewModel> _rows = new();
@@ -43,11 +42,10 @@ public partial class PlayersViewModel : ViewModelBase
     private IReadOnlyDictionary<string, PlayerDefaultEntry> _defaults;
 
     public PlayersViewModel(
-        IPlayerDataRepository repo, ServerFormViewModel form, IRuneberryApiClient api, IUserPreferencesProvider userPrefs)
+        IPlayerDataRepository repo, ServerFormViewModel form, IUserPreferencesProvider userPrefs)
     {
         _repo = repo;
         _form = form;
-        _api = api;
         _userPrefs = userPrefs;
         _defaults = CopyDefaults(userPrefs.LoadPreferences());
 
@@ -185,13 +183,9 @@ public partial class PlayersViewModel : ViewModelBase
         // The role lands on this server's override (via the form, tripping the profile's dirty flag) or, as a
         // default role, in user preferences — saved immediately, which re-renders the tab and live-applies.
         var prefs = _userPrefs.LoadPreferences();
-        var outcome = AddPlayerFlow.Apply(result, new RepoPlayerRecordStore(_repo), prefs.PlayerDefaults, _form.SetRole);
-        if (outcome is null) return;
+        var player = AddPlayerFlow.Apply(result, new RepoPlayerRecordStore(_repo), prefs.PlayerDefaults, _form.SetRole);
+        if (player is null) return;
         if (result.AsDefault) _userPrefs.SavePreferences(prefs);
-
-        // A brand-new record with no name yet: look it up the same way the join path does (fire-and-forget).
-        if (outcome.IsNewRecord && string.IsNullOrWhiteSpace(outcome.Player.PlayerName))
-            _ = _api.RequestPlayerInfoAsync(outcome.Player.Platform ?? string.Empty, outcome.Player.PlayerId ?? string.Empty);
     }
 
     private ResolvedRole Resolve(string key) => PlayerRoleResolver.Resolve(key, _form.PlayerRoles, _defaults);

@@ -41,7 +41,7 @@ public class ShellCoordinatorTests
                 Core.GetRequiredService<IPlayerDataRepository>(),
                 Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>(),
                 new FakeSoftwareUpdateProvider(), shell, pathResolver,
-                Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
+                Core.GetRequiredService<IPlayerListImportService>());
         var startupService = new StartupService(new FakeSoftwareUpdateProvider(), new FakePlayerDataRepository(), TestLog.Silent);
         var logger = Core.GetRequiredService<ValheimServerGUI.Tools.Logging.IApplicationLogger>();
 

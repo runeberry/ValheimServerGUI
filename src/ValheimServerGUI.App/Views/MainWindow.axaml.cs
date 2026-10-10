@@ -184,8 +184,7 @@ public partial class MainWindow : Window
     // Player details live in Manage Players: "View Player Details" opens it focused on that player.
     private async Task ShowManagePlayersAsync(string? focusPlayerKey = null)
     {
-        var vm = new ManagePlayersViewModel(
-            Svc<IUserPreferencesProvider>(), Svc<IPlayerDataRepository>(), Svc<IRuneberryApiClient>());
+        var vm = new ManagePlayersViewModel(Svc<IUserPreferencesProvider>(), Svc<IPlayerDataRepository>());
         if (focusPlayerKey is not null) vm.FocusPlayer(focusPlayerKey);
         await new ManagePlayersWindow(vm).ShowDialog(this);
     }

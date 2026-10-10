@@ -21,7 +21,7 @@ namespace ValheimServerGUI.Tools.Models
         /// <summary>
         /// Gets a case-corrected platform name from an input string. The accepted inputs are the tokens the
         /// game prints in its crossplay log lines (case-insensitively), mapped to VSG's canonical name used
-        /// for UI/icons and the name-lookup API. The raw log token is preserved separately on
+        /// for UI and icons. The raw log token is preserved separately on
         /// <see cref="ValheimServerGUI.Game.PlayerInfo.PlatformRaw"/> for writing list-file entries, so
         /// this normalization never has to guess the binary's exact casing.
         /// </summary>

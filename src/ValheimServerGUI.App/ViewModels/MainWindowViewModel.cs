@@ -72,7 +72,6 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly IValheimPathResolver _pathResolver;
     private readonly IApplicationLogger _logger;
     private readonly IPlayerListImportService _import;
-    private readonly IRuneberryApiClient _api;
 
     private string? _startedNewWorld;
 
@@ -88,8 +87,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ISoftwareUpdateProvider updateProvider,
         IShellLauncher shell,
         IValheimPathResolver pathResolver,
-        IPlayerListImportService import,
-        IRuneberryApiClient api)
+        IPlayerListImportService import)
     {
         _serverManager = serverManager;
         _userPrefs = userPrefs;
@@ -102,7 +100,6 @@ public partial class MainWindowViewModel : ViewModelBase
         _pathResolver = pathResolver;
         _logger = appLogger;
         _import = import;
-        _api = api;
 
         // No server is bound until the first LoadProfile → RetargetTo (the window is always loaded with a
         // profile immediately after construction). ServerStatus defaults to Stopped, which the gates expect.
@@ -112,7 +109,7 @@ public partial class MainWindowViewModel : ViewModelBase
         // The Players tab edits the active profile's role overrides/mode, which live on the form, and reads the
         // app-global player defaults from user preferences; the three list files are generated from the resolved
         // roles at server start (in Core), so the tab needs no access-list service here.
-        Players = new PlayersViewModel(playerRepo, Form, api, userPrefs);
+        Players = new PlayersViewModel(playerRepo, Form, userPrefs);
         Logs = new LogsViewModel(appLogger, shell, pathResolver);
 
         _updateProvider.UpdateCheckStarted += OnUpdateCheckStarted;
@@ -733,23 +730,11 @@ public partial class MainWindowViewModel : ViewModelBase
             }
         }
 
-        ApplyImportPlan(plan.Roles, plan.UsePermittedList, plan.NewPlayers);
+        Form.ApplyImport(plan.Roles, plan.UsePermittedList);
         _logger.Information("Player-list import applied: {count} role change(s), usePermittedList={mode}.",
             plan.UpdateCount, plan.UsePermittedList);
 
         if (interactive) await ShowMessageAsync(Strings.Import_Title, string.Format(Strings.Import_Updated, plan.UpdateCount));
-    }
-
-    // Applies a role map + flag to the form as one batched edit, then fires a name lookup for each new player
-    // (fire-and-forget, the same call the join/add-by-ID paths use).
-    private void ApplyImportPlan(
-        IReadOnlyDictionary<string, PlayerRoleEntry> roles,
-        bool usePermittedList,
-        IReadOnlyList<PlayerRoleAssignment> newPlayers)
-    {
-        Form.ApplyImport(roles, usePermittedList);
-        foreach (var np in newPlayers)
-            _ = _api.RequestPlayerInfoAsync(np.Platform ?? string.Empty, np.PlayerId ?? string.Empty);
     }
 
     /// <summary>
@@ -799,7 +784,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
 
         foreach (var line in report.LogLines) _logger.Information("{line}", line);
-        if (report.Changed) ApplyImportPlan(report.Overrides, Form.UsePermittedList, report.NewPlayers);
+        if (report.Changed) Form.ApplyImport(report.Overrides, Form.UsePermittedList);
 
         if (report.Conflicts.Count == 0) return true;
 
@@ -816,7 +801,7 @@ public partial class MainWindowViewModel : ViewModelBase
             case RoleConflictChoice.UseRolesFromFile:
                 var fromFiles = _import.Reconcile(savedir, Form.PlayerRoles, defaults, externalWins: true);
                 foreach (var line in fromFiles.LogLines) _logger.Information("{line}", line);
-                ApplyImportPlan(fromFiles.Overrides, Form.UsePermittedList, fromFiles.NewPlayers);
+                Form.ApplyImport(fromFiles.Overrides, Form.UsePermittedList);
                 _logger.Information("Role conflict resolved: adopted the list files' roles into the profile.");
                 return true;
 
@@ -1061,8 +1046,6 @@ public partial class MainWindowViewModel : ViewModelBase
         if (string.Equals(CurrentProfile?.ProfileName, e.ProfileName, StringComparison.OrdinalIgnoreCase))
             Form.ReplaceRoles(e.Result.Overrides);
 
-        foreach (var np in e.Result.NewPlayers)
-            _ = _api.RequestPlayerInfoAsync(np.Platform ?? string.Empty, np.PlayerId ?? string.Empty);
         _logger.Information("Saved {count} player role change(s) made in the list files during play to profile '{profile}'.",
             e.Result.LogLines.Count, e.ProfileName);
     });

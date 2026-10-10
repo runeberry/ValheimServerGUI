@@ -15,10 +15,9 @@ namespace ValheimServerGUI.App.Tests.ViewModels;
 public class PlayersViewModelTests
 {
     private readonly ServerFormViewModel _form = new();
-    private readonly FakeRuneberryApiClient _api = new();
     private readonly FakeUserPreferencesProvider _userPrefs = new();
 
-    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form, _api, _userPrefs);
+    private PlayersViewModel NewVm(FakePlayerDataRepository repo) => new(repo, _form, _userPrefs);
 
     // Saves the app-global defaults the way the Manage Players dialog does (raises PreferencesSaved).
     private void SaveDefaults(params (string key, PlayerRole role)[] entries)
@@ -438,7 +437,6 @@ public class PlayersViewModelTests
         Assert.Equal("Thor", row.Player.PlayerName);
         Assert.Equal(PlayerRole.Admin, _form.GetOverride(row.Key));
         Assert.Empty(_userPrefs.LoadPreferences().PlayerDefaults);
-        Assert.Equal(0, _api.RequestPlayerInfoCallCount); // name given, no lookup needed
     }
 
     [AvaloniaFact]
@@ -460,19 +458,6 @@ public class PlayersViewModelTests
         Assert.Null(_form.GetOverride("Steam:5"));
         Assert.Equal(Strings.Role_Admin, RowFor(vm, "Steam:5").RoleText); // the default now applies here, unmarked
         Assert.Equal("A", RowFor(vm, "Steam:5").Player.PlayerName); // blank name keeps the cached one
-    }
-
-    [AvaloniaFact]
-    public async Task Add_player_new_record_without_a_name_triggers_a_lookup()
-    {
-        var repo = new FakePlayerDataRepository();
-        var vm = NewVm(repo);
-        vm.AddPlayerPrompt = _ => Task.FromResult<AddPlayerResult?>(
-            new AddPlayerResult(PlayerPlatforms.Steam, "77", null, PlayerRole.Admin, AsDefault: false));
-
-        await vm.AddPlayerCommand.ExecuteAsync(null);
-
-        Assert.Equal(1, _api.RequestPlayerInfoCallCount); // same lookup path a join uses
     }
 
     [AvaloniaFact]

@@ -104,19 +104,6 @@ namespace ValheimServerGUI.Core.Tests.Game
         }
 
         [Fact]
-        public void BuildImport_PopulatesNewPlayers_ForPreviouslyUnknownKeys()
-        {
-            Seed("adminlist.txt", SteamA);
-
-            var plan = _svc.BuildImport(_savedir, new Dictionary<string, PlayerRoleEntry>(), currentFlag: false);
-
-            var np = Assert.Single(plan.NewPlayers);
-            Assert.Equal(PlayerPlatforms.Steam, np.Platform);
-            Assert.Equal(SteamA, np.PlayerId);
-            Assert.Equal(PlayerRole.Admin, np.Role);
-        }
-
-        [Fact]
         public void BuildImport_IsIdempotent_SecondImportHasNoUpdates()
         {
             Seed("adminlist.txt", SteamA);
@@ -128,7 +115,6 @@ namespace ValheimServerGUI.Core.Tests.Game
             // Feed the first result back in as the current state → nothing left to do.
             var second = _svc.BuildImport(_savedir, first.Roles, first.UsePermittedList);
             Assert.Equal(0, second.UpdateCount);
-            Assert.Empty(second.NewPlayers);
         }
 
         [Fact]
@@ -157,7 +143,6 @@ namespace ValheimServerGUI.Core.Tests.Game
 
             Assert.Empty(plan.Roles);
             Assert.Equal(0, plan.UpdateCount);
-            Assert.Empty(plan.NewPlayers); // already known via the defaults
         }
 
         [Fact]
@@ -219,7 +204,6 @@ namespace ValheimServerGUI.Core.Tests.Game
             var result = Reconcile(new(), externalWins: false);
 
             Assert.Equal(PlayerRole.Banned, result.Overrides[$"Steam:{SteamA}"].Role);
-            Assert.Single(result.NewPlayers);
             Assert.Empty(result.Conflicts);
         }
 

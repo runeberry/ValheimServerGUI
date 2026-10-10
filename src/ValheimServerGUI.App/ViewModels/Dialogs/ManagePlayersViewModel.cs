@@ -23,16 +23,14 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
 {
     private readonly IUserPreferencesProvider _prefs;
     private readonly IPlayerDataRepository _repo;
-    private readonly IRuneberryApiClient? _api;
     private readonly Dictionary<string, PlayerDefaultEntry> _defaults;
     private readonly StagedPlayerRecords _records;
     private readonly DispatcherTimer _sinceTimer;
 
-    public ManagePlayersViewModel(IUserPreferencesProvider prefs, IPlayerDataRepository repo, IRuneberryApiClient? api)
+    public ManagePlayersViewModel(IUserPreferencesProvider prefs, IPlayerDataRepository repo)
     {
         _prefs = prefs;
         _repo = repo;
-        _api = api;
         _defaults = new Dictionary<string, PlayerDefaultEntry>(prefs.LoadPreferences().PlayerDefaults);
         _records = new StagedPlayerRecords(repo);
 
@@ -89,20 +87,15 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
 
     /// <summary>
     /// Commits the staged player records to the repo (removals, then new/edited records), then saves the default
-    /// roles to user preferences — which re-renders every Players tab and live-applies to running servers. New
-    /// records with no name get the same background lookup the join path uses.
+    /// roles to user preferences — which re-renders every Players tab and live-applies to running servers.
     /// </summary>
     public void Save()
     {
-        var created = _records.CommitTo(_repo);
+        _records.CommitTo(_repo);
 
         var prefs = _prefs.LoadPreferences();
         prefs.PlayerDefaults = new Dictionary<string, PlayerDefaultEntry>(_defaults);
         _prefs.SavePreferences(prefs);
-
-        if (_api is null) return;
-        foreach (var player in created.Where(p => string.IsNullOrWhiteSpace(p.PlayerName)))
-            _ = _api.RequestPlayerInfoAsync(player.Platform ?? string.Empty, player.PlayerId ?? string.Empty);
     }
 
     // ===== Section callbacks =====
@@ -115,12 +108,12 @@ public sealed partial class ManagePlayersViewModel : ModalEditViewModel, IDispos
         if (result is null) return;
 
         // The same routine the Players tab uses, over this dialog's staged records + default roles.
-        var outcome = AddPlayerFlow.Apply(result, _records, _defaults, setServerOverride: null);
-        if (outcome is null) return;
+        var player = AddPlayerFlow.Apply(result, _records, _defaults, setServerOverride: null);
+        if (player is null) return;
 
         IsDirty = true;
         RebuildAll();
-        Select(outcome.Player.Key);
+        Select(player.Key);
     }
 
     internal void RemoveAccount(string key)

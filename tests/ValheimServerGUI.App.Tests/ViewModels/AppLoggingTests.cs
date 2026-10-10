@@ -28,7 +28,7 @@ public class AppLoggingTests
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             Core.GetRequiredService<IPlayerDataRepository>(), logger,
             new FakeSoftwareUpdateProvider(), shell, Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
     }
 
     [Fact]

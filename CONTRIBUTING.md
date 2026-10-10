@@ -19,7 +19,7 @@ This project was developed using Visual Studio 2019 on Windows 10. The instructi
 
 ## Backend
 
-The server-side backend (player-name lookup and crash/bug report handling) lives in a **separate repository** and is **not needed** to build or run the client. The desktop client talks to it over HTTP through `CoreConstants.UrlRuneberryApi`; when the backend is unreachable the client stays fully functional (only name enrichment and report submission need connectivity).
+The server-side backend (crash/bug report handling, update check and external-IP check) lives in a **separate repository** and is **not needed** to build or run the client. The desktop client talks to it over HTTP through `CoreConstants.UrlRuneberryApi`; when the backend is unreachable the client stays fully functional (only report submission and those checks need connectivity). Player names come from the world save, not the backend.
 
 ## Solution Resources (Secrets)
 

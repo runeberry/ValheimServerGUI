@@ -90,8 +90,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
             new FakeSoftwareUpdateProvider(),
             shell,
             Core.GetRequiredService<IValheimPathResolver>(),
-            import,
-            Core.GetRequiredService<IRuneberryApiClient>());
+            import);
 
         return (vm, manager, serverPrefs);
     }

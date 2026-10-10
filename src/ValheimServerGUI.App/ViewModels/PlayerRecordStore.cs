@@ -86,14 +86,13 @@ public sealed class StagedPlayerRecords : IPlayerRecordStore
 
     /// <summary>
     /// Applies the staged removals, then writes every staged record to the repo: new records as-is, existing ones
-    /// by merging the editable fields onto the live record. Returns the records that were new to the repo.
+    /// by merging the editable fields onto the live record.
     /// </summary>
-    public IReadOnlyList<PlayerInfo> CommitTo(IPlayerDataRepository repo)
+    public void CommitTo(IPlayerDataRepository repo)
     {
         foreach (var key in _removed) repo.Remove(key);
         _removed.Clear();
 
-        var created = new List<PlayerInfo>();
         foreach (var staged in _staged.Values)
         {
             if (repo.FindById(staged.Key) is { } live)
@@ -105,11 +104,9 @@ public sealed class StagedPlayerRecords : IPlayerRecordStore
             else
             {
                 repo.Upsert(staged);
-                created.Add(staged);
             }
         }
         _staged.Clear();
-        return created;
     }
 
     private static PlayerInfo? Clone(PlayerInfo? p) => p is null ? null : new PlayerInfo

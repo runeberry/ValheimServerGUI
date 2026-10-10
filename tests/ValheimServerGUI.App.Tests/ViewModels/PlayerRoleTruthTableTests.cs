@@ -107,7 +107,7 @@ public class PlayerRoleTruthTableTests
         var repo = new FakePlayerDataRepository();
         repo.PushUpdate(player);
         var form = new ServerFormViewModel();
-        var vm = new PlayersViewModel(repo, form, new FakeRuneberryApiClient(), new FakeUserPreferencesProvider(prefs));
+        var vm = new PlayersViewModel(repo, form, new FakeUserPreferencesProvider(prefs));
 
         if (serverRole is { } s) form.SetRole(player, s);
         form.UsePermittedList = usePermittedList;

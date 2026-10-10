@@ -58,7 +58,7 @@ public class DialogRenderTests
     {
         var repo = Core.GetRequiredService<IPlayerDataRepository>();
         Realize(new ManagePlayersWindow(
-            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null)));
+            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo)));
     }
 
     // "View Player Details" opens Manage Players focused on one player: the window shows that player's tab, and the
@@ -76,7 +76,7 @@ public class DialogRenderTests
             defaults.PlayerDefaults["Steam:" + id] = new PlayerDefaultEntry(PlayerRole.Banned, "Steam");
         }
         prefs.SavePreferences(defaults);
-        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(prefs, repo, null);
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(prefs, repo);
         vm.FocusPlayer("Steam:59");
 
         var window = new ManagePlayersWindow(vm);
@@ -95,7 +95,7 @@ public class DialogRenderTests
     public void ManagePlayers_tabs_have_known_characters_and_the_name_and_id_actions()
     {
         var repo = Core.GetRequiredService<IPlayerDataRepository>();
-        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null);
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo);
 
         foreach (var section in new[] { vm.PlayerAccounts, vm.Banned })
         {
@@ -120,7 +120,7 @@ public class DialogRenderTests
     public void ManagePlayers_banned_tab_has_no_role_column()
     {
         var repo = Core.GetRequiredService<IPlayerDataRepository>();
-        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null);
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo);
         var sections = new[] { vm.PlayerAccounts, vm.Banned }
             .Select(s => new PlayerListSectionView { DataContext = s })
             .ToList();
@@ -139,7 +139,7 @@ public class DialogRenderTests
     {
         var repo = new FakePlayerDataRepository();
         repo.PushUpdate(new PlayerInfo { Platform = "Steam", PlatformRaw = "Steam", PlayerId = "1", PlayerName = "Loki" });
-        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null);
+        var vm = new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo);
         var view = new PlayerListSectionView { DataContext = vm.PlayerAccounts };
         var window = new Window { Content = view, Width = 560, Height = 420 };
         window.Show();

@@ -36,7 +36,7 @@ public class WindowLifecycleTests
             Core.GetRequiredService<IWorldPreferencesProvider>(), Core.GetRequiredService<ISteamCloudWorldProvider>(),
             Core.GetRequiredService<IIpAddressProvider>(), Core.GetRequiredService<IPlayerDataRepository>(),
             logger, new FakeSoftwareUpdateProvider(), shell, pathResolver,
-            Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
         var windowManager = new WindowManager(logger);
         var coordinator = new ShellCoordinator(
             serverPrefs, userPrefs, new StartupArgsProvider(Array.Empty<string>()),

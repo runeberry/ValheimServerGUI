@@ -49,8 +49,7 @@ public class MainWindowViewModelTests
             update,
             shell,
             Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(),
-            Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
     }
 
     [Fact]

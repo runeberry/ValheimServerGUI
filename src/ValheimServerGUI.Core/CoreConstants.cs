@@ -40,12 +40,12 @@ namespace ValheimServerGUI
         public static readonly TimeSpan UpdateCheckInterval = TimeSpan.FromDays(1);
 
         /// <summary>
-        /// The app's backend base (player-info lookups, crash reports, update check, external-IP check). Served by the
+        /// The app's backend base (crash reports, update check, external-IP check). Served by the
         /// Cloudflare Worker in the <c>ValheimServerGUI.Api</c> repo, which replaced the retired Runeberry
         /// AWS Lambda with the identical contract. The Worker enforces <c>CLIENT_API_KEY</c> against
         /// <c>ClientSecrets.RuneberryClientApiKey</c>. Mounted under the <c>/vsg</c> prefix on the shared
-        /// <c>api.runeberry.com</c> host; the client appends the route (<c>/player-info</c>, <c>/crash-report</c>,
-        /// <c>/update-check</c>, <c>/ip-check</c>).
+        /// <c>api.runeberry.com</c> host; the client appends the route (<c>/crash-report</c>, <c>/update-check</c>,
+        /// <c>/ip-check</c>).
         /// (Resources: UrlRuneberryApi.)
         /// </summary>
         public const string UrlRuneberryApi = "https://api.runeberry.com/vsg";

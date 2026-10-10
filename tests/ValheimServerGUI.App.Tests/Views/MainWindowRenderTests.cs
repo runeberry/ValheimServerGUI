@@ -38,8 +38,7 @@ public class MainWindowRenderTests
             new FakeSoftwareUpdateProvider(),
             shell,
             Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(),
-            Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
         vm.LoadProfile(new ServerPreferences { ProfileName = profiles.FirstOrDefault() ?? "Render" });
         return vm;
     }
@@ -171,8 +170,7 @@ public class MainWindowRenderTests
             new FakeServerPreferencesProvider(), Core.GetRequiredService<IWorldPreferencesProvider>(),
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             repo, Core.GetRequiredService<IApplicationLogger>(), new FakeSoftwareUpdateProvider(), shell,
-            Core.GetRequiredService<IValheimPathResolver>(), Core.GetRequiredService<IPlayerListImportService>(),
-            Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IValheimPathResolver>(), Core.GetRequiredService<IPlayerListImportService>());
         vm.LoadProfile(new ServerPreferences { ProfileName = "Menu" });
         var view = new ValheimServerGUI.App.Views.Tabs.PlayersView { DataContext = vm };
         var window = new Window { Content = view, Width = 550, Height = 400 };

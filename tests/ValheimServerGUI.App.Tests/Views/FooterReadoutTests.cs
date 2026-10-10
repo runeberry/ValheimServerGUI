@@ -38,7 +38,7 @@ public class FooterReadoutTests
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             Core.GetRequiredService<IPlayerDataRepository>(), Core.GetRequiredService<IApplicationLogger>(),
             update, shell, Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
 
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
         window.Show();
@@ -66,7 +66,7 @@ public class FooterReadoutTests
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             Core.GetRequiredService<IPlayerDataRepository>(), Core.GetRequiredService<IApplicationLogger>(),
             update, shell, Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
 
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
         window.Show();

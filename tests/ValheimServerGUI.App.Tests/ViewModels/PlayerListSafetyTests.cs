@@ -97,7 +97,7 @@ public sealed class PlayerListSafetyTests : IDisposable
             Core.GetRequiredService<IWorldPreferencesProvider>(), new FakeSteamCloudWorldProvider(),
             Core.GetRequiredService<IIpAddressProvider>(), Core.GetRequiredService<IPlayerDataRepository>(),
             Core.GetRequiredService<IApplicationLogger>(), new FakeSoftwareUpdateProvider(), shell,
-            Core.GetRequiredService<IValheimPathResolver>(), import, new FakeRuneberryApiClient());
+            Core.GetRequiredService<IValheimPathResolver>(), import);
 
         var h = new Harness { Vm = vm };
         vm.MessagePrompt = (t, b) => { h.Messages.Add((t, b)); return Task.CompletedTask; };

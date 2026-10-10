@@ -45,7 +45,6 @@ public sealed class PlayerListImportFlowTests : IDisposable
     private sealed class Harness
     {
         public required MainWindowViewModel Vm { get; init; }
-        public required FakeRuneberryApiClient Api { get; init; }
         public List<(string Title, string Body)> Messages { get; } = new();
         public List<string> ConfirmBodies { get; } = new();
         public List<string> ConflictBodies { get; } = new();
@@ -61,7 +60,6 @@ public sealed class PlayerListImportFlowTests : IDisposable
         var manager = new ServerManager(
             () => Core.GetRequiredService<ValheimServer>(),
             Core.GetRequiredService<Serilog.ILogger>());
-        var api = new FakeRuneberryApiClient();
 
         var vm = new MainWindowViewModel(
             manager,
@@ -75,12 +73,11 @@ public sealed class PlayerListImportFlowTests : IDisposable
             new FakeSoftwareUpdateProvider(),
             shell,
             Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(),
-            api);
+            Core.GetRequiredService<IPlayerListImportService>());
 
         vm.LoadProfile(new ServerPreferences { ProfileName = "Test" });
 
-        var h = new Harness { Vm = vm, Api = api };
+        var h = new Harness { Vm = vm };
         vm.MessagePrompt = (t, b) => { h.Messages.Add((t, b)); return Task.CompletedTask; };
         vm.ImportConfirmPrompt = b => { h.ConfirmBodies.Add(b); return Task.FromResult(h.ConfirmResult); };
         vm.ConflictPrompt = b => { h.ConflictBodies.Add(b); return Task.FromResult(h.ConflictResult); };
@@ -144,7 +141,6 @@ public sealed class PlayerListImportFlowTests : IDisposable
         Assert.Equal(PlayerRole.Admin, h.Vm.Form.GetOverride($"Steam:{SteamA}"));
         Assert.True(h.Vm.Form.IsDirty);
         Assert.Contains(h.Messages, m => m.Body == string.Format(Strings.Import_Updated, 1));
-        Assert.Equal(1, h.Api.RequestPlayerInfoCallCount); // name lookup for the new player
     }
 
     [Fact]

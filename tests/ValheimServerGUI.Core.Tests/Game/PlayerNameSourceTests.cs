@@ -10,12 +10,11 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
-    /// Where a known player's platform name comes from: the world save's player history (the name the client
-    /// reported for itself) takes precedence over the name-lookup API. Only players VSG already knows are named.
+    /// A known player's platform name comes from the world save's player history (the name the client reported for
+    /// itself). Only players VSG already knows are named.
     /// </summary>
     public class PlayerNameSourceTests
     {
-        private readonly FakeRuneberryApiClient _api = new();
         private readonly PlayerDataRepository _repo;
 
         public PlayerNameSourceTests()
@@ -23,7 +22,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             ILogger serilog = new LoggerConfiguration().CreateLogger();
             var context = new DataFileRepositoryContext(new MockDataFileProvider(), serilog);
             var resolver = new LinuxValheimPathResolver("/tmp/vsg-test-home", xdgDataHome: null);
-            _repo = new PlayerDataRepository(context, _api, resolver);
+            _repo = new PlayerDataRepository(context, resolver);
         }
 
         private PlayerInfo Known(string platform, string playerId, string? name = null)
@@ -51,12 +50,11 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal("Shieldmaiden1", xbox.PlayerName);
         }
 
+        // A persona or gamertag change reaches VSG on the player's next join + save.
         [Fact]
-        public void WorldHistory_TakesPrecedenceOverTheLookupName()
+        public void WorldHistory_ReplacesAStaleName()
         {
-            var player = Known(PlayerPlatforms.Steam, "76561198000000001");
-            _api.RaisePlayerInfo(new PlayerInfoResponse(PlayerPlatforms.Steam, "76561198000000001", "OldPersona"));
-            Assert.Equal("OldPersona", player.PlayerName);
+            var player = Known(PlayerPlatforms.Steam, "76561198000000001", name: "OldPersona");
 
             _repo.ApplyWorldPlayerHistory(new[] { Entry("Steam_76561198000000001", "NewPersona") });
 

@@ -34,7 +34,7 @@ public class TabFontConsistencyTests
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             Core.GetRequiredService<IPlayerDataRepository>(), Core.GetRequiredService<IApplicationLogger>(),
             new FakeSoftwareUpdateProvider(), shell, Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(), Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
         vm.LoadProfile(new ServerPreferences { ProfileName = "Font" });
 
         var window = new ValheimServerGUI.App.Views.MainWindow(vm);
@@ -56,7 +56,7 @@ public class TabFontConsistencyTests
     {
         var repo = Core.GetRequiredService<IPlayerDataRepository>();
         var window = new ValheimServerGUI.App.Views.Dialogs.ManagePlayersWindow(
-            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo, null));
+            new ValheimServerGUI.App.ViewModels.Dialogs.ManagePlayersViewModel(new FakeUserPreferencesProvider(), repo));
         window.Show();
         Dispatcher.UIThread.RunJobs();
 

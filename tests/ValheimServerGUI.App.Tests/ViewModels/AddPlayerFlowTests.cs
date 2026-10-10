@@ -15,20 +15,20 @@ public class AddPlayerFlowTests
     private readonly Dictionary<string, PlayerDefaultEntry> _defaults = new();
     private readonly Dictionary<string, PlayerRole?> _overrides = new();
 
-    private AddPlayerFlow.Outcome? Add(PlayerRole role, bool asDefault, bool fromServer = true, string? name = null)
+    private PlayerInfo? Add(PlayerRole role, bool asDefault, bool fromServer = true, string? name = null)
         => AddPlayerFlow.Apply(
             new AddPlayerResult(PlayerPlatforms.Steam, " 42 ", name, role, asDefault),
             new RepoPlayerRecordStore(_repo), _defaults,
             fromServer ? (player, over) => _overrides[player.Key] = over : null);
 
     [Fact]
-    public void Creates_the_record_and_reports_it_new()
+    public void Creates_the_record_then_updates_it()
     {
-        var outcome = Add(PlayerRole.Permitted, asDefault: true, name: "Thor")!;
+        var created = Add(PlayerRole.Permitted, asDefault: true, name: "Thor")!;
 
-        Assert.True(outcome.IsNewRecord);
-        Assert.Equal("Thor", _repo.FindById("Steam:42")!.PlayerName);
-        Assert.False(Add(PlayerRole.Permitted, asDefault: true)!.IsNewRecord);
+        Assert.Same(created, _repo.FindById("Steam:42"));
+        Assert.Equal("Thor", created.PlayerName);
+        Assert.Same(created, Add(PlayerRole.Permitted, asDefault: true));
         Assert.Equal("Thor", _repo.FindById("Steam:42")!.PlayerName); // blank name keeps the cached one
     }
 

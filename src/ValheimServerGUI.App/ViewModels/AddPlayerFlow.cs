@@ -14,16 +14,13 @@ namespace ValheimServerGUI.App.ViewModels;
 /// </summary>
 public static class AddPlayerFlow
 {
-    /// <summary>The outcome: the player's record and whether it was new (so the caller can look up its name).</summary>
-    public sealed record Outcome(PlayerInfo Player, bool IsNewRecord);
-
     /// <param name="result">The dialog result.</param>
     /// <param name="records">Where the player's record is read and written.</param>
     /// <param name="defaults">The player default roles to update (key = <see cref="PlayerInfo.Key"/>).</param>
     /// <param name="setServerOverride">Sets (or clears, with null) the current server's override; null when there
     /// is no server context (Manage Players), in which case the result always applies as a default.</param>
-    /// <returns>The outcome, or null when the result names no valid platform/ID.</returns>
-    public static Outcome? Apply(
+    /// <returns>The player's record, or null when the result names no valid platform/ID.</returns>
+    public static PlayerInfo? Apply(
         AddPlayerResult result,
         IPlayerRecordStore records,
         IDictionary<string, PlayerDefaultEntry> defaults,
@@ -65,6 +62,6 @@ public static class AddPlayerFlow
         }
 
         records.Upsert(player);
-        return new Outcome(player, existing is null);
+        return player;
     }
 }

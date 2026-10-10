@@ -61,8 +61,7 @@ public class SinceColumnSortTests
             new FakeServerPreferencesProvider(), Core.GetRequiredService<IWorldPreferencesProvider>(),
             Core.GetRequiredService<ISteamCloudWorldProvider>(), Core.GetRequiredService<IIpAddressProvider>(),
             repo, Core.GetRequiredService<IApplicationLogger>(), new FakeSoftwareUpdateProvider(), shell,
-            Core.GetRequiredService<IValheimPathResolver>(), Core.GetRequiredService<IPlayerListImportService>(),
-            Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IValheimPathResolver>(), Core.GetRequiredService<IPlayerListImportService>());
         vm.LoadProfile(new ServerPreferences { ProfileName = "Sort" });
         var view = new ValheimServerGUI.App.Views.Tabs.PlayersView { DataContext = vm };
         var window = Show(view);

@@ -16,7 +16,6 @@ public class ManagePlayersViewModelTests
 {
     private readonly FakeUserPreferencesProvider _prefs = new();
     private readonly FakePlayerDataRepository _repo = new();
-    private readonly FakeRuneberryApiClient _api = new();
     private readonly List<AddPlayerOptions> _offered = new();
 
     private ManagePlayersViewModel NewVm(params (string key, PlayerRole role)[] defaults)
@@ -28,7 +27,7 @@ public class ManagePlayersViewModelTests
                 prefs.PlayerDefaults[key] = new PlayerDefaultEntry(role, "Steam");
             _prefs.SavePreferences(prefs);
         }
-        return new ManagePlayersViewModel(_prefs, _repo, _api);
+        return new ManagePlayersViewModel(_prefs, _repo);
     }
 
     // Makes the next Add Player dialog return the given result, recording the options it was opened with.
@@ -433,12 +432,12 @@ public class ManagePlayersViewModelTests
     // ---- save / cancel / copy ----
 
     [AvaloniaFact]
-    public async Task Save_writes_defaults_and_new_records_and_looks_up_unnamed_players()
+    public async Task Save_writes_defaults_and_new_records()
     {
         var vm = NewVm();
-        NextAdd(vm, "1", PlayerRole.Admin);                  // no name → lookup
+        NextAdd(vm, "1", PlayerRole.Admin);
         await vm.PlayerAccounts.AddCommand.ExecuteAsync(null);
-        NextAdd(vm, "2", PlayerRole.Banned, name: "Loki");   // named → no lookup
+        NextAdd(vm, "2", PlayerRole.Banned, name: "Loki");
         await vm.Banned.AddCommand.ExecuteAsync(null);
 
         vm.Save();
@@ -447,7 +446,7 @@ public class ManagePlayersViewModelTests
         Assert.Equal(new PlayerDefaultEntry(PlayerRole.Admin, "Steam"), defaults["Steam:1"]);
         Assert.Equal(new PlayerDefaultEntry(PlayerRole.Banned, "Steam"), defaults["Steam:2"]);
         Assert.Equal("Loki", _repo.FindById("Steam:2")!.PlayerName);
-        Assert.Equal(1, _api.RequestPlayerInfoCallCount);
+        Assert.NotNull(_repo.FindById("Steam:1"));
     }
 
     [AvaloniaFact]

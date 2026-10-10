@@ -21,7 +21,7 @@ namespace ValheimServerGUI.Game
         /// The exact platform token as the game printed it in its crossplay log line (e.g. "Xbox",
         /// "PlayStation"/"Playstation", "Switch"), preserved verbatim so admin/ban/permit list-file entries
         /// are written with the binary's own casing (<c>ZNet.ListContainsId</c> matches non-Steam IDs
-        /// case-sensitively). <see cref="Platform"/> stays the normalized value for UI/icons/name-lookup.
+        /// case-sensitively). <see cref="Platform"/> stays the normalized value for UI/icons.
         /// Null for records created before this field existed or added by ID without a captured token; the
         /// access-list service then falls back to <see cref="Platform"/>.
         /// </summary>

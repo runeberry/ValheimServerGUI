@@ -43,9 +43,9 @@ start-on-login applies). SteamCMD / headless install flows are explicitly not a 
 Windows and Linux*. In this spec and the product UI: **"crossplay"** = the Steam/Xbox player
 feature; **"cross-platform"** = the app's OS support.
 
-**Branding & backend.** Keep the Runeberry identity/branding. The backend (crash-report + player-name
-lookup) now lives in the separate **`ValheimServerGUI.Api`** repo (a Cloudflare Worker) with the same
-app-facing contract; the client is unaffected (see §8).
+**Branding & backend.** Keep the Runeberry identity/branding. The backend (crash reports, update check,
+external-IP check) now lives in the separate **`ValheimServerGUI.Api`** repo (a Cloudflare Worker); see §8.
+Player names no longer use it (§7.3).
 
 ---
 
@@ -555,11 +555,19 @@ Disconnect matches `PlayerId` OR `ZdoId` (Or-query). Every mutation upserts + sa
 (consider debouncing — perf, §16). **Hardening (§16):** on server stop/exit, explicitly reset all
 live statuses to Offline rather than relying on disconnect log lines being emitted.
 
-### 7.3 Name resolution (parity)
+### 7.3 Name resolution (changed 2026-10-09: world save replaces the API)
 
-On join, if `PlayerName` is empty → fire-and-forget Runeberry `GET /player-info` (§8). One-shot
-per unnamed player; resolved name persists permanently (no TTL — decision §16). Offline/failure
-degrades silently (keeps the `[...NNNN]` fallback; retries on next join since name still empty).
+Platform names (Steam persona, Xbox gamertag, PSN/Nintendo names) come from the world save's player
+history, `worlds_local/<World>/_main.<N>.fwl2` (`WorldPlayerHistory`). The server records the name each
+client reports for itself and never removes entries. VSG reads the newest committed save (the one with
+its `_main.<N>.ok` marker) at server start and after each `World save (5/5) done` line, and applies the
+names to known players (unknown players are not created; empty names are ignored; a changed name replaces
+the old one). No network call, no platform ID leaves the machine. Newer save versions are parsed
+best-effort and accepted only if the layout lines up exactly; an unreadable save is logged and skipped.
+
+Known gap: a player who joins mid-session, or is added by ID, has no platform name until a save that
+includes them (autosave interval, or a graceful stop). Until then the display falls back to
+`[...NNNN]`. The old `GET /player-info` lookup was removed entirely (Xbox lookups were broken upstream).
 
 ### 7.4 Players tab + Player Details (parity)
 
@@ -587,13 +595,9 @@ only when a copyable code is present. Model it separately from player records.
 
 The backend moved out of this repo into **`ValheimServerGUI.Api`** (a Cloudflare Worker;
 `https://forge.nuffle.dev/arcanum/ValheimServerGUI.Api`, auto-deployed to Cloudflare on push to
-main). It replaced the old AWS Lambda but serves the **same app-facing contract**, so the Avalonia
-client is unchanged — it still reproduces the two calls exactly:
+main). It replaced the old AWS Lambda. The client no longer calls `GET /player-info` (removed
+2026-10-09; names come from the world save, §7.3).
 
-- **`GET /player-info?platform=&playerId=`** → `{id,name,platform}`. Server resolves Steam
-  (Steam Web API) / Xbox (OpenXBL) display names; 400 on missing/unsupported platform. Client
-  calls it fire-and-forget from `SetPlayerJoining` when name unknown; ignores responses with any
-  empty field.
 - **`POST /crash-report`** ← `CrashReport` (`id, clientCorrelationId, source, timestamp,
   appVersion, osVersion, dotnetVersion, currentCulture, currentUiCulture, additionalInfo, logs`).
   Persisted to R2 (was S3). Client calls it consent-gated (crash) or user-initiated (bug report);
@@ -601,13 +605,13 @@ client is unchanged — it still reproduces the two calls exactly:
 
 Both require an API-key header from `ClientSecrets` (out-of-source-control partial class —
 preserve the build/config-time secret-injection pattern; do not hardcode). All HTTP failures are
-caught + logged + return null → the app is fully functional offline (only name enrichment and
-report submission need connectivity).
+caught + logged + return null → the app is fully functional offline (only report submission and
+the update/IP checks need connectivity).
 
 **Follow-up:** repoint `CoreConstants.UrlRuneberryApi` to the deployed Worker URL once it is live.
 
-**Privacy note (kept behavior):** the player-info call sends a platform ID (PII) to the backend for
-every unknown joiner, with no opt-out. Kept as-is per decision; an opt-out is roadmap (§17).
+**Privacy note:** player platform IDs no longer leave the machine; the player-info call that sent one
+for every unknown joiner was removed with the switch to world-save names (§7.3).
 
 ---
 
@@ -903,7 +907,7 @@ save-flush must be shown to fail under force-kill).
 | E19 | World | Cloud import partial-copy failure | Delete dest only if we created it; never destroy pre-existing cache | 1 |
 | E20 | World | Case sensitivity `MyWorld` vs `myworld` | Same world on both OSes (case-insensitive); illegal chars sanitized on input | 1 |
 | E21 | Player | Unknown platform in log line | Not recorded | 1/2 |
-| E22 | Player | Name resolution offline/failure | Silent; `[...NNNN]` fallback; retries next join | 1 |
+| E22 | Player | Name resolution: no committed save / unreadable save | Warning logged; `[...NNNN]` fallback; reread after next save | 1 |
 | E23 | Player | Name response missing fields | Ignored | 1 |
 | E24 | Player | Multiple simultaneous joiners, no name match | Best-guess earliest joiner, `matchConfident=false` | 1 |
 | E25 | Player | Misattributed character then corrected | Stray Joining reverted to Offline, original timestamp restored | 1 |
@@ -1025,8 +1029,6 @@ Documented so the parity spec stays clean; each is researched in prior sessions.
 - **In-app self-update** (per-OS packaging complexity) — keep notify-only for v3.0.
 - **Expose the `LogFilteringDisabled` toggle** in the UI (a real behavior with no control today).
 - **Backup browse/restore UI.**
-- **Player-name re-resolution TTL / manual re-fetch** (names are cached forever today).
-- **Player-ID lookup opt-out / privacy notice** (PII leaves the machine per join today).
 - **Tray balloon/toast notifications** (none today).
 
 ---

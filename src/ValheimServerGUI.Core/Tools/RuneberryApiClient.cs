@@ -12,10 +12,6 @@ namespace ValheimServerGUI.Tools
 {
     public interface IRuneberryApiClient
     {
-        event EventHandler<PlayerInfoResponse> PlayerInfoAvailable;
-
-        Task RequestPlayerInfoAsync(string platform, string playerId);
-
         Task SendCrashReportAsync(CrashReport report);
 
         /// <summary>
@@ -33,23 +29,6 @@ namespace ValheimServerGUI.Tools
         }
 
         #region IRuneberryApiClient implementation
-
-        public event EventHandler<PlayerInfoResponse>? PlayerInfoAvailable;
-
-        public async Task RequestPlayerInfoAsync(string platform, string playerId)
-        {
-            var response = await Get($"{CoreConstants.UrlRuneberryApi}/player-info?platform={platform}&playerId={playerId}")
-                .WithRuneberryApiKey()
-                .SendAsync<PlayerInfoResponse>();
-
-            if (response == null)
-            {
-                Logger.Error($"Unable to get info for {platform} player with ID {playerId}");
-                return;
-            }
-
-            PlayerInfoAvailable?.Invoke(this, response);
-        }
 
         public async Task SendCrashReportAsync(CrashReport report)
         {

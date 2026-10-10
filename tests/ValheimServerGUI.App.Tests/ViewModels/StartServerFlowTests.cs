@@ -69,8 +69,7 @@ public sealed class StartServerFlowTests : IDisposable
             new FakeSoftwareUpdateProvider(),
             shell,
             Core.GetRequiredService<IValheimPathResolver>(),
-            Core.GetRequiredService<IPlayerListImportService>(),
-            Core.GetRequiredService<IRuneberryApiClient>());
+            Core.GetRequiredService<IPlayerListImportService>());
 
         vm.LoadProfile(new ServerPreferences { ProfileName = "Test" });
 

@@ -63,7 +63,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
+          apt-get update -qq && apt-get install -y -qq --no-install-recommends jq zip unzip
           packaging/install-tools.sh
 
       - uses: actions/setup-dotnet@v4
@@ -82,6 +82,12 @@ jobs:
         with:
           files: dist/*-win-x64.exe
           credentials: ${{ secrets.CS_SIGNER_KEY }}
+
+      - name: Zip the Windows exe
+        shell: bash
+        env:
+          ASSET_DIR: dist
+        run: ci/release-zip.sh
 
       - name: Create draft releases
         shell: bash

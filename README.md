@@ -27,7 +27,7 @@ On all platforms, you must have **Valheim Dedicated Server** installed. This com
 
 **Requirements:** Windows 10 or later and the ".NET Runtime 10.X.X". If you don't already have this installed, you can download it [here](https://dotnet.microsoft.com/download/dotnet/10.0).
 
-**Setup:** Download and run the latest `ValheimServerGUI-<version>-win-x64.exe` from the [Releases page](https://github.com/runeberry/ValheimServerGUI/releases).
+**Setup:** Download the latest `ValheimServerGUI-<version>-win-x64.zip` from the [Releases page](https://github.com/runeberry/ValheimServerGUI/releases), extract it, and run `ValheimServerGUI.exe`.
 
 ### Linux
 

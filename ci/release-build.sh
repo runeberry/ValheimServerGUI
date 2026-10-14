@@ -22,6 +22,14 @@ template="${template//__RUNEBERRY_API_KEY_HEADER__/$header}"
 template="${template//__RUNEBERRY_CLIENT_API_KEY__/$key}"
 printf '%s\n' "$template" > SolutionResources/ClientSecrets.Values.cs
 
+# Fail before building if the API refuses the key: a stale secret otherwise ships a build whose
+# update checks and crash reports are all rejected. The URL comes from the tagged source.
+api_url="$(grep -oP 'UrlRuneberryApi\s*=\s*"\K[^"]+' src/ValheimServerGUI.Core/CoreConstants.cs)" \
+  || die "could not find UrlRuneberryApi in CoreConstants.cs."
+status="$(curl -s -o /dev/null -w '%{http_code}' --retry 3 \
+  -H "${RUNEBERRY_API_KEY_HEADER}: ${RUNEBERRY_CLIENT_API_KEY}" "${api_url}/update-check")" || true
+[ "$status" = 200 ] || die "the Runeberry API answered ${status} to ${api_url}/update-check with the client key secrets (expected 200)."
+
 # Same hang guard as scripts/validate.sh: a deadlocked test fails the build instead of stalling it.
 dotnet test ValheimServerGUI.slnx -c Release --blame-hang --blame-hang-timeout 120s
 

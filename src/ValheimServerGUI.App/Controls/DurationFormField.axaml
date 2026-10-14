@@ -1,0 +1,36 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             x:Class="ValheimServerGUI.App.Controls.DurationFormField"
+             x:Name="Root" x:CompileBindings="False">
+    <UserControl.Resources>
+        <!-- Same scoped compact spinner skin NumericFormField uses, so the two fields match exactly. -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactNumericUpDown.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactComboBox.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
+        <!-- One outlined shell: a borderless spinner (every state paints the shell colour via the palette,
+             BorderThickness 0 drops its own outline) plus the unit dropdown as a connected end-cap. -->
+        <Border Classes="fieldShell" IsEnabled="{Binding #Root.IsEnabled}">
+            <Grid ColumnDefinitions="*,Auto">
+                <NumericUpDown Grid.Column="0" BorderThickness="0"
+                               Value="{Binding #Root.DisplayAmount, Mode=TwoWay}"
+                               Minimum="{Binding #Root.NumericMinimum}"
+                               Maximum="{Binding #Root.NumericMaximum}"
+                               Increment="1" FormatString="0" />
+                <!-- Fixed width sized for the longest unit ("Seconds") so it does not resize per selection. -->
+                <ComboBox Grid.Column="1" Classes="affix" Width="96"
+                          HorizontalContentAlignment="Left"
+                          ItemsSource="{Binding #Root.Units}"
+                          DisplayMemberBinding="{Binding Converter={x:Static conv:EnumDisplayConverter.Instance}}"
+                          SelectedItem="{Binding #Root.SelectedUnit, Mode=TwoWay}" />
+            </Grid>
+        </Border>
+    </c:FormRow>
+</UserControl>

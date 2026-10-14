@@ -16,11 +16,14 @@ This project was developed using Visual Studio 2019 on Windows 10. The instructi
 * **ValheimServerGUI** - The main desktop client application
 * **ValheimServerGUI.Controls** - Common user controls used in the desktop client. These contain no Valheim-specific code.
 * **ValheimServerGUI.Tools** - Common utilities used in the desktop client. These contain no Valheim-specific code and no references to Windows Forms.
-* **ValheimServerGUI.Serverless** - A small REST API built specifically for the desktop client using the [AWS Serverless Application Model](https://aws.amazon.com/serverless/sam/).
+
+## Backend
+
+The server-side backend (crash/bug report handling, update check and external-IP check) lives in a **separate repository** and is **not needed** to build or run the client. The desktop client talks to it over HTTP through `CoreConstants.UrlRuneberryApi`; when the backend is unreachable the client stays fully functional (only report submission and those checks need connectivity). Player names come from the world save, not the backend.
 
 ## Solution Resources (Secrets)
 
-The **SolutionResources** folder contains code, configuration, and/or assets that are used in multiple projects in the Solution. Some files are considered "secret" and are not committed to source control. However, the solution is set up so that you **should not need any of these secret files** in order to do local development - only to publish the app or Serverless code.
+The **SolutionResources** folder contains code, configuration, and/or assets that are used in multiple projects in the Solution. Some files are considered "secret" and are not committed to source control. However, the solution is set up so that you **should not need any of these secret files** in order to do local development - only to publish the app.
 
 In some cases, however, you may want to supply your own mock secret values for testing. Read more about specific SolutionResources files [here](/SolutionResources/README.md).
 
@@ -41,63 +44,17 @@ This project uses a **Publish Profile** (.pubxml) file to store configuration fo
 4. Click the **Publish** button in the top-right.
 5. The .exe file will appear in the **/publish/small-x64/** folder in the root of this repo.
 
-### Publishing a signed version of the app
-
-_For projects maintainers only._
-
-Signed releases are built by CI, not locally. Pushing a version tag (e.g. `v2.4.0`, matching
-`<Version>` in `ValheimServerGUI.csproj`) builds the app, signs `ValheimServerGUI.exe` with the
-Runeberry Software code signing certificate, and creates **draft** releases with
-`ValheimServerGUI-<version>.zip` attached. A maintainer then edits the release notes and publishes
-the drafts. The workflow can also be run by hand for an existing tag.
-
-### Creating a new release
+### Publishing a release
 
 _For project maintainers only._
 
-In order to bump the desktop client's application version, simply change the number in the `<Version>` section of **ValheimServerGUI.csproj**, then publish the app using the steps outlined above.
+Releases are built and signed by CI, not locally. To cut one:
 
-The desktop client queries GitHub to find out if a new release is available. Follow these instructions to ensure that users will be notified about a client update.
+1. Set the new version in the `<Version>` element of **src/ValheimServerGUI.Core/ValheimServerGUI.Core.csproj** (a semantic version, e.g. `3.0.0` or `3.0.0-rc.1`).
+2. Push a matching tag prefixed with `v`, such as `v3.0.0`. The workflow can also be run by hand for an existing tag.
 
-1. Start creating a new release [here](https://github.com/runeberry/ValheimServerGUI/releases/new). Set the release title and description to whatever you see fit.
-2. Set the release tag version to a semantic version prefixed with `v`, such as `v1.2.3`.
-   * This semver should correspond to the `<Version>` set in the .csproj file.
-   * The semver on GitHub must be greater than the client's current version trigger an update notification.
-3. Attach a .zip file containing just the `ValheimServerGUI.exe` file published from the previous section. The release must contain an asset in order to trigger an update notification.
-4. Ensure the Pre-release button is **NOT** checked. Pre-releases will not trigger an update notification.
-5. Click **Publish release**.
+The release workflow (`.forgejo/workflows/release.yml`) runs the test suite, builds the Windows `.exe`, Linux `.tar.gz`, and `.AppImage`, signs the `.exe` with the Runeberry Software code signing certificate, and creates **draft** releases on GitHub and the public forge with all three attached. A tag with a pre-release suffix (e.g. `v3.0.0-rc.1`) is marked as a pre-release.
 
-Users will be notified that an update is available the next time they open the desktop client, or within 24 hours. This timeframe is configured in the project's [Resource file](ValheimServerGUI/Properties/Resources.resx).
+A maintainer then edits the release notes and publishes the drafts.
 
-## ValheimServerGUI.Serverless - REST API
-
-You only need to run the Serverless application locally if you're making changes to the REST API that you want to test. If you're just making changes to the desktop client, you can skip this section.
-
-To run the serverless application locally (Visual Studio 2022):
-
-1. Right-click the **ValheimServerGUI.Serverless** project in the Solution Explorer, and select "Set as Startup Project".
-2. Press **F5** or click the play button to start debugging the application in IIS Express. This will launch a new browser window.
-3. Using a REST client of your choice (such as [Postman](https://www.postman.com/downloads/) or just cURL), you can then query any API route using the base address shown in the console. For example:
-
-```bash
-curl --header "Content-Type: application/json" \
-  --request POST \
-  --data '{}' \
-  http://localhost:44385/crash-report
-```
-
-### Publishing the Serverless API
-
-_For project maintainers only._
-
-The API is published to AWS using the [Serverless Application Model](https://aws.amazon.com/serverless/sam/), which essentially means that the deployment instructions are contained within a CloudFormation template in this repo - namely, [serverless.template](/ValheimServerGUI.Serverless/serverless.template).
-
-Before publishing, ensure that the following Solution Resources are set up locally:
-* ServerSecrets.Values.cs
-
-The easiest way to publish the API is to install the [AWS Toolkit Extension](https://marketplace.visualstudio.com/items?itemName=AmazonWebServices.AWSToolkitforVisualStudio2017) for Visual Studio. After installing the extension, follow these steps:
-
-1. Open the **AWS Explorer** within Visual Studio.
-2. Click the button to "Add AWS Credentials File" and log in. You must have credentials with an IAM role that will allow you to publish to the Runeberry account.
-3. Right-click the **ValheimServerGUI.Serverless** project and click "Publish to AWS Lambda".
-4. Click **Publish**.
+The desktop client queries GitHub to find out if a new release is available. It only considers releases that are published, **not** marked as pre-releases, and have at least one asset, and it notifies the user when that release's version is greater than its own. Pre-releases never trigger an update notification. Users are notified the next time they open the desktop client, or within 24 hours (`UpdateCheckInterval` in [CoreConstants.cs](src/ValheimServerGUI.Core/CoreConstants.cs)).

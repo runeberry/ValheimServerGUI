@@ -1,0 +1,67 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.ServerDetailsView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <ScrollViewer>
+        <StackPanel Margin="8" Spacing="4">
+            <c:GroupBox Header="{x:Static loc:Strings.ServerDetails_Connection_Header}" HorizontalAlignment="Left" Width="350">
+                <StackPanel Spacing="2">
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_ExternalIp_Label}" Value="{Binding Details.ExternalIp}"
+                                  HelpText="{x:Static loc:Strings.ServerDetails_ExternalIp_Help}">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.ExternalIp}" ToolTip.Tip="{x:Static loc:Strings.ServerDetails_ExternalIp_CopyTip}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
+
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_InternalIp_Label}" Value="{Binding Details.InternalIp}"
+                                  HelpText="{x:Static loc:Strings.ServerDetails_InternalIp_Help}">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.InternalIp}" ToolTip.Tip="{x:Static loc:Strings.ServerDetails_InternalIp_CopyTip}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
+
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_LocalIp_Label}" Value="{Binding Details.LocalIp}"
+                                  HelpText="{x:Static loc:Strings.ServerDetails_LocalIp_Help}">
+                        <c:LabelField.TrailingContent>
+                            <c:CopyButton Text="{Binding Details.LocalIp}" ToolTip.Tip="{x:Static loc:Strings.ServerDetails_LocalIp_CopyTip}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
+
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_InviteCode_Label}" Value="{Binding Details.InviteCode}"
+                                  HelpText="{x:Static loc:Strings.ServerDetails_InviteCode_Help}">
+                        <c:LabelField.TrailingContent>
+                            <!-- Keep the copy button's slot even when there's no invite code to copy, so the
+                                 help glyph doesn't shift between rows (hidden-but-reserved, not collapsed). -->
+                            <c:CopyButton Text="{Binding Details.InviteCode}" ToolTip.Tip="{x:Static loc:Strings.ServerDetails_InviteCode_CopyTip}"
+                                          Opacity="{Binding Details.InviteCodeCopyable, Converter={x:Static conv:BooleanToOpacityConverter.Instance}}"
+                                          IsHitTestVisible="{Binding Details.InviteCodeCopyable}" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
+
+                    <TextBlock Margin="0,4,0,0" FontStyle="Italic"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               Text="{x:Static loc:Strings.ServerDetails_TroubleConnecting}" />
+                </StackPanel>
+            </c:GroupBox>
+
+            <c:GroupBox Header="{x:Static loc:Strings.ServerDetails_Statistics_Header}" HorizontalAlignment="Left" Width="350">
+                <StackPanel Spacing="2">
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_Uptime_Label}" Value="{Binding Details.Uptime}" />
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_LastWorldSave_Label}" Value="{Binding Details.LastWorldSave}" />
+                    <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_AvgWorldSave_Label}" Value="{Binding Details.AverageWorldSave}"
+                                  HelpText="{x:Static loc:Strings.ServerDetails_AvgWorldSave_Help}">
+                        <c:LabelField.TrailingContent>
+                            <!-- Empty, invisible icon slot so this help glyph lines up with the ones above it. -->
+                            <c:IconButton Opacity="0" IsHitTestVisible="False" Focusable="False" />
+                        </c:LabelField.TrailingContent>
+                    </c:LabelField>
+                </StackPanel>
+            </c:GroupBox>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

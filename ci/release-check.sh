@@ -8,13 +8,14 @@ set -euo pipefail
 
 die() { echo "ERROR: $*" >&2; exit 1; }
 
-[[ "$TAG" == v* ]] || die "tag '${TAG}' must start with 'v' (e.g. v2.4.0)."
+[[ "$TAG" == v* ]] || die "tag '${TAG}' must start with 'v' (e.g. v3.0.0)."
 version="${TAG#v}"
 
 git rev-parse -q --verify "refs/tags/${TAG}" >/dev/null || die "tag ${TAG} does not exist."
-csproj_version="$(git show "${TAG}:ValheimServerGUI/ValheimServerGUI.csproj" | grep -oP '(?<=<Version>)[^<]+')"
+csproj=src/ValheimServerGUI.Core/ValheimServerGUI.Core.csproj
+csproj_version="$(git show "${TAG}:${csproj}" | grep -oP '(?<=<Version>)[^<]+')"
 [ "$csproj_version" = "$version" ] \
-  || die "tag ${TAG} does not match <Version>${csproj_version}</Version> in ValheimServerGUI.csproj at that tag."
+  || die "tag ${TAG} does not match <Version>${csproj_version}</Version> in ${csproj} at that tag."
 
 # Lists every release page by page and prints the tag names. Drafts are included because
 # the tokens can write to the repos (the by-tag lookup endpoints do not return drafts).

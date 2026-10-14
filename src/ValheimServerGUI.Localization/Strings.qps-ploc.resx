@@ -1,0 +1,1281 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <!-- Common -->
+  <data name="Common_OK" xml:space="preserve">
+    <value>⟦Common_OK⟧</value>
+  </data>
+  <data name="Common_Cancel" xml:space="preserve">
+    <value>⟦Common_Cancel⟧</value>
+  </data>
+  <data name="Common_Yes" xml:space="preserve">
+    <value>⟦Common_Yes⟧</value>
+  </data>
+  <data name="Common_No" xml:space="preserve">
+    <value>⟦Common_No⟧</value>
+  </data>
+  <data name="Common_RestoreDefaults" xml:space="preserve">
+    <value>⟦Common_RestoreDefaults⟧</value>
+  </data>
+  <data name="Common_Close" xml:space="preserve">
+    <value>⟦Common_Close⟧</value>
+  </data>
+  <data name="Common_Save" xml:space="preserve">
+    <value>⟦Common_Save⟧</value>
+  </data>
+  <data name="Common_Continue" xml:space="preserve">
+    <value>⟦Common_Continue⟧</value>
+  </data>
+  <data name="Common_NotAvailable" xml:space="preserve">
+    <value>⟦Common_NotAvailable⟧</value>
+  </data>
+  <data name="Common_Loading" xml:space="preserve">
+    <value>⟦Common_Loading⟧</value>
+  </data>
+  <!-- Main window -->
+  <data name="MainWindow_Profile_Label" xml:space="preserve">
+    <value>⟦MainWindow_Profile_Label⟧</value>
+  </data>
+  <data name="ServerAction_Start" xml:space="preserve">
+    <value>⟦ServerAction_Start⟧</value>
+  </data>
+  <data name="ServerAction_Restart" xml:space="preserve">
+    <value>⟦ServerAction_Restart⟧</value>
+  </data>
+  <data name="ServerAction_Stop" xml:space="preserve">
+    <value>⟦ServerAction_Stop⟧</value>
+  </data>
+  <data name="MainWindow_Menu_File" xml:space="preserve">
+    <value>⟦MainWindow_Menu_File⟧</value>
+  </data>
+  <data name="MainWindow_Menu_NewWindow" xml:space="preserve">
+    <value>⟦MainWindow_Menu_NewWindow⟧</value>
+  </data>
+  <data name="MainWindow_Menu_NewProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_NewProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_SaveProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_SaveProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_SaveProfileAs" xml:space="preserve">
+    <value>⟦MainWindow_Menu_SaveProfileAs⟧</value>
+  </data>
+  <data name="MainWindow_Menu_LoadProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_LoadProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_RemoveProfile" xml:space="preserve">
+    <value>⟦MainWindow_Menu_RemoveProfile⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Preferences" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Preferences⟧</value>
+  </data>
+  <data name="MainWindow_Menu_SetDirectories" xml:space="preserve">
+    <value>⟦MainWindow_Menu_SetDirectories⟧</value>
+  </data>
+  <data name="MainWindow_Menu_OpenSettingsDirectory" xml:space="preserve">
+    <value>⟦MainWindow_Menu_OpenSettingsDirectory⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Close" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Close⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Help" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Help⟧</value>
+  </data>
+  <data name="MainWindow_Menu_OnlineManual" xml:space="preserve">
+    <value>⟦MainWindow_Menu_OnlineManual⟧</value>
+  </data>
+  <data name="MainWindow_Menu_PortForwarding" xml:space="preserve">
+    <value>⟦MainWindow_Menu_PortForwarding⟧</value>
+  </data>
+  <data name="MainWindow_Menu_BugReport" xml:space="preserve">
+    <value>⟦MainWindow_Menu_BugReport⟧</value>
+  </data>
+  <data name="MainWindow_Menu_CheckForUpdates" xml:space="preserve">
+    <value>⟦MainWindow_Menu_CheckForUpdates⟧</value>
+  </data>
+  <data name="MainWindow_Menu_Discord" xml:space="preserve">
+    <value>⟦MainWindow_Menu_Discord⟧</value>
+  </data>
+  <data name="MainWindow_Menu_About" xml:space="preserve">
+    <value>⟦MainWindow_Menu_About⟧</value>
+  </data>
+  <data name="MainWindow_Tab_ServerControls" xml:space="preserve">
+    <value>⟦MainWindow_Tab_ServerControls⟧</value>
+  </data>
+  <data name="MainWindow_Tab_AdvancedControls" xml:space="preserve">
+    <value>⟦MainWindow_Tab_AdvancedControls⟧</value>
+  </data>
+  <data name="MainWindow_Tab_ServerDetails" xml:space="preserve">
+    <value>⟦MainWindow_Tab_ServerDetails⟧</value>
+  </data>
+  <data name="MainWindow_Tab_Players" xml:space="preserve">
+    <value>⟦MainWindow_Tab_Players⟧</value>
+  </data>
+  <data name="MainWindow_Tab_Logs" xml:space="preserve">
+    <value>⟦MainWindow_Tab_Logs⟧</value>
+  </data>
+  <!-- Server Controls tab -->
+  <data name="ServerControls_Name_Label" xml:space="preserve">
+    <value>⟦ServerControls_Name_Label⟧</value>
+  </data>
+  <data name="ServerControls_Name_Help" xml:space="preserve">
+    <value>⟦ServerControls_Name_Help⟧</value>
+  </data>
+  <data name="ServerControls_Port_Label" xml:space="preserve">
+    <value>⟦ServerControls_Port_Label⟧</value>
+  </data>
+  <data name="ServerControls_Port_Help" xml:space="preserve">
+    <value>⟦ServerControls_Port_Help⟧</value>
+  </data>
+  <data name="ServerControls_Password_Label" xml:space="preserve">
+    <value>⟦ServerControls_Password_Label⟧</value>
+  </data>
+  <data name="ServerControls_Password_Help" xml:space="preserve">
+    <value>⟦ServerControls_Password_Help⟧</value>
+  </data>
+  <data name="ServerControls_ShowPassword_Tip" xml:space="preserve">
+    <value>⟦ServerControls_ShowPassword_Tip⟧</value>
+  </data>
+  <data name="ServerControls_CopyPassword_Tip" xml:space="preserve">
+    <value>⟦ServerControls_CopyPassword_Tip⟧</value>
+  </data>
+  <data name="ServerControls_World_Header" xml:space="preserve">
+    <value>⟦ServerControls_World_Header⟧</value>
+  </data>
+  <data name="ServerControls_ExistingWorld_Label" xml:space="preserve">
+    <value>⟦ServerControls_ExistingWorld_Label⟧</value>
+  </data>
+  <data name="ServerControls_NewWorld_Label" xml:space="preserve">
+    <value>⟦ServerControls_NewWorld_Label⟧</value>
+  </data>
+  <data name="ServerControls_WorldSettings_Tip" xml:space="preserve">
+    <value>⟦ServerControls_WorldSettings_Tip⟧</value>
+  </data>
+  <data name="ServerControls_RefreshWorlds_Tip" xml:space="preserve">
+    <value>⟦ServerControls_RefreshWorlds_Tip⟧</value>
+  </data>
+  <data name="ServerControls_OpenSaveFolder_Tip" xml:space="preserve">
+    <value>⟦ServerControls_OpenSaveFolder_Tip⟧</value>
+  </data>
+  <data name="ServerControls_SelectWorld_Label" xml:space="preserve">
+    <value>⟦ServerControls_SelectWorld_Label⟧</value>
+  </data>
+  <data name="ServerControls_SelectWorld_Placeholder" xml:space="preserve">
+    <value>⟦ServerControls_SelectWorld_Placeholder⟧</value>
+  </data>
+  <data name="ServerControls_NewWorldName_Label" xml:space="preserve">
+    <value>⟦ServerControls_NewWorldName_Label⟧</value>
+  </data>
+  <data name="ServerControls_NewWorldName_Watermark" xml:space="preserve">
+    <value>⟦ServerControls_NewWorldName_Watermark⟧</value>
+  </data>
+  <data name="ServerControls_JoinOptions_Header" xml:space="preserve">
+    <value>⟦ServerControls_JoinOptions_Header⟧</value>
+  </data>
+  <data name="ServerControls_Public_Label" xml:space="preserve">
+    <value>⟦ServerControls_Public_Label⟧</value>
+  </data>
+  <data name="ServerControls_Public_Help" xml:space="preserve">
+    <value>⟦ServerControls_Public_Help⟧</value>
+  </data>
+  <data name="ServerControls_Crossplay_Label" xml:space="preserve">
+    <value>⟦ServerControls_Crossplay_Label⟧</value>
+  </data>
+  <data name="ServerControls_Crossplay_Help" xml:space="preserve">
+    <value>⟦ServerControls_Crossplay_Help⟧</value>
+  </data>
+  <data name="ServerControls_CloudWorldSuffix" xml:space="preserve">
+    <value>⟦ServerControls_CloudWorldSuffix⟧</value>
+  </data>
+  <!-- Advanced Controls tab -->
+  <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
+    <value>⟦AdvancedControls_DirectoryOverrides_Header⟧</value>
+  </data>
+  <data name="Paths_ServerExe_Label" xml:space="preserve">
+    <value>⟦Paths_ServerExe_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_ServerExe_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_ServerExe_Help⟧</value>
+  </data>
+  <data name="Paths_SaveData_Label" xml:space="preserve">
+    <value>⟦Paths_SaveData_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveData_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveData_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_OtherSettings_Header" xml:space="preserve">
+    <value>⟦AdvancedControls_OtherSettings_Header⟧</value>
+  </data>
+  <data name="AdvancedControls_AutoStart_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_AutoStart_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_AutoStart_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_AutoStart_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_WriteLogs_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_WriteLogs_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_WriteLogs_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_WriteLogs_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_AdditionalArgs_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_AdditionalArgs_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_AdditionalArgs_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_AdditionalArgs_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_SavingBackups_Header" xml:space="preserve">
+    <value>⟦AdvancedControls_SavingBackups_Header⟧</value>
+  </data>
+  <data name="AdvancedControls_Backups_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_Backups_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_Backups_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_Backups_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveInterval_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveInterval_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_SaveInterval_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_SaveInterval_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_ShortBackup_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_ShortBackup_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_ShortBackup_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_ShortBackup_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_LongBackup_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_LongBackup_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_LongBackup_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_LongBackup_Help⟧</value>
+  </data>
+  <!-- Server Details tab -->
+  <data name="ServerDetails_Connection_Header" xml:space="preserve">
+    <value>⟦ServerDetails_Connection_Header⟧</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_Label" xml:space="preserve">
+    <value>⟦ServerDetails_ExternalIp_Label⟧</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_Help" xml:space="preserve">
+    <value>⟦ServerDetails_ExternalIp_Help⟧</value>
+  </data>
+  <data name="ServerDetails_ExternalIp_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_ExternalIp_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_InternalIp_Label" xml:space="preserve">
+    <value>⟦ServerDetails_InternalIp_Label⟧</value>
+  </data>
+  <data name="ServerDetails_InternalIp_Help" xml:space="preserve">
+    <value>⟦ServerDetails_InternalIp_Help⟧</value>
+  </data>
+  <data name="ServerDetails_InternalIp_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_InternalIp_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_LocalIp_Label" xml:space="preserve">
+    <value>⟦ServerDetails_LocalIp_Label⟧</value>
+  </data>
+  <data name="ServerDetails_LocalIp_Help" xml:space="preserve">
+    <value>⟦ServerDetails_LocalIp_Help⟧</value>
+  </data>
+  <data name="ServerDetails_LocalIp_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_LocalIp_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_InviteCode_Label" xml:space="preserve">
+    <value>⟦ServerDetails_InviteCode_Label⟧</value>
+  </data>
+  <data name="ServerDetails_InviteCode_Help" xml:space="preserve">
+    <value>⟦ServerDetails_InviteCode_Help⟧</value>
+  </data>
+  <data name="ServerDetails_InviteCode_CopyTip" xml:space="preserve">
+    <value>⟦ServerDetails_InviteCode_CopyTip⟧</value>
+  </data>
+  <data name="ServerDetails_TroubleConnecting" xml:space="preserve">
+    <value>⟦ServerDetails_TroubleConnecting⟧</value>
+  </data>
+  <data name="ServerDetails_Statistics_Header" xml:space="preserve">
+    <value>⟦ServerDetails_Statistics_Header⟧</value>
+  </data>
+  <data name="ServerDetails_Uptime_Label" xml:space="preserve">
+    <value>⟦ServerDetails_Uptime_Label⟧</value>
+  </data>
+  <data name="ServerDetails_LastWorldSave_Label" xml:space="preserve">
+    <value>⟦ServerDetails_LastWorldSave_Label⟧</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Label" xml:space="preserve">
+    <value>⟦ServerDetails_AvgWorldSave_Label⟧</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Help" xml:space="preserve">
+    <value>⟦ServerDetails_AvgWorldSave_Help⟧</value>
+  </data>
+  <data name="ServerDetails_Uptime_OneDay" xml:space="preserve">
+    <value>⟦ServerDetails_Uptime_OneDay {0}⟧</value>
+  </data>
+  <data name="ServerDetails_Uptime_Days" xml:space="preserve">
+    <value>⟦ServerDetails_Uptime_Days {0} {1}⟧</value>
+  </data>
+  <data name="ServerDetails_LastWorldSave_Value" xml:space="preserve">
+    <value>⟦ServerDetails_LastWorldSave_Value {0:G} {1:F0}⟧</value>
+  </data>
+  <data name="ServerDetails_AvgWorldSave_Value" xml:space="preserve">
+    <value>⟦ServerDetails_AvgWorldSave_Value {0:F0}⟧</value>
+  </data>
+  <!-- Players tab -->
+  <data name="Players_ManagePlayers" xml:space="preserve">
+    <value>⟦Players_ManagePlayers⟧</value>
+  </data>
+  <data name="Players_CharacterNamesHelp" xml:space="preserve">
+    <value>⟦Players_CharacterNamesHelp⟧</value>
+  </data>
+  <data name="Players_UsePermittedList_Label" xml:space="preserve">
+    <value>⟦Players_UsePermittedList_Label⟧</value>
+  </data>
+  <data name="Players_UsePermittedList_Help" xml:space="preserve">
+    <value>⟦Players_UsePermittedList_Help⟧</value>
+  </data>
+  <data name="Players_ShowBanned_Label" xml:space="preserve">
+    <value>⟦Players_ShowBanned_Label⟧</value>
+  </data>
+  <data name="Players_Menu_ViewDetails" xml:space="preserve">
+    <value>⟦Players_Menu_ViewDetails⟧</value>
+  </data>
+  <data name="Players_Menu_SetServerRole" xml:space="preserve">
+    <value>⟦Players_Menu_SetServerRole⟧</value>
+  </data>
+  <data name="Role_Admin" xml:space="preserve">
+    <value>⟦Role_Admin⟧</value>
+  </data>
+  <data name="Role_Permitted" xml:space="preserve">
+    <value>⟦Role_Permitted⟧</value>
+  </data>
+  <data name="Role_Banned" xml:space="preserve">
+    <value>⟦Role_Banned⟧</value>
+  </data>
+  <data name="Players_Menu_AddPlayer" xml:space="preserve">
+    <value>⟦Players_Menu_AddPlayer⟧</value>
+  </data>
+  <data name="Players_Menu_RemovePlayer" xml:space="preserve">
+    <value>⟦Players_Menu_RemovePlayer⟧</value>
+  </data>
+  <data name="Players_Column_Player" xml:space="preserve">
+    <value>⟦Players_Column_Player⟧</value>
+  </data>
+  <data name="Players_Column_Role" xml:space="preserve">
+    <value>⟦Players_Column_Role⟧</value>
+  </data>
+  <data name="Players_Column_Status" xml:space="preserve">
+    <value>⟦Players_Column_Status⟧</value>
+  </data>
+  <data name="Players_Column_Since" xml:space="preserve">
+    <value>⟦Players_Column_Since⟧</value>
+  </data>
+  <data name="Players_ViewDetails_Tip" xml:space="preserve">
+    <value>⟦Players_ViewDetails_Tip⟧</value>
+  </data>
+  <data name="Players_ImportLists_Tip" xml:space="preserve">
+    <value>⟦Players_ImportLists_Tip⟧</value>
+  </data>
+  <data name="Players_AddPlayer_Tip" xml:space="preserve">
+    <value>⟦Players_AddPlayer_Tip⟧</value>
+  </data>
+  <data name="Players_RemovePlayer_Tip" xml:space="preserve">
+    <value>⟦Players_RemovePlayer_Tip⟧</value>
+  </data>
+  <data name="Players_EmptyText" xml:space="preserve">
+    <value>⟦Players_EmptyText⟧</value>
+  </data>
+  <data name="Players_Menu_DefaultRole" xml:space="preserve">
+    <value>⟦Players_Menu_DefaultRole {0}⟧</value>
+  </data>
+  <data name="Players_UnknownName" xml:space="preserve">
+    <value>⟦Players_UnknownName⟧</value>
+  </data>
+  <!-- Server status -->
+  <data name="ServerStatus_Stopped" xml:space="preserve">
+    <value>⟦ServerStatus_Stopped⟧</value>
+  </data>
+  <data name="ServerStatus_Starting" xml:space="preserve">
+    <value>⟦ServerStatus_Starting⟧</value>
+  </data>
+  <data name="ServerStatus_Running" xml:space="preserve">
+    <value>⟦ServerStatus_Running⟧</value>
+  </data>
+  <data name="ServerStatus_Stopping" xml:space="preserve">
+    <value>⟦ServerStatus_Stopping⟧</value>
+  </data>
+  <!-- Player status -->
+  <data name="PlayerStatus_Offline" xml:space="preserve">
+    <value>⟦PlayerStatus_Offline⟧</value>
+  </data>
+  <data name="PlayerStatus_Joining" xml:space="preserve">
+    <value>⟦PlayerStatus_Joining⟧</value>
+  </data>
+  <data name="PlayerStatus_Online" xml:space="preserve">
+    <value>⟦PlayerStatus_Online⟧</value>
+  </data>
+  <data name="PlayerStatus_Leaving" xml:space="preserve">
+    <value>⟦PlayerStatus_Leaving⟧</value>
+  </data>
+  <data name="Players_RoleOverridden" xml:space="preserve">
+    <value>⟦Players_RoleOverridden {0}⟧</value>
+  </data>
+  <!-- Logs tab -->
+  <data name="Logs_ViewFor_Label" xml:space="preserve">
+    <value>⟦Logs_ViewFor_Label⟧</value>
+  </data>
+  <data name="Logs_OpenFolder_Tip" xml:space="preserve">
+    <value>⟦Logs_OpenFolder_Tip⟧</value>
+  </data>
+  <data name="Logs_SaveLogs" xml:space="preserve">
+    <value>⟦Logs_SaveLogs⟧</value>
+  </data>
+  <data name="Logs_ClearLogs" xml:space="preserve">
+    <value>⟦Logs_ClearLogs⟧</value>
+  </data>
+  <!-- Theme -->
+  <data name="Theme_System" xml:space="preserve">
+    <value>⟦Theme_System⟧</value>
+  </data>
+  <data name="Theme_Light" xml:space="preserve">
+    <value>⟦Theme_Light⟧</value>
+  </data>
+  <data name="Theme_Dark" xml:space="preserve">
+    <value>⟦Theme_Dark⟧</value>
+  </data>
+  <!-- Duration units -->
+  <data name="DurationUnit_Seconds" xml:space="preserve">
+    <value>⟦DurationUnit_Seconds⟧</value>
+  </data>
+  <data name="DurationUnit_Minutes" xml:space="preserve">
+    <value>⟦DurationUnit_Minutes⟧</value>
+  </data>
+  <data name="DurationUnit_Hours" xml:space="preserve">
+    <value>⟦DurationUnit_Hours⟧</value>
+  </data>
+  <data name="DurationUnit_Days" xml:space="preserve">
+    <value>⟦DurationUnit_Days⟧</value>
+  </data>
+  <data name="Logs_View_Server" xml:space="preserve">
+    <value>⟦Logs_View_Server⟧</value>
+  </data>
+  <data name="Logs_View_Application" xml:space="preserve">
+    <value>⟦Logs_View_Application⟧</value>
+  </data>
+  <!-- Prompts -->
+  <data name="Prompt_UnsavedChanges_Title" xml:space="preserve">
+    <value>⟦Prompt_UnsavedChanges_Title⟧</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_DiscardMessage" xml:space="preserve">
+    <value>⟦Prompt_UnsavedChanges_DiscardMessage⟧</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_SaveMessage" xml:space="preserve">
+    <value>⟦Prompt_UnsavedChanges_SaveMessage⟧</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_Save" xml:space="preserve">
+    <value>⟦Prompt_UnsavedChanges_Save⟧</value>
+  </data>
+  <data name="Prompt_UnsavedChanges_Discard" xml:space="preserve">
+    <value>⟦Prompt_UnsavedChanges_Discard⟧</value>
+  </data>
+  <data name="Prompt_Warning_Title" xml:space="preserve">
+    <value>⟦Prompt_Warning_Title⟧</value>
+  </data>
+  <data name="Prompt_ErrorStartingServer_Title" xml:space="preserve">
+    <value>⟦Prompt_ErrorStartingServer_Title⟧</value>
+  </data>
+  <data name="Prompt_CheckForUpdates_Title" xml:space="preserve">
+    <value>⟦Prompt_CheckForUpdates_Title⟧</value>
+  </data>
+  <data name="Prompt_RoleConflict_UseServerProfile" xml:space="preserve">
+    <value>⟦Prompt_RoleConflict_UseServerProfile⟧</value>
+  </data>
+  <data name="Prompt_RoleConflict_UseRolesFromFile" xml:space="preserve">
+    <value>⟦Prompt_RoleConflict_UseRolesFromFile⟧</value>
+  </data>
+  <data name="Prompt_ProfileName_Title" xml:space="preserve">
+    <value>⟦Prompt_ProfileName_Title⟧</value>
+  </data>
+  <data name="Prompt_ProfileName_Message" xml:space="preserve">
+    <value>⟦Prompt_ProfileName_Message⟧</value>
+  </data>
+  <data name="Prompt_ProfileName_Invalid" xml:space="preserve">
+    <value>⟦Prompt_ProfileName_Invalid⟧</value>
+  </data>
+  <data name="Prompt_ProfileName_CopyOf" xml:space="preserve">
+    <value>⟦Prompt_ProfileName_CopyOf {0}⟧</value>
+  </data>
+  <data name="Prompt_RemoveProfile_Title" xml:space="preserve">
+    <value>⟦Prompt_RemoveProfile_Title⟧</value>
+  </data>
+  <data name="Prompt_RemoveProfile_Message" xml:space="preserve">
+    <value>⟦Prompt_RemoveProfile_Message {0}⟧</value>
+  </data>
+  <data name="Prompt_WorldNameMissing_Title" xml:space="preserve">
+    <value>⟦Prompt_WorldNameMissing_Title⟧</value>
+  </data>
+  <data name="Prompt_WorldNameMissing_NewWorld" xml:space="preserve">
+    <value>⟦Prompt_WorldNameMissing_NewWorld⟧</value>
+  </data>
+  <data name="Prompt_WorldNameMissing_NoWorld" xml:space="preserve">
+    <value>⟦Prompt_WorldNameMissing_NoWorld⟧</value>
+  </data>
+  <data name="Prompt_ServerExeNotFound_Title" xml:space="preserve">
+    <value>⟦Prompt_ServerExeNotFound_Title⟧</value>
+  </data>
+  <data name="Prompt_ServerExeNotFound_Message" xml:space="preserve">
+    <value>⟦Prompt_ServerExeNotFound_Message {0}⟧</value>
+  </data>
+  <data name="Prompt_CloudImport_Title" xml:space="preserve">
+    <value>⟦Prompt_CloudImport_Title⟧</value>
+  </data>
+  <data name="Prompt_CloudImport_Message" xml:space="preserve">
+    <value>⟦Prompt_CloudImport_Message {0}⟧</value>
+  </data>
+  <data name="Prompt_CloudImport_Move" xml:space="preserve">
+    <value>⟦Prompt_CloudImport_Move⟧</value>
+  </data>
+  <data name="Prompt_CloudImport_Copy" xml:space="preserve">
+    <value>⟦Prompt_CloudImport_Copy⟧</value>
+  </data>
+  <data name="Prompt_PathNotFound_Title" xml:space="preserve">
+    <value>⟦Prompt_PathNotFound_Title⟧</value>
+  </data>
+  <data name="Prompt_PathNotFound_Message" xml:space="preserve">
+    <value>⟦Prompt_PathNotFound_Message {0}⟧</value>
+  </data>
+  <data name="Prompt_AddCharacter_Title" xml:space="preserve">
+    <value>⟦Prompt_AddCharacter_Title⟧</value>
+  </data>
+  <data name="Prompt_AddCharacter_Message" xml:space="preserve">
+    <value>⟦Prompt_AddCharacter_Message⟧</value>
+  </data>
+  <data name="Prompt_EditCharacter_Title" xml:space="preserve">
+    <value>⟦Prompt_EditCharacter_Title⟧</value>
+  </data>
+  <data name="Prompt_EditCharacter_Message" xml:space="preserve">
+    <value>⟦Prompt_EditCharacter_Message {0}⟧</value>
+  </data>
+  <data name="Prompt_EditPlayerName_Title" xml:space="preserve">
+    <value>⟦Prompt_EditPlayerName_Title⟧</value>
+  </data>
+  <data name="Prompt_EditPlayerName_Message" xml:space="preserve">
+    <value>⟦Prompt_EditPlayerName_Message⟧</value>
+  </data>
+  <data name="Prompt_ExitWhileRunning" xml:space="preserve">
+    <value>⟦Prompt_ExitWhileRunning⟧</value>
+  </data>
+  <data name="Prompt_ExitWhileStopping" xml:space="preserve">
+    <value>⟦Prompt_ExitWhileStopping⟧</value>
+  </data>
+  <!-- Tray -->
+  <data name="Tray_Profile" xml:space="preserve">
+    <value>⟦Tray_Profile {0}⟧</value>
+  </data>
+  <data name="Tray_NoProfile" xml:space="preserve">
+    <value>⟦Tray_NoProfile⟧</value>
+  </data>
+  <data name="Logs_SaveDialog_Title" xml:space="preserve">
+    <value>⟦Logs_SaveDialog_Title⟧</value>
+  </data>
+  <data name="Logs_NothingToSave" xml:space="preserve">
+    <value>⟦Logs_NothingToSave⟧</value>
+  </data>
+  <!-- Roles -->
+  <data name="Role_None" xml:space="preserve">
+    <value>⟦Role_None⟧</value>
+  </data>
+  <!-- Preferences dialog -->
+  <data name="Preferences_Title" xml:space="preserve">
+    <value>⟦Preferences_Title⟧</value>
+  </data>
+  <data name="Preferences_CheckForUpdates_Label" xml:space="preserve">
+    <value>⟦Preferences_CheckForUpdates_Label⟧</value>
+  </data>
+  <data name="Preferences_CheckForUpdates_Help" xml:space="preserve">
+    <value>⟦Preferences_CheckForUpdates_Help⟧</value>
+  </data>
+  <data name="Preferences_StartWithOs_Label" xml:space="preserve">
+    <value>⟦Preferences_StartWithOs_Label⟧</value>
+  </data>
+  <data name="Preferences_StartWithOs_Help" xml:space="preserve">
+    <value>⟦Preferences_StartWithOs_Help⟧</value>
+  </data>
+  <data name="Preferences_StartMinimized_Label" xml:space="preserve">
+    <value>⟦Preferences_StartMinimized_Label⟧</value>
+  </data>
+  <data name="Preferences_StartMinimized_Help" xml:space="preserve">
+    <value>⟦Preferences_StartMinimized_Help⟧</value>
+  </data>
+  <data name="Preferences_SaveOnStart_Label" xml:space="preserve">
+    <value>⟦Preferences_SaveOnStart_Label⟧</value>
+  </data>
+  <data name="Preferences_SaveOnStart_Help" xml:space="preserve">
+    <value>⟦Preferences_SaveOnStart_Help⟧</value>
+  </data>
+  <data name="Preferences_WriteAppLogs_Label" xml:space="preserve">
+    <value>⟦Preferences_WriteAppLogs_Label⟧</value>
+  </data>
+  <data name="Preferences_WriteAppLogs_Help" xml:space="preserve">
+    <value>⟦Preferences_WriteAppLogs_Help⟧</value>
+  </data>
+  <data name="Preferences_ValidatePassword_Label" xml:space="preserve">
+    <value>⟦Preferences_ValidatePassword_Label⟧</value>
+  </data>
+  <data name="Preferences_ValidatePassword_Help" xml:space="preserve">
+    <value>⟦Preferences_ValidatePassword_Help⟧</value>
+  </data>
+  <data name="Preferences_Theme_Label" xml:space="preserve">
+    <value>⟦Preferences_Theme_Label⟧</value>
+  </data>
+  <!-- Directories dialog -->
+  <data name="Directories_Title" xml:space="preserve">
+    <value>⟦Directories_Title⟧</value>
+  </data>
+  <data name="Directories_Intro" xml:space="preserve">
+    <value>⟦Directories_Intro⟧</value>
+  </data>
+  <data name="Directories_ServerExe_Help" xml:space="preserve">
+    <value>⟦Directories_ServerExe_Help⟧</value>
+  </data>
+  <data name="Directories_SaveData_Help" xml:space="preserve">
+    <value>⟦Directories_SaveData_Help⟧</value>
+  </data>
+  <data name="Directories_MissingServerExe" xml:space="preserve">
+    <value>⟦Directories_MissingServerExe {0}⟧</value>
+  </data>
+  <data name="Directories_MissingSaveData" xml:space="preserve">
+    <value>⟦Directories_MissingSaveData {0}⟧</value>
+  </data>
+  <!-- Known characters -->
+  <data name="KnownCharacters_Header" xml:space="preserve">
+    <value>⟦KnownCharacters_Header⟧</value>
+  </data>
+  <data name="KnownCharacters_Help" xml:space="preserve">
+    <value>⟦KnownCharacters_Help⟧</value>
+  </data>
+  <data name="KnownCharacters_Menu_Rename" xml:space="preserve">
+    <value>⟦KnownCharacters_Menu_Rename⟧</value>
+  </data>
+  <data name="KnownCharacters_Menu_Remove" xml:space="preserve">
+    <value>⟦KnownCharacters_Menu_Remove⟧</value>
+  </data>
+  <data name="KnownCharacters_Column_Name" xml:space="preserve">
+    <value>⟦KnownCharacters_Column_Name⟧</value>
+  </data>
+  <data name="KnownCharacters_Column_Status" xml:space="preserve">
+    <value>⟦KnownCharacters_Column_Status⟧</value>
+  </data>
+  <data name="KnownCharacters_Column_Since" xml:space="preserve">
+    <value>⟦KnownCharacters_Column_Since⟧</value>
+  </data>
+  <data name="KnownCharacters_Add_Tip" xml:space="preserve">
+    <value>⟦KnownCharacters_Add_Tip⟧</value>
+  </data>
+  <data name="KnownCharacters_Rename_Tip" xml:space="preserve">
+    <value>⟦KnownCharacters_Rename_Tip⟧</value>
+  </data>
+  <data name="KnownCharacters_Remove_Tip" xml:space="preserve">
+    <value>⟦KnownCharacters_Remove_Tip⟧</value>
+  </data>
+  <!-- Manage Players dialog -->
+  <data name="ManagePlayers_Title" xml:space="preserve">
+    <value>⟦ManagePlayers_Title⟧</value>
+  </data>
+  <data name="ManagePlayers_Tab_Accounts" xml:space="preserve">
+    <value>⟦ManagePlayers_Tab_Accounts⟧</value>
+  </data>
+  <data name="ManagePlayers_Tab_Banned" xml:space="preserve">
+    <value>⟦ManagePlayers_Tab_Banned⟧</value>
+  </data>
+  <data name="ManagePlayers_Menu_SetDefaultRole" xml:space="preserve">
+    <value>⟦ManagePlayers_Menu_SetDefaultRole⟧</value>
+  </data>
+  <data name="ManagePlayers_Column_PlayerName" xml:space="preserve">
+    <value>⟦ManagePlayers_Column_PlayerName⟧</value>
+  </data>
+  <data name="ManagePlayers_NameUnknown" xml:space="preserve">
+    <value>⟦ManagePlayers_NameUnknown⟧</value>
+  </data>
+  <data name="ManagePlayers_Column_PlatformId" xml:space="preserve">
+    <value>⟦ManagePlayers_Column_PlatformId⟧</value>
+  </data>
+  <data name="ManagePlayers_Column_DefaultRole" xml:space="preserve">
+    <value>⟦ManagePlayers_Column_DefaultRole⟧</value>
+  </data>
+  <data name="ManagePlayers_NoAccounts" xml:space="preserve">
+    <value>⟦ManagePlayers_NoAccounts⟧</value>
+  </data>
+  <data name="ManagePlayers_NoAccountSelected" xml:space="preserve">
+    <value>⟦ManagePlayers_NoAccountSelected⟧</value>
+  </data>
+  <data name="ManagePlayers_NoKnownCharacters" xml:space="preserve">
+    <value>⟦ManagePlayers_NoKnownCharacters⟧</value>
+  </data>
+  <data name="ManagePlayers_Menu_EditName" xml:space="preserve">
+    <value>⟦ManagePlayers_Menu_EditName⟧</value>
+  </data>
+  <data name="ManagePlayers_Menu_CopyId" xml:space="preserve">
+    <value>⟦ManagePlayers_Menu_CopyId⟧</value>
+  </data>
+  <data name="ManagePlayers_EditName_Tip" xml:space="preserve">
+    <value>⟦ManagePlayers_EditName_Tip⟧</value>
+  </data>
+  <data name="ManagePlayers_CopyId_Tip" xml:space="preserve">
+    <value>⟦ManagePlayers_CopyId_Tip⟧</value>
+  </data>
+  <!-- Add Player dialog -->
+  <data name="AddPlayer_Title" xml:space="preserve">
+    <value>⟦AddPlayer_Title⟧</value>
+  </data>
+  <data name="AddPlayer_Platform_Label" xml:space="preserve">
+    <value>⟦AddPlayer_Platform_Label⟧</value>
+  </data>
+  <data name="AddPlayer_PlatformId_Label" xml:space="preserve">
+    <value>⟦AddPlayer_PlatformId_Label⟧</value>
+  </data>
+  <data name="AddPlayer_PlatformId_Watermark" xml:space="preserve">
+    <value>⟦AddPlayer_PlatformId_Watermark⟧</value>
+  </data>
+  <data name="AddPlayer_PlayerName_Label" xml:space="preserve">
+    <value>⟦AddPlayer_PlayerName_Label⟧</value>
+  </data>
+  <data name="AddPlayer_DefaultRole_Label" xml:space="preserve">
+    <value>⟦AddPlayer_DefaultRole_Label⟧</value>
+  </data>
+  <data name="AddPlayer_ServerRole_Label" xml:space="preserve">
+    <value>⟦AddPlayer_ServerRole_Label⟧</value>
+  </data>
+  <data name="AddPlayer_SetAsDefault_Label" xml:space="preserve">
+    <value>⟦AddPlayer_SetAsDefault_Label⟧</value>
+  </data>
+  <data name="AddPlayer_Submit" xml:space="preserve">
+    <value>⟦AddPlayer_Submit⟧</value>
+  </data>
+  <data name="AddPlayer_DefaultRole_Help" xml:space="preserve">
+    <value>⟦AddPlayer_DefaultRole_Help⟧</value>
+  </data>
+  <data name="AddPlayer_ServerRole_Help" xml:space="preserve">
+    <value>⟦AddPlayer_ServerRole_Help⟧</value>
+  </data>
+  <data name="AddPlayer_SetAsDefault_Help" xml:space="preserve">
+    <value>⟦AddPlayer_SetAsDefault_Help⟧</value>
+  </data>
+  <!-- World Settings dialog -->
+  <data name="WorldPreferences_Preset_Label" xml:space="preserve">
+    <value>⟦WorldPreferences_Preset_Label⟧</value>
+  </data>
+  <data name="WorldPreferences_Preset_Help" xml:space="preserve">
+    <value>⟦WorldPreferences_Preset_Help⟧</value>
+  </data>
+  <data name="WorldPreferences_WikiPrefix" xml:space="preserve">
+    <value>⟦WorldPreferences_WikiPrefix⟧</value>
+  </data>
+  <data name="WorldPreferences_WikiLink" xml:space="preserve">
+    <value>⟦WorldPreferences_WikiLink⟧</value>
+  </data>
+  <data name="WorldPreferences_Modifiers_Header" xml:space="preserve">
+    <value>⟦WorldPreferences_Modifiers_Header⟧</value>
+  </data>
+  <data name="WorldPreferences_NotWorking" xml:space="preserve">
+    <value>⟦WorldPreferences_NotWorking⟧</value>
+  </data>
+  <data name="WorldPreferences_NotWorkingLink" xml:space="preserve">
+    <value>⟦WorldPreferences_NotWorkingLink⟧</value>
+  </data>
+  <data name="WorldPreferences_Keys_Header" xml:space="preserve">
+    <value>⟦WorldPreferences_Keys_Header⟧</value>
+  </data>
+  <data name="WorldPreferences_Title" xml:space="preserve">
+    <value>⟦WorldPreferences_Title {0}⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Custom" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Custom⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Easy" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Easy⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Normal" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Normal⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Hard" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Hard⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Hardcore" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Hardcore⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Casual" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Casual⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Hammer" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Hammer⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Immersive" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Immersive⟧</value>
+  </data>
+  <data name="WorldGen_Value_Normal" xml:space="preserve">
+    <value>⟦WorldGen_Value_Normal⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Name" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Name⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Help" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Help⟧</value>
+  </data>
+  <data name="WorldGen_Combat_VeryEasy" xml:space="preserve">
+    <value>⟦WorldGen_Combat_VeryEasy⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Easy" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Easy⟧</value>
+  </data>
+  <data name="WorldGen_Combat_Hard" xml:space="preserve">
+    <value>⟦WorldGen_Combat_Hard⟧</value>
+  </data>
+  <data name="WorldGen_Combat_VeryHard" xml:space="preserve">
+    <value>⟦WorldGen_Combat_VeryHard⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Name" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Name⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Help" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Help⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Casual" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Casual⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_VeryEasy" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_VeryEasy⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Easy" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Easy⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Hard" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Hard⟧</value>
+  </data>
+  <data name="WorldGen_DeathPenalty_Hardcore" xml:space="preserve">
+    <value>⟦WorldGen_DeathPenalty_Hardcore⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Name" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Name⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Help" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Help⟧</value>
+  </data>
+  <data name="WorldGen_Resources_MuchLess" xml:space="preserve">
+    <value>⟦WorldGen_Resources_MuchLess⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Less" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Less⟧</value>
+  </data>
+  <data name="WorldGen_Resources_More" xml:space="preserve">
+    <value>⟦WorldGen_Resources_More⟧</value>
+  </data>
+  <data name="WorldGen_Resources_MuchMore" xml:space="preserve">
+    <value>⟦WorldGen_Resources_MuchMore⟧</value>
+  </data>
+  <data name="WorldGen_Resources_Most" xml:space="preserve">
+    <value>⟦WorldGen_Resources_Most⟧</value>
+  </data>
+  <data name="WorldGen_Raids_Name" xml:space="preserve">
+    <value>⟦WorldGen_Raids_Name⟧</value>
+  </data>
+  <data name="WorldGen_Raids_Help" xml:space="preserve">
+    <value>⟦WorldGen_Raids_Help⟧</value>
+  </data>
+  <data name="WorldGen_Raids_None" xml:space="preserve">
+    <value>⟦WorldGen_Raids_None⟧</value>
+  </data>
+  <data name="WorldGen_Raids_MuchLess" xml:space="preserve">
+    <value>⟦WorldGen_Raids_MuchLess⟧</value>
+  </data>
+  <data name="WorldGen_Raids_Less" xml:space="preserve">
+    <value>⟦WorldGen_Raids_Less⟧</value>
+  </data>
+  <data name="WorldGen_Raids_More" xml:space="preserve">
+    <value>⟦WorldGen_Raids_More⟧</value>
+  </data>
+  <data name="WorldGen_Raids_MuchMore" xml:space="preserve">
+    <value>⟦WorldGen_Raids_MuchMore⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Name" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Name⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Help" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Help⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Casual" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Casual⟧</value>
+  </data>
+  <data name="WorldGen_Portals_Hard" xml:space="preserve">
+    <value>⟦WorldGen_Portals_Hard⟧</value>
+  </data>
+  <data name="WorldGen_Portals_VeryHard" xml:space="preserve">
+    <value>⟦WorldGen_Portals_VeryHard⟧</value>
+  </data>
+  <data name="WorldGen_NoBuildCost_Name" xml:space="preserve">
+    <value>⟦WorldGen_NoBuildCost_Name⟧</value>
+  </data>
+  <data name="WorldGen_NoBuildCost_Help" xml:space="preserve">
+    <value>⟦WorldGen_NoBuildCost_Help⟧</value>
+  </data>
+  <data name="WorldGen_PlayerEvents_Name" xml:space="preserve">
+    <value>⟦WorldGen_PlayerEvents_Name⟧</value>
+  </data>
+  <data name="WorldGen_PlayerEvents_Help" xml:space="preserve">
+    <value>⟦WorldGen_PlayerEvents_Help⟧</value>
+  </data>
+  <data name="WorldGen_PassiveMobs_Name" xml:space="preserve">
+    <value>⟦WorldGen_PassiveMobs_Name⟧</value>
+  </data>
+  <data name="WorldGen_PassiveMobs_Help" xml:space="preserve">
+    <value>⟦WorldGen_PassiveMobs_Help⟧</value>
+  </data>
+  <data name="WorldGen_NoMap_Name" xml:space="preserve">
+    <value>⟦WorldGen_NoMap_Name⟧</value>
+  </data>
+  <data name="WorldGen_NoMap_Help" xml:space="preserve">
+    <value>⟦WorldGen_NoMap_Help⟧</value>
+  </data>
+  <data name="WorldGen_Fire_Name" xml:space="preserve">
+    <value>⟦WorldGen_Fire_Name⟧</value>
+  </data>
+  <data name="WorldGen_Fire_Help" xml:space="preserve">
+    <value>⟦WorldGen_Fire_Help⟧</value>
+  </data>
+  <!-- Bug Report dialog -->
+  <data name="BugReport_Title" xml:space="preserve">
+    <value>⟦BugReport_Title⟧</value>
+  </data>
+  <data name="BugReport_Intro" xml:space="preserve">
+    <value>⟦BugReport_Intro⟧</value>
+  </data>
+  <data name="BugReport_Description_Label" xml:space="preserve">
+    <value>⟦BugReport_Description_Label⟧</value>
+  </data>
+  <data name="BugReport_Description_Help" xml:space="preserve">
+    <value>⟦BugReport_Description_Help⟧</value>
+  </data>
+  <data name="BugReport_Contact_Label" xml:space="preserve">
+    <value>⟦BugReport_Contact_Label⟧</value>
+  </data>
+  <data name="BugReport_Contact_Help" xml:space="preserve">
+    <value>⟦BugReport_Contact_Help⟧</value>
+  </data>
+  <data name="BugReport_Submit" xml:space="preserve">
+    <value>⟦BugReport_Submit⟧</value>
+  </data>
+  <data name="BugReport_Submitting" xml:space="preserve">
+    <value>⟦BugReport_Submitting⟧</value>
+  </data>
+  <data name="BugReport_Submitted" xml:space="preserve">
+    <value>⟦BugReport_Submitted⟧</value>
+  </data>
+  <data name="BugReport_Failed" xml:space="preserve">
+    <value>⟦BugReport_Failed⟧</value>
+  </data>
+  <!-- About dialog -->
+  <data name="About_Title" xml:space="preserve">
+    <value>⟦About_Title⟧</value>
+  </data>
+  <data name="About_TipJar" xml:space="preserve">
+    <value>⟦About_TipJar⟧</value>
+  </data>
+  <data name="About_SourceCode" xml:space="preserve">
+    <value>⟦About_SourceCode⟧</value>
+  </data>
+  <data name="About_BuyValheim" xml:space="preserve">
+    <value>⟦About_BuyValheim⟧</value>
+  </data>
+  <data name="About_Version" xml:space="preserve">
+    <value>⟦About_Version {0}⟧</value>
+  </data>
+  <data name="About_BuildDate" xml:space="preserve">
+    <value>⟦About_BuildDate {0}⟧</value>
+  </data>
+  <data name="About_License" xml:space="preserve">
+    <value>⟦About_License⟧</value>
+  </data>
+  <data name="About_Disclaimer" xml:space="preserve">
+    <value>⟦About_Disclaimer⟧</value>
+  </data>
+  <!-- Controls -->
+  <data name="Controls_Browse" xml:space="preserve">
+    <value>⟦Controls_Browse⟧</value>
+  </data>
+  <data name="Controls_Browse_Tip" xml:space="preserve">
+    <value>⟦Controls_Browse_Tip⟧</value>
+  </data>
+  <data name="Controls_OpenThisFolder_Tip" xml:space="preserve">
+    <value>⟦Controls_OpenThisFolder_Tip⟧</value>
+  </data>
+  <data name="Controls_LogViewer_Copy" xml:space="preserve">
+    <value>⟦Controls_LogViewer_Copy⟧</value>
+  </data>
+  <data name="Controls_LogViewer_SelectAll" xml:space="preserve">
+    <value>⟦Controls_LogViewer_SelectAll⟧</value>
+  </data>
+  <data name="Controls_OpenFolder_Tip" xml:space="preserve">
+    <value>⟦Controls_OpenFolder_Tip⟧</value>
+  </data>
+  <data name="Controls_Refresh_Tip" xml:space="preserve">
+    <value>⟦Controls_Refresh_Tip⟧</value>
+  </data>
+  <data name="Controls_Edit_Tip" xml:space="preserve">
+    <value>⟦Controls_Edit_Tip⟧</value>
+  </data>
+  <data name="Controls_Settings_Tip" xml:space="preserve">
+    <value>⟦Controls_Settings_Tip⟧</value>
+  </data>
+  <data name="Controls_Copy_Tip" xml:space="preserve">
+    <value>⟦Controls_Copy_Tip⟧</value>
+  </data>
+  <!-- Async operation dialog -->
+  <data name="AsyncOperation_Failure" xml:space="preserve">
+    <value>⟦AsyncOperation_Failure {0} {1}⟧</value>
+  </data>
+  <!-- Startup -->
+  <data name="Startup_Starting" xml:space="preserve">
+    <value>⟦Startup_Starting⟧</value>
+  </data>
+  <data name="Update_Checking" xml:space="preserve">
+    <value>⟦Update_Checking⟧</value>
+  </data>
+  <data name="Startup_LoadingPlayerData" xml:space="preserve">
+    <value>⟦Startup_LoadingPlayerData⟧</value>
+  </data>
+  <data name="Startup_Ready" xml:space="preserve">
+    <value>⟦Startup_Ready⟧</value>
+  </data>
+  <!-- Update check -->
+  <data name="Update_StatusFailed" xml:space="preserve">
+    <value>⟦Update_StatusFailed⟧</value>
+  </data>
+  <data name="Update_StatusAvailable" xml:space="preserve">
+    <value>⟦Update_StatusAvailable {0}⟧</value>
+  </data>
+  <data name="Update_StatusUpToDate" xml:space="preserve">
+    <value>⟦Update_StatusUpToDate {0}⟧</value>
+  </data>
+  <data name="Update_StatusPreRelease" xml:space="preserve">
+    <value>⟦Update_StatusPreRelease {0}⟧</value>
+  </data>
+  <data name="Update_StatusUnparsable" xml:space="preserve">
+    <value>⟦Update_StatusUnparsable {0}⟧</value>
+  </data>
+  <data name="Update_ManualPrompt" xml:space="preserve">
+    <value>⟦Update_ManualPrompt {0}⟧</value>
+  </data>
+  <data name="Update_ManualFailed" xml:space="preserve">
+    <value>⟦Update_ManualFailed {0}⟧</value>
+  </data>
+  <data name="Update_ManualAvailable" xml:space="preserve">
+    <value>⟦Update_ManualAvailable⟧</value>
+  </data>
+  <data name="Update_ManualUpToDate" xml:space="preserve">
+    <value>⟦Update_ManualUpToDate⟧</value>
+  </data>
+  <data name="Update_ManualPreRelease" xml:space="preserve">
+    <value>⟦Update_ManualPreRelease {0}⟧</value>
+  </data>
+  <data name="Update_ManualUnparsable" xml:space="preserve">
+    <value>⟦Update_ManualUnparsable {0}⟧</value>
+  </data>
+  <!-- Start server validation -->
+  <data name="Validation_OpenSaveFolderFailed" xml:space="preserve">
+    <value>⟦Validation_OpenSaveFolderFailed {0}⟧</value>
+  </data>
+  <data name="Validation_OpenServerFolderFailed" xml:space="preserve">
+    <value>⟦Validation_OpenServerFolderFailed {0}⟧</value>
+  </data>
+  <data name="Validation_CloudImportFailed" xml:space="preserve">
+    <value>⟦Validation_CloudImportFailed {0} {1}⟧</value>
+  </data>
+  <data name="Validation_PortInUse" xml:space="preserve">
+    <value>⟦Validation_PortInUse {0} {1}⟧</value>
+  </data>
+  <data name="Validation_WorldNameRequired" xml:space="preserve">
+    <value>⟦Validation_WorldNameRequired⟧</value>
+  </data>
+  <data name="Validation_WorldNameLength" xml:space="preserve">
+    <value>⟦Validation_WorldNameLength⟧</value>
+  </data>
+  <data name="Validation_WorldNameTaken" xml:space="preserve">
+    <value>⟦Validation_WorldNameTaken {0}⟧</value>
+  </data>
+  <data name="Validation_WorldNotFound" xml:space="preserve">
+    <value>⟦Validation_WorldNotFound {0}⟧</value>
+  </data>
+  <data name="Validation_ServerNameRequired" xml:space="preserve">
+    <value>⟦Validation_ServerNameRequired⟧</value>
+  </data>
+  <data name="Validation_WorldNameMissing" xml:space="preserve">
+    <value>⟦Validation_WorldNameMissing⟧</value>
+  </data>
+  <data name="Validation_ServerNameMatchesWorld" xml:space="preserve">
+    <value>⟦Validation_ServerNameMatchesWorld {0}⟧</value>
+  </data>
+  <data name="Validation_PasswordRequired" xml:space="preserve">
+    <value>⟦Validation_PasswordRequired⟧</value>
+  </data>
+  <data name="Validation_PasswordLength" xml:space="preserve">
+    <value>⟦Validation_PasswordLength⟧</value>
+  </data>
+  <data name="Validation_PasswordContainsServerName" xml:space="preserve">
+    <value>⟦Validation_PasswordContainsServerName {0}⟧</value>
+  </data>
+  <data name="Validation_PasswordContainsWorldName" xml:space="preserve">
+    <value>⟦Validation_PasswordContainsWorldName {0}⟧</value>
+  </data>
+  <data name="Validation_PortRange" xml:space="preserve">
+    <value>⟦Validation_PortRange⟧</value>
+  </data>
+  <data name="Validation_SaveIntervalPositive" xml:space="preserve">
+    <value>⟦Validation_SaveIntervalPositive⟧</value>
+  </data>
+  <data name="Validation_ShortBackupPositive" xml:space="preserve">
+    <value>⟦Validation_ShortBackupPositive⟧</value>
+  </data>
+  <data name="Validation_LongBackupPositive" xml:space="preserve">
+    <value>⟦Validation_LongBackupPositive⟧</value>
+  </data>
+  <data name="Validation_SaveIntervalOrder" xml:space="preserve">
+    <value>⟦Validation_SaveIntervalOrder⟧</value>
+  </data>
+  <data name="Validation_BackupIntervalOrder" xml:space="preserve">
+    <value>⟦Validation_BackupIntervalOrder⟧</value>
+  </data>
+  <data name="Validation_WorldPresetInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldPresetInvalid {0} {1}⟧</value>
+  </data>
+  <data name="Validation_WorldModifiersWithPreset" xml:space="preserve">
+    <value>⟦Validation_WorldModifiersWithPreset⟧</value>
+  </data>
+  <data name="Validation_WorldModifierKeyInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldModifierKeyInvalid {0} {1}⟧</value>
+  </data>
+  <data name="Validation_WorldModifierValueInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldModifierValueInvalid {0} {1} {2}⟧</value>
+  </data>
+  <data name="Validation_WorldKeyInvalid" xml:space="preserve">
+    <value>⟦Validation_WorldKeyInvalid {0} {1}⟧</value>
+  </data>
+  <data name="Validation_LogFileArgument" xml:space="preserve">
+    <value>⟦Validation_LogFileArgument⟧</value>
+  </data>
+  <data name="Validation_ListBackupFailed" xml:space="preserve">
+    <value>⟦Validation_ListBackupFailed {0}⟧</value>
+  </data>
+  <!-- Player list import -->
+  <data name="Import_Title" xml:space="preserve">
+    <value>⟦Import_Title⟧</value>
+  </data>
+  <data name="Import_NoFiles" xml:space="preserve">
+    <value>⟦Import_NoFiles⟧</value>
+  </data>
+  <data name="Import_NoRoles" xml:space="preserve">
+    <value>⟦Import_NoRoles⟧</value>
+  </data>
+  <data name="Import_Confirm" xml:space="preserve">
+    <value>⟦Import_Confirm {0}⟧</value>
+  </data>
+  <data name="Import_Updated" xml:space="preserve">
+    <value>⟦Import_Updated {0}⟧</value>
+  </data>
+  <data name="Import_Failed" xml:space="preserve">
+    <value>⟦Import_Failed⟧</value>
+  </data>
+  <data name="Import_PermittedFileError_Title" xml:space="preserve">
+    <value>⟦Import_PermittedFileError_Title⟧</value>
+  </data>
+  <data name="Import_PermittedFileError_Message" xml:space="preserve">
+    <value>⟦Import_PermittedFileError_Message {0}⟧</value>
+  </data>
+  <data name="Import_RoleConflict_Title" xml:space="preserve">
+    <value>⟦Import_RoleConflict_Title⟧</value>
+  </data>
+  <data name="Import_RoleConflict_Message" xml:space="preserve">
+    <value>⟦Import_RoleConflict_Message {0}⟧</value>
+  </data>
+  <!-- Relative time -->
+  <data name="RelativeTime_JustNow" xml:space="preserve">
+    <value>⟦RelativeTime_JustNow⟧</value>
+  </data>
+  <data name="RelativeTime_Seconds_One" xml:space="preserve">
+    <value>⟦RelativeTime_Seconds_One⟧</value>
+  </data>
+  <data name="RelativeTime_Seconds_Other" xml:space="preserve">
+    <value>⟦RelativeTime_Seconds_Other {0}⟧</value>
+  </data>
+  <data name="RelativeTime_Minutes_One" xml:space="preserve">
+    <value>⟦RelativeTime_Minutes_One⟧</value>
+  </data>
+  <data name="RelativeTime_Minutes_Other" xml:space="preserve">
+    <value>⟦RelativeTime_Minutes_Other {0}⟧</value>
+  </data>
+  <data name="RelativeTime_Hours_One" xml:space="preserve">
+    <value>⟦RelativeTime_Hours_One⟧</value>
+  </data>
+  <data name="RelativeTime_Hours_Other" xml:space="preserve">
+    <value>⟦RelativeTime_Hours_Other {0}⟧</value>
+  </data>
+  <data name="RelativeTime_Days_One" xml:space="preserve">
+    <value>⟦RelativeTime_Days_One⟧</value>
+  </data>
+  <data name="RelativeTime_Days_Other" xml:space="preserve">
+    <value>⟦RelativeTime_Days_Other {0}⟧</value>
+  </data>
+  <data name="RelativeTime_Past" xml:space="preserve">
+    <value>⟦RelativeTime_Past {0}⟧</value>
+  </data>
+  <data name="RelativeTime_Future" xml:space="preserve">
+    <value>⟦RelativeTime_Future {0}⟧</value>
+  </data>
+  <!-- Paths -->
+  <data name="Path_FileNotDefined" xml:space="preserve">
+    <value>⟦Path_FileNotDefined⟧</value>
+  </data>
+  <data name="Path_FileWrongType" xml:space="preserve">
+    <value>⟦Path_FileWrongType {0} {1}⟧</value>
+  </data>
+  <data name="Path_FileNotFound" xml:space="preserve">
+    <value>⟦Path_FileNotFound {0}⟧</value>
+  </data>
+  <data name="Path_DirectoryNotDefined" xml:space="preserve">
+    <value>⟦Path_DirectoryNotDefined⟧</value>
+  </data>
+  <data name="Path_DirectoryNotFound" xml:space="preserve">
+    <value>⟦Path_DirectoryNotFound {0}⟧</value>
+  </data>
+  <!-- Steam Cloud worlds -->
+  <data name="CloudWorld_NotFound" xml:space="preserve">
+    <value>⟦CloudWorld_NotFound {0}⟧</value>
+  </data>
+  <data name="CloudWorld_AlreadyExists" xml:space="preserve">
+    <value>⟦CloudWorld_AlreadyExists {0}⟧</value>
+  </data>
+  <!-- Online services -->
+  <data name="Api_UpdateServerUnreachable" xml:space="preserve">
+    <value>⟦Api_UpdateServerUnreachable⟧</value>
+  </data>
+  <data name="Api_RuneberryUnreachable" xml:space="preserve">
+    <value>⟦Api_RuneberryUnreachable⟧</value>
+  </data>
+  <data name="Api_UnknownError" xml:space="preserve">
+    <value>⟦Api_UnknownError⟧</value>
+  </data>
+  <!-- Crash report -->
+  <data name="CrashReport_Prompt" xml:space="preserve">
+    <value>⟦CrashReport_Prompt {0}⟧</value>
+  </data>
+</root>

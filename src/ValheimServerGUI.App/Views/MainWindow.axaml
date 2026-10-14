@@ -1,0 +1,166 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+        xmlns:conv="using:ValheimServerGUI.App.Converters"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
+        xmlns:tabs="using:ValheimServerGUI.App.Views.Tabs"
+        mc:Ignorable="d"
+        x:Class="ValheimServerGUI.App.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        x:Name="Root"
+        Width="550" Height="408"
+        MinWidth="550" MinHeight="408"
+        Title="{Binding Title}">
+
+    <Window.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- The shared WinForms-style tab theme (window-scoped; also used by Manage Players). -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/Tabs.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Window.Resources>
+
+    <DockPanel>
+        <!-- ===== Menu ===== -->
+        <!-- Bottom hairline mirrors the footer's top border so the menu bar reads as a banded strip. -->
+        <Border DockPanel.Dock="Top" BorderThickness="0,0,0,1" BorderBrush="{DynamicResource AppBorderBrush}">
+        <DockPanel>
+        <!-- Right of the menu: a label-less profile picker + Start/Restart/Stop controls, turning the strip
+             into a single-window multi-profile control panel. The controls bind the same VM commands as the
+             Server Controls tab and the tray, so their enablement is derived from the selected server. -->
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Spacing="3"
+                    VerticalAlignment="Center" Margin="6,0,6,0">
+            <TextBlock Text="{x:Static loc:Strings.MainWindow_Profile_Label}" VerticalAlignment="Center" Margin="0,0,4,0"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <c:DropdownFormField x:Name="ProfileDropdown" Width="170" VerticalAlignment="Center"
+                                 ItemsSource="{Binding Profiles}" />
+            <c:IconButton IconName="Run_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Start}" Command="{Binding StartCommand}" />
+            <c:IconButton IconName="Restart_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Restart}" Command="{Binding RestartCommand}" />
+            <c:IconButton IconName="Stop_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Stop}" Command="{Binding StopCommand}" />
+        </StackPanel>
+        <Menu>
+            <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_File}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_NewWindow}" Command="{Binding NewWindowCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="AddImmediateWindow_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_NewProfile}" Command="{Binding NewProfileCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="NewFile_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SaveProfile}" Command="{Binding SaveProfileCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="Save_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SaveProfileAs}" Command="{Binding SaveProfileAsCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="Save_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_LoadProfile}" ItemsSource="{Binding Profiles}"
+                          IsEnabled="{Binding HasProfiles}" x:CompileBindings="False">
+                    <MenuItem.Icon><c:IconImage IconName="OpenFile_16x" /></MenuItem.Icon>
+                    <MenuItem.Styles>
+                        <!-- Tree=Logical: on desktop the submenu is a separate PopupRoot, so a default (visual)
+                             ancestor search never reaches the Window and the command binds to null (the items
+                             then render disabled). The logical tree survives the popup, so it resolves there. -->
+                        <Style Selector="MenuItem > MenuItem">
+                            <Setter Property="Command"
+                                    Value="{Binding DataContext.LoadProfileCommand, RelativeSource={RelativeSource AncestorType=Window, Tree=Logical}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.Styles>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_RemoveProfile}" ItemsSource="{Binding Profiles}"
+                          IsEnabled="{Binding CanRemoveProfile}" x:CompileBindings="False">
+                    <MenuItem.Icon><c:IconImage IconName="Cancel_16x" /></MenuItem.Icon>
+                    <MenuItem.Styles>
+                        <!-- Tree=Logical: see Load Profile above (desktop submenu popup breaks the visual search). -->
+                        <Style Selector="MenuItem > MenuItem">
+                            <Setter Property="Command"
+                                    Value="{Binding DataContext.RemoveProfileCommand, RelativeSource={RelativeSource AncestorType=Window, Tree=Logical}}" />
+                            <Setter Property="CommandParameter" Value="{Binding}" />
+                        </Style>
+                    </MenuItem.Styles>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Preferences}" Command="{Binding PreferencesCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="Settings_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SetDirectories}" Command="{Binding SetDirectoriesCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="FolderInformation_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_OpenSettingsDirectory}" Command="{Binding OpenSettingsDirectoryCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="OpenFolder_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Close}" Command="{Binding CloseCommand}" />
+            </MenuItem>
+            <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Help}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_OnlineManual}" Command="{Binding OnlineManualCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="OpenWeb_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_PortForwarding}" Command="{Binding PortForwardingCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="OpenWeb_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_BugReport}" Command="{Binding BugReportCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="NewBug_16x" /></MenuItem.Icon>
+                </MenuItem>
+                <Separator />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_CheckForUpdates}" Command="{Binding CheckForUpdatesCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="UnsyncedCommits_16x_Horiz" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Discord}" Command="{Binding DiscordCommand}">
+                    <MenuItem.Icon><c:IconImage IconName="DiscordLogo" /></MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_About}" Command="{Binding AboutCommand}" />
+            </MenuItem>
+        </Menu>
+        </DockPanel>
+        </Border>
+
+        <!-- ===== Status bar ===== -->
+        <Border DockPanel.Dock="Bottom" BorderThickness="0,1,0,0" Background="{DynamicResource LayerDarkest}"
+                BorderBrush="{DynamicResource AppBorderBrush}" Padding="8,4">
+            <Grid ColumnDefinitions="*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                    <Image Width="16" Height="16" VerticalAlignment="Center"
+                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                           Source="{Binding ServerStatus, Converter={x:Static conv:ServerStatusToIconConverter.Instance}}" />
+                    <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                </StackPanel>
+                <!-- Icon + text always render at full contrast; only the text turns into a clickable link
+                     when there is somewhere to go (UpdateIsLink). Previously the whole readout was a Button
+                     that went disabled when not a link, dimming the icon and text to near-invisibility. -->
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                    <Image Width="16" Height="16" VerticalAlignment="Center"
+                           RenderOptions.BitmapInterpolationMode="HighQuality"
+                           Source="{Binding UpdateStatus, Converter={x:Static conv:UpdateStatusToIconConverter.Instance}}" />
+                    <TextBlock Text="{Binding UpdateStatusText}" VerticalAlignment="Center"
+                               IsVisible="{Binding UpdateIsLink, Converter={x:Static conv:InverseBooleanConverter.Instance}}" />
+                    <c:HyperlinkLabel Text="{Binding UpdateStatusText}" VerticalAlignment="Center"
+                                      Command="{Binding UpdateLinkCommand}" IsVisible="{Binding UpdateIsLink}" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- ===== Tabs ===== -->
+        <TabControl Margin="8" x:Name="Tabs" SelectionChanged="OnTabChanged">
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_ServerControls}">
+                <tabs:ServerControlsView />
+            </TabItem>
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_AdvancedControls}">
+                <tabs:AdvancedControlsView />
+            </TabItem>
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_ServerDetails}" x:Name="DetailsTab">
+                <tabs:ServerDetailsView />
+            </TabItem>
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_Players}" x:Name="PlayersTab">
+                <tabs:PlayersView />
+            </TabItem>
+            <TabItem Header="{x:Static loc:Strings.MainWindow_Tab_Logs}">
+                <tabs:LogsView />
+            </TabItem>
+        </TabControl>
+    </DockPanel>
+</Window>

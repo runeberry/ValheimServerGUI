@@ -1,0 +1,30 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             x:Class="ValheimServerGUI.App.Controls.FilenameFormField"
+             x:Name="Root" x:CompileBindings="False">
+    <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
+        <!-- One outlined shell around a chromeless text box; the Browse / open-folder buttons are
+             connected end-caps inside the same border (left divider only). See Styles/Compact.axaml. -->
+        <Border Classes="fieldShell" IsEnabled="{Binding #Root.IsEnabled}">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0" Classes="chromeless" VerticalAlignment="Stretch"
+                         IsEnabled="{Binding #Root.IsInputEnabled}"
+                         VerticalContentAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
+                    <Button Classes="affix" Content="{x:Static loc:Strings.Controls_Browse}"
+                            IsVisible="{Binding #Root.ShowBrowse}"
+                            IsEnabled="{Binding #Root.IsInputEnabled}"
+                            ToolTip.Tip="{x:Static loc:Strings.Controls_Browse_Tip}" Click="Browse" />
+                    <Button Classes="affix"
+                            IsVisible="{Binding #Root.ShowOpenFolder}"
+                            Command="{Binding #Root.OpenFolderCommand}"
+                            ToolTip.Tip="{x:Static loc:Strings.Controls_OpenThisFolder_Tip}">
+                        <c:IconImage IconName="OpenFolder_16x" />
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </c:FormRow>
+</UserControl>

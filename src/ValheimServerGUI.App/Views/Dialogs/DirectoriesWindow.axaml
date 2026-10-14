@@ -1,0 +1,30 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.DirectoriesWindow"
+        x:DataType="vm:DirectoriesViewModel"
+        Title="{x:Static loc:Strings.Directories_Title}"
+        SizeToContent="Height" Width="560" MinWidth="480"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="8">
+        <TextBlock TextWrapping="Wrap"
+                   Text="{x:Static loc:Strings.Directories_Intro}" />
+        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_ServerExe_Label}" SelectMode="File"
+                             Value="{Binding ServerExePath}"
+                             ShowOpenFolder="True" OpenFolderCommand="{Binding OpenServerExeFolderCommand}"
+                             HelpText="{x:Static loc:Strings.Directories_ServerExe_Help}" />
+        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_SaveData_Label}" SelectMode="Directory"
+                             Value="{Binding SaveDataFolderPath}"
+                             ShowOpenFolder="True" OpenFolderCommand="{Binding OpenSaveFolderCommand}"
+                             HelpText="{x:Static loc:Strings.Directories_SaveData_Help}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

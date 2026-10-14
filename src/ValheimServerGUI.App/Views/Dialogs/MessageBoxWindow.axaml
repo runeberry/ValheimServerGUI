@@ -1,0 +1,14 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.MessageBoxWindow"
+        SizeToContent="WidthAndHeight"
+        MinWidth="360" MaxWidth="560"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="16">
+        <TextBlock x:Name="MessageText" TextWrapping="Wrap" />
+        <StackPanel x:Name="ButtonBar" Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" />
+    </StackPanel>
+</Window>

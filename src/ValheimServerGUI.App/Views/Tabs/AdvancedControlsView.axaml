@@ -1,0 +1,59 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.AdvancedControlsView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <ScrollViewer>
+        <Grid Margin="8" ColumnDefinitions="*,8,Auto">
+            <StackPanel Grid.Column="0" Spacing="2">
+                <c:GroupBox Header="{x:Static loc:Strings.AdvancedControls_DirectoryOverrides_Header}">
+                    <StackPanel Spacing="2">
+                        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_ServerExe_Label}" SelectMode="File"
+                                             HelpText="{x:Static loc:Strings.AdvancedControls_ServerExe_Help}"
+                                             Value="{Binding Form.ServerExePath}" IsInputEnabled="{Binding AllowServerChanges}"
+                                             ShowOpenFolder="True" OpenFolderCommand="{Binding OpenServerExeFolderCommand}" />
+                        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_SaveData_Label}" SelectMode="Directory"
+                                             HelpText="{x:Static loc:Strings.AdvancedControls_SaveData_Help}"
+                                             Value="{Binding Form.SaveDataFolderPath}" IsInputEnabled="{Binding AllowServerChanges}"
+                                             ShowOpenFolder="True" OpenFolderCommand="{Binding OpenSaveFolderCommand}" />
+                    </StackPanel>
+                </c:GroupBox>
+
+                <c:GroupBox Header="{x:Static loc:Strings.AdvancedControls_OtherSettings_Header}">
+                    <StackPanel Spacing="4">
+                        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.AdvancedControls_AutoStart_Label}"
+                                             HelpText="{x:Static loc:Strings.AdvancedControls_AutoStart_Help}"
+                                             Value="{Binding Form.AutoStart}" IsEnabled="{Binding AllowServerChanges}" />
+                        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.AdvancedControls_WriteLogs_Label}"
+                                             HelpText="{x:Static loc:Strings.AdvancedControls_WriteLogs_Help}"
+                                             Value="{Binding Form.WriteServerLogsToFile}" IsEnabled="{Binding AllowServerChanges}" />
+                        <c:TextFormField LabelText="{x:Static loc:Strings.AdvancedControls_AdditionalArgs_Label}"
+                                         HelpText="{x:Static loc:Strings.AdvancedControls_AdditionalArgs_Help}"
+                                         Value="{Binding Form.AdditionalArgs}" MaxLength="32767"
+                                         IsEnabled="{Binding AllowServerChanges}" />
+                    </StackPanel>
+                </c:GroupBox>
+            </StackPanel>
+
+            <c:GroupBox Grid.Column="2" Header="{x:Static loc:Strings.AdvancedControls_SavingBackups_Header}" VerticalAlignment="Top">
+                <StackPanel Spacing="2" Width="190">
+                    <c:NumericFormField LabelText="{x:Static loc:Strings.AdvancedControls_Backups_Label}" Value="{Binding Form.BackupCount}"
+                                        Minimum="1" Maximum="1000" IsEnabled="{Binding AllowServerChanges}"
+                                        HelpText="{x:Static loc:Strings.AdvancedControls_Backups_Help}" />
+                    <c:DurationFormField LabelText="{x:Static loc:Strings.AdvancedControls_SaveInterval_Label}" Value="{Binding Form.SaveInterval}"
+                                         Minimum="60" Maximum="86400" IsEnabled="{Binding AllowServerChanges}"
+                                         HelpText="{x:Static loc:Strings.AdvancedControls_SaveInterval_Help}" />
+                    <c:DurationFormField LabelText="{x:Static loc:Strings.AdvancedControls_ShortBackup_Label}" Value="{Binding Form.BackupIntervalShort}"
+                                         Minimum="300" Maximum="2592000" IsEnabled="{Binding AllowServerChanges}"
+                                         HelpText="{x:Static loc:Strings.AdvancedControls_ShortBackup_Help}" />
+                    <c:DurationFormField LabelText="{x:Static loc:Strings.AdvancedControls_LongBackup_Label}" Value="{Binding Form.BackupIntervalLong}"
+                                         Minimum="300" Maximum="2592000" IsEnabled="{Binding AllowServerChanges}"
+                                         HelpText="{x:Static loc:Strings.AdvancedControls_LongBackup_Help}" />
+                </StackPanel>
+            </c:GroupBox>
+        </Grid>
+    </ScrollViewer>
+</UserControl>

@@ -1,0 +1,27 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
+             x:Class="ValheimServerGUI.App.Controls.LogViewer"
+             x:Name="Root" x:CompileBindings="False">
+    <Border BorderThickness="1" BorderBrush="{DynamicResource AppBorderBrush}">
+        <ScrollViewer x:Name="Scroll" Background="{DynamicResource LayerBase}"
+                      HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+            <!-- A single contiguous, read-only text surface so logs copy-paste in bulk (select, Ctrl+C,
+                 or the context menu). The lines are capped upstream (LogsViewModel), so the text stays
+                 bounded rather than growing forever. Word-wrapped so long lines never need horizontal
+                 scrolling; the mono stack lists a concrete family per platform (Windows/mac/Linux) since
+                 Avalonia does not resolve the generic "monospace" keyword. -->
+            <SelectableTextBlock x:Name="TextView" Padding="6,4"
+                                 FontFamily="Cascadia Mono,Consolas,Menlo,DejaVu Sans Mono,Liberation Mono,monospace"
+                                 FontSize="12" TextWrapping="Wrap"
+                                 Foreground="{DynamicResource TextControlForeground}">
+                <SelectableTextBlock.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="{x:Static loc:Strings.Controls_LogViewer_Copy}" Click="CopySelection" />
+                        <MenuItem Header="{x:Static loc:Strings.Controls_LogViewer_SelectAll}" Click="SelectAllText" />
+                    </ContextMenu>
+                </SelectableTextBlock.ContextMenu>
+            </SelectableTextBlock>
+        </ScrollViewer>
+    </Border>
+</UserControl>

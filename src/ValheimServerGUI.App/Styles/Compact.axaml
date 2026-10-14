@@ -1,0 +1,100 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Compact density pass (§ V3 styling). Merged AFTER FluentTheme so these win. Restores the
+         WinForms 2.x information-dense feel: ~12px base font, ~23px control heights, tight margins, and
+         crisp 2px corners — implemented purely as theme-resource + selector overrides so the whole tree
+         (including the separate dialog Windows) inherits it and it still scales cleanly across DPIs. -->
+
+    <Styles.Resources>
+        <!-- Global Fluent knobs many control themes read from. -->
+        <CornerRadius x:Key="ControlCornerRadius">2</CornerRadius>
+        <x:Double x:Key="ControlContentThemeFontSize">12</x:Double>
+        <x:Double x:Key="TabItemHeaderFontSize">13</x:Double>
+        <Thickness x:Key="TabItemHeaderMargin">10,4</Thickness>
+        <Thickness x:Key="ComboBoxDropdownContentMargin">0,2</Thickness>
+        <x:Double x:Key="ComboBoxItemThemeMinHeight">26</x:Double>
+        <x:Double x:Key="MenuFlyoutThemeMinHeight">26</x:Double>
+    </Styles.Resources>
+
+    <!-- Base font: Segoe UI on Windows, the bundled Inter elsewhere. Inherits to every descendant.
+         Base surface is the layered app background (no pure black); menu/footer paint darker themselves. -->
+    <Style Selector="Window">
+        <Setter Property="FontFamily" Value="Segoe UI, Inter" />
+        <Setter Property="FontSize" Value="12" />
+        <!-- App background blends with the menu/footer (darkest); only tabs + content stand out. -->
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+    </Style>
+
+    <Style Selector="Button">
+        <Setter Property="MinHeight" Value="23" />
+        <Setter Property="Padding" Value="10,2" />
+        <!-- Content (text, or an icon+text group) is always centred as one unit. -->
+        <Setter Property="HorizontalContentAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <!-- Icon-only 16x16 button: no min width, fixed to the standard input height so a row of
+         [text box | icon button] stays a uniform height and the two align. Reads as a slim floating icon —
+         no background or border at rest OR on hover/press, just a hand cursor. Fluent paints the button
+         chrome on PART_ContentPresenter per state, so each state is forced transparent here (app Style beats
+         the ControlTheme's state styles). -->
+    <Style Selector="Button.icon">
+        <Setter Property="MinWidth" Value="0" />
+        <Setter Property="Height" Value="24" />
+        <Setter Property="Padding" Value="2" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Button.icon /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+        <Setter Property="BorderThickness" Value="0" />
+    </Style>
+    <Style Selector="Button.icon:pointerover /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <Style Selector="Button.icon:pressed /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="BorderBrush" Value="Transparent" />
+    </Style>
+    <!-- Keep the disabled icon at full opacity: the glyph itself is greyed by IconImage (its universal
+         disabled cue), so Fluent's extra content-dim would double up. -->
+    <Style Selector="Button.icon:disabled /template/ ContentPresenter#PART_ContentPresenter">
+        <Setter Property="Opacity" Value="1" />
+    </Style>
+
+    <!-- Text/number inputs, the field shell, and connected affixes now live in Styles/Inputs.axaml
+         (colours from Styles/Palette.axaml Input* tokens). -->
+
+
+    <!-- CheckBox / RadioButton are fully retemplated (12px box/circle, tight margins) in
+         Styles/CheckBox.axaml and Styles/RadioButton.axaml — a Style pass can't shrink the box because
+         Fluent hard-codes the part sizes as local values, so we own the template instead. -->
+
+    <!-- TabItem/TabControl look lives in Styles/Tabs.axaml (the custom bordered tab theme, merged per window). -->
+
+    <Style Selector="Menu">
+        <Setter Property="MinHeight" Value="0" />
+        <!-- Menu bar is the darkest layer. -->
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+    </Style>
+    <Style Selector="Menu > MenuItem">
+        <Setter Property="Padding" Value="8,1.5" />
+    </Style>
+
+    <!-- Right-click context menus: same app font + compact density as the rest of the chrome. The popup is a
+         separate visual root, so the Window font doesn't reach it — pin it here. -->
+    <Style Selector="ContextMenu">
+        <Setter Property="FontFamily" Value="Segoe UI, Inter" />
+        <Setter Property="FontSize" Value="12" />
+    </Style>
+    <Style Selector="ContextMenu > MenuItem">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="MinHeight" Value="24" />
+        <Setter Property="Padding" Value="4,2" />
+    </Style>
+</Styles>

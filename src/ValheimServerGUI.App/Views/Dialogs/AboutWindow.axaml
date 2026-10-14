@@ -1,0 +1,53 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
+        xmlns:conv="using:ValheimServerGUI.App.Converters"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.AboutWindow"
+        x:DataType="vm:AboutViewModel"
+        Title="{x:Static loc:Strings.About_Title}"
+        SizeToContent="Height" Width="400"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="24" Spacing="6" HorizontalAlignment="Center">
+        <Image Source="avares://ValheimServerGUI.App/Assets/vsg_logo_256.png" Width="72" Height="72"
+               HorizontalAlignment="Center" Margin="0,0,0,4"
+               RenderOptions.BitmapInterpolationMode="HighQuality" />
+
+        <TextBlock Text="{Binding ProductName}" FontSize="20" FontWeight="SemiBold"
+                   HorizontalAlignment="Center" TextAlignment="Center" />
+
+        <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="0,6,0,0">
+            <TextBlock Text="{Binding Copyright}" HorizontalAlignment="Center" TextAlignment="Center"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+            <TextBlock Text="{Binding License}" HorizontalAlignment="Center" TextAlignment="Center"
+                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+        </StackPanel>
+
+        <TextBlock Text="{Binding Disclaimer}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"
+                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+
+        <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="0,8,0,0">
+            <TextBlock Text="{Binding Version, StringFormat={x:Static loc:Strings.About_Version}}"
+                       HorizontalAlignment="Center" TextAlignment="Center" />
+            <TextBlock Text="{Binding BuildDate, StringFormat={x:Static loc:Strings.About_BuildDate}}"
+                       HorizontalAlignment="Center" TextAlignment="Center"
+                       IsVisible="{Binding BuildDate, Converter={x:Static conv:StringNotEmptyConverter.Instance}}" />
+        </StackPanel>
+
+        <StackPanel Orientation="Horizontal" Spacing="12" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <c:IconHyperlinkLabel IconName="ForgejoLogo" Text="{x:Static loc:Strings.About_SourceCode}"
+                                  Command="{Binding OpenSourceCodeCommand}" />
+            <c:IconHyperlinkLabel IconName="DiscordLogo" Text="Discord" Command="{Binding OpenDiscordCommand}" />
+            <c:IconHyperlinkLabel IconName="Donate_16x" Text="{x:Static loc:Strings.About_TipJar}"
+                                  Command="{Binding OpenTipJarCommand}" />
+        </StackPanel>
+
+        <c:IconHyperlinkLabel IconName="vsg_logo_16" Text="{x:Static loc:Strings.About_BuyValheim}" Margin="0,8,0,0"
+                              HorizontalAlignment="Center" Command="{Binding OpenValheimSiteCommand}" />
+
+        <Button Content="{x:Static loc:Strings.Common_Close}" MinWidth="80" HorizontalAlignment="Center" Margin="0,12,0,0"
+                IsDefault="True" IsCancel="True" Click="OnClose" />
+    </StackPanel>
+</Window>

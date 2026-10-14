@@ -1,0 +1,25 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.BugReportWindow"
+        x:DataType="vm:BugReportViewModel"
+        Title="{x:Static loc:Strings.BugReport_Title}"
+        SizeToContent="Height" Width="480" MinWidth="420"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="10">
+        <TextBlock TextWrapping="Wrap"
+                   Text="{x:Static loc:Strings.BugReport_Intro}" />
+        <c:TextFormField LabelText="{x:Static loc:Strings.BugReport_Description_Label}" Value="{Binding Description}" Multiline="True" InputHeight="160"
+                         HelpText="{x:Static loc:Strings.BugReport_Description_Help}" />
+        <c:TextFormField LabelText="{x:Static loc:Strings.BugReport_Contact_Label}" Value="{Binding ContactInfo}"
+                         HelpText="{x:Static loc:Strings.BugReport_Contact_Help}" />
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <Button Content="{x:Static loc:Strings.BugReport_Submit}" MinWidth="80" IsDefault="True"
+                    IsEnabled="{Binding CanSubmit}" Click="OnSubmit" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

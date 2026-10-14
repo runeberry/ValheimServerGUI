@@ -1,0 +1,35 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:loc="using:ValheimServerGUI.Localization"
+        xmlns:c="using:ValheimServerGUI.App.Controls"
+        xmlns:vm="using:ValheimServerGUI.App.ViewModels.Dialogs"
+        x:Class="ValheimServerGUI.App.Views.Dialogs.PreferencesWindow"
+        x:DataType="vm:PreferencesViewModel"
+        Title="{x:Static loc:Strings.Preferences_Title}"
+        SizeToContent="Height" Width="440" MinWidth="380"
+        WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
+
+    <StackPanel Margin="20" Spacing="6">
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_CheckForUpdates_Label}" Value="{Binding CheckForUpdates}"
+                             HelpText="{x:Static loc:Strings.Preferences_CheckForUpdates_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartWithOs_Label}" Value="{Binding StartWithWindows}"
+                             HelpText="{x:Static loc:Strings.Preferences_StartWithOs_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartMinimized_Label}" Value="{Binding StartMinimized}"
+                             HelpText="{x:Static loc:Strings.Preferences_StartMinimized_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_SaveOnStart_Label}" Value="{Binding SaveProfileOnStart}"
+                             HelpText="{x:Static loc:Strings.Preferences_SaveOnStart_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_WriteAppLogs_Label}" Value="{Binding WriteApplicationLogsToFile}"
+                             HelpText="{x:Static loc:Strings.Preferences_WriteAppLogs_Help}" />
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_ValidatePassword_Label}" Value="{Binding EnablePasswordValidation}"
+                             HelpText="{x:Static loc:Strings.Preferences_ValidatePassword_Help}" />
+
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.Preferences_Theme_Label}" Width="200" HorizontalAlignment="Left" Margin="0,4,0,0"
+                             ItemsSource="{Binding Themes}" Value="{Binding Theme}" />
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
+            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" HorizontalAlignment="Left" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
+        </StackPanel>
+    </StackPanel>
+</Window>

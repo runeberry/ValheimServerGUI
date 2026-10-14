@@ -1,0 +1,48 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Look + density for the shared DataListView grid (§ V3 styling). Merged after the Fluent DataGrid
+         theme so these win. The header + rows are a fixed 20px tall (set on the DataGrid in DataListView.cs)
+         with content vertically centred, so a 16px icon rests naturally and content aligns without any
+         per-cell vertical padding. Horizontal inset is a single 6px cell/header padding. A dark header bar
+         matches the footer; there are no inter-row gridlines. -->
+
+    <!-- Header: dark bar (matches the footer), app body font, 6px inset, content centred. -->
+    <Style Selector="DataGridColumnHeadersPresenter">
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+    </Style>
+    <Style Selector="DataGridColumnHeader">
+        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="6,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <!-- Fluent's 32px min blocks the fixed 20px ColumnHeaderHeight; drop it. -->
+        <Setter Property="MinHeight" Value="0" />
+    </Style>
+
+    <Style Selector="DataGridCell">
+        <Setter Property="FontSize" Value="12" />
+        <Setter Property="Padding" Value="6,0" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <!-- Fluent's 32px min blocks the fixed 20px RowHeight; drop it. -->
+        <Setter Property="MinHeight" Value="0" />
+    </Style>
+
+    <!-- No border/box around the focused-or-selected cell; the selected row's highlight is the only cue.
+         The box is the cell template's FocusVisual, made visible by the theme in the :current /
+         :selected / :focus states, so it is hidden in each of those (equal specificity, app style wins). -->
+    <Style Selector="DataGridCell /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:current /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:selected /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:focus /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+    <Style Selector="DataGridCell:focus-within /template/ Grid#FocusVisual">
+        <Setter Property="Opacity" Value="0" />
+    </Style>
+</Styles>

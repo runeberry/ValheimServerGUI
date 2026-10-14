@@ -1,0 +1,56 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <!-- Windows .exe icon (the app/window/tray icon is the PNG below, loaded as an Avalonia resource). -->
+    <ApplicationIcon>Assets/ApplicationIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <AvaloniaResource Include="Assets/vsg_logo_256.png" />
+    <!-- Restored WinForms icon set (VS Image Library glyphs + brand logos); see Assets/Icons/README.md. -->
+    <AvaloniaResource Include="Assets/Icons/**/*.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Avalonia" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+    <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
+    <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
+      <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
+      <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
+    </PackageReference>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="10.0.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ValheimServerGUI.Core\ValheimServerGUI.Core.csproj" />
+    <!-- Referenced directly (not only through Core) so it is guaranteed to build before XamlIl
+         resolves {x:Static loc:Strings.*}. -->
+    <ProjectReference Include="..\ValheimServerGUI.Localization\ValheimServerGUI.Localization.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ValheimServerGUI.App.Tests" />
+  </ItemGroup>
+
+  <!-- The qps-ploc satellite is the key-echo TEST culture (see ValheimServerGUI.Localization). It is
+       built into the normal output so tests and `VSG_LANG=qps-ploc dotnet run` QA work, but it must
+       never ship: drop it from the publish list, which also feeds the single-file bundle. -->
+  <Target Name="ExcludeTestCultureFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Remove="@(ResolvedFileToPublish)"
+                             Condition="$([System.String]::Copy('%(ResolvedFileToPublish.RelativePath)').Replace('\', '/').StartsWith('qps-ploc/'))" />
+    </ItemGroup>
+  </Target>
+
+</Project>

@@ -14,6 +14,6 @@
         /// <summary>
         /// The API key that will be attached to all VSG client requests to the Runeberry API.
         /// </summary>
-        public static string RuneberryClientApiKey { get; }
+        public static string RuneberryClientApiKey { get; } = string.Empty;
     }
 }

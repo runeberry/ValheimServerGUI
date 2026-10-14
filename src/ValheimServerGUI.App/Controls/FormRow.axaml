@@ -1,0 +1,33 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:c="using:ValheimServerGUI.App.Controls"
+                    xmlns:conv="using:ValheimServerGUI.App.Converters">
+
+    <!-- Shared "form row" template (§11.2): WinForms-style label-on-top, input below, with a blue "?"
+         help glyph pinned to the field's top-right. Its tooltip carries HelpText; the glyph collapses when
+         HelpText is empty. The FormRow/HelpText API is unchanged — only this layout differs. -->
+    <ControlTheme x:Key="{x:Type c:FormRow}" TargetType="c:FormRow">
+        <Setter Property="Margin" Value="0,1.5" />
+        <Setter Property="Template">
+            <ControlTemplate>
+                <Grid RowDefinitions="Auto,Auto">
+                    <!-- Header row collapses when there is no label, so a label-less field (a toolbar or
+                         list-item picker) renders as just its input. -->
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,1"
+                          IsVisible="{TemplateBinding Header, Converter={x:Static conv:StringNotEmptyConverter.Instance}}">
+                        <ContentControl Grid.Column="0"
+                                        Content="{TemplateBinding Header}"
+                                        ContentTemplate="{TemplateBinding HeaderTemplate}"
+                                        VerticalAlignment="Center" />
+                        <c:HelpLabel Grid.Column="1" HelpText="{TemplateBinding HelpText}" />
+                    </Grid>
+                    <ContentPresenter Grid.Row="1"
+                                      Content="{TemplateBinding Content}"
+                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                      HorizontalAlignment="Stretch" />
+                </Grid>
+            </ControlTemplate>
+        </Setter>
+    </ControlTheme>
+
+</ResourceDictionary>

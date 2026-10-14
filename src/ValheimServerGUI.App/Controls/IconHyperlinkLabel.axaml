@@ -1,0 +1,13 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             x:Class="ValheimServerGUI.App.Controls.IconHyperlinkLabel"
+             x:Name="Root" x:CompileBindings="False"
+             Background="Transparent" Cursor="Hand">
+    <!-- The inner label carries no Command: the click is handled once, by this control, so the icon is part
+         of the link too. -->
+    <StackPanel Orientation="Horizontal" Spacing="6">
+        <c:IconImage IconName="{Binding #Root.IconName}" VerticalAlignment="Center" />
+        <c:HyperlinkLabel Text="{Binding #Root.Text}" VerticalAlignment="Center" />
+    </StackPanel>
+</UserControl>

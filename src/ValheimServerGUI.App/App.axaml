@@ -1,0 +1,37 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ValheimServerGUI.App.App"
+             RequestedThemeVariant="Default">
+    <!-- "Default" follows the OS theme variant; the App applies the user's Light/Dark/System
+         preference at startup via RequestedThemeVariant (see App.axaml.cs). -->
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- The layered surface palette (theme-variant aware; no pure black). -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/Palette.axaml" />
+
+                <!-- Custom-control themes (Controls/): each is the ControlTheme for the same-named control.
+                     Stock controls we restyle (CheckBox, RadioButton, NumericUpDown, TabControl) are NOT here
+                     — each is owned + scoped inside the wrapper/window that uses it (the tab theme lives in
+                     Styles/Tabs.axaml and is merged by each window that hosts a TabControl). -->
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/FormRow.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/GroupBox.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/DataListView.axaml" />
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/HelpLabel.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/AppStyles.axaml" />
+        <!-- Compact density pass — merged last so it overrides Fluent's touch-sized defaults. -->
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Compact.axaml" />
+        <!-- Shared input styling (text/number/shell/affixes); colours from Palette Input* tokens. -->
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/Inputs.axaml" />
+        <!-- Compact density for the shared DataListView grid (cell/header font + halved padding). -->
+        <StyleInclude Source="avares://ValheimServerGUI.App/Styles/DataGrid.axaml" />
+    </Application.Styles>
+</Application>

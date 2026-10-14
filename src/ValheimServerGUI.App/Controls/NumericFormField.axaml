@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             x:Class="ValheimServerGUI.App.Controls.NumericFormField"
+             x:Name="Root" x:CompileBindings="False">
+    <UserControl.Resources>
+        <!-- The compact spinner skin (scoped here, not global) lives in one shared dictionary so this field
+             and DurationFormField present an identical NumericUpDown. -->
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://ValheimServerGUI.App/Controls/CompactNumericUpDown.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+
+    <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
+        <NumericUpDown IsEnabled="{Binding #Root.IsEnabled}" Value="{Binding #Root.Value, Mode=TwoWay}"
+                       Minimum="{Binding #Root.Minimum}"
+                       Maximum="{Binding #Root.Maximum}"
+                       FormatString="0" />
+    </c:FormRow>
+</UserControl>

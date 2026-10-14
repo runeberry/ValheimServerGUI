@@ -1,0 +1,188 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using ValheimServerGUI.Localization;
+
+namespace ValheimServerGUI.Game
+{
+    public class ValheimServerOptions : IValheimServerOptions
+    {
+        public string? Name { get; set; }
+
+        public string? Password { get; set; }
+
+        public bool PasswordValidation { get; set; }
+
+        public string? WorldName { get; set; }
+
+        public bool Public { get; set; }
+
+        public int Port { get; set; }
+
+        public bool Crossplay { get; set; }
+
+        public int SaveInterval { get; set; }
+
+        public int Backups { get; set; }
+
+        public int BackupShort { get; set; }
+
+        public int BackupLong { get; set; }
+
+        public string? AdditionalArgs { get; set; }
+
+        public string? ServerExePath { get; set; }
+
+        public string? SaveDataFolderPath { get; set; }
+
+        public bool LogToFile { get; set; }
+
+        // TODO: This option is not currently exposed in the UI, so log filtering
+        // cannot be functionally disabled. Can add this if someone wants it.
+        public bool LogFilteringDisabled { get; set; }
+
+        public Action<string>? LogMessageHandler { get; set; }
+
+        public string? WorldPreset { get; set; }
+
+        public Dictionary<string, string>? WorldModifiers { get; set; }
+
+        public HashSet<string>? WorldKeys { get; set; }
+
+        public bool UsePermittedList { get; set; }
+
+        public IReadOnlyDictionary<string, PlayerRoleEntry> RoleOverrides { get; set; } = new Dictionary<string, PlayerRoleEntry>();
+
+        public IReadOnlyDictionary<string, PlayerDefaultEntry> RoleDefaults { get; set; } = new Dictionary<string, PlayerDefaultEntry>();
+
+        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles => PlayerRoleResolver.BuildAssignments(RoleOverrides, RoleDefaults);
+
+        public void Validate()
+        {
+            // Ensure all required fields exist
+            if (string.IsNullOrWhiteSpace(Name)) throw new ArgumentException(Strings.Validation_ServerNameRequired);
+            if (string.IsNullOrWhiteSpace(WorldName)) throw new ArgumentException(Strings.Validation_WorldNameMissing);
+
+            // Name validation
+            if (Name == WorldName) throw new ArgumentException(string.Format(Strings.Validation_ServerNameMatchesWorld, WorldName));
+
+            // Password validation
+            if (PasswordValidation)
+            {
+                if (string.IsNullOrWhiteSpace(Password))
+                {
+                    if (Public) throw new ArgumentException(Strings.Validation_PasswordRequired);
+                }
+                else
+                {
+                    if (Password.Length < 5) throw new ArgumentException(Strings.Validation_PasswordLength);
+                    if (Password.Contains(Name)) throw new ArgumentException(string.Format(Strings.Validation_PasswordContainsServerName, Name));
+                    if (Password.Contains(WorldName)) throw new ArgumentException(string.Format(Strings.Validation_PasswordContainsWorldName, WorldName));
+                }
+            }
+
+            // Port validation
+            if (Port < 1 || Port > 65535) throw new ArgumentException(Strings.Validation_PortRange);
+
+            // Save and Backup validation
+            if (SaveInterval < 1) throw new ArgumentException(Strings.Validation_SaveIntervalPositive);
+            if (BackupShort < 1) throw new ArgumentException(Strings.Validation_ShortBackupPositive);
+            if (BackupLong < 1) throw new ArgumentException(Strings.Validation_LongBackupPositive);
+            if (SaveInterval > BackupShort || SaveInterval > BackupLong) throw new ArgumentException(Strings.Validation_SaveIntervalOrder);
+            if (BackupShort > BackupLong) throw new ArgumentException(Strings.Validation_BackupIntervalOrder);
+
+            // World generation settings
+            if (WorldPreset != null)
+            {
+                if (!WorldGenPresets.All.Contains(WorldPreset)) throw new ArgumentException(string.Format(Strings.Validation_WorldPresetInvalid, WorldPreset, string.Join(", ", WorldGenPresets.All)));
+                if (WorldModifiers != null && WorldModifiers.Count > 0) throw new ArgumentException(Strings.Validation_WorldModifiersWithPreset);
+            }
+            else if (WorldModifiers != null)
+            {
+                foreach (var (key, value) in WorldModifiers)
+                {
+                    if (!WorldGenModifiers.All.Contains(key)) throw new ArgumentException(string.Format(Strings.Validation_WorldModifierKeyInvalid, key, string.Join(", ", WorldGenModifiers.All)));
+                    var allowedValues = WorldGenModifiers.AllowedValues[key];
+                    if (!allowedValues.Contains(value)) throw new ArgumentException(string.Format(Strings.Validation_WorldModifierValueInvalid, value, key, string.Join(", ", allowedValues)));
+                }
+            }
+
+            if (WorldKeys != null)
+            {
+                foreach (var key in WorldKeys)
+                {
+                    if (!WorldGenKeys.All.Contains(key)) throw new ArgumentException(string.Format(Strings.Validation_WorldKeyInvalid, key, string.Join(", ", WorldGenKeys.All)));
+                }
+            }
+
+            // Additional args
+            // Using the native -logFile command will prevent logs from being piped to VSG, so don't allow it.
+            if ((AdditionalArgs ?? string.Empty).ToLower().Contains("-logfile")) throw new ArgumentException(Strings.Validation_LogFileArgument);
+
+            // Filepaths
+            this.GetValidatedServerExe();
+            this.GetValidatedSaveDataFolder();
+        }
+    }
+
+    public interface IValheimServerOptions
+    {
+        string? Name { get; }
+
+        string? Password { get; }
+
+        string? WorldName { get; }
+
+        bool Public { get; }
+
+        int Port { get; }
+
+        bool Crossplay { get; }
+
+        int SaveInterval { get; }
+
+        int Backups { get; }
+
+        int BackupShort { get; }
+
+        int BackupLong { get; }
+
+        string? AdditionalArgs { get; }
+
+        string? ServerExePath { get; }
+
+        string? SaveDataFolderPath { get; }
+
+        bool LogToFile { get; }
+
+        bool LogFilteringDisabled { get; }
+
+        Action<string>? LogMessageHandler { get; }
+
+        public string? WorldPreset { get; }
+
+        public Dictionary<string, string>? WorldModifiers { get; }
+
+        public HashSet<string>? WorldKeys { get; }
+
+        /// <summary>Whether the server should run in permitted-list mode (drives access-list generation).</summary>
+        public bool UsePermittedList { get; }
+
+        /// <summary>This server's role overrides (the profile's player roles), keyed by <c>Platform:PlayerId</c>.</summary>
+        public IReadOnlyDictionary<string, PlayerRoleEntry> RoleOverrides { get; }
+
+        /// <summary>The app-global player default roles the overrides layer over.</summary>
+        public IReadOnlyDictionary<string, PlayerDefaultEntry> RoleDefaults { get; }
+
+        /// <summary>The effective player roles the three gating files are written from, resolved from
+        /// <see cref="RoleOverrides"/> over <see cref="RoleDefaults"/>.</summary>
+        public IReadOnlyList<PlayerRoleAssignment> PlayerRoles { get; }
+    }
+
+    /// <summary>
+    /// A self-contained (no repository dependency) role assignment carried into <see cref="ValheimServer.Start"/>
+    /// for access-list generation. <see cref="PlatformRaw"/> preserves the game's exact casing for non-Steam
+    /// list-file tokens; it falls back to <see cref="Platform"/> when null.
+    /// </summary>
+    public record PlayerRoleAssignment(string? Platform, string? PlatformRaw, string? PlayerId, PlayerRole Role);
+}

@@ -1,0 +1,130 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:loc="using:ValheimServerGUI.Localization"
+             xmlns:c="using:ValheimServerGUI.App.Controls"
+             xmlns:conv="using:ValheimServerGUI.App.Converters"
+             xmlns:vm="using:ValheimServerGUI.App.ViewModels"
+             x:Class="ValheimServerGUI.App.Views.Tabs.PlayersView"
+             x:DataType="vm:MainWindowViewModel">
+
+    <DockPanel Margin="8">
+        <StackPanel DockPanel.Dock="Top" Spacing="6" Margin="0,0,0,6">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <StackPanel Grid.Column="0" Orientation="Horizontal" Spacing="6">
+                    <Button Content="{x:Static loc:Strings.Players_ManagePlayers}" Command="{Binding Players.ManagePlayersCommand}" />
+                </StackPanel>
+                <c:HyperlinkLabel Grid.Column="2" Text="{x:Static loc:Strings.Players_CharacterNamesHelp}"
+                                  Command="{Binding CharacterNamesHelpCommand}" VerticalAlignment="Center" />
+            </Grid>
+            <StackPanel Orientation="Horizontal" Spacing="24">
+                <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Players_UsePermittedList_Label}"
+                                     HelpText="{x:Static loc:Strings.Players_UsePermittedList_Help}"
+                                     Value="{Binding Form.UsePermittedList}" />
+                <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Players_ShowBanned_Label}"
+                                     Value="{Binding Players.ShowBannedPlayers}" />
+            </StackPanel>
+        </StackPanel>
+
+        <c:DataListView ItemsSource="{Binding Players.Players}"
+                        SelectedItem="{Binding Players.SelectedPlayer}"
+                        EmptyText="{Binding Players.EmptyText}"
+                        RowInvokeCommand="{Binding Players.ViewDetailsCommand}">
+            <c:DataListView.RowContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_ViewDetails}" Command="{Binding Players.ViewDetailsCommand}" />
+                    <!-- Radio items read/write this server's override for the selected player; the last one
+                         removes the override (labelled with the default it falls back to, or "None"). -->
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_SetServerRole}">
+                        <MenuItem Header="{x:Static loc:Strings.Role_Admin}" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsAdmin, Mode=TwoWay}" />
+                        <MenuItem Header="{x:Static loc:Strings.Role_Permitted}" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsPermitted, Mode=TwoWay}" />
+                        <MenuItem Header="{x:Static loc:Strings.Role_Banned}" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsBanned, Mode=TwoWay}" />
+                        <MenuItem Header="{Binding Players.ServerRoleDefaultLabel}" ToggleType="Radio" GroupName="ServerRole"
+                                  IsChecked="{Binding Players.ServerRoleIsDefault, Mode=TwoWay}" />
+                    </MenuItem>
+                    <Separator />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_AddPlayer}" Command="{Binding Players.AddPlayerCommand}" />
+                    <MenuItem Header="{x:Static loc:Strings.Players_Menu_RemovePlayer}" Command="{Binding Players.RemoveCommand}" />
+                </ContextMenu>
+            </c:DataListView.RowContextMenu>
+            <c:DataListView.Styles>
+                <Style Selector="DataGridRow" x:DataType="vm:PlayerRowViewModel">
+                    <Setter Property="Opacity"
+                            Value="{Binding IsOffline, Converter={x:Static conv:OfflineOpacityConverter.Instance}}" />
+                </Style>
+                <!-- A selected row is shown at full strength even when offline (the dim is only a
+                     background cue, so the selection stays legible at the standard font colour). -->
+                <Style Selector="DataGridRow:selected" x:DataType="vm:PlayerRowViewModel">
+                    <Setter Property="Opacity" Value="1" />
+                </Style>
+            </c:DataListView.Styles>
+            <c:DataListView.Columns>
+                <!-- Platform icon is a prefix of the name (its own column was collapsed here); the column
+                     still sorts by the plain DisplayName so the icon doesn't affect ordering. -->
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Player}" Width="*" SortMemberPath="DisplayName">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+                                <Image Source="{Binding PlatformIcon}" Width="16" Height="16"
+                                       VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality" />
+                                <TextBlock Text="{Binding DisplayName}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- The effective role on this server (override ?? global default), mode-filtered; "(*)" marks a
+                     server override of a global default. Blank when the player has no role. Kept the same
+                     fixed width as Status (the column to its right) so the two read as a matched pair. -->
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Role}" Width="100" SortMemberPath="RoleText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <Image Width="16" Height="16" VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                       Source="{Binding RoleIcon}" />
+                                <TextBlock Text="{Binding RoleText}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <!-- Status text prefixed with a glyph representing the status. Width matches Role (its left neighbour). -->
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Status}" Width="100" SortMemberPath="StatusText">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
+                            <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+                                <Image Width="16" Height="16" VerticalAlignment="Center"
+                                       RenderOptions.BitmapInterpolationMode="HighQuality"
+                                       Source="{Binding Status, Converter={x:Static conv:PlayerStatusToIconConverter.Instance}}" />
+                                <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Since}" Width="Auto" SortMemberPath="LastStatusChange">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate x:DataType="vm:PlayerRowViewModel">
+                            <TextBlock Text="{Binding SinceText}" VerticalAlignment="Center" />
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </c:DataListView.Columns>
+            <c:DataListView.FooterLeft>
+                <c:IconButton IconName="User_16x" ToolTip.Tip="{x:Static loc:Strings.Players_ViewDetails_Tip}"
+                              Command="{Binding Players.ViewDetailsCommand}" />
+            </c:DataListView.FooterLeft>
+            <c:DataListView.FooterRight>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                    <c:IconButton IconName="ImportFile_16x" ToolTip.Tip="{x:Static loc:Strings.Players_ImportLists_Tip}"
+                                  Command="{Binding ImportPlayerListsCommand}" />
+                    <c:IconButton IconName="Add_16x" ToolTip.Tip="{x:Static loc:Strings.Players_AddPlayer_Tip}"
+                                  Command="{Binding Players.AddPlayerCommand}" />
+                    <c:IconButton IconName="Cancel_16x" ToolTip.Tip="{x:Static loc:Strings.Players_RemovePlayer_Tip}"
+                                  Command="{Binding Players.RemoveCommand}" />
+                </StackPanel>
+            </c:DataListView.FooterRight>
+        </c:DataListView>
+    </DockPanel>
+</UserControl>

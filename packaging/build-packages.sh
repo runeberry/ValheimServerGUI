@@ -6,6 +6,7 @@
 #   * ValheimServerGUI-<ver>-win-x64.exe        (single-file Windows executable)
 #   * ValheimServerGUI-<ver>-linux-x64.tar.gz   (Linux publish + .desktop + icon)
 #   * ValheimServerGUI-<ver>-x86_64.AppImage    (portable Linux app)
+#   * ValheimServerGUI-<ver>-x86_64.AppImage.zsync (update data for AppImage updaters; a release asset)
 #
 # Set SELF_CONTAINED=true to bundle the .NET runtime into every artifact instead (needed if you want the
 # AppImage to run without .NET installed — see the note in scripts/package.sh / CLAUDE.local.md).
@@ -19,6 +20,11 @@ SELF_CONTAINED="${SELF_CONTAINED:-false}"
 APP_CSPROJ="$ROOT/src/ValheimServerGUI.App/ValheimServerGUI.App.csproj"
 CORE_CSPROJ="$ROOT/src/ValheimServerGUI.Core/ValheimServerGUI.Core.csproj"
 ICON="$ROOT/src/ValheimServerGUI.App/Assets/vsg_logo_256.png"
+
+# AppImage update information (the AppImage spec's .upd_info): updaters find new versions among the
+# GitHub releases and fetch them with the .zsync file published beside each AppImage.
+APPIMAGE_UPDATE_INFO="gh-releases-zsync|runeberry|ValheimServerGUI|latest|ValheimServerGUI-*-x86_64.AppImage.zsync"
+APPIMAGE_HOMEPAGE="https://forge.nuffle.me/runeberry/ValheimServerGUI"
 
 VERSION="$(grep -oP '<Version>\K[^<]+' "$CORE_CSPROJ" | head -1)"
 [ -n "$VERSION" ] || { echo "!! could not read <Version> from Core.csproj" >&2; exit 1; }
@@ -81,15 +87,22 @@ mkdir -p "$appdir/usr/bin"
 cp -r "$work/linux/." "$appdir/usr/bin/"
 cp "$ICON" "$appdir/valheim-server-gui.png"
 write_desktop "ValheimServerGUI.App" "$appdir/valheim-server-gui.desktop"
-# AppImage integrators (e.g. AppManager) read the app version from this key.
-echo "X-AppImage-Version=$VERSION" >> "$appdir/valheim-server-gui.desktop"
+# AppImage integrators (e.g. AppManager) read the app version and web page from these keys.
+cat >> "$appdir/valheim-server-gui.desktop" <<EOF
+X-AppImage-Version=$VERSION
+X-AppImage-Homepage=$APPIMAGE_HOMEPAGE
+EOF
 cat > "$appdir/AppRun" <<'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"
 exec "$HERE/usr/bin/ValheimServerGUI.App" "$@"
 EOF
 chmod +x "$appdir/AppRun"
-ARCH=x86_64 appimagetool "$appdir" "$OUT/ValheimServerGUI-$VERSION-x86_64.AppImage"
+appimage="$OUT/ValheimServerGUI-$VERSION-x86_64.AppImage"
+# Given update information, appimagetool also writes a .zsync, but into the current directory rather
+# than beside the AppImage, so build from the output directory.
+(cd "$OUT" && ARCH=x86_64 appimagetool -u "$APPIMAGE_UPDATE_INFO" "$appdir" "$appimage")
+[ -f "$appimage.zsync" ] || { echo "!! appimagetool did not write $appimage.zsync" >&2; exit 1; }
 
 echo ">> Done. Artifacts in $OUT:"
 ls -la "$OUT"

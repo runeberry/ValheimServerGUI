@@ -81,6 +81,8 @@ mkdir -p "$appdir/usr/bin"
 cp -r "$work/linux/." "$appdir/usr/bin/"
 cp "$ICON" "$appdir/valheim-server-gui.png"
 write_desktop "ValheimServerGUI.App" "$appdir/valheim-server-gui.desktop"
+# AppImage integrators (e.g. AppManager) read the app version from this key.
+echo "X-AppImage-Version=$VERSION" >> "$appdir/valheim-server-gui.desktop"
 cat > "$appdir/AppRun" <<'EOF'
 #!/bin/sh
 HERE="$(dirname "$(readlink -f "$0")")"

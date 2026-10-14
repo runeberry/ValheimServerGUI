@@ -75,7 +75,9 @@ public sealed class ServerManagerTests : IDisposable
         LogToFile = false,
     };
 
-    private static void WaitFor(Func<bool> condition, int timeoutMs = 2000)
+    // Returns as soon as the condition holds; the timeout only bounds a real failure. It is generous because
+    // the awaited work runs on the thread pool, which a loaded CI runner can be slow to schedule.
+    private static void WaitFor(Func<bool> condition, int timeoutMs = 10000)
     {
         var sw = Stopwatch.StartNew();
         while (!condition() && sw.ElapsedMilliseconds < timeoutMs) Thread.Sleep(10);

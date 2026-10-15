@@ -94,7 +94,7 @@ fi
 section "Server images"
 # Every KEY=value in server-configs.env becomes a build arg: that file is the single source of the mod pins.
 BUILD_ARGS=(--build-arg "SERVER_CACHE_BUST=$SERVER_CACHE_BUST")
-# shellcheck source=../tests/integration-image/server-configs.env
+# shellcheck source=tests/integration-image/server-configs.env
 source "$IMAGE_DIR/server-configs.env"
 while IFS= read -r key; do
   BUILD_ARGS+=(--build-arg "$key=${!key}")

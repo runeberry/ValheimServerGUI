@@ -6,7 +6,7 @@
 #
 # Server configurations are the final stages of tests/integration-image/Dockerfile:
 #   vanilla  - the current public dedicated server build
-#   bepinex  - the same server with BepInExPack_Valheim and one popular plugin (pinned in the Dockerfile)
+#   bepinex  - the same server with BepInExPack_Valheim and one popular plugin (pinned in server-configs.env)
 #
 # Each container holds the .NET SDK and the server install, and runs `dotnet test -p:Integration=true` on the
 # integration project against the read-only repo, so ValheimServer launches the real binary as a local child
@@ -92,9 +92,15 @@ fi
 
 # ---- 2. images ------------------------------------------------------------------------------
 section "Server images"
+# Every KEY=value in server-configs.env becomes a build arg: that file is the single source of the mod pins.
+BUILD_ARGS=(--build-arg "SERVER_CACHE_BUST=$SERVER_CACHE_BUST")
+# shellcheck source=../tests/integration-image/server-configs.env
+source "$IMAGE_DIR/server-configs.env"
+while IFS= read -r key; do
+  BUILD_ARGS+=(--build-arg "$key=${!key}")
+done < <(grep -oP '^[A-Z][A-Z0-9_]*(?==)' "$IMAGE_DIR/server-configs.env")
 for config in "${CONFIGS[@]}"; do
-  if docker build --target "$config" -t "vsg-integration:$config" \
-      --build-arg SERVER_CACHE_BUST="$SERVER_CACHE_BUST" \
+  if docker build --target "$config" -t "vsg-integration:$config" "${BUILD_ARGS[@]}" \
       "$IMAGE_DIR" >"$RUNLOG/image-$config.log" 2>&1; then
     buildid="$(docker run --rm "vsg-integration:$config" cat /opt/valheim/vsg-buildid.txt 2>/dev/null)"
     ok "$config (server build ${buildid:-unknown})"

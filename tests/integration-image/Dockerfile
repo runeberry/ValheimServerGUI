@@ -6,7 +6,8 @@
 #   bepinex  - vanilla + BepInExPack_Valheim + one popular server-side plugin, pinned by version and sha256
 #
 # The server download is cached as a layer; scripts/integration.sh --update-server re-runs it to pick up a
-# new Valheim build. Third-party mods are downloaded at build time and never stored in this repository.
+# new Valheim build. The bepinex pins live in server-configs.env (shared with the Windows VM image) and arrive
+# here as build args. Third-party mods are downloaded at build time and never stored in this repository.
 
 FROM steamcmd/steamcmd:ubuntu-24 AS server
 # Changing this value invalidates the cached download (integration.sh --update-server passes a timestamp).
@@ -29,16 +30,16 @@ ENV VSG_IT_SERVER_EXE=/opt/valheim/valheim_server.x86_64 \
     VSG_IT_EXPECTED_PLUGIN=
 
 FROM vanilla AS bepinex
-# The mod loader (Thunderstore denikson/BepInExPack_Valheim). Its archive holds the server-folder files under
-# BepInExPack_Valheim/.
-ARG BEPINEX_PACK_URL=https://thunderstore.io/package/download/denikson/BepInExPack_Valheim/5.4.2351/
-ARG BEPINEX_PACK_SHA256=bce631497976a93977ceb08e166712e6c31d15244956f89f17df092a9b62e29f
-# The plugin (Thunderstore JereKuusela/Server_devcommands, Unlicense). Its DLL sits at the archive root.
-ARG PLUGIN_URL=https://thunderstore.io/package/download/JereKuusela/Server_devcommands/1.115.0/
-ARG PLUGIN_SHA256=b2752c18342bc9cabf4734e3480cd2cc4aa9faa8955ba503d4f7cefcfa3e4b33
-ARG PLUGIN_DIR=JereKuusela-Server_devcommands
+# Values come from server-configs.env, which documents each one.
+ARG BEPINEX_PACK_URL
+ARG BEPINEX_PACK_SHA256
+ARG PLUGIN_URL
+ARG PLUGIN_SHA256
+ARG PLUGIN_DIR
+ARG EXPECTED_PLUGIN
 # BepInEx writes its config, cache and LogOutput.log under BepInEx/ at runtime, hence a+rwX there.
 RUN set -e; cd /tmp \
+    && test -n "$BEPINEX_PACK_SHA256" && test -n "$PLUGIN_SHA256" && test -n "$PLUGIN_DIR" && test -n "$EXPECTED_PLUGIN" \
     && curl -fsSL -o pack.zip "$BEPINEX_PACK_URL" \
     && echo "$BEPINEX_PACK_SHA256  pack.zip" | sha256sum -c - \
     && unzip -q pack.zip -d pack \
@@ -49,7 +50,5 @@ RUN set -e; cd /tmp \
     && unzip -q plugin.zip '*.dll' -d "/opt/valheim/BepInEx/plugins/$PLUGIN_DIR" \
     && rm -rf /tmp/pack /tmp/pack.zip /tmp/plugin.zip \
     && chmod -R a+rwX /opt/valheim/BepInEx
-# What the BepInEx chainloader prints for the plugin: "Loading [<Name> <Version>]", from the plugin's own
-# [BepInPlugin] attribute (version 1.115, not the package's 1.115.0). Update it with PLUGIN_URL.
 ENV VSG_IT_SERVER_CONFIG=bepinex \
-    VSG_IT_EXPECTED_PLUGIN="Server Devcommands 1.115"
+    VSG_IT_EXPECTED_PLUGIN="$EXPECTED_PLUGIN"

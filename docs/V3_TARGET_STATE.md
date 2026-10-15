@@ -867,11 +867,12 @@ MVVM enforces the UI/logic split; the safety net lives mostly in `Valheim.Core.T
    `tests/ValheimServerGUI.Integration.Tests`, Phase 2.5). Boots the **real Linux dedicated server**
    (Steam appid 896660) with `-public 1` and asserts lifecycle (Starting→Running via the real
    "connected" line), the graceful-stop save-flush A/B that `taskkill`/SIGINT is there to guarantee
-   (graceful SIGINT advances the world-save mtime; a hard kill does not), a Steam Cloud world
-   import round-trip, and a fixture-drift guard (the captured live log still matches the parser
-   patterns). The test project is intentionally **not** in `ValheimServerGUI.slnx` and every test is
-   env-gated (machine-specific Steam paths from a gitignored config), so `validate.sh` never runs it
-   and an accidental direct run skips. Tiers 1+4 cover each other's blind spots (fixture snapshot vs.
+   (graceful SIGINT advances the world-save mtime; a hard kill does not), a fixture-drift guard (the
+   captured live log still matches the parser patterns), and mod loading. It runs once per server
+   configuration (`vanilla`, and `bepinex`: BepInExPack_Valheim plus one popular plugin), each in its
+   own container built from `tests/integration-image/Dockerfile`, in parallel. The test project is
+   only a test project under `-p:Integration=true`, so `validate.sh` never runs it, and a
+   misconfigured run fails rather than skips. Tiers 1+4 cover each other's blind spots (fixture snapshot vs.
    current binary). No headless *client* exists anywhere, so join/leave-with-names stays fixture-based
    (tier 2).
 

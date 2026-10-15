@@ -135,6 +135,29 @@ namespace ValheimServerGUI.Integration.Tests
             Assert.Empty(_fixture.HistoryAfterStop!);
         }
 
+        // Mods load when VSG starts the server: with BepInEx installed, the chainloader loads the installed plugin and
+        // finishes startup; on a vanilla install no mod loader appears at all. On Linux this needs VSG to set up the
+        // loader's environment, so the BepInEx configuration fails if Start ever stops doing that.
+        [Fact]
+        public void ModLoader_MatchesServerConfiguration()
+        {
+            Assert.True(_fixture.ReachedRunning, "Precondition failed: server never reached Running.");
+            var log = _fixture.CapturedLog;
+            var config = IntegrationConfig.Current;
+
+            if (config.ServerConfig == ServerConfiguration.BepInEx)
+            {
+                Assert.True(log.Any(l => l.Contains($"Loading [{config.ExpectedPlugin}]")),
+                    $"BepInEx did not load the plugin '{config.ExpectedPlugin}'. Artifact: {_fixture.ArtifactPath}");
+                Assert.True(log.Any(l => l.Contains("Chainloader startup complete")),
+                    $"The BepInEx chainloader did not finish starting up. Artifact: {_fixture.ArtifactPath}");
+            }
+            else
+            {
+                Assert.DoesNotContain(log, l => l.Contains("BepInEx"));
+            }
+        }
+
         // Fixture-drift / capture: the captured real log is written as a run artifact, and we re-feed it
         // through a fresh REAL ServerLogParser to confirm the current binary still emits lines the parser's
         // patterns match (connected + world-saved). A Valheim log-format change surfaces here; refreshing the

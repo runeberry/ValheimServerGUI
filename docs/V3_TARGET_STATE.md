@@ -870,7 +870,10 @@ MVVM enforces the UI/logic split; the safety net lives mostly in `Valheim.Core.T
    (graceful SIGINT advances the world-save mtime; a hard kill does not), a fixture-drift guard (the
    captured live log still matches the parser patterns), and mod loading. It runs once per server
    configuration (`vanilla`, and `bepinex`: BepInExPack_Valheim plus one popular plugin), each in its
-   own container built from `tests/integration-image/Dockerfile`, in parallel. The test project is
+   own container built from `tests/integration-image/Dockerfile`, in parallel. On Windows,
+   `scripts/integration-windows.sh` runs the same complete suite per configuration in disposable Windows 11
+   VMs (`tests/integration-vm/`, docs/WINDOWS_INTEGRATION_PLAN.md), in the logged-on user's interactive session,
+   where the graceful `taskkill` stop works. The test project is
    only a test project under `-p:Integration=true`, so `validate.sh` never runs it, and a
    misconfigured run fails rather than skips. Tiers 1+4 cover each other's blind spots (fixture snapshot vs.
    current binary). No headless *client* exists anywhere, so join/leave-with-names stays fixture-based

@@ -1,6 +1,6 @@
 # Plan: Windows live integration tier (`scripts/integration-windows.sh`)
 
-Status: proposed (2026-10-15). Productionizes the spike in `./tmp/win-spike/` (gitignored).
+Status: implemented (2026-10-15): `scripts/integration-windows.sh` + `tests/integration-vm/`. Productionizes the spike in `./tmp/win-spike/` (gitignored).
 
 ## Goal
 
@@ -47,10 +47,11 @@ Linux in containers. No dependency on Nuffle's laptop, no real Valheim data or p
    spike's grep of the Dockerfile.
 4. **Separate script, not a flag on `integration.sh`.** The Windows tier needs a one-time ~6 GB ISO download and an
    hour-long image build, and the `libvirt` group; `integration.sh` stays the fast default. Both can run at once.
-5. **OpenSSH from the pinned Win32-OpenSSH MSI** (GitHub release, sha256-pinned), installed by the first-logon
-   script from the answer-file CD. Avoids depending on Windows Update for the Feature-on-Demand. Host key auth only
-   (dedicated key `~/.ssh/vsg_win_vm`, chmod 600). Key goes to `administrators_authorized_keys` (stock sshd_config
-   for an admin user); the spike's `authorized_keys` workaround was specific to the vagrant box.
+5. **OpenSSH from Windows' own optional feature** (`Add-WindowsCapability OpenSSH.Server~~~~0.0.1.0`), installed
+   by the first-logon script from the answer-file CD. Microsoft's inbox build, no pin to maintain (every
+   Win32-OpenSSH GitHub release is tagged "Preview"). Host key auth only (dedicated key `~/.ssh/vsg_win_vm`, chmod
+   600). Key goes to `administrators_authorized_keys` (stock sshd_config for an admin user); the spike's
+   `authorized_keys` workaround was specific to the vagrant box.
 6. **Local account `vsg` (admin), random password generated at image build**, stored only in the image's
    Winlogon `DefaultPassword` (required for auto-logon) and a gitignored file next to the image metadata. The VMs
    sit on libvirt's NAT network, not reachable from the LAN.
@@ -66,7 +67,7 @@ Linux in containers. No dependency on Nuffle's laptop, no real Valheim data or p
 | --- | --- |
 | `scripts/integration-windows.sh` | Host entry point (flags below). Bash, same structure/output style as `integration.sh`. |
 | `tests/integration-vm/autounattend.xml` | Unattended Win11 install: TPM/Secure Boot check bypass (LabConfig), disk layout, locale, local `vsg` admin, skip OOBE, first-logon command. |
-| `tests/integration-vm/firstlogon.ps1` | From the answer-file CD: install OpenSSH MSI, firewall rule 22, write host key. Nothing else. |
+| `tests/integration-vm/firstlogon.ps1` | From the answer-file CD: enable the inbox OpenSSH server, firewall rule 22, authorize the host key. Nothing else. |
 | `tests/integration-vm/bake-os.ps1` | Over SSH: permanent auto-logon, no lock screen/power timeouts, Windows Update off, Defender exclusions, .NET 10 SDK to `C:\dotnet`, `vsg-runner` task (`/it /rl highest`). |
 | `tests/integration-vm/bake-server.ps1` | Over SSH: steamcmd, vanilla install + `buildid.txt`, bepinex copy + sha-verified pack/plugin, firewall per exe. (Spike `bake.ps1` second half.) |
 | `tests/integration-vm/run.ps1` | In the VM (session 1): transcript, refuse session 0 unless `-AllowServicesSession`, set `VSG_IT_*`, `dotnet test ... -p:Integration=true --logger trx --blame-hang`, write `exit_code.txt`, kill leftover servers. (Spike `run.ps1`.) |
@@ -104,7 +105,7 @@ scripts/integration-windows.sh [--rebuild-image] [--update-server] [--keep] [--c
    `exit_code.txt` every 15 s with a 1500 s backstop, copy `C:\vsg\out` back, destroy VM + overlay (trap on EXIT).
 5. Summary + exit code.
 6. Build `os` layer: create empty 128G qcow2; build answer CD (`xorriso`, already installed) with
-   `autounattend.xml`, `firstlogon.ps1`, OpenSSH MSI, public key; `virt-install` with ISO + answer CD; wait for
+   `autounattend.xml`, `firstlogon.ps1`, public key; `virt-install` with ISO + answer CD; wait for
    SSH (key login); run `bake-os.ps1`; reboot once and assert auto-logon (`query user` → session 1 Active);
    `Stop-Computer`; wait for `shut off` **before** `undefine` (undefining a running domain leaves it running as a
    transient domain, still writing the image); write the stamp.
@@ -142,10 +143,10 @@ Cleanup only touches domains/volumes this script named (`vsg-it-*`, `vsg-win-bui
 
 ## Open risks
 
-- **ISO download URL:** Microsoft's eval center hands out `go.microsoft.com/fwlink` links that may change or need
-  the web form. Fallback: `--iso <path>` to a manually downloaded ISO; the sha256 pin lives in
-  `tests/integration-vm/iso.env` and the script says so on mismatch (Microsoft refreshes the eval ISO a few times a
-  year).
+- **ISO download URL:** pinned to a direct `software-static.download.prss.microsoft.com` URL + sha256 in
+  `tests/integration-vm/image.env` (the eval center page itself is behind a bot wall). Microsoft refreshes the eval
+  ISO a few times a year and old URLs may disappear. Fallback: download it by hand to
+  `~/.cache/valheim-server-gui/windows/win11-eval.iso`; the script uses that file if it matches the pin.
 - **Unattended Win11 on q35/OVMF without TPM:** relies on the LabConfig bypass keys in the windowsPE pass. If setup
   still refuses, switch the build VM to `--tpm emulator` + secboot OVMF (swtpm is installed); run VMs stay as-is.
 - **Eval expiry:** an image older than 90 days shuts down hourly. The 80-day automatic rebuild prevents it; the

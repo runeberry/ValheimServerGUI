@@ -149,6 +149,46 @@ namespace ValheimServerGUI.Core.Tests.Game
             }
         }
 
+        // BepInEx on Linux: its Doorstop loader is a preload library that only loads when the launch environment
+        // names it, so Start must set it up whenever the pack is in the server folder. On Windows the pack's
+        // winhttp.dll proxy loads by itself and Start must leave the environment alone.
+        [Fact]
+        public void Start_WithBepInExInstalled_EnablesItsLoaderOnLinux()
+        {
+            var doorstop = Path.Join(_dir, "doorstop_libs", "libdoorstop_x64.so");
+            var preloader = Path.Join(_dir, "BepInEx", "core", "BepInEx.Preloader.dll");
+            foreach (var file in new[] { doorstop, preloader })
+            {
+                Directory.CreateDirectory(Path.GetDirectoryName(file)!);
+                File.WriteAllText(file, "");
+            }
+
+            _server.Start(Options());
+
+            var env = _processProvider.LastProcess!.StartInfo.EnvironmentVariables;
+            if (OperatingSystem.IsWindows())
+            {
+                Assert.False(env.ContainsKey("DOORSTOP_ENABLED"));
+                Assert.False(env.ContainsKey("DOORSTOP_TARGET_ASSEMBLY"));
+            }
+            else
+            {
+                Assert.Equal("1", env["DOORSTOP_ENABLED"]);
+                Assert.Equal(preloader, env["DOORSTOP_TARGET_ASSEMBLY"]);
+                Assert.Equal(doorstop, env["LD_PRELOAD"]!.Split(':')[0]);
+            }
+        }
+
+        [Fact]
+        public void Start_WithoutBepInEx_LeavesItsLoaderOff()
+        {
+            _server.Start(Options());
+
+            var env = _processProvider.LastProcess!.StartInfo.EnvironmentVariables;
+            Assert.False(env.ContainsKey("DOORSTOP_ENABLED"));
+            Assert.False(env.ContainsKey("DOORSTOP_TARGET_ASSEMBLY"));
+        }
+
         [Fact]
         public void ConnectedLogLine_PromotesToRunning()
         {

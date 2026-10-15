@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -188,6 +189,8 @@ namespace ValheimServerGUI.Game
                 var prior = envVars.ContainsKey("LD_LIBRARY_PATH") ? envVars["LD_LIBRARY_PATH"] : null;
                 envVars["LD_LIBRARY_PATH"] =
                     string.Join(':', new[] { exeDir, Path.Combine(exeDir, "linux64"), prior }.Where(s => !string.IsNullOrEmpty(s)));
+
+                EnableBepInExLoader(envVars, exeDir);
             }
 
             process.OutputDataReceived += Process_OnDataReceived;
@@ -379,6 +382,28 @@ namespace ValheimServerGUI.Game
                 ApplicationLogger.Warning(e, "Could not read player names from the save of world {world}: {message}",
                     options.WorldName, e.Message);
             }
+        }
+
+        /// <summary>
+        /// BepInEx loads through Unity Doorstop. On Windows, Doorstop is a winhttp.dll proxy in the server folder that
+        /// the game loads by itself. On Linux it is a preload library that only loads when the launch environment
+        /// names it (the BepInEx pack's start_server_bepinex.sh sets these same variables), so without them a modded
+        /// server starts unmodded with no sign of why. The Linux Doorstop build ignores DOORSTOP_DISABLE (only
+        /// DOORSTOP_ENABLED=0 turns it off), so on Linux a BepInEx install always loads.
+        /// </summary>
+        private void EnableBepInExLoader(StringDictionary envVars, string exeDir)
+        {
+            var doorstop = Path.Combine(exeDir, "doorstop_libs", "libdoorstop_x64.so");
+            var preloader = Path.Combine(exeDir, "BepInEx", "core", "BepInEx.Preloader.dll");
+            if (!File.Exists(doorstop) || !File.Exists(preloader)) return;
+
+            ApplicationLogger.Information("BepInEx found in the server folder, enabling its loader: {doorstop}", doorstop);
+
+            envVars["DOORSTOP_ENABLED"] = "1";
+            envVars["DOORSTOP_TARGET_ASSEMBLY"] = preloader;
+            // The indexer throws on a missing key in this runtime, so probe before reading.
+            var prior = envVars.ContainsKey("LD_PRELOAD") ? envVars["LD_PRELOAD"] : null;
+            envVars["LD_PRELOAD"] = string.Join(':', new[] { doorstop, prior }.Where(s => !string.IsNullOrEmpty(s)));
         }
 
         private static string GenerateArgs(IValheimServerOptions options)

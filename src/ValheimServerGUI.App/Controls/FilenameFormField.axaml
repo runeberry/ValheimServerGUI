@@ -11,7 +11,8 @@
             <Grid ColumnDefinitions="*,Auto">
                 <TextBox Grid.Column="0" Classes="chromeless" VerticalAlignment="Stretch"
                          IsEnabled="{Binding #Root.IsInputEnabled}"
-                         VerticalContentAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}" />
+                         VerticalContentAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}"
+                         PlaceholderText="{Binding #Root.Watermark}" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
                     <Button Classes="affix" Content="{x:Static loc:Strings.Controls_Browse}"
                             IsVisible="{Binding #Root.ShowBrowse}"

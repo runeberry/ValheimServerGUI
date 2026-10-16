@@ -1,14 +1,28 @@
 using System;
 using System.Collections;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Data;
 using Avalonia.Markup.Xaml;
 
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
+/// An item that draws a divider line in a <see cref="DropdownFormField"/> list. It cannot be selected.
+/// </summary>
+public sealed class DropdownSeparator
+{
+    public static readonly DropdownSeparator Instance = new();
+
+    private DropdownSeparator()
+    {
+    }
+}
+
+/// <summary>
 /// The app's dropdown field: a caption + help glyph over a combo box. Replaces raw
-/// <see cref="Avalonia.Controls.ComboBox"/> in the data-bound views.
+/// <see cref="Avalonia.Controls.ComboBox"/> in the data-bound views. Items may include
+/// <see cref="DropdownSeparator.Instance"/> to group them.
 /// </summary>
 public partial class DropdownFormField : FormFieldBase, IFormField<object?>
 {
@@ -22,7 +36,26 @@ public partial class DropdownFormField : FormFieldBase, IFormField<object?>
     public static readonly StyledProperty<string?> PlaceholderTextProperty =
         AvaloniaProperty.Register<DropdownFormField, string?>(nameof(PlaceholderText));
 
-    public DropdownFormField() => AvaloniaXamlLoader.Load(this);
+    public DropdownFormField()
+    {
+        AvaloniaXamlLoader.Load(this);
+        this.FindControl<ComboBox>("Combo")!.ContainerPrepared += OnContainerPrepared;
+    }
+
+    // Containers can be recycled between items, so every prepared container is set for the item it now holds.
+    private static void OnContainerPrepared(object? sender, ContainerPreparedEventArgs e)
+    {
+        if (e.Container is not ComboBoxItem item) return;
+
+        var isSeparator = item.DataContext is DropdownSeparator;
+        item.IsEnabled = !isSeparator;
+        item.Focusable = !isSeparator;
+        if (isSeparator)
+        {
+            item.ContentTemplate = null;
+            item.Content = new Separator();
+        }
+    }
 
     public string? PlaceholderText
     {
@@ -49,6 +82,13 @@ public partial class DropdownFormField : FormFieldBase, IFormField<object?>
     protected override void OnPropertyChanged(AvaloniaPropertyChangedEventArgs change)
     {
         base.OnPropertyChanged(change);
-        if (change.Property == ValueProperty) ValueChanged?.Invoke(this, Value);
+        if (change.Property != ValueProperty) return;
+
+        if (Value is DropdownSeparator)
+        {
+            SetCurrentValue(ValueProperty, change.OldValue);
+            return;
+        }
+        ValueChanged?.Invoke(this, Value);
     }
 }

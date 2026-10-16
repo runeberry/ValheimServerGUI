@@ -38,6 +38,12 @@ namespace ValheimServerGUI.Game
 
         public string? SaveDataFolderPath { get; set; }
 
+        public string? BepInExPreloaderPath { get; set; }
+
+        public string? DoorstopLibraryPath { get; set; }
+
+        public string? EnvironmentVariables { get; set; }
+
         public bool WriteServerLogsToFile { get; set; } = true;
 
         /// <summary>
@@ -90,6 +96,9 @@ namespace ValheimServerGUI.Game
             prefs.AdditionalArgs = file.AdditionalArgs ?? prefs.AdditionalArgs;
             prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
             prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
+            prefs.BepInExPreloaderPath = file.BepInExPreloaderPath ?? prefs.BepInExPreloaderPath;
+            prefs.DoorstopLibraryPath = file.DoorstopLibraryPath ?? prefs.DoorstopLibraryPath;
+            prefs.EnvironmentVariables = file.EnvironmentVariables ?? prefs.EnvironmentVariables;
             prefs.WriteServerLogsToFile = file.WriteServerLogsToFile ?? prefs.WriteServerLogsToFile;
             prefs.UsePermittedList = file.UsePermittedList ?? prefs.UsePermittedList;
 
@@ -127,6 +136,9 @@ namespace ValheimServerGUI.Game
                 AdditionalArgs = AdditionalArgs,
                 ServerExePath = ServerExePath,
                 SaveDataFolderPath = SaveDataFolderPath,
+                BepInExPreloaderPath = BepInExPreloaderPath,
+                DoorstopLibraryPath = DoorstopLibraryPath,
+                EnvironmentVariables = EnvironmentVariables,
                 WriteServerLogsToFile = WriteServerLogsToFile,
                 UsePermittedList = UsePermittedList,
             };

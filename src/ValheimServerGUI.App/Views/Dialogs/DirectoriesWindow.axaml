@@ -10,19 +10,34 @@
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="8">
-        <TextBlock TextWrapping="Wrap"
-                   Text="{x:Static loc:Strings.Directories_Intro}" />
+        <c:DropdownFormField LabelText="{x:Static loc:Strings.Directories_Target_Label}"
+                             ItemsSource="{Binding Targets}" Value="{Binding SelectedTarget}" />
         <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_ServerExe_Label}" SelectMode="File"
-                             Value="{Binding ServerExePath}"
+                             Value="{Binding ServerExePath}" Watermark="{Binding Placeholder}"
+                             IsInputEnabled="{Binding IsInputEnabled}"
                              ShowOpenFolder="True" OpenFolderCommand="{Binding OpenServerExeFolderCommand}"
                              HelpText="{x:Static loc:Strings.Directories_ServerExe_Help}" />
         <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_SaveData_Label}" SelectMode="Directory"
-                             Value="{Binding SaveDataFolderPath}"
+                             Value="{Binding SaveDataFolderPath}" Watermark="{Binding Placeholder}"
+                             IsInputEnabled="{Binding IsInputEnabled}"
                              ShowOpenFolder="True" OpenFolderCommand="{Binding OpenSaveFolderCommand}"
                              HelpText="{x:Static loc:Strings.Directories_SaveData_Help}" />
+        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_BepInExPreloader_Label}" SelectMode="File"
+                             IsVisible="{Binding ShowsModPaths}"
+                             Value="{Binding BepInExPreloaderPath}" Watermark="{Binding Placeholder}"
+                             IsInputEnabled="{Binding IsInputEnabled}"
+                             ShowOpenFolder="True" OpenFolderCommand="{Binding OpenBepInExPreloaderFolderCommand}"
+                             HelpText="{x:Static loc:Strings.Directories_BepInExPreloader_Help}" />
+        <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_DoorstopLibrary_Label}" SelectMode="File"
+                             IsVisible="{Binding ShowsModPaths}"
+                             Value="{Binding DoorstopLibraryPath}" Watermark="{Binding Placeholder}"
+                             IsInputEnabled="{Binding IsInputEnabled}"
+                             ShowOpenFolder="True" OpenFolderCommand="{Binding OpenDoorstopLibraryFolderCommand}"
+                             HelpText="{x:Static loc:Strings.Directories_DoorstopLibrary_Help}" />
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
-            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" />
+            <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults"
+                    IsEnabled="{Binding IsInputEnabled}" />
             <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
             <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>

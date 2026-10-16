@@ -24,6 +24,7 @@ public enum MenuAction
     RemoveProfile,
     Preferences,
     SetDirectories,
+    SetProfileDirectories,
     BugReport,
     About,
     WorldPreferences,
@@ -302,6 +303,9 @@ public partial class MainWindowViewModel : ViewModelBase
     private void SetDirectories() => MenuActionRequested?.Invoke(MenuAction.SetDirectories);
 
     [RelayCommand]
+    private void SetProfileDirectories() => MenuActionRequested?.Invoke(MenuAction.SetProfileDirectories);
+
+    [RelayCommand]
     private void WorldPreferences() => MenuActionRequested?.Invoke(MenuAction.WorldPreferences);
 
     [RelayCommand]
@@ -320,19 +324,6 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    [RelayCommand]
-    private void OpenServerExeFolder()
-    {
-        try
-        {
-            var exe = BuildOptions().GetValidatedServerExe().FullName;
-            _shell.OpenDirectory(exe);
-        }
-        catch (Exception ex)
-        {
-            ErrorReported?.Invoke(string.Format(Strings.Validation_OpenServerFolderFailed, ex.Message));
-        }
-    }
 
     [RelayCommand]
     private void OpenSettingsDirectory()
@@ -609,12 +600,12 @@ public partial class MainWindowViewModel : ViewModelBase
             BackupShort = serverPrefs.BackupIntervalShort,
             BackupLong = serverPrefs.BackupIntervalLong,
             AdditionalArgs = serverPrefs.AdditionalArgs,
-            ServerExePath = !string.IsNullOrWhiteSpace(serverPrefs.ServerExePath)
-                ? serverPrefs.ServerExePath
-                : userPrefs.ServerExePath,
-            SaveDataFolderPath = !string.IsNullOrWhiteSpace(serverPrefs.SaveDataFolderPath)
-                ? serverPrefs.SaveDataFolderPath
-                : userPrefs.SaveDataFolderPath,
+            EnvironmentVariables = serverPrefs.EnvironmentVariables,
+            // Directories: the profile's override (set in the Set Directories dialog), else the app-wide path.
+            ServerExePath = OverrideOr(serverPrefs.ServerExePath, userPrefs.ServerExePath),
+            SaveDataFolderPath = OverrideOr(serverPrefs.SaveDataFolderPath, userPrefs.SaveDataFolderPath),
+            BepInExPreloaderPath = OverrideOr(serverPrefs.BepInExPreloaderPath, userPrefs.BepInExPreloaderPath),
+            DoorstopLibraryPath = OverrideOr(serverPrefs.DoorstopLibraryPath, userPrefs.DoorstopLibraryPath),
             LogToFile = serverPrefs.WriteServerLogsToFile,
             // Lines land in the profile's server-owned buffer regardless of which window started the server.
             LogMessageHandler = _serverManager.GetLogAppender(
@@ -643,6 +634,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
         return options;
     }
+
+    private static string OverrideOr(string? profileValue, string appValue)
+        => !string.IsNullOrWhiteSpace(profileValue) ? profileValue : appValue;
 
     private IReadOnlyDictionary<string, PlayerDefaultEntry> LoadPlayerDefaults()
         => _userPrefs.LoadPreferences().PlayerDefaults;

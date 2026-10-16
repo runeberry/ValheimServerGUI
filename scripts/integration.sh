@@ -5,8 +5,9 @@
 # in every server configuration, each in its own container, in parallel.
 #
 # Server configurations are the final stages of tests/integration-image/Dockerfile:
-#   vanilla  - the current public dedicated server build
-#   bepinex  - the same server with BepInExPack_Valheim and one popular plugin (pinned in server-configs.env)
+#   vanilla           - the current public dedicated server build
+#   bepinex           - the same server with BepInExPack_Valheim and one popular plugin (pinned in server-configs.env)
+#   bepinex-external  - the same pack + plugin kept outside the server folder, loaded via the configured paths
 #
 # Each container holds the .NET SDK and the server install, and runs `dotnet test -p:Integration=true` on the
 # integration project against the read-only repo, so ValheimServer launches the real binary as a local child
@@ -33,7 +34,7 @@
 
 set -uo pipefail
 
-ALL_CONFIGS=(vanilla bepinex)
+ALL_CONFIGS=(vanilla bepinex bepinex-external)
 
 KEEP=0
 SERVER_CACHE_BUST=0
@@ -42,7 +43,7 @@ for arg in "$@"; do
   case "$arg" in
     --keep) KEEP=1 ;;
     --update-server) SERVER_CACHE_BUST="$(date +%s)" ;;
-    vanilla|bepinex) CONFIGS+=("$arg") ;;
+    vanilla|bepinex|bepinex-external) CONFIGS+=("$arg") ;;
     *) echo "usage: $0 [--keep] [--update-server] [${ALL_CONFIGS[*]}]..." >&2; exit 2 ;;
   esac
 done
@@ -186,7 +187,7 @@ done
 section "Summary"
 for config in "${CONFIGS[@]}"; do
   if [[ " ${FAILED[*]} " == *" $config "* ]]; then status="fail"; else status="pass"; fi
-  printf '%-8s : %s  (artifacts: %s)\n' "$config" "$status" "$ARTIFACT_ROOT/$config"
+  printf '%-16s : %s  (artifacts: %s)\n' "$config" "$status" "$ARTIFACT_ROOT/$config"
 done
 printf 'run log  : %s\n' "$RUNLOG"
 printf 'savedirs : %s\n' "$([[ $KEEP -eq 1 ]] && echo "kept in $RUNLOG" || echo "removed")"

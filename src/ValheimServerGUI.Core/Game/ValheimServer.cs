@@ -57,6 +57,13 @@ namespace ValheimServerGUI.Game
         /// </summary>
         public event EventHandler<ReconcileResult>? PlayerRolesAdopted;
 
+        /// <summary>The variable the server reads its Steam app id from; always set by <see cref="Start"/>.</summary>
+        public const string SteamAppIdVariable = "SteamAppId";
+
+        /// <summary>The variables <see cref="Start"/> sets when it enables BepInEx's loader (Linux).</summary>
+        public static readonly IReadOnlySet<string> BepInExLoaderVariables =
+            new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "DOORSTOP_ENABLED", "DOORSTOP_TARGET_ASSEMBLY" };
+
         public bool CanStart => IsAnyStatus(ServerStatus.Stopped) && ProcessKey == null;
         public bool CanStop => IsAnyStatus(ServerStatus.Starting, ServerStatus.Running) && ProcessKey != null;
         public bool CanRestart => IsAnyStatus(ServerStatus.Running) && ProcessKey != null;
@@ -159,9 +166,14 @@ namespace ValheimServerGUI.Game
 
             var exePath = options.GetValidatedServerExe().FullName;
             var processArgs = GenerateArgs(options);
+            // Parsed before anything launches, so malformed input stops the start here.
+            var profileEnvironment = EnvironmentVariableParser.Parse(options.EnvironmentVariables);
 
+            // The profile's variables are logged as typed, ahead of the command, the way a shell would run it.
+            var envPrefix = string.IsNullOrWhiteSpace(options.EnvironmentVariables) ? string.Empty : options.EnvironmentVariables.Trim() + " ";
             ApplicationLogger.Information(
-                @"Server run command: ""{exePath}"" {processArgs}",
+                @"Server run command: {envPrefix:l}""{exePath}"" {processArgs}",
+                envPrefix,
                 exePath,
                 CleanArgsForLogging(processArgs));
 
@@ -172,9 +184,13 @@ namespace ValheimServerGUI.Game
             ProcessKey = Guid.NewGuid().ToString();
             var process = ProcessProvider.AddBackgroundProcess(ProcessKey, exePath, processArgs);
 
-            // Indexer, not Add: the inherited environment may already carry SteamAppId (e.g. launched
-            // from a Steam context), and StringDictionary.Add throws on a duplicate key.
-            process.StartInfo.EnvironmentVariables["SteamAppId"] = CoreConstants.ValheimSteamAppId;
+            // Layering: inherited environment, then the profile's variables (replacing inherited ones of the same
+            // name), then what the launch itself requires. Validation rejects profile variables that the last
+            // layer would overwrite; the path lists below keep the profile's value and prepend to it.
+            // Indexer, not Add: StringDictionary.Add throws on a key the inherited environment already has.
+            var envVars = process.StartInfo.EnvironmentVariables;
+            foreach (var (name, value) in profileEnvironment) envVars[name] = value;
+            envVars[SteamAppIdVariable] = CoreConstants.ValheimSteamAppId;
 
             // The server binary loads steamclient.so from its own directory (and linux64/ beneath it)
             // and reads steam_appid.txt from the working directory, so both must point at the exe's
@@ -184,19 +200,24 @@ namespace ValheimServerGUI.Game
             process.StartInfo.WorkingDirectory = exeDir;
             if (!OperatingSystem.IsWindows() && exeDir is not null)
             {
-                var envVars = process.StartInfo.EnvironmentVariables;
                 // The indexer throws on a missing key in this runtime, so probe before reading.
                 var prior = envVars.ContainsKey("LD_LIBRARY_PATH") ? envVars["LD_LIBRARY_PATH"] : null;
                 envVars["LD_LIBRARY_PATH"] =
                     string.Join(':', new[] { exeDir, Path.Combine(exeDir, "linux64"), prior }.Where(s => !string.IsNullOrEmpty(s)));
 
-                EnableBepInExLoader(envVars, exeDir);
+                EnableBepInExLoader(envVars, options);
             }
+
+            // Windows: BepInEx's console output never reaches stdout there, so its disk log is fed in instead.
+            var bepInExLog = OperatingSystem.IsWindows() && exeDir is not null
+                ? new BepInExLogTail(Path.Join(exeDir, "BepInEx", "LogOutput.log"), DateTime.UtcNow, line => ServerLogger?.Information(line))
+                : null;
 
             process.OutputDataReceived += Process_OnDataReceived;
             process.ErrorDataReceived += Process_OnErrorReceived;
             process.Exited += (obj, e) =>
             {
+                bepInExLog?.Complete();
                 ProcessKey = null;
                 Status = ServerStatus.Stopped;
             };
@@ -210,6 +231,7 @@ namespace ValheimServerGUI.Game
             }
 
             ProcessProvider.StartIO(process);
+            bepInExLog?.Start(TimeSpan.FromMilliseconds(500));
 
             Options = options;
             IsRestarting = false;
@@ -388,22 +410,25 @@ namespace ValheimServerGUI.Game
         /// BepInEx loads through Unity Doorstop. On Windows, Doorstop is a winhttp.dll proxy in the server folder that
         /// the game loads by itself. On Linux it is a preload library that only loads when the launch environment
         /// names it (the BepInEx pack's start_server_bepinex.sh sets these same variables), so without them a modded
-        /// server starts unmodded with no sign of why. The Linux Doorstop build ignores DOORSTOP_DISABLE (only
-        /// DOORSTOP_ENABLED=0 turns it off), so on Linux a BepInEx install always loads.
+        /// server starts unmodded with no sign of why. The two files come from the configured paths (Set
+        /// Directories); when either is missing the server starts without mods and the log says which.
         /// </summary>
-        private void EnableBepInExLoader(StringDictionary envVars, string exeDir)
+        private void EnableBepInExLoader(StringDictionary envVars, IValheimServerOptions options)
         {
-            var doorstop = Path.Combine(exeDir, "doorstop_libs", "libdoorstop_x64.so");
-            var preloader = Path.Combine(exeDir, "BepInEx", "core", "BepInEx.Preloader.dll");
-            if (!File.Exists(doorstop) || !File.Exists(preloader)) return;
+            if (!options.LoadsBepInEx())
+            {
+                var missing = File.Exists(options.BepInExPreloaderPath) ? options.DoorstopLibraryPath : options.BepInExPreloaderPath;
+                ApplicationLogger.Information("BepInEx not loaded, starting without mods: {path} not found", missing);
+                return;
+            }
 
-            ApplicationLogger.Information("BepInEx found in the server folder, enabling its loader: {doorstop}", doorstop);
+            ApplicationLogger.Information("Loading BepInEx: {preloader} via {doorstop}", options.BepInExPreloaderPath, options.DoorstopLibraryPath);
 
             envVars["DOORSTOP_ENABLED"] = "1";
-            envVars["DOORSTOP_TARGET_ASSEMBLY"] = preloader;
+            envVars["DOORSTOP_TARGET_ASSEMBLY"] = options.BepInExPreloaderPath;
             // The indexer throws on a missing key in this runtime, so probe before reading.
             var prior = envVars.ContainsKey("LD_PRELOAD") ? envVars["LD_PRELOAD"] : null;
-            envVars["LD_PRELOAD"] = string.Join(':', new[] { doorstop, prior }.Where(s => !string.IsNullOrEmpty(s)));
+            envVars["LD_PRELOAD"] = string.Join(':', new[] { options.DoorstopLibraryPath, prior }.Where(s => !string.IsNullOrEmpty(s)));
         }
 
         private static string GenerateArgs(IValheimServerOptions options)

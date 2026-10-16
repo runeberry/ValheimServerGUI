@@ -118,6 +118,8 @@ namespace ValheimServerGUI.Game
         {
             if (string.IsNullOrWhiteSpace(prefs.ServerExePath)) prefs.ServerExePath = PathResolver.DefaultServerPath;
             if (string.IsNullOrWhiteSpace(prefs.SaveDataFolderPath)) prefs.SaveDataFolderPath = PathResolver.DefaultSaveDataFolder;
+            if (string.IsNullOrWhiteSpace(prefs.BepInExPreloaderPath)) prefs.BepInExPreloaderPath = PathResolver.DefaultBepInExPreloaderPath;
+            if (string.IsNullOrWhiteSpace(prefs.DoorstopLibraryPath)) prefs.DoorstopLibraryPath = PathResolver.DefaultDoorstopLibraryPath;
         }
 
         private static readonly Dictionary<string, Action<UserPreferences, string>> MigrationActions = new()

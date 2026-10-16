@@ -42,7 +42,8 @@ public class DialogRenderTests
     [AvaloniaFact]
     public void DirectoriesWindow_realizes()
         => Realize(new DirectoriesWindow(new DirectoriesViewModel(
-            new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher())));
+            new FakeUserPreferencesProvider(), new FakeServerPreferencesProvider(new[] { new ServerPreferences { ProfileName = "P" } }),
+            Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher(), "P")));
 
     [AvaloniaFact]
     public void WorldPreferencesWindow_realizes()

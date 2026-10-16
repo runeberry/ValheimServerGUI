@@ -1,6 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
+using ValheimServerGUI.App.Controls;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
 using ValheimServerGUI.App.ViewModels.Dialogs;
@@ -57,26 +58,165 @@ public class DialogViewModelTests
     }
 
     // ----- Directories -----
-    [Fact]
-    public void Directories_missing_path_is_detected()
+    private static readonly IValheimPathResolver Paths = Core.GetRequiredService<IValheimPathResolver>();
+
+    private static UserPreferences AppPaths() => new()
     {
-        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher())
-        {
-            ServerExePath = "/definitely/not/here",
-        };
-        Assert.True(vm.HasMissingPath);
+        ServerExePath = "/srv/valheim/valheim_server.x86_64",
+        SaveDataFolderPath = "/srv/saves",
+        BepInExPreloaderPath = "/srv/valheim/BepInEx/core/BepInEx.Preloader.dll",
+        DoorstopLibraryPath = "/srv/valheim/doorstop_libs/libdoorstop_x64.so",
+    };
+
+    private static DirectoriesViewModel Directories(FakeUserPreferencesProvider user, FakeServerPreferencesProvider servers,
+        string? profileName = null, System.Func<string, bool>? isRunning = null)
+        => new(user, servers, Paths, new RecordingShellLauncher(), profileName, isRunning);
+
+    private static FakeServerPreferencesProvider Profiles(params ServerPreferences[] profiles) => new(profiles);
+
+    [Fact]
+    public void Directories_lists_all_profiles_a_separator_then_each_profile_by_name()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()),
+            Profiles(new ServerPreferences { ProfileName = "zeta" }, new ServerPreferences { ProfileName = "Alpha" }));
+
+        Assert.Equal(new object[] { DirectoryTarget.AllProfiles, DropdownSeparator.Instance, new DirectoryTarget("Alpha"), new DirectoryTarget("zeta") },
+            vm.Targets);
+        Assert.Equal(Strings.Directories_Target_AllProfiles, DirectoryTarget.AllProfiles.ToString());
+    }
+
+    [Fact]
+    public void Directories_opens_on_all_profiles_showing_the_app_wide_paths()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()), Profiles(new ServerPreferences { ProfileName = "P" }));
+
+        Assert.Equal(DirectoryTarget.AllProfiles, vm.SelectedTarget);
+        Assert.Equal(AppPaths().ServerExePath, vm.ServerExePath);
+        Assert.Equal(AppPaths().DoorstopLibraryPath, vm.DoorstopLibraryPath);
+        Assert.Null(vm.Placeholder);
+        Assert.False(vm.IsDirty);
+    }
+
+    [Fact]
+    public void Directories_opens_on_a_profile_showing_its_overrides_with_empty_ones_using_the_default()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()),
+            Profiles(new ServerPreferences { ProfileName = "P", SaveDataFolderPath = "/srv/other-saves" }), profileName: "P");
+
+        Assert.Equal(new DirectoryTarget("P"), vm.SelectedTarget);
+        Assert.Equal(string.Empty, vm.ServerExePath);
+        Assert.Equal("/srv/other-saves", vm.SaveDataFolderPath);
+        Assert.Equal(Strings.Directories_UseDefault, vm.Placeholder);
+        Assert.False(vm.IsDirty);
+    }
+
+    [Fact]
+    public void Directories_keeps_edits_across_switching_and_ok_saves_every_changed_target_only()
+    {
+        var user = new FakeUserPreferencesProvider(AppPaths());
+        var servers = Profiles(new ServerPreferences { ProfileName = "A" }, new ServerPreferences { ProfileName = "B" });
+        var vm = Directories(user, servers);
+
+        vm.ServerExePath = "/srv/new/valheim_server.x86_64";
+        vm.SelectedTarget = new DirectoryTarget("A");
+        vm.BepInExPreloaderPath = "/mods/BepInEx/core/BepInEx.Preloader.dll";
+        vm.SelectedTarget = new DirectoryTarget("B"); // visited, not changed
+        vm.SelectedTarget = DirectoryTarget.AllProfiles;
+        Assert.Equal("/srv/new/valheim_server.x86_64", vm.ServerExePath); // edit kept
+        Assert.True(vm.IsDirty);
+
+        vm.Save();
+
+        Assert.Equal("/srv/new/valheim_server.x86_64", user.LoadPreferences().ServerExePath);
+        Assert.Equal(AppPaths().SaveDataFolderPath, user.LoadPreferences().SaveDataFolderPath);
+        var a = servers.LoadPreferences("A")!;
+        Assert.Equal("/mods/BepInEx/core/BepInEx.Preloader.dll", a.BepInExPreloaderPath);
+        Assert.Null(a.ServerExePath); // blank override stored as "none"
+        Assert.Equal(System.DateTime.UnixEpoch, servers.LoadPreferences("B")!.LastSaved); // unchanged: not saved
+    }
+
+    [Fact]
+    public void Directories_switching_targets_alone_is_not_an_edit()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()), Profiles(new ServerPreferences { ProfileName = "A" }));
+
+        vm.SelectedTarget = new DirectoryTarget("A");
+        vm.SelectedTarget = DirectoryTarget.AllProfiles;
+
+        Assert.False(vm.IsDirty);
+    }
+
+    [Fact]
+    public void Directories_restore_defaults_resets_app_paths_to_the_os_defaults_or_clears_a_profiles_overrides()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()),
+            Profiles(new ServerPreferences { ProfileName = "A", ServerExePath = "/x", DoorstopLibraryPath = "/y" }));
+
+        vm.ApplyDefaults();
+        Assert.Equal(Paths.DefaultServerPath, vm.ServerExePath);
+        Assert.Equal(Paths.DefaultSaveDataFolder, vm.SaveDataFolderPath);
+        Assert.Equal(Paths.DefaultBepInExPreloaderPath, vm.BepInExPreloaderPath);
+        Assert.Equal(Paths.DefaultDoorstopLibraryPath, vm.DoorstopLibraryPath);
+
+        vm.SelectedTarget = new DirectoryTarget("A");
+        vm.ApplyDefaults();
+        Assert.All(new[] { vm.ServerExePath, vm.SaveDataFolderPath, vm.BepInExPreloaderPath, vm.DoorstopLibraryPath }, Assert.Empty);
+    }
+
+    [Fact]
+    public void Directories_a_running_profile_is_read_only()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()),
+            Profiles(new ServerPreferences { ProfileName = "Up" }, new ServerPreferences { ProfileName = "Down" }),
+            isRunning: name => name == "Up");
+
+        Assert.True(vm.IsInputEnabled); // all profiles
+        vm.SelectedTarget = new DirectoryTarget("Up");
+        Assert.False(vm.IsInputEnabled);
+        vm.SelectedTarget = new DirectoryTarget("Down");
+        Assert.True(vm.IsInputEnabled);
+    }
+
+    [Fact]
+    public void Directories_a_changed_missing_server_binary_is_detected()
+    {
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()), Profiles());
+
+        vm.ServerExePath = "/definitely/not/here";
+
+        Assert.Equal(string.Format(Strings.Directories_MissingServerExe, "/definitely/not/here"), vm.MissingPathDescription);
     }
 
     [Fact]
     public void Directories_existing_paths_are_ok()
     {
         var dir = Directory.CreateTempSubdirectory().FullName;
-        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher())
-        {
-            ServerExePath = string.Empty,
-            SaveDataFolderPath = dir,
-        };
+        var vm = Directories(new FakeUserPreferencesProvider(AppPaths()), Profiles(new ServerPreferences { ProfileName = "P" }), "P");
+
+        vm.SaveDataFolderPath = dir; // the other overrides stay empty
+
         Assert.False(vm.HasMissingPath);
+        Directory.Delete(dir);
+    }
+
+    // An unmodded server has no BepInEx files, so their (default) paths only count as missing once the user sets them.
+    [Fact]
+    public void Directories_missing_bepinex_paths_count_only_when_changed()
+    {
+        var dir = Directory.CreateTempSubdirectory().FullName;
+        var app = AppPaths();
+        app.ServerExePath = string.Empty;
+        app.SaveDataFolderPath = dir;
+        var vm = Directories(new FakeUserPreferencesProvider(app), Profiles());
+
+        vm.SaveDataFolderPath = dir + "/"; // a change to the target, with the BepInEx defaults still missing
+        Assert.False(vm.HasMissingPath);
+
+        vm.DoorstopLibraryPath = "/mods/missing.so";
+        if (vm.ShowsModPaths)
+            Assert.Equal(string.Format(Strings.Directories_MissingDoorstopLibrary, "/mods/missing.so"), vm.MissingPathDescription);
+        else
+            Assert.False(vm.HasMissingPath);
         Directory.Delete(dir);
     }
 

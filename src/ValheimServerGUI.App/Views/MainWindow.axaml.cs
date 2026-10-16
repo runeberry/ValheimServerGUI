@@ -113,8 +113,10 @@ public partial class MainWindow : Window
                     Svc<IUserPreferencesProvider>(), Svc<IStartupManager>())).ShowDialog(this);
                 break;
             case MenuAction.SetDirectories:
-                await new DirectoriesWindow(new DirectoriesViewModel(
-                    Svc<IUserPreferencesProvider>(), Svc<IValheimPathResolver>(), Svc<IShellLauncher>())).ShowDialog(this);
+                await ShowDirectoriesAsync(profileName: null);
+                break;
+            case MenuAction.SetProfileDirectories:
+                await ShowDirectoriesAsync(ViewModel.CurrentProfile?.ProfileName);
                 break;
             case MenuAction.BugReport:
                 await new BugReportWindow(new BugReportViewModel(Svc<IRuneberryApiClient>())).ShowDialog(this);
@@ -126,6 +128,16 @@ public partial class MainWindow : Window
                 await ShowWorldPreferencesAsync();
                 break;
         }
+    }
+
+    private async Task ShowDirectoriesAsync(string? profileName)
+    {
+        var servers = Svc<IServerManager>();
+        var vm = new DirectoriesViewModel(Svc<IUserPreferencesProvider>(), Svc<IServerPreferencesProvider>(),
+            Svc<IValheimPathResolver>(), Svc<IShellLauncher>(), profileName,
+            isProfileRunning: name => servers.TryGet(name, out var server) && !server.IsAnyStatus(ServerStatus.Stopped));
+        if (await new DirectoriesWindow(vm).ShowDialog<bool>(this))
+            ViewModel?.RefreshWorldsCommand.Execute(null); // the save folder may have moved
     }
 
     private async Task CreateProfileAsync(bool fromForm = false)
@@ -144,9 +156,9 @@ public partial class MainWindow : Window
 
         if (string.IsNullOrWhiteSpace(name)) return;
 
-        var prefs = fromForm
-            ? ViewModel.Form.ToPreferences(new ServerPreferences { ProfileName = name })
-            : ServerPreferences.CreateNew(name);
+        // A copy keeps the source profile's directory overrides, which live outside the form.
+        var prefs = fromForm ? ViewModel.BuildPreferences() : ServerPreferences.CreateNew(name);
+        prefs.ProfileName = name;
         serverPrefs.SavePreferences(prefs);
         ViewModel.LoadProfile(prefs);
     }

@@ -54,6 +54,14 @@ public sealed class PlayerListImportFlowTests : IDisposable
     }
 
     // A VM over the temp savedir. `withConfig` seeds a valid, startable form (world created + selected).
+    // The directories come from the app-wide paths (the profile has no overrides).
+    private UserPreferences WithDirectories(UserPreferences prefs)
+    {
+        prefs.ServerExePath = _exe;
+        prefs.SaveDataFolderPath = _saveDir;
+        return prefs;
+    }
+
     private Harness Build(bool withConfig = false, UserPreferences? userPrefs = null)
     {
         var shell = new ShellLauncher(new RecordingSystemShell(), TestLog.Silent);
@@ -63,7 +71,7 @@ public sealed class PlayerListImportFlowTests : IDisposable
 
         var vm = new MainWindowViewModel(
             manager,
-            new FakeUserPreferencesProvider(userPrefs),
+            new FakeUserPreferencesProvider(WithDirectories(userPrefs ?? new UserPreferences())),
             new FakeServerPreferencesProvider(),
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             new FakeSteamCloudWorldProvider(),
@@ -82,9 +90,6 @@ public sealed class PlayerListImportFlowTests : IDisposable
         vm.ImportConfirmPrompt = b => { h.ConfirmBodies.Add(b); return Task.FromResult(h.ConfirmResult); };
         vm.ConflictPrompt = b => { h.ConflictBodies.Add(b); return Task.FromResult(h.ConflictResult); };
         vm.StartAction = h.Started.Add; // don't actually launch
-
-        vm.Form.SaveDataFolderPath = _saveDir;
-        vm.Form.ServerExePath = _exe;
 
         if (withConfig)
         {

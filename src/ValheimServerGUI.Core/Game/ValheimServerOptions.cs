@@ -35,6 +35,12 @@ namespace ValheimServerGUI.Game
 
         public string? SaveDataFolderPath { get; set; }
 
+        public string? BepInExPreloaderPath { get; set; }
+
+        public string? DoorstopLibraryPath { get; set; }
+
+        public string? EnvironmentVariables { get; set; }
+
         public bool LogToFile { get; set; }
 
         // TODO: This option is not currently exposed in the UI, so log filtering
@@ -119,6 +125,16 @@ namespace ValheimServerGUI.Game
             // Using the native -logFile command will prevent logs from being piped to VSG, so don't allow it.
             if ((AdditionalArgs ?? string.Empty).ToLower().Contains("-logfile")) throw new ArgumentException(Strings.Validation_LogFileArgument);
 
+            // Additional environment variables: the syntax must parse, and none may name a variable VSG sets itself
+            // in this launch configuration (VSG's value would silently replace the user's).
+            foreach (var (name, _) in EnvironmentVariableParser.Parse(EnvironmentVariables))
+            {
+                if (string.Equals(name, ValheimServer.SteamAppIdVariable, StringComparison.OrdinalIgnoreCase))
+                    throw new ArgumentException(string.Format(Strings.Validation_EnvVarSetByApp, name));
+                if (ValheimServer.BepInExLoaderVariables.Contains(name) && this.LoadsBepInEx())
+                    throw new ArgumentException(string.Format(Strings.Validation_EnvVarSetForBepInEx, name));
+            }
+
             // Filepaths
             this.GetValidatedServerExe();
             this.GetValidatedSaveDataFolder();
@@ -152,6 +168,15 @@ namespace ValheimServerGUI.Game
         string? ServerExePath { get; }
 
         string? SaveDataFolderPath { get; }
+
+        /// <summary>BepInEx's <c>BepInEx.Preloader.dll</c>. Linux only: with <see cref="DoorstopLibraryPath"/>, enables mod loading.</summary>
+        string? BepInExPreloaderPath { get; }
+
+        /// <summary>Doorstop's <c>libdoorstop_x64.so</c>. Linux only: with <see cref="BepInExPreloaderPath"/>, enables mod loading.</summary>
+        string? DoorstopLibraryPath { get; }
+
+        /// <summary>The profile's additional environment variables as typed (see <see cref="EnvironmentVariableParser"/>).</summary>
+        string? EnvironmentVariables { get; }
 
         bool LogToFile { get; }
 

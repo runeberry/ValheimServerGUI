@@ -120,6 +120,8 @@ namespace ValheimServerGUI.Integration.Tests
             BackupLong = 43200,
             ServerExePath = IntegrationConfig.Current.ServerExe,
             SaveDataFolderPath = SaveDir,
+            BepInExPreloaderPath = IntegrationConfig.Current.BepInExPreloader,
+            DoorstopLibraryPath = IntegrationConfig.Current.DoorstopLibrary,
             LogToFile = false,
             LogMessageHandler = line => { lock (_lock) Log.Add(line); },
         };

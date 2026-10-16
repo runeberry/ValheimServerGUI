@@ -30,6 +30,17 @@ namespace ValheimServerGUI.Game
         }
 
         /// <summary>
+        /// Whether VSG enables BepInEx's loader for this launch: Linux only (on Windows the pack's own winhttp.dll
+        /// proxy loads it), and only when both configured files exist.
+        /// </summary>
+        public static bool LoadsBepInEx(this IValheimServerOptions options)
+        {
+            return !OperatingSystem.IsWindows()
+                && File.Exists(options.BepInExPreloaderPath)
+                && File.Exists(options.DoorstopLibraryPath);
+        }
+
+        /// <summary>
         /// The admin/ban/permit list files live directly in the save-data root (the <c>-savedir</c>),
         /// alongside <c>worlds</c>/<c>worlds_local</c>, shared by every world in that savedir -- exactly
         /// where <c>ZNet</c> reads them from (<c>Utils.GetSaveDataPath()/adminlist.txt</c> etc.). These

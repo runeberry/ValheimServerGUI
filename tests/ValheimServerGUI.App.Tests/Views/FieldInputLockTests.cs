@@ -8,6 +8,8 @@ using ValheimServerGUI.App.Controls;
 using ValheimServerGUI.App.Services;
 using ValheimServerGUI.App.Tests.Fakes;
 using ValheimServerGUI.App.ViewModels;
+using ValheimServerGUI.App.ViewModels.Dialogs;
+using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.App.Views.Tabs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Localization;
@@ -101,15 +103,20 @@ public class FieldInputLockTests
     }
 
     [AvaloniaFact]
-    public void Running_server_locks_directory_inputs_and_browse_but_not_open_folder()
+    public void Running_profile_locks_its_directory_inputs_and_browse_but_not_open_folder()
     {
-        var vm = BuildViewModel();
-        var view = Show(new AdvancedControlsView { DataContext = vm });
-        var paths = view.GetVisualDescendants().OfType<FilenameFormField>().ToList();
-        Assert.Equal(2, paths.Count); // server exe + save data
-
-        vm.ServerStatus = ServerStatus.Running;
+        var servers = new FakeServerPreferencesProvider(new[]
+        {
+            new ServerPreferences { ProfileName = "Up" },
+            new ServerPreferences { ProfileName = "Down" },
+        });
+        var vm = new DirectoriesViewModel(new FakeUserPreferencesProvider(), servers,
+            Core.GetRequiredService<IValheimPathResolver>(), new RecordingShellLauncher(), "Up", name => name == "Up");
+        var window = new DirectoriesWindow(vm);
+        window.Show();
         Dispatcher.UIThread.RunJobs();
+        var paths = window.GetVisualDescendants().OfType<FilenameFormField>().Where(f => f.IsEffectivelyVisible).ToList();
+        Assert.Equal(vm.ShowsModPaths ? 4 : 2, paths.Count);
 
         Assert.All(paths, f =>
         {
@@ -118,7 +125,7 @@ public class FieldInputLockTests
             Assert.True(OpenFolder(f).IsEffectivelyEnabled);
         });
 
-        vm.ServerStatus = ServerStatus.Stopped;
+        vm.SelectedTarget = new DirectoryTarget("Down");
         Dispatcher.UIThread.RunJobs();
 
         Assert.All(paths, f =>
@@ -126,5 +133,6 @@ public class FieldInputLockTests
             Assert.True(Input(f).IsEffectivelyEnabled);
             Assert.True(Browse(f).IsEffectivelyEnabled);
         });
+        window.Close();
     }
 }

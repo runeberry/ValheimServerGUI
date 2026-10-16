@@ -161,11 +161,10 @@ public partial class ServerFormViewModel : ObservableObject
     }
 
     // ----- Advanced Controls -----
-    [ObservableProperty] private string? _serverExePath;
-    [ObservableProperty] private string? _saveDataFolderPath;
     [ObservableProperty] private bool _autoStart;
     [ObservableProperty] private bool _writeServerLogsToFile = true;
     [ObservableProperty] private string? _additionalArgs;
+    [ObservableProperty] private string? _environmentVariables;
     [ObservableProperty] private int _saveInterval = CoreConstants.DefaultSaveInterval;
     [ObservableProperty] private int _backupCount = CoreConstants.DefaultBackupCount;
     [ObservableProperty] private int _backupIntervalShort = CoreConstants.DefaultBackupIntervalShort;
@@ -209,8 +208,7 @@ public partial class ServerFormViewModel : ObservableObject
             BackupIntervalLong = prefs.BackupIntervalLong;
             AutoStart = prefs.AutoStart;
             AdditionalArgs = prefs.AdditionalArgs;
-            ServerExePath = prefs.ServerExePath;
-            SaveDataFolderPath = prefs.SaveDataFolderPath;
+            EnvironmentVariables = prefs.EnvironmentVariables;
             WriteServerLogsToFile = prefs.WriteServerLogsToFile;
             UsePermittedList = prefs.UsePermittedList;
 
@@ -236,8 +234,7 @@ public partial class ServerFormViewModel : ObservableObject
         prefs.BackupIntervalLong = BackupIntervalLong;
         prefs.AutoStart = AutoStart;
         prefs.AdditionalArgs = AdditionalArgs;
-        prefs.ServerExePath = ServerExePath;
-        prefs.SaveDataFolderPath = SaveDataFolderPath;
+        prefs.EnvironmentVariables = EnvironmentVariables;
         prefs.WriteServerLogsToFile = WriteServerLogsToFile;
         ApplyRolesTo(prefs);
         return prefs;

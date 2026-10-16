@@ -20,6 +20,12 @@ namespace ValheimServerGUI.Game
         [JsonProperty("valheimSaveDataFolder")]
         public string?SaveDataFolderPath { get; set; }
 
+        [JsonProperty("bepInExPreloaderPath")]
+        public string? BepInExPreloaderPath { get; set; }
+
+        [JsonProperty("doorstopLibraryPath")]
+        public string? DoorstopLibraryPath { get; set; }
+
         [JsonProperty("startWithWindows")]
         public bool? StartWithWindows { get; set; }
 

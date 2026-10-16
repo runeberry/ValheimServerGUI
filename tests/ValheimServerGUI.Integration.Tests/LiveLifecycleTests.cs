@@ -37,15 +37,12 @@ namespace ValheimServerGUI.Integration.Tests
         public IReadOnlyList<WorldPlayerHistoryEntry>? HistoryAfterStop { get; private set; }
         public Exception? HistoryReadError { get; private set; }
         public IReadOnlyList<string> CapturedLog { get; private set; } = Array.Empty<string>();
-        /// <summary>BepInEx's own LogOutput.log from this boot, or null if the server folder has none written since the boot began.</summary>
-        public IReadOnlyList<string>? BepInExDiskLog { get; private set; }
 
         public async ValueTask InitializeAsync()
         {
             var worldName = "ITLife" + Guid.NewGuid().ToString("n")[..6];
             using var harness = new LiveServerHarness(IntegrationConfig.Current.SaveDir, worldName);
 
-            var bootStartedUtc = DateTime.UtcNow;
             ReachedRunning = await harness.BootToRunningAsync(BootTimeout);
 
             if (ReachedRunning)
@@ -72,25 +69,9 @@ namespace ValheimServerGUI.Integration.Tests
 
             CapturedLog = harness.Log.ToArray();
             ArtifactPath = WriteArtifact(worldName, CapturedLog);
-            BepInExDiskLog = ReadBepInExDiskLog(bootStartedUtc);
         }
 
         public ValueTask DisposeAsync() => ValueTask.CompletedTask;
-
-        // BepInEx rewrites LogOutput.log on every start, so a file older than this boot belongs to an earlier run.
-        private static string[]? ReadBepInExDiskLog(DateTime bootStartedUtc)
-        {
-            var exeDir = Path.GetDirectoryName(IntegrationConfig.Current.ServerExe)!;
-            var file = new FileInfo(Path.Join(exeDir, "BepInEx", "LogOutput.log"));
-            if (!file.Exists || file.LastWriteTimeUtc < bootStartedUtc)
-            {
-                return null;
-            }
-
-            using var stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
-            using var reader = new StreamReader(stream);
-            return reader.ReadToEnd().Split('\n', StringSplitOptions.TrimEntries);
-        }
 
         private static string WriteArtifact(string worldName, IReadOnlyList<string> log)
         {
@@ -154,11 +135,12 @@ namespace ValheimServerGUI.Integration.Tests
             Assert.Empty(_fixture.HistoryAfterStop!);
         }
 
-        // Mods load when VSG starts the server: with BepInEx installed, the preloader runs inside the process VSG
-        // launched and the chainloader loads the installed plugin; on a vanilla install no mod loader appears at all.
-        // On Linux this needs VSG to set up the loader's environment, so the BepInEx configuration fails if Start ever
-        // stops doing that. Plugin loading is read from BepInEx's own LogOutput.log: on Windows its console logger
-        // writes to the console (CONOUT$), never to the redirected stdout, so only the preloader lines reach VSG there.
+        // Mods load when VSG starts the server, and the user sees it in the server log: with BepInEx installed, the
+        // preloader runs inside the process VSG launched and the chainloader loads the installed plugin; on a vanilla
+        // install no mod loader appears at all. On Linux this needs VSG to set up the loader's environment from the
+        // configured paths (bepinex-external keeps the pack outside the server folder), and the lines arrive on
+        // stdout. On Windows BepInEx's console logger never reaches stdout, so the plugin lines arrive only through
+        // VSG's tail of BepInEx's LogOutput.log, which must not repeat what stdout already shows.
         [Fact]
         public void ModLoader_MatchesServerConfiguration()
         {
@@ -171,12 +153,15 @@ namespace ValheimServerGUI.Integration.Tests
                 Assert.True(log.Any(l => l.Contains("Preloader finished")),
                     $"The BepInEx preloader did not run in the server VSG started. Artifact: {_fixture.ArtifactPath}");
 
-                var diskLog = _fixture.BepInExDiskLog;
-                Assert.True(diskLog is not null, "BepInEx wrote no LogOutput.log during this boot.");
-                Assert.True(diskLog!.Any(l => l.Contains($"Loading [{config.ExpectedPlugin}]")),
-                    $"BepInEx did not load the plugin '{config.ExpectedPlugin}'.");
-                Assert.True(diskLog.Any(l => l.Contains("Chainloader startup complete")),
-                    "The BepInEx chainloader did not finish starting up.");
+                Assert.True(log.Count(l => l.Contains($"Loading [{config.ExpectedPlugin}]")) == 1,
+                    $"The server log does not show BepInEx loading the plugin '{config.ExpectedPlugin}' exactly once. Artifact: {_fixture.ArtifactPath}");
+                Assert.True(log.Count(l => l.Contains("Chainloader startup complete")) == 1,
+                    $"The server log does not show the BepInEx chainloader finishing exactly once. Artifact: {_fixture.ArtifactPath}");
+                if (OperatingSystem.IsWindows())
+                {
+                    Assert.True(log.Count(l => l.Contains("Preloader finished")) == 1,
+                        $"The preloader lines BepInEx replays to stdout were repeated from LogOutput.log. Artifact: {_fixture.ArtifactPath}");
+                }
             }
             else
             {

@@ -49,7 +49,17 @@ public partial class FilenameFormField : FormFieldBase, IFormField<string?>
     public static readonly StyledProperty<bool> IsInputEnabledProperty =
         AvaloniaProperty.Register<FilenameFormField, bool>(nameof(IsInputEnabled), defaultValue: true);
 
+    /// <summary>Text shown while the path is empty (e.g. what an empty override falls back to).</summary>
+    public static readonly StyledProperty<string?> WatermarkProperty =
+        AvaloniaProperty.Register<FilenameFormField, string?>(nameof(Watermark));
+
     public FilenameFormField() => AvaloniaXamlLoader.Load(this);
+
+    public string? Watermark
+    {
+        get => GetValue(WatermarkProperty);
+        set => SetValue(WatermarkProperty, value);
+    }
 
     public string? Value
     {

@@ -59,7 +59,8 @@ public sealed class StartServerFlowTests : IDisposable
             Core.GetRequiredService<Serilog.ILogger>());
         var vm = new MainWindowViewModel(
             manager,
-            new FakeUserPreferencesProvider(),
+            // The directories come from the app-wide paths (the profile has no overrides).
+            new FakeUserPreferencesProvider(new UserPreferences { ServerExePath = _exe, SaveDataFolderPath = _saveDir }),
             serverPrefs,
             Core.GetRequiredService<IWorldPreferencesProvider>(),
             cloud,
@@ -82,8 +83,6 @@ public sealed class StartServerFlowTests : IDisposable
         vm.Form.Name = "MyServer";
         vm.Form.Password = "hunter2";
         vm.Form.Port = 2456;
-        vm.Form.ServerExePath = _exe;
-        vm.Form.SaveDataFolderPath = _saveDir;
         return harness;
     }
 

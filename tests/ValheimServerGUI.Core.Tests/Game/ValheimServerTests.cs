@@ -149,21 +149,28 @@ namespace ValheimServerGUI.Core.Tests.Game
             }
         }
 
-        // BepInEx on Linux: its Doorstop loader is a preload library that only loads when the launch environment
-        // names it, so Start must set it up whenever the pack is in the server folder. On Windows the pack's
-        // winhttp.dll proxy loads by itself and Start must leave the environment alone.
-        [Fact]
-        public void Start_WithBepInExInstalled_EnablesItsLoaderOnLinux()
+        private string CreateFile(params string[] relative)
         {
-            var doorstop = Path.Join(_dir, "doorstop_libs", "libdoorstop_x64.so");
-            var preloader = Path.Join(_dir, "BepInEx", "core", "BepInEx.Preloader.dll");
-            foreach (var file in new[] { doorstop, preloader })
-            {
-                Directory.CreateDirectory(Path.GetDirectoryName(file)!);
-                File.WriteAllText(file, "");
-            }
+            var path = Path.Join(_dir, Path.Join(relative));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
+            File.WriteAllText(path, "");
+            return path;
+        }
 
-            _server.Start(Options());
+        // BepInEx on Linux: its Doorstop loader is a preload library that only loads when the launch environment
+        // names it, so Start sets it up whenever both configured files exist. They need not be in the server folder.
+        // On Windows the pack's winhttp.dll proxy loads by itself and Start must leave the environment alone.
+        [Fact]
+        public void Start_WithBothBepInExFiles_EnablesItsLoaderOnLinux()
+        {
+            var preloader = CreateFile("mods", "BepInEx", "core", "BepInEx.Preloader.dll");
+            var doorstop = CreateFile("mods", "doorstop_libs", "libdoorstop_x64.so");
+
+            _server.Start(Options(o =>
+            {
+                o.BepInExPreloaderPath = preloader;
+                o.DoorstopLibraryPath = doorstop;
+            }));
 
             var env = _processProvider.LastProcess!.StartInfo.EnvironmentVariables;
             if (OperatingSystem.IsWindows())
@@ -176,17 +183,89 @@ namespace ValheimServerGUI.Core.Tests.Game
                 Assert.Equal("1", env["DOORSTOP_ENABLED"]);
                 Assert.Equal(preloader, env["DOORSTOP_TARGET_ASSEMBLY"]);
                 Assert.Equal(doorstop, env["LD_PRELOAD"]!.Split(':')[0]);
+                Assert.Contains(_appLogger.Messages, m => m.Contains("Loading BepInEx") && m.Contains(preloader));
             }
         }
 
-        [Fact]
-        public void Start_WithoutBepInEx_LeavesItsLoaderOff()
+        // Either file missing: start vanilla, and say which file was missing.
+        [Theory]
+        [InlineData(true, false)]
+        [InlineData(false, true)]
+        [InlineData(false, false)]
+        public void Start_WithABepInExFileMissing_LeavesItsLoaderOff_AndLogsTheMissingFile(bool hasPreloader, bool hasDoorstop)
         {
-            _server.Start(Options());
+            var preloader = Path.Join(_dir, "BepInEx", "core", "BepInEx.Preloader.dll");
+            var doorstop = Path.Join(_dir, "doorstop_libs", "libdoorstop_x64.so");
+            if (hasPreloader) CreateFile("BepInEx", "core", "BepInEx.Preloader.dll");
+            if (hasDoorstop) CreateFile("doorstop_libs", "libdoorstop_x64.so");
+
+            _server.Start(Options(o =>
+            {
+                o.BepInExPreloaderPath = preloader;
+                o.DoorstopLibraryPath = doorstop;
+            }));
 
             var env = _processProvider.LastProcess!.StartInfo.EnvironmentVariables;
             Assert.False(env.ContainsKey("DOORSTOP_ENABLED"));
             Assert.False(env.ContainsKey("DOORSTOP_TARGET_ASSEMBLY"));
+            if (!OperatingSystem.IsWindows())
+            {
+                var missing = hasPreloader ? doorstop : preloader;
+                Assert.Contains(_appLogger.Messages, m => m.Contains("BepInEx not loaded") && m.Contains(missing));
+            }
+        }
+
+        // The profile's variables reach the process. The path lists keep the profile's value, with the entries the
+        // launch needs placed in front of it.
+        [Fact]
+        public void Start_AppliesProfileEnvironmentVariables_UnderTheLaunchRequirements()
+        {
+            var preloader = CreateFile("BepInEx", "core", "BepInEx.Preloader.dll");
+            var doorstop = CreateFile("doorstop_libs", "libdoorstop_x64.so");
+
+            _server.Start(Options(o =>
+            {
+                o.BepInExPreloaderPath = preloader;
+                o.DoorstopLibraryPath = doorstop;
+                o.EnvironmentVariables = @"MY_FLAG=1 MY_PATH=""/opt/my dir"" LD_PRELOAD=/opt/libmine.so LD_LIBRARY_PATH=/opt/lib";
+            }));
+
+            var env = _processProvider.LastProcess!.StartInfo.EnvironmentVariables;
+            Assert.Equal("1", env["MY_FLAG"]);
+            Assert.Equal("/opt/my dir", env["MY_PATH"]);
+            Assert.Equal(CoreConstants.ValheimSteamAppId, env[ValheimServer.SteamAppIdVariable]);
+            if (OperatingSystem.IsWindows())
+            {
+                Assert.Equal("/opt/libmine.so", env["LD_PRELOAD"]);
+                Assert.Equal("/opt/lib", env["LD_LIBRARY_PATH"]);
+            }
+            else
+            {
+                Assert.Equal(new[] { doorstop, "/opt/libmine.so" }, env["LD_PRELOAD"]!.Split(':'));
+                Assert.Equal(new[] { _dir, Path.Join(_dir, "linux64"), "/opt/lib" }, env["LD_LIBRARY_PATH"]!.Split(':'));
+            }
+        }
+
+        // The run-command log line shows the variables as typed, ahead of the command, and still masks the password.
+        [Fact]
+        public void Start_LogsTheRunCommand_WithEnvironmentVariablesFirst()
+        {
+            _server.Start(Options(o => o.EnvironmentVariables = @"  MY_FLAG=1 MY_PATH=""/opt/my dir""  "));
+
+            var line = Assert.Single(_appLogger.Messages, m => m.StartsWith("Server run command:"));
+            // The test logger renders string properties quoted; the app's sink renders them as-is.
+            Assert.StartsWith(@"Server run command: MY_FLAG=1 MY_PATH=""/opt/my dir"" """, line);
+            Assert.Contains(_exe, line);
+            Assert.DoesNotContain("hunter2", line);
+        }
+
+        [Fact]
+        public void Start_WithMalformedEnvironmentVariables_DoesNotStart()
+        {
+            Assert.Throws<ArgumentException>(() => _server.Start(Options(o => o.EnvironmentVariables = "NOT_AN_ASSIGNMENT")));
+
+            Assert.Null(_processProvider.LastProcess);
+            Assert.Equal(ServerStatus.Stopped, _server.Status);
         }
 
         [Fact]

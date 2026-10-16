@@ -47,6 +47,14 @@ public abstract partial class ModalEditViewModel : ObservableObject
         IsDirty = false;
     }
 
+    /// <summary>Changes values without counting as an edit, keeping any earlier edits' dirty state.</summary>
+    protected void WithoutDirtying(Action change)
+    {
+        _suppressDirty = true;
+        try { change(); }
+        finally { _suppressDirty = false; }
+    }
+
     /// <summary>Restores default values (marks dirty — the user must still confirm with OK).</summary>
     public abstract void ApplyDefaults();
 }

@@ -20,6 +20,12 @@ namespace ValheimServerGUI.Game
         /// <summary>Default folder Valheim itself writes world saves to.</summary>
         string DefaultSaveDataFolder { get; }
 
+        /// <summary>Default BepInEx preloader: where the BepInEx pack puts it in the default server folder.</summary>
+        string DefaultBepInExPreloaderPath { get; }
+
+        /// <summary>Default Doorstop library (Linux): where the BepInEx pack puts it in the default server folder.</summary>
+        string DefaultDoorstopLibraryPath { get; }
+
         /// <summary>The current (v2, JSON) user-preferences file path.</summary>
         string UserPrefsFilePath { get; }
 
@@ -52,6 +58,12 @@ namespace ValheimServerGUI.Game
         public abstract string ServerBinaryName { get; }
         public abstract string DefaultServerPath { get; }
         public abstract string DefaultSaveDataFolder { get; }
+
+        public string DefaultBepInExPreloaderPath =>
+            Path.Join(Path.GetDirectoryName(DefaultServerPath), "BepInEx", "core", "BepInEx.Preloader.dll");
+
+        public string DefaultDoorstopLibraryPath =>
+            Path.Join(Path.GetDirectoryName(DefaultServerPath), "doorstop_libs", "libdoorstop_x64.so");
 
         /// <summary>The per-user folder the application stores its own data (prefs, caches, logs) under.</summary>
         protected abstract string AppDataRoot { get; }

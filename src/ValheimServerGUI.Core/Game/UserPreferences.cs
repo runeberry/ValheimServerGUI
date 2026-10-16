@@ -13,6 +13,10 @@ namespace ValheimServerGUI.Game
 
         public string SaveDataFolderPath { get; set; } = string.Empty;
 
+        public string BepInExPreloaderPath { get; set; } = string.Empty;
+
+        public string DoorstopLibraryPath { get; set; } = string.Empty;
+
         public bool CheckForUpdates { get; set; } = true;
 
         public bool StartWithWindows { get; set; }
@@ -53,6 +57,8 @@ namespace ValheimServerGUI.Game
 
             prefs.ServerExePath = file.ServerExePath ?? prefs.ServerExePath;
             prefs.SaveDataFolderPath = file.SaveDataFolderPath ?? prefs.SaveDataFolderPath;
+            prefs.BepInExPreloaderPath = file.BepInExPreloaderPath ?? prefs.BepInExPreloaderPath;
+            prefs.DoorstopLibraryPath = file.DoorstopLibraryPath ?? prefs.DoorstopLibraryPath;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
             prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
@@ -101,6 +107,8 @@ namespace ValheimServerGUI.Game
             {
                 ServerExePath = ServerExePath,
                 SaveDataFolderPath = SaveDataFolderPath,
+                BepInExPreloaderPath = BepInExPreloaderPath,
+                DoorstopLibraryPath = DoorstopLibraryPath,
                 CheckForUpdates = CheckForUpdates,
                 StartWithWindows = StartWithWindows,
                 StartMinimized = StartMinimized,

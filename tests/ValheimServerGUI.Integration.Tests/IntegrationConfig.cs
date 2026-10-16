@@ -53,9 +53,21 @@ namespace ValheimServerGUI.Integration.Tests
         /// </summary>
         public string? ExpectedPlugin { get; }
 
+        /// <summary>
+        /// The BepInEx preloader and Doorstop library paths the suite configures, as the app's Set Directories
+        /// would. Linux only (Windows ignores them, so they are null there): the bepinex images point them at the
+        /// installed pack, the vanilla image at where the pack would be.
+        /// </summary>
+        public string? BepInExPreloader { get; }
+
+        /// <inheritdoc cref="BepInExPreloader"/>
+        public string? DoorstopLibrary { get; }
+
         private IntegrationConfig(string serverExe, string saveDir, string artifactDir,
-            ServerConfiguration serverConfig, string? expectedPlugin)
+            ServerConfiguration serverConfig, string? expectedPlugin, string? bepInExPreloader, string? doorstopLibrary)
         {
+            BepInExPreloader = bepInExPreloader;
+            DoorstopLibrary = doorstopLibrary;
             ServerExe = serverExe;
             SaveDir = saveDir;
             ArtifactDir = artifactDir;
@@ -90,6 +102,17 @@ namespace ValheimServerGUI.Integration.Tests
             else if (serverConfig == ServerConfiguration.Vanilla && expectedPlugin is not null)
                 problems.Add($"VSG_IT_EXPECTED_PLUGIN is set to '{expectedPlugin}', but a vanilla server has no plugins.");
 
+            string? bepInExPreloader = null, doorstopLibrary = null;
+            if (!OperatingSystem.IsWindows())
+            {
+                bepInExPreloader = Environment.GetEnvironmentVariable("VSG_IT_BEPINEX_PRELOADER");
+                doorstopLibrary = Environment.GetEnvironmentVariable("VSG_IT_DOORSTOP_LIBRARY");
+                if (string.IsNullOrWhiteSpace(bepInExPreloader))
+                    problems.Add("VSG_IT_BEPINEX_PRELOADER is not set (the BepInEx.Preloader.dll path to configure).");
+                if (string.IsNullOrWhiteSpace(doorstopLibrary))
+                    problems.Add("VSG_IT_DOORSTOP_LIBRARY is not set (the libdoorstop_x64.so path to configure).");
+            }
+
             if (problems.Count > 0)
             {
                 throw new InvalidOperationException(
@@ -107,7 +130,8 @@ namespace ValheimServerGUI.Integration.Tests
             Directory.CreateDirectory(saveDir);
             Directory.CreateDirectory(artifactDir);
 
-            return new IntegrationConfig(serverExe!, saveDir, artifactDir, serverConfig, expectedPlugin);
+            return new IntegrationConfig(serverExe!, saveDir, artifactDir, serverConfig, expectedPlugin,
+                bepInExPreloader, doorstopLibrary);
         }
     }
 }

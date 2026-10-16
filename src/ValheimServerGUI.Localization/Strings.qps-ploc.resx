@@ -199,20 +199,20 @@
     <value>⟦ServerControls_CloudWorldSuffix⟧</value>
   </data>
   <!-- Advanced Controls tab -->
-  <data name="AdvancedControls_DirectoryOverrides_Header" xml:space="preserve">
-    <value>⟦AdvancedControls_DirectoryOverrides_Header⟧</value>
-  </data>
   <data name="Paths_ServerExe_Label" xml:space="preserve">
     <value>⟦Paths_ServerExe_Label⟧</value>
-  </data>
-  <data name="AdvancedControls_ServerExe_Help" xml:space="preserve">
-    <value>⟦AdvancedControls_ServerExe_Help⟧</value>
   </data>
   <data name="Paths_SaveData_Label" xml:space="preserve">
     <value>⟦Paths_SaveData_Label⟧</value>
   </data>
-  <data name="AdvancedControls_SaveData_Help" xml:space="preserve">
-    <value>⟦AdvancedControls_SaveData_Help⟧</value>
+  <data name="Paths_BepInExPreloader_Label" xml:space="preserve">
+    <value>⟦Paths_BepInExPreloader_Label⟧</value>
+  </data>
+  <data name="Paths_DoorstopLibrary_Label" xml:space="preserve">
+    <value>⟦Paths_DoorstopLibrary_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_SetDirectories" xml:space="preserve">
+    <value>⟦AdvancedControls_SetDirectories⟧</value>
   </data>
   <data name="AdvancedControls_OtherSettings_Header" xml:space="preserve">
     <value>⟦AdvancedControls_OtherSettings_Header⟧</value>
@@ -234,6 +234,12 @@
   </data>
   <data name="AdvancedControls_AdditionalArgs_Help" xml:space="preserve">
     <value>⟦AdvancedControls_AdditionalArgs_Help⟧</value>
+  </data>
+  <data name="AdvancedControls_EnvironmentVariables_Label" xml:space="preserve">
+    <value>⟦AdvancedControls_EnvironmentVariables_Label⟧</value>
+  </data>
+  <data name="AdvancedControls_EnvironmentVariables_Help" xml:space="preserve">
+    <value>⟦AdvancedControls_EnvironmentVariables_Help⟧</value>
   </data>
   <data name="AdvancedControls_SavingBackups_Header" xml:space="preserve">
     <value>⟦AdvancedControls_SavingBackups_Header⟧</value>
@@ -643,20 +649,38 @@
   <data name="Directories_Title" xml:space="preserve">
     <value>⟦Directories_Title⟧</value>
   </data>
-  <data name="Directories_Intro" xml:space="preserve">
-    <value>⟦Directories_Intro⟧</value>
-  </data>
   <data name="Directories_ServerExe_Help" xml:space="preserve">
     <value>⟦Directories_ServerExe_Help⟧</value>
   </data>
   <data name="Directories_SaveData_Help" xml:space="preserve">
     <value>⟦Directories_SaveData_Help⟧</value>
   </data>
+  <data name="Directories_Target_Label" xml:space="preserve">
+    <value>⟦Directories_Target_Label⟧</value>
+  </data>
+  <data name="Directories_Target_AllProfiles" xml:space="preserve">
+    <value>⟦Directories_Target_AllProfiles⟧</value>
+  </data>
+  <data name="Directories_UseDefault" xml:space="preserve">
+    <value>⟦Directories_UseDefault⟧</value>
+  </data>
+  <data name="Directories_BepInExPreloader_Help" xml:space="preserve">
+    <value>⟦Directories_BepInExPreloader_Help⟧</value>
+  </data>
+  <data name="Directories_DoorstopLibrary_Help" xml:space="preserve">
+    <value>⟦Directories_DoorstopLibrary_Help⟧</value>
+  </data>
   <data name="Directories_MissingServerExe" xml:space="preserve">
     <value>⟦Directories_MissingServerExe {0}⟧</value>
   </data>
   <data name="Directories_MissingSaveData" xml:space="preserve">
     <value>⟦Directories_MissingSaveData {0}⟧</value>
+  </data>
+  <data name="Directories_MissingBepInExPreloader" xml:space="preserve">
+    <value>⟦Directories_MissingBepInExPreloader {0}⟧</value>
+  </data>
+  <data name="Directories_MissingDoorstopLibrary" xml:space="preserve">
+    <value>⟦Directories_MissingDoorstopLibrary {0}⟧</value>
   </data>
   <!-- Known characters -->
   <data name="KnownCharacters_Header" xml:space="preserve">
@@ -1172,6 +1196,21 @@
   </data>
   <data name="Validation_LogFileArgument" xml:space="preserve">
     <value>⟦Validation_LogFileArgument⟧</value>
+  </data>
+  <data name="Validation_EnvVarMissingEquals" xml:space="preserve">
+    <value>⟦Validation_EnvVarMissingEquals {0}⟧</value>
+  </data>
+  <data name="Validation_EnvVarInvalidName" xml:space="preserve">
+    <value>⟦Validation_EnvVarInvalidName {0}⟧</value>
+  </data>
+  <data name="Validation_EnvVarUnterminatedQuote" xml:space="preserve">
+    <value>⟦Validation_EnvVarUnterminatedQuote {0}⟧</value>
+  </data>
+  <data name="Validation_EnvVarSetByApp" xml:space="preserve">
+    <value>⟦Validation_EnvVarSetByApp {0}⟧</value>
+  </data>
+  <data name="Validation_EnvVarSetForBepInEx" xml:space="preserve">
+    <value>⟦Validation_EnvVarSetForBepInEx {0}⟧</value>
   </data>
   <data name="Validation_ListBackupFailed" xml:space="preserve">
     <value>⟦Validation_ListBackupFailed {0}⟧</value>

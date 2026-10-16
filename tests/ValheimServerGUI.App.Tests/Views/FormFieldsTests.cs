@@ -69,4 +69,41 @@ public class FormFieldsTests
         var field = Realize(new FilenameFormField { LabelText = "Save Folder", Value = "/tmp/worlds" });
         Assert.Equal("/tmp/worlds", Child<TextBox>(field).Text);
     }
+
+    [AvaloniaFact]
+    public void FilenameFormField_shows_its_watermark_while_empty()
+    {
+        var field = Realize(new FilenameFormField { LabelText = "Path", Watermark = "(use default)" });
+        Assert.Equal("(use default)", Child<TextBox>(field).PlaceholderText);
+    }
+
+    // A separator draws as a disabled divider in the list and can never become the value.
+    [AvaloniaFact]
+    public void DropdownFormField_separator_is_a_disabled_divider_that_cannot_be_selected()
+    {
+        var field = Realize(new DropdownFormField
+        {
+            LabelText = "For",
+            ItemsSource = new List<object> { "All", DropdownSeparator.Instance, "Alpha" },
+            Value = "All",
+        });
+        var combo = Child<ComboBox>(field);
+        combo.IsDropDownOpen = true;
+        Dispatcher.UIThread.RunJobs();
+
+        var separatorItem = (ComboBoxItem)combo.ContainerFromIndex(1)!;
+        Assert.False(separatorItem.IsEnabled);
+        Assert.IsType<Separator>(separatorItem.Content);
+        Assert.True(((ComboBoxItem)combo.ContainerFromIndex(2)!).IsEnabled);
+
+        field.Value = DropdownSeparator.Instance;
+        Assert.Equal("All", field.Value);
+
+        combo.SelectedItem = DropdownSeparator.Instance;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal("All", field.Value);
+
+        field.Value = "Alpha";
+        Assert.Equal("Alpha", combo.SelectedItem);
+    }
 }

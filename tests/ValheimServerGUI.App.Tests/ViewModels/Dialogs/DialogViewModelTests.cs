@@ -83,6 +83,7 @@ public class DialogViewModelTests
         Assert.Equal(new object[] { DirectoryTarget.AllProfiles, DropdownSeparator.Instance, new DirectoryTarget("Alpha"), new DirectoryTarget("zeta") },
             vm.Targets);
         Assert.Equal(Strings.Directories_Target_AllProfiles, DirectoryTarget.AllProfiles.ToString());
+        Assert.Equal(string.Format(Strings.Directories_Target_Profile, "Alpha"), new DirectoryTarget("Alpha").ToString());
     }
 
     [Fact]

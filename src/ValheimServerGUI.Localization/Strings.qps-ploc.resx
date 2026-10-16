@@ -664,6 +664,9 @@
   <data name="Directories_UseDefault" xml:space="preserve">
     <value>⟦Directories_UseDefault⟧</value>
   </data>
+  <data name="Directories_Target_Profile" xml:space="preserve">
+    <value>⟦Directories_Target_Profile {0}⟧</value>
+  </data>
   <data name="Directories_BepInExPreloader_Help" xml:space="preserve">
     <value>⟦Directories_BepInExPreloader_Help⟧</value>
   </data>

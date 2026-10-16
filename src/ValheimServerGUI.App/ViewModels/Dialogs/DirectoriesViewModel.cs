@@ -21,7 +21,9 @@ public sealed record DirectoryTarget(string? ProfileName)
 
     public bool IsAllProfiles => ProfileName is null;
 
-    public override string ToString() => ProfileName ?? Strings.Directories_Target_AllProfiles;
+    public override string ToString() => ProfileName is null
+        ? Strings.Directories_Target_AllProfiles
+        : string.Format(Strings.Directories_Target_Profile, ProfileName);
 }
 
 /// <summary>

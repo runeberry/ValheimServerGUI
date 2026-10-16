@@ -688,7 +688,10 @@ NOTE: You must have Valheim Dedicated Server installed in order to use this appl
     <value>All profiles</value>
   </data>
   <data name="Directories_UseDefault" xml:space="preserve">
-    <value>(use default)</value>
+    <value>(use default for all profiles)</value>
+  </data>
+  <data name="Directories_Target_Profile" xml:space="preserve">
+    <value>Profile: {0}</value>
   </data>
   <data name="Directories_BepInExPreloader_Help" xml:space="preserve">
     <value>The location of BepInEx.Preloader.dll. This library is required when loading mods on Linux.</value>

@@ -1,6 +1,8 @@
 # Plan: explicit mod support (launch controls + BepInEx log)
 
-Status: planned (2026-10-16). Ships in 3.0.0-rc.2; rc.2 is not cut until this is done.
+Status: implemented (2026-10-16, 2624660). Ships in 3.0.0-rc.2. Deviations from the plan below: the Windows tail
+holds back the preloader section (BepInEx replays it to stdout) and releases it only if the process exits first;
+the Directories "Save anyway?" check skips unchanged BepInEx paths (an unmodded server has none).
 
 ## Goal
 

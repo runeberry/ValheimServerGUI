@@ -230,8 +230,11 @@ One instance = one named profile, keyed by `ProfileName`. Fields (JSON key / def
 | `BackupIntervalLong` | `backupIntervalLong` | `43200` (s) | |
 | `AutoStart` | `autoStart` | `false` | start this profile at app launch |
 | `AdditionalArgs` | `additionalArgs` | `null` | appended verbatim to launch |
+| `EnvironmentVariables` | `environmentVariables` | `null` | `NAME=VALUE` list set in the server's environment (§5.3) |
 | `ServerExePath` | `valheimServerPath` | `null` | per-profile override of global; blank → global |
 | `SaveDataFolderPath` | `valheimSaveDataFolder` | `null` | per-profile override of global; blank → global |
+| `BepInExPreloaderPath` | `bepInExPreloaderPath` | `null` | per-profile override of global; blank → global (Linux) |
+| `DoorstopLibraryPath` | `doorstopLibraryPath` | `null` | per-profile override of global; blank → global (Linux) |
 | `WriteServerLogsToFile` | `writeServerLogsToFile` | `true` | |
 
 A profile references a world only by `WorldName` (string); world-gen settings live separately in
@@ -288,13 +291,16 @@ booleans exist), update-check interval (hardcoded 24h), a persisted "last active
   - Guard `WorldPreferences.FromFile` against a null `keys` JSON key (currently NPEs).
   - Guard `AdditionalArgs.ToLower()` against null in validation.
 
-### 3.6 Directories configuration (parity)
+### 3.6 Directories configuration
 
-The Directories dialog edits the two **global** default paths (`ServerExePath`,
-`SaveDataFolderPath`); per-profile overrides live on the profile and win when non-blank. On save,
-paths are validated by constructing options and calling the path validators; failure shows
-"Save anyway?" (Yes proceeds, No reverts). Invalid paths CAN be saved deliberately. The file
-picker's `.exe` filter and default root must become platform-aware (§12).
+The Directories dialog edits the **global** default paths (`ServerExePath`, `SaveDataFolderPath`, and on
+Linux `BepInExPreloaderPath`, `DoorstopLibraryPath`) or, picked from "Set directories for:", one profile's
+overrides of them; an override wins when non-blank (an empty one shows "(use default)"). The BepInEx defaults
+are where the pack goes in the default server folder (`BepInEx/core/BepInEx.Preloader.dll`,
+`doorstop_libs/libdoorstop_x64.so`). Edits are kept per target while switching; OK saves every changed target.
+A changed path that does not exist prompts "Save anyway?" (the BepInEx paths only once the user changed them:
+an unmodded server has none). Invalid paths CAN be saved deliberately. Overrides live outside the main form,
+so saving a profile keeps them. Design: docs/MOD_SUPPORT_PLAN.md.
 
 ### 3.7 Launch-time validation (parity — `ValheimServerOptions.Validate`)
 
@@ -310,6 +316,8 @@ every entry point is protected — §5.2):
   exclusion); else each modifier key/value must be in the allowed sets; each key must be known.
 - `AdditionalArgs` must not contain `-logfile` (case-insensitive) — it would divert stdout away
   from the app's capture and break every log-based feature.
+- `EnvironmentVariables` must parse (§5.3) and must not set `SteamAppId`, nor `DOORSTOP_ENABLED` /
+  `DOORSTOP_TARGET_ASSEMBLY` while VSG is loading BepInEx (VSG sets them; the user's value would be lost).
 - Server binary + save dir validated last (existence).
 
 Target improvement: centralize validation so a profile can be validated at edit/save time with
@@ -399,6 +407,14 @@ Conditional:
 - `-modifier {key} {value}` once per modifier, only when no preset.
 - `-setkey {key}` once per key (independent of preset).
 - `{AdditionalArgs}` appended verbatim if non-blank.
+
+Environment: inherited, then the profile's `EnvironmentVariables` (whitespace-separated `NAME=VALUE`, shell-like
+quoting: literal outside quotes and in single quotes, `\"`/`\\` escapes in double quotes, no expansion), then
+the launch's own: `SteamAppId`; on Linux `LD_LIBRARY_PATH` (exe dir + `linux64/` in front of the existing value)
+and, when both BepInEx paths exist, `DOORSTOP_ENABLED=1`, `DOORSTOP_TARGET_ASSEMBLY=<preloader>` and the
+Doorstop library in front of `LD_PRELOAD`. The run-command log line starts with the variables as typed. On
+Windows BepInEx loads itself (winhttp.dll); its plugin output never reaches stdout there, so VSG tails this
+boot's `BepInEx/LogOutput.log` into the server log (preloader lines, which BepInEx replays to stdout, held back).
 
 The arg set was validated against the Valheim Dedicated Server manual and is unchanged by the
 2026 save-format update — the v2.4 breakage was detection-only, not command-building. Linux uses
@@ -725,9 +741,9 @@ field is a labeled input with optional tooltip/help.
   toggle + Copy; World group (Existing/New radios, existing dropdown, new-name field max 20,
   world-settings gear → World Preferences dialog, refresh worlds, open save folder); Join Options
   (Community Server, Enable Crossplay); **Start / Restart / Stop** buttons.
-- **Advanced Controls:** Directory Overrides (per-profile server exe [platform-aware picker] + save
-  folder, each with open button); Other Settings (auto-start this server, write server logs to
-  file, additional command-line args max 32767); Saving & Backups (save interval 60–86400, backups
+- **Advanced Controls:** a "Set Directories…" button (opens the Directories dialog on this profile);
+  Other Settings (auto-start this server, write server logs to file, additional command-line args max
+  32767, additional environment variables max 32767); Saving & Backups (save interval 60–86400, backups
   1–1000, short 300–2592000, long 300–2592000).
 - **Server Details** (read-only, refreshed on tab-visible + 1s timer): Connection Details (External
   / Internal / Local IP each + copy; Invite Code + copy; port-forwarding hint); Statistics (Server
@@ -773,8 +789,9 @@ active-profile, and the two log views. Tab-activation drives lazy refresh (bind 
   interval], start-on-login, start-minimized, write-app-logs-to-file, validate-password). OK saves
   (start-on-login applies via `IStartupManager`); Cancel discards; Restore Defaults repopulates
   fields only (no save until OK). Load in an on-open hook so a reused dialog shows current values.
-- **Directories:** global server-binary path (platform-aware picker) + save folder + open buttons;
-  OK validates-by-construction with a "Save anyway?" override; Restore Defaults repopulates only.
+- **Directories:** "Set directories for:" (All profiles / each profile) over the server binary, save
+  folder and (Linux) BepInEx preloader + Doorstop library paths, each with open buttons (§3.6); OK
+  saves with a "Save anyway?" override; Restore Defaults repopulates only (a profile: clears overrides).
 - **Bug Report:** description + optional contact; Submit gated on non-empty; submits via the crash
   pipeline in an async-operation dialog; fields cleared on open + close.
 - **Player Details:** §7.4.
@@ -869,7 +886,8 @@ MVVM enforces the UI/logic split; the safety net lives mostly in `Valheim.Core.T
    "connected" line), the graceful-stop save-flush A/B that `taskkill`/SIGINT is there to guarantee
    (graceful SIGINT advances the world-save mtime; a hard kill does not), a fixture-drift guard (the
    captured live log still matches the parser patterns), and mod loading. It runs once per server
-   configuration (`vanilla`, and `bepinex`: BepInExPack_Valheim plus one popular plugin), each in its
+   configuration (`vanilla`; `bepinex`: BepInExPack_Valheim plus one popular plugin; `bepinex-external`:
+   the same kept outside the server folder, loaded through the configured paths), each in its
    own container built from `tests/integration-image/Dockerfile`, in parallel. On Windows,
    `scripts/integration-windows.sh` runs the same complete suite per configuration in disposable Windows 11
    VMs (`tests/integration-vm/`, docs/WINDOWS_INTEGRATION_PLAN.md), in the logged-on user's interactive session,

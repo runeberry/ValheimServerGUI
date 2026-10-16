@@ -48,14 +48,20 @@ BUILD_LOG="$LOGDIR/build.log"
 TEST_LOG="$LOGDIR/test.log"
 BOOT_LOG="$LOGDIR/boot.log"
 
+# This host's build output (Directory.Build.props: $HOME/.cache/valheim-server-gui/artifacts). The integration
+# containers build the same projects under their own HOME (/tmp), so cleanup anchored here never touches their
+# test hosts while they run.
+ARTIFACTS="$HOME/.cache/valheim-server-gui/artifacts"
+XAUTH="$LOGDIR/Xauthority"
+
 cleanup() {
-  # Never leave a stray app/Xvfb/testhost behind if a phase is interrupted or a test deadlocks.
-  # The app pattern is anchored to argv[0] (the built apphost, or `dotnet <built dll>`), so a shell whose
-  # command line merely MENTIONS the app — e.g. the caller's own shell — is never matched; a bare
-  # "ValheimServerGUI.App" pattern used to kill the invoking shell. Xvfb is matched by exact process name.
-  pkill -f '^[^ ]*(dotnet [^ ]*)?valheim-server-gui/artifacts/bin/ValheimServerGUI\.App/' 2>/dev/null || true
-  pkill -x Xvfb 2>/dev/null || true
-  pkill -f "valheim-server-gui/artifacts/bin/ValheimServerGUI.*Tests" 2>/dev/null || true
+  # Never leave a stray app/Xvfb/testhost behind if a phase is interrupted or a test deadlocks. Every pattern
+  # names something only this run owns. The app pattern is anchored to argv[0] (the built apphost, or
+  # `dotnet <built dll>`), so a shell whose command line merely MENTIONS the app (e.g. the caller's own shell) is
+  # never matched. Xvfb is the one started with this run's auth file.
+  pkill -f "^([^ ]*dotnet )?$ARTIFACTS/bin/ValheimServerGUI\.App/" 2>/dev/null || true
+  pkill -f "^Xvfb .*-auth $XAUTH" 2>/dev/null || true
+  pkill -f "$ARTIFACTS/bin/ValheimServerGUI.*Tests" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
@@ -146,7 +152,7 @@ if [[ $RUN_BOOT -eq 1 && "$build_status" != "fail" ]]; then
   else
     # timeout returns 124 when it kills a still-running process — for a GUI app that IS the
     # success signal (it booted and stayed up). Any other exit = it died early.
-    timeout "$BOOT_TIMEOUT" xvfb-run -a dotnet run --project "$APP_PROJECT" --no-build >"$BOOT_LOG" 2>&1
+    timeout "$BOOT_TIMEOUT" xvfb-run -a -f "$XAUTH" dotnet run --project "$APP_PROJECT" --no-build >"$BOOT_LOG" 2>&1
     boot_code=$?
     cleanup
     if grep -iqE 'exception|unhandled|fatal error' "$BOOT_LOG"; then

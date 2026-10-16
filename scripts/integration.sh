@@ -125,9 +125,16 @@ for config in "${CONFIGS[@]}"; do
   rm -rf "$artifacts/blame"
   mkdir -p "$artifacts" "$savedir"
 
+  # The suite runs as the host user, who needs a passwd entry in the container: PlayFab Party (crossplay) looks the
+  # user up at load time and crashes the server (SIGSEGV in its logger) when getpwuid() finds no one.
+  passwd="$RUNLOG/passwd-$config"
+  { docker run --rm "vsg-integration:$config" cat /etc/passwd
+    echo "vsg:x:$(id -u):$(id -g):VSG integration:/tmp:/bin/sh"; } >"$passwd"
+
   # --blame-hang bounds + diagnoses a wedged test (dump + sequence file); `timeout` is the backstop.
   docker run --rm --init --name "$CONTAINER_PREFIX-$config" \
     -u "$(id -u):$(id -g)" \
+    -v "$passwd:/etc/passwd:ro" \
     -e HOME=/tmp \
     -e NUGET_PACKAGES=/tmp/nuget \
     -e VSG_IT_SAVEDIR=/save \

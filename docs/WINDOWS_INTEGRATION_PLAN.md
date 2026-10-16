@@ -18,7 +18,9 @@ Linux in containers. No dependency on Nuffle's laptop, no real Valheim data or p
     cleanly", "did not reach Stopped within the graceful-stop timeout").
 - **Windows containers are out** (no interactive session). Full VM on libvirt/KVM is the only fit on this host.
 - **One VM per configuration**, disposable qcow2 overlay on a read-only golden image, both in parallel.
-- **The server needs no extra runtimes** (no DirectX, no VC++ install) on a clean Win11 Enterprise eval.
+- **The server needs no extra runtimes to boot** (no DirectX) on a clean Win11 Enterprise eval, but **crossplay needs the
+  VC++ Redistributable**: PlayFab Party's PartyWin32.dll fails to load without it (found 2026-10-16 when the suite
+  switched to crossplay). `bake-server.ps1` installs it, checked by Microsoft signature.
 - **BepInEx on Windows never writes plugin lines to stdout** (its console logger writes to `CONOUT$`); the mod-loader
   test reads `BepInEx/LogOutput.log` (commit 3af9913). Nothing Windows-specific left in the tests.
 - **Eval license: 90 days counted from the image install**, 1 rearm. Disposable clones inherit the golden clock.

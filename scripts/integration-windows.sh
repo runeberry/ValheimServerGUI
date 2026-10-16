@@ -10,7 +10,8 @@
 #                 SDK, permanent auto-logon, the vsg-runner task. Rebuilt every IMAGE_MAX_AGE_DAYS (the evaluation
 #                 licence lasts 90 days from install) or on --rebuild-image. Takes 30-60 minutes, unattended.
 #   server layer  steamcmd + C:\valheim\vanilla + C:\valheim\bepinex (pins from
-#                 tests/integration-image/server-configs.env). Rebuilt with the OS layer or on --update-server.
+#                 tests/integration-image/server-configs.env). Rebuilt with the OS layer, on --update-server, or
+#                 when server-configs.env or bake-server.ps1 changes.
 #
 # Why a VM and a scheduled task: the lifecycle tests stop the server gracefully, and Windows refuses a graceful stop
 # from session 0, where SSH lands. The VM logs its user on automatically, and the host starts the suite with
@@ -60,6 +61,8 @@ done
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 VM_DIR="$REPO_ROOT/tests/integration-vm"
 PINS_FILE="$REPO_ROOT/tests/integration-image/server-configs.env"
+# What the server layer is built from besides the Valheim build; recorded in its stamp so a change rebuilds it.
+SERVER_INPUTS_HASH="$(cat "$PINS_FILE" "$VM_DIR/bake-server.ps1" | sha256sum | cut -c1-16)"
 ARTIFACT_ROOT="$REPO_ROOT/dist/integration-windows"
 CACHE="${XDG_CACHE_HOME:-$HOME/.cache}/valheim-server-gui/windows"
 LIBVIRT_URI="${VSG_LIBVIRT_URI:-qemu:///system}"
@@ -251,14 +254,14 @@ build_server_layer() {
   vm_scp "$VM_DIR/bake-server.ps1" "$VM_USER@$ip:C:/bake-server.ps1" || return 1
   vm_ssh "$ip" "powershell -NoProfile -ExecutionPolicy Bypass -File C:\\bake-server.ps1 \
     -BepInExPackUrl \"$BEPINEX_PACK_URL\" -BepInExPackSha256 \"$BEPINEX_PACK_SHA256\" \
-    -PluginUrl \"$PLUGIN_URL\" -PluginSha256 \"$PLUGIN_SHA256\" -PluginDir \"$PLUGIN_DIR\"" >"$RUNLOG/bake-server.log" 2>&1 \
+    -Plugins \"$PLUGINS\"" >"$RUNLOG/bake-server.log" 2>&1 \
     || { fail "bake-server.ps1"; tail -n 30 "$RUNLOG/bake-server.log"; return 1; }
   vm_ssh "$ip" "del C:\\bake-server.ps1" >/dev/null
   buildid="$(vm_ssh "$ip" "type C:\\valheim\\buildid.txt" | tr -dc '0-9')"
 
   shutdown_vm "$dom" "$ip" || { fail "the server build VM did not shut down"; return 1; }
   "${VIRSH[@]}" undefine --nvram "$dom" >/dev/null
-  echo "$(date +%s) $buildid" > "$CACHE/server.stamp"
+  echo "$(date +%s) $buildid $SERVER_INPUTS_HASH" > "$CACHE/server.stamp"
   ok "server layer built in $(( (SECONDS - t0) / 60 )) min (server build $buildid)"
 }
 
@@ -378,7 +381,8 @@ if [[ $REBUILD_IMAGE -eq 1 ]] || ! vol_exists "$OS_VOL" || ((os_age >= IMAGE_MAX
   os_age=0
 fi
 if [[ $UPDATE_SERVER -eq 1 ]] || ! vol_exists "$SERVER_VOL" || [[ ! -f "$CACHE/server.stamp" ]] \
-    || [[ "$CACHE/server.stamp" -ot "$CACHE/os.stamp" ]]; then
+    || [[ "$CACHE/server.stamp" -ot "$CACHE/os.stamp" ]] \
+    || [[ "$(cut -d' ' -f3 "$CACHE/server.stamp")" != "$SERVER_INPUTS_HASH" ]]; then
   log "building the server layer"
   build_server_layer || die "server layer build failed (VM vsg-win-build-server left up for inspection; the next build removes it)"
 fi

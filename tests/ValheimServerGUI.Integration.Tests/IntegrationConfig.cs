@@ -11,7 +11,7 @@ namespace ValheimServerGUI.Integration.Tests
         /// <summary>An unmodded server: no mod loader may load.</summary>
         Vanilla,
 
-        /// <summary>A server with BepInExPack_Valheim and <see cref="IntegrationConfig.ExpectedPlugin"/> installed.</summary>
+        /// <summary>A server with BepInExPack_Valheim and <see cref="IntegrationConfig.ExpectedPlugins"/> installed.</summary>
         BepInEx,
     }
 
@@ -48,10 +48,10 @@ namespace ValheimServerGUI.Integration.Tests
         public ServerConfiguration ServerConfig { get; }
 
         /// <summary>
-        /// For <see cref="ServerConfiguration.BepInEx"/>: the plugin as the BepInEx chainloader names it when loading
-        /// it (<c>"&lt;Name&gt; &lt;Version&gt;"</c>). Null for a vanilla server.
+        /// For <see cref="ServerConfiguration.BepInEx"/>: the installed plugins as the BepInEx chainloader names them
+        /// when loading them (<c>"&lt;Name&gt; &lt;Version&gt;"</c>). Empty for a vanilla server.
         /// </summary>
-        public string? ExpectedPlugin { get; }
+        public IReadOnlyList<string> ExpectedPlugins { get; }
 
         /// <summary>
         /// The BepInEx preloader and Doorstop library paths the suite configures, as the app's Set Directories
@@ -64,7 +64,7 @@ namespace ValheimServerGUI.Integration.Tests
         public string? DoorstopLibrary { get; }
 
         private IntegrationConfig(string serverExe, string saveDir, string artifactDir,
-            ServerConfiguration serverConfig, string? expectedPlugin, string? bepInExPreloader, string? doorstopLibrary)
+            ServerConfiguration serverConfig, IReadOnlyList<string> expectedPlugins, string? bepInExPreloader, string? doorstopLibrary)
         {
             BepInExPreloader = bepInExPreloader;
             DoorstopLibrary = doorstopLibrary;
@@ -72,7 +72,7 @@ namespace ValheimServerGUI.Integration.Tests
             SaveDir = saveDir;
             ArtifactDir = artifactDir;
             ServerConfig = serverConfig;
-            ExpectedPlugin = expectedPlugin;
+            ExpectedPlugins = expectedPlugins;
         }
 
         private static IntegrationConfig Load()
@@ -94,13 +94,12 @@ namespace ValheimServerGUI.Integration.Tests
             else if (!Enum.TryParse(configName, ignoreCase: true, out serverConfig) || !Enum.IsDefined(serverConfig))
                 problems.Add($"VSG_IT_SERVER_CONFIG must be vanilla or bepinex, not '{configName}'.");
 
-            var expectedPlugin = Environment.GetEnvironmentVariable("VSG_IT_EXPECTED_PLUGIN") is { Length: > 0 } plugin
-                ? plugin
-                : null;
-            if (serverConfig == ServerConfiguration.BepInEx && expectedPlugin is null)
-                problems.Add("VSG_IT_EXPECTED_PLUGIN is not set (the installed plugin as BepInEx logs it, e.g. 'Server Devcommands 1.115').");
-            else if (serverConfig == ServerConfiguration.Vanilla && expectedPlugin is not null)
-                problems.Add($"VSG_IT_EXPECTED_PLUGIN is set to '{expectedPlugin}', but a vanilla server has no plugins.");
+            var expectedPlugins = (Environment.GetEnvironmentVariable("VSG_IT_EXPECTED_PLUGINS") ?? string.Empty)
+                .Split(';', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            if (serverConfig == ServerConfiguration.BepInEx && expectedPlugins.Length == 0)
+                problems.Add("VSG_IT_EXPECTED_PLUGINS is not set (the installed plugins as BepInEx logs them, ';'-separated, e.g. 'Server Devcommands 1.115;Network 1.0.2').");
+            else if (serverConfig == ServerConfiguration.Vanilla && expectedPlugins.Length > 0)
+                problems.Add($"VSG_IT_EXPECTED_PLUGINS is set to '{string.Join(';', expectedPlugins)}', but a vanilla server has no plugins.");
 
             string? bepInExPreloader = null, doorstopLibrary = null;
             if (!OperatingSystem.IsWindows())
@@ -130,7 +129,7 @@ namespace ValheimServerGUI.Integration.Tests
             Directory.CreateDirectory(saveDir);
             Directory.CreateDirectory(artifactDir);
 
-            return new IntegrationConfig(serverExe!, saveDir, artifactDir, serverConfig, expectedPlugin,
+            return new IntegrationConfig(serverExe!, saveDir, artifactDir, serverConfig, expectedPlugins,
                 bepInExPreloader, doorstopLibrary);
         }
     }

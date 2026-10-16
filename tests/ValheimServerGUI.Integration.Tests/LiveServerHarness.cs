@@ -53,6 +53,7 @@ namespace ValheimServerGUI.Integration.Tests
         private readonly ServiceProvider _services;
         private readonly object _lock = new();
         private TaskCompletionSource<bool>? _runningTcs;
+        private readonly TaskCompletionSource<string> _inviteCodeTcs = new(TaskCreationOptions.RunContinuationsAsynchronously);
 
         public CapturingProcessProvider Processes { get; }
         public ValheimServer Server { get; }
@@ -85,6 +86,7 @@ namespace ValheimServerGUI.Integration.Tests
 
             Server.WorldSaved += (_, ms) => { lock (_lock) WorldSaves.Add(ms); };
             Server.StatusChanged += (_, s) => { if (s == ServerStatus.Running) _runningTcs?.TrySetResult(true); };
+            Server.InviteCodeReady += (_, code) => _inviteCodeTcs.TrySetResult(code);
         }
 
         public T GetService<T>() where T : notnull => _services.GetRequiredService<T>();
@@ -112,7 +114,8 @@ namespace ValheimServerGUI.Integration.Tests
             // §13: run public so the server goes through the real Steam relay path to "connected".
             Public = true,
             Port = 2700,
-            Crossplay = false,
+            // Crossplay, as a new profile defaults to: the server also registers with PlayFab and gets an invite code.
+            Crossplay = true,
             // Keep the auto-save interval long so no background save muddies the stop A/B window.
             SaveInterval = 1800,
             Backups = 1,
@@ -134,6 +137,16 @@ namespace ValheimServerGUI.Integration.Tests
 
             var completed = await Task.WhenAny(_runningTcs.Task, Task.Delay(timeout));
             return completed == _runningTcs.Task && Server.Status == ServerStatus.Running;
+        }
+
+        /// <summary>
+        /// Waits for the invite code the parser raises once the crossplay session is registered (after world
+        /// generation on a new world). Null if none arrives in time.
+        /// </summary>
+        public async Task<string?> WaitForInviteCodeAsync(TimeSpan timeout)
+        {
+            var completed = await Task.WhenAny(_inviteCodeTcs.Task, Task.Delay(timeout));
+            return completed == _inviteCodeTcs.Task ? _inviteCodeTcs.Task.Result : null;
         }
 
         /// <summary>Gracefully stops the server (SIGINT) and waits for it to reach Stopped.</summary>

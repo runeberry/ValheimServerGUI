@@ -21,8 +21,8 @@ try {
     $env:VSG_IT_SERVER_EXE = "C:\valheim\$cfg\valheim_server.exe"
     $env:VSG_IT_SERVER_CONFIG = $cfg
     if ($cfg -eq 'bepinex') {
-        $line = Select-String -Path "$src\tests\integration-image\server-configs.env" -Pattern '^EXPECTED_PLUGIN=(.*)$'
-        $env:VSG_IT_EXPECTED_PLUGIN = $line.Matches[0].Groups[1].Value.Trim('"')
+        $line = Select-String -Path "$src\tests\integration-image\server-configs.env" -Pattern '^EXPECTED_PLUGINS=(.*)$'
+        $env:VSG_IT_EXPECTED_PLUGINS = $line.Matches[0].Groups[1].Value.Trim('"')
     }
     $env:VSG_IT_SAVEDIR = "$out\savedir"
     $env:VSG_IT_ARTIFACT_DIR = "$out\artifacts"

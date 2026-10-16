@@ -23,11 +23,14 @@ namespace ValheimServerGUI.Integration.Tests
         // The stop is sent right after Running, while a new world may still be generating. Windows defers the
         // graceful stop until generation finishes (34 s measured on a laptop), so allow as long as a cold boot.
         private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(150);
+        // The invite code comes once world generation is done and PlayFab has registered the session.
+        private static readonly TimeSpan InviteCodeTimeout = TimeSpan.FromSeconds(120);
         private static readonly TimeSpan SettleAfterRunning = TimeSpan.FromSeconds(3);
         private static readonly TimeSpan DrainAfterStop = TimeSpan.FromSeconds(2);
 
         public bool ReachedRunning { get; private set; }
         public bool StoppedCleanly { get; private set; }
+        public string? InviteCode { get; private set; }
         public DateTime? SaveTimeBeforeStopUtc { get; private set; }
         public DateTime? SaveTimeAfterStopUtc { get; private set; }
         public int WorldSavesBeforeStop { get; private set; }
@@ -47,6 +50,8 @@ namespace ValheimServerGUI.Integration.Tests
 
             if (ReachedRunning)
             {
+                InviteCode = await harness.WaitForInviteCodeAsync(InviteCodeTimeout);
+
                 // Let the initial post-gen save settle so the "before" mtime is stable.
                 await Task.Delay(SettleAfterRunning);
                 SaveTimeBeforeStopUtc = harness.LatestWorldSaveTimeUtc();
@@ -153,10 +158,14 @@ namespace ValheimServerGUI.Integration.Tests
                 Assert.True(log.Any(l => l.Contains("Preloader finished")),
                     $"The BepInEx preloader did not run in the server VSG started. Artifact: {_fixture.ArtifactPath}");
 
-                Assert.True(log.Count(l => l.Contains($"Loading [{config.ExpectedPlugin}]")) == 1,
-                    $"The server log does not show BepInEx loading the plugin '{config.ExpectedPlugin}' exactly once. Artifact: {_fixture.ArtifactPath}");
-                Assert.True(log.Count(l => l.Contains("Chainloader startup complete")) == 1,
-                    $"The server log does not show the BepInEx chainloader finishing exactly once. Artifact: {_fixture.ArtifactPath}");
+                foreach (var plugin in config.ExpectedPlugins)
+                {
+                    Assert.True(log.Count(l => l.Contains($"Loading [{plugin}]")) == 1,
+                        $"The server log does not show BepInEx loading the plugin '{plugin}' exactly once. Artifact: {_fixture.ArtifactPath}");
+                }
+                var loaded = $"Chainloader startup complete ({config.ExpectedPlugins.Count} loaded, 0 skipped, 0 failed)";
+                Assert.True(log.Count(l => l.Contains(loaded)) == 1,
+                    $"The server log does not show '{loaded}' exactly once. Artifact: {_fixture.ArtifactPath}");
                 if (OperatingSystem.IsWindows())
                 {
                     Assert.True(log.Count(l => l.Contains("Preloader finished")) == 1,
@@ -167,6 +176,18 @@ namespace ValheimServerGUI.Integration.Tests
             {
                 Assert.DoesNotContain(log, l => l.Contains("BepInEx"));
             }
+        }
+
+        // Crossplay (a new profile's default): the server registers a PlayFab session and VSG picks the invite code
+        // players join with out of the live log. Runs with the configuration's mods loaded, so a mod that breaks
+        // crossplay registration fails here.
+        [Fact]
+        public void Crossplay_InviteCodeAppears()
+        {
+            Assert.True(_fixture.ReachedRunning, "Precondition failed: server never reached Running.");
+            Assert.True(_fixture.InviteCode is not null,
+                $"No invite code was raised from the server log. Artifact: {_fixture.ArtifactPath}");
+            Assert.Matches("^[0-9]{6}$", _fixture.InviteCode);
         }
 
         // Fixture-drift / capture: the captured real log is written as a run artifact, and we re-feed it

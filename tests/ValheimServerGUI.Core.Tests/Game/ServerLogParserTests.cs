@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using Serilog;
 using ValheimServerGUI.Core.Tests.Fakes;
 using ValheimServerGUI.Game;
@@ -236,6 +236,26 @@ namespace ValheimServerGUI.Core.Tests.Game
             _parser.ProcessLine("World save (5/5) done. Total time [20ms]");
 
             Assert.Equal(20m, saved);
+        }
+
+        // The game writes the total with ToString("N0") in the server's culture (ZNet.SaveWorldThread), so a save of
+        // a second or more carries that culture's group separator. Built here the same way, per culture.
+        [Theory]
+        [InlineData("en-US", 2760)]
+        [InlineData("de-DE", 2760)]
+        [InlineData("fr-FR", 2760)]
+        [InlineData("de-CH", 1234567)]
+        [InlineData("sv-SE", 1234567)]
+        [InlineData("en-US", 37)]
+        public void WorldSaved_CurrentFormat_ReadsTotalsWithGroupSeparators(string culture, int totalMs)
+        {
+            decimal? saved = null;
+            _parser.WorldSaved += (_, ms) => saved = ms;
+
+            var total = ((double)totalMs).ToString("N0", System.Globalization.CultureInfo.GetCultureInfo(culture));
+            _parser.ProcessLine("World save (5/5) done. Total time [" + total + "ms]");
+
+            Assert.Equal(totalMs, saved);
         }
 
         [Fact]

@@ -10,8 +10,11 @@
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
     <StackPanel Margin="20" Spacing="8">
-        <c:DropdownFormField LabelText="{x:Static loc:Strings.Directories_Target_Label}"
-                             ItemsSource="{Binding Targets}" Value="{Binding SelectedTarget}" />
+        <!-- Half width, so the target picker reads as different from the path fields it controls. -->
+        <Grid ColumnDefinitions="*,*">
+            <c:DropdownFormField LabelText="{x:Static loc:Strings.Directories_Target_Label}"
+                                 ItemsSource="{Binding Targets}" Value="{Binding SelectedTarget}" />
+        </Grid>
         <c:FilenameFormField LabelText="{x:Static loc:Strings.Paths_ServerExe_Label}" SelectMode="File"
                              Value="{Binding ServerExePath}" Watermark="{Binding Placeholder}"
                              IsInputEnabled="{Binding IsInputEnabled}"

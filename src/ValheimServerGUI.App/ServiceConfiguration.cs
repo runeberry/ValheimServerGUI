@@ -57,7 +57,7 @@ internal static class ServiceConfiguration
     // registration relaunches the actual running app.
     private static IStartupStrategy CreateStartupStrategy()
     {
-        var execPath = Environment.ProcessPath ?? string.Empty;
+        var execPath = ResolveLaunchPath(Environment.ProcessPath, Environment.GetEnvironmentVariable("APPIMAGE"));
 
         if (OperatingSystem.IsWindows())
             return new WindowsRunKeyStrategy(new RegistryRunKey(), AppConstants.StartupKey, execPath);
@@ -69,4 +69,11 @@ internal static class ServiceConfiguration
 
         return new LinuxAutostartStrategy(autostartDir, execPath, AppConstants.ProductName, AppConstants.StartupKey);
     }
+
+    /// <summary>
+    /// The path that relaunches this app. An AppImage runs from a temporary mount that is gone once the app
+    /// exits, so when the AppImage runtime sets <c>APPIMAGE</c> (the AppImage file itself), that path is used.
+    /// </summary>
+    internal static string ResolveLaunchPath(string? processPath, string? appImagePath)
+        => !string.IsNullOrEmpty(appImagePath) ? appImagePath : processPath ?? string.Empty;
 }

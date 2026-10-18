@@ -60,7 +60,7 @@ internal static class ServiceConfiguration
         var execPath = Environment.ProcessPath ?? string.Empty;
 
         if (OperatingSystem.IsWindows())
-            return new WindowsRunKeyStrategy(AppConstants.StartupKey, execPath);
+            return new WindowsRunKeyStrategy(new RegistryRunKey(), AppConstants.StartupKey, execPath);
 
         var configHome = Environment.GetEnvironmentVariable("XDG_CONFIG_HOME");
         if (string.IsNullOrEmpty(configHome))

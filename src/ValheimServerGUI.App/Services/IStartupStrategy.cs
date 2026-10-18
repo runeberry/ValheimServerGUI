@@ -3,7 +3,7 @@ namespace ValheimServerGUI.App.Services;
 /// <summary>
 /// The per-OS mechanism behind <see cref="ValheimServerGUI.Tools.IStartupManager"/>: Windows uses the
 /// HKCU Run key, Linux an XDG autostart <c>.desktop</c> entry. Split out so each strategy is unit-tested
-/// against an injected boundary (a temp autostart dir on Linux; a Win-guarded registry test on Windows).
+/// against an injected boundary (an autostart directory; an <see cref="IRunKey"/>).
 /// </summary>
 public interface IStartupStrategy
 {

@@ -1,23 +1,20 @@
 using System;
-using System.Runtime.Versioning;
-using Microsoft.Win32;
 
 namespace ValheimServerGUI.App.Services;
 
 /// <summary>
-/// Windows run-on-login via the per-user HKCU <c>Run</c> key (HKLM would need admin rights). Idempotent, and
-/// repairs a stale value that points at the wrong executable.
+/// Windows run-on-login via a value in the per-user <c>Run</c> registry key. Idempotent, and repairs a stale
+/// value that points at the wrong executable.
 /// </summary>
-[SupportedOSPlatform("windows")]
 public sealed class WindowsRunKeyStrategy : IStartupStrategy
 {
-    private const string RunKeyPath = @"Software\Microsoft\Windows\CurrentVersion\Run";
-
+    private readonly IRunKey _runKey;
     private readonly string _valueName;
     private readonly string _command;
 
-    public WindowsRunKeyStrategy(string valueName, string executablePath)
+    public WindowsRunKeyStrategy(IRunKey runKey, string valueName, string executablePath)
     {
+        _runKey = runKey;
         _valueName = valueName;
         // Quote the path so a space in the install directory does not split the command.
         _command = $"\"{executablePath}\"";
@@ -25,23 +22,19 @@ public sealed class WindowsRunKeyStrategy : IStartupStrategy
 
     public bool Apply(bool runOnStartup)
     {
-        using var key = Registry.CurrentUser.OpenSubKey(RunKeyPath, writable: true)
-                        ?? Registry.CurrentUser.CreateSubKey(RunKeyPath);
-        if (key is null) return false;
-
-        var current = key.GetValue(_valueName) as string;
+        var current = _runKey.GetValue(_valueName);
 
         if (!runOnStartup)
         {
             if (current is null) return false;
-            key.DeleteValue(_valueName, throwOnMissingValue: false);
+            _runKey.DeleteValue(_valueName);
             return true;
         }
 
         if (string.Equals(current, _command, StringComparison.OrdinalIgnoreCase))
             return false; // already correct — idempotent no-op
 
-        key.SetValue(_valueName, _command);
+        _runKey.SetValue(_valueName, _command);
         return true;
     }
 }

@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
 #
 # integration.sh — the COMPLETE test suite: the build + unit tests (scripts/validate.sh --quick) on the host,
-# then the tier-4 LIVE smoke against a real Valheim dedicated server (docs/V3_TARGET_STATE.md §13, matrix E9)
-# in every server configuration, each in its own container, in parallel.
+# then the LIVE smoke against a real Valheim dedicated server in every server configuration, each in its own
+# container, in parallel.
 #
 # Server configurations are the final stages of tests/integration-image/Dockerfile:
 #   vanilla           - the current public dedicated server build
-#   bepinex           - the same server with BepInExPack_Valheim and one popular plugin (pinned in server-configs.env)
-#   bepinex-external  - the same pack + plugin kept outside the server folder, loaded via the configured paths
+#   bepinex           - the same server with BepInExPack_Valheim and the plugins pinned in server-configs.env
+#   bepinex-external  - the same pack + plugins kept outside the server folder, loaded via the configured paths
 #
 # Each container holds the .NET SDK and the server install, and runs `dotnet test -p:Integration=true` on the
 # integration project against the read-only repo, so ValheimServer launches the real binary as a local child
@@ -16,10 +16,11 @@
 #
 # What each configuration proves (all against the REAL binary, no game client):
 #   - the server boots to Running off the real "Game server connected" line;
-#   - a graceful SIGINT stop flushes a world save, and a hard kill does NOT (the E9 A/B);
+#   - with crossplay on, the parser raises an invite code once PlayFab registers the session;
+#   - a graceful SIGINT stop flushes a world save, and a hard kill does NOT (proving the graceful path matters);
 #   - the world save parses with the player-history reader;
 #   - the live log still matches the ServerLogParser patterns (fixture-drift guard), captured as an artifact;
-#   - mods load exactly when installed (BepInEx loads its plugin; vanilla shows no mod loader).
+#   - mods load exactly when installed (BepInEx loads its plugins; vanilla shows no mod loader).
 #
 # Needs Docker, and outbound connectivity to Steam (image build downloads the server; reaching Running needs
 # the Steam relay). The first run downloads ~2 GB and is cached as an image layer afterwards.
@@ -29,8 +30,8 @@
 #   --update-server   re-download the dedicated server (picks up a new Valheim build)
 #   config...         run only these configurations (default: all)
 #
-# Keep this script + tests/integration-image/Dockerfile + the CLAUDE.local.md note in step with the test
-# project as the workflow evolves (same rule as validate.sh).
+# Keep this script + tests/integration-image/Dockerfile in step with the test project as the workflow
+# evolves (same rule as validate.sh).
 
 set -uo pipefail
 

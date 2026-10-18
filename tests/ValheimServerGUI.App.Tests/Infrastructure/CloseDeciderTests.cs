@@ -7,7 +7,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Tests.Infrastructure;
 
-// §2.4 "safe shutdowns": the exit decision when the last window closes, aggregated over every server's status.
+// Safe shutdown: the exit decision when the last window closes, aggregated over every server's status.
 public class CloseDeciderTests
 {
     private readonly List<string> _asked = new();

@@ -5,7 +5,7 @@ using ValheimServerGUI.Tools.Logging;
 namespace ValheimServerGUI.App.Infrastructure;
 
 /// <summary>
-/// Tracks the open <see cref="MainWindow"/> instances (multi-window, §2.2) and disposes each window's
+/// Tracks the open <see cref="MainWindow"/> instances and disposes each window's
 /// view-model — and therefore its transient <see cref="ValheimServerGUI.Game.ValheimServer"/> — when the
 /// window closes. Process exit is governed by the lifetime's <c>OnLastWindowClose</c>; this manager only
 /// owns the per-window bookkeeping the tray and "New Window" build on.

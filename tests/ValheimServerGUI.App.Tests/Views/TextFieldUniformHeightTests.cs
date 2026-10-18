@@ -9,10 +9,10 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// Regression: a text box paired with a taller sibling (browse/copy button, show toggle) used to stretch
-// vertically, giving those fields visibly more padding than a plain field. Every field's visible input box
-// must be the same height — for a plain field that box is the TextBox; for a shell-wrapped field
-// (FilenameFormField) it is the outlined Border.fieldShell that hosts the chromeless box + end-caps.
+// A text box paired with a taller sibling (browse/copy button, show toggle) must not stretch vertically.
+// Every field's visible input box must be the same height — for a plain field that box is the TextBox; for a
+// shell-wrapped field (FilenameFormField) it is the outlined Border.fieldShell that hosts the chromeless box +
+// end-caps.
 public class TextFieldUniformHeightTests
 {
     private static void Realize(Control field)
@@ -47,7 +47,7 @@ public class TextFieldUniformHeightTests
 
         var plainHeight = Box(plainField).Bounds.Height;
 
-        // Two bare boxes must match exactly (the original regression was a several-px stretch).
+        // Two bare boxes must match exactly.
         Assert.Equal(plainHeight, Box(withTrailingField).Bounds.Height);
         // The shell (border + chromeless box) matches a bare box to within a pixel of border/metric rounding.
         Assert.True(System.Math.Abs(plainHeight - Shell(filenameField).Bounds.Height) <= 1,

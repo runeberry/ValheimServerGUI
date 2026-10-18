@@ -10,8 +10,8 @@ namespace ValheimServerGUI.Game
     /// <see cref="PlayerAccessListService"/>'s canonical-write form and is the ONLY place tokens are parsed
     /// into a platform, so the heuristic lives in one spot.
     ///
-    /// <para>The resolution is deliberately <b>fail-closed</b> (a caller fails the whole import on any
-    /// unresolved token) because deeper study of the binary's exact token grammar is deferred:</para>
+    /// <para>The resolution is deliberately <b>fail-closed</b>: a token resolves only when its shape is unambiguous,
+    /// and callers skip unresolved tokens (list writes carry them through untouched):</para>
     /// <list type="bullet">
     /// <item>A prefixed <c>&lt;Platform&gt;_&lt;id&gt;</c> token resolves when the prefix is a known platform
     /// (case-insensitively, via <see cref="PlayerPlatforms.TryGetValidPlatform"/>). The remainder is the id;

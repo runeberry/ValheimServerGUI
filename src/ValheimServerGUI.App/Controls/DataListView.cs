@@ -14,7 +14,7 @@ using Avalonia.VisualTree;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// The app's one shared data table (the WinForms <c>DataListView</c> equivalent), used by both the Players
+/// The app's one shared data table, used by both the Players
 /// grid and the Known Characters table. It wraps a <see cref="DataGrid"/> carrying the shared styling —
 /// LayerBase background, dark header, no gridlines, read-only / no-column-reorder defaults, a 1px frame —
 /// and adds an optional compact <b>footer</b> hosting action controls (icon buttons) anchored left and/or
@@ -138,7 +138,7 @@ public class DataListView : TemplatedControl
         _grid = e.NameScope.Find<DataGrid>("PART_Grid");
         if (_grid is null) return;
 
-        // Shared defaults (previously set on the DataGrid subclass).
+        // Shared defaults.
         _grid.IsReadOnly = true;
         _grid.CanUserReorderColumns = false;
         _grid.GridLinesVisibility = DataGridGridLinesVisibility.None;

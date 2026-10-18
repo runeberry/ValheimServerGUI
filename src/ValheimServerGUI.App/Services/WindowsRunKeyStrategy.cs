@@ -5,9 +5,8 @@ using Microsoft.Win32;
 namespace ValheimServerGUI.App.Services;
 
 /// <summary>
-/// Windows run-on-login via the per-user HKCU <c>Run</c> key (the HKLM tier is dropped — see §16: it
-/// needed admin and silently fell back to HKCU anyway). Idempotent, and repairs a stale value that points
-/// at the wrong executable (E53).
+/// Windows run-on-login via the per-user HKCU <c>Run</c> key (HKLM would need admin rights). Idempotent, and
+/// repairs a stale value that points at the wrong executable.
 /// </summary>
 [SupportedOSPlatform("windows")]
 public sealed class WindowsRunKeyStrategy : IStartupStrategy

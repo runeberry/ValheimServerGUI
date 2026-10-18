@@ -4,7 +4,7 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Tools.Models
 {
     /// <summary>
-    /// Backs the crossplay player-correlation path (E21) and list management: Steam/Xbox/PlayStation/Nintendo
+    /// Backs the crossplay player-correlation path and list management: Steam/Xbox/PlayStation/Nintendo
     /// are valid platforms (the game's "Switch" token normalizes to Nintendo), input is case-corrected and
     /// trimmed, and anything else (or null) is rejected so it is never recorded.
     /// </summary>

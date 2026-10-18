@@ -61,8 +61,8 @@
                 </Style>
             </c:DataListView.Styles>
             <c:DataListView.Columns>
-                <!-- Platform icon is a prefix of the name (its own column was collapsed here); the column
-                     still sorts by the plain DisplayName so the icon doesn't affect ordering. -->
+                <!-- Platform icon is a prefix of the name rather than its own column; the column sorts by
+                     the plain DisplayName so the icon doesn't affect ordering. -->
                 <DataGridTemplateColumn Header="{x:Static loc:Strings.Players_Column_Player}" Width="*" SortMemberPath="DisplayName">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate x:DataType="vm:PlayerRowViewModel">

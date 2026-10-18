@@ -6,9 +6,8 @@ using ValheimServerGUI.Localization;
 namespace ValheimServerGUI.App.Views.Dialogs;
 
 /// <summary>
-/// Async facade over <see cref="MessageBoxWindow"/> — the app's WinForms <c>MessageBox.Show</c> replacement.
-/// All modal prompts (info, yes/no, multi-choice) route through here so there is one dialog implementation and
-/// no per-prompt window classes.
+/// Async facade over <see cref="MessageBoxWindow"/>. All modal prompts (info, yes/no, multi-choice) route
+/// through here so there is one dialog implementation and no per-prompt window classes.
 /// </summary>
 public static class MessageBox
 {

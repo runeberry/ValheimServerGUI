@@ -25,7 +25,7 @@ namespace ValheimServerGUI.Game
             prefs.WorldName = file.WorldName;
             prefs.LastSaved = file.LastSaved ?? prefs.LastSaved;
             prefs.Preset = file.Preset;
-            // §15 #7: a JSON file with null "modifiers"/"keys" (absent or explicitly null) must not NPE.
+            // A JSON file with null "modifiers"/"keys" (absent or explicitly null) must not NPE.
             prefs.Modifiers = file.Modifiers ?? prefs.Modifiers;
             prefs.Keys = file.Keys?.ToHashSet() ?? prefs.Keys;
 

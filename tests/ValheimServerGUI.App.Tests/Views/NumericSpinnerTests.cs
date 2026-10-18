@@ -11,8 +11,8 @@ using Xunit;
 namespace ValheimServerGUI.App.Tests.Views;
 
 // The compact vertically-stacked NumericUpDown spinner (owned + scoped inside NumericFormField): the up/down
-// repeat buttons stay wired (named PART_Increase/DecreaseButton) so clicking them steps by Increment —
-// proving the custom ButtonSpinner theme replaced Fluent's wide side-by-side pair without losing function.
+// repeat buttons stay wired (named PART_Increase/DecreaseButton) so clicking them steps by Increment, i.e. the
+// custom ButtonSpinner theme keeps the behavior of Fluent's side-by-side pair.
 public class NumericSpinnerTests
 {
     private static NumericUpDown Show()

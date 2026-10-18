@@ -5,9 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// Base for the OK / Cancel / Restore-Defaults dialog VMs (§11.2 reusable shape): load on open, flush on
-/// OK. Tracks a dirty flag (any edit after load) to back the unsaved-changes guard (§13.3). Derivations
-/// implement <see cref="ApplyDefaults"/> and typically a <c>Save</c> the window calls on OK.
+/// Base for the OK / Cancel / Restore-Defaults dialog VMs: load on open, flush on OK. Tracks a dirty flag
+/// (any edit after load) to back the unsaved-changes guard. Derivations implement <see cref="ApplyDefaults"/>
+/// and typically a <c>Save</c> the window calls on OK.
 /// </summary>
 public abstract partial class ModalEditViewModel : ObservableObject
 {

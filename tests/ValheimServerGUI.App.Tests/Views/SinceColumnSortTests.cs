@@ -19,7 +19,7 @@ using Xunit;
 namespace ValheimServerGUI.App.Tests.Views;
 
 // The "Since" columns sort by the underlying timestamp, not by their relative-time text (which orders by wording:
-// "just now" would land before "5 minutes ago"). Oldest first ascending, like the WinForms TimeAgo comparison.
+// "just now" would land before "5 minutes ago"). Ascending puts the oldest first.
 public class SinceColumnSortTests
 {
     private static readonly IServiceProvider Core =

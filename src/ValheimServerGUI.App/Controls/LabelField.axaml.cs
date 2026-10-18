@@ -7,10 +7,10 @@ using Avalonia.Markup.Xaml;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// The app's read-only caption + value row (the WinForms <c>LabelField</c> equivalent): a right-aligned
+/// The app's read-only caption + value row: a right-aligned
 /// <see cref="FormFieldBase.LabelText"/> caption, a selectable read-only <see cref="Value"/>, the help glyph,
-/// and an optional <see cref="TrailingContent"/> slot (e.g. a <see cref="CopyButton"/>). Replaces the raw
-/// caption/value grids in the Server Details surface.
+/// and an optional <see cref="TrailingContent"/> slot (e.g. a <see cref="CopyButton"/>). Use it instead of
+/// raw caption/value grids (e.g. the Server Details surface).
 /// </summary>
 public partial class LabelField : FormFieldBase, IFormField<string>
 {
@@ -18,7 +18,7 @@ public partial class LabelField : FormFieldBase, IFormField<string>
         AvaloniaProperty.Register<LabelField, string>(nameof(Value), defaultValue: string.Empty,
             defaultBindingMode: BindingMode.TwoWay);
 
-    /// <summary>Width of the caption column (default 130, matching the WinForms detail rows).</summary>
+    /// <summary>Width of the caption column (default 130).</summary>
     public static readonly StyledProperty<GridLength> LabelWidthProperty =
         AvaloniaProperty.Register<LabelField, GridLength>(nameof(LabelWidth), defaultValue: new GridLength(130));
 

@@ -12,8 +12,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.ViewModels;
 
-// Regression: the app layer had lost nearly all of its logging in the port. These assert that ordinary
-// user actions actually reach the shared application-log buffer (what the Logs tab shows).
+// Ordinary user actions must reach the shared application-log buffer (what the Logs tab shows).
 public class AppLoggingTests
 {
     private static readonly IServiceProvider Core =

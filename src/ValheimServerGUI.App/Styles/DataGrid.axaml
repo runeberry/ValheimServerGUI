@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Look + density for the shared DataListView grid (§ V3 styling). Merged after the Fluent DataGrid
-         theme so these win. The header + rows are a fixed 20px tall (set on the DataGrid in DataListView.cs)
+    <!-- Look + density for the shared DataListView grid. Merged after the Fluent DataGrid theme so these
+         win. The header (28px) and rows (20px) have fixed heights (set on the DataGrid in DataListView.cs)
          with content vertically centred, so a 16px icon rests naturally and content aligns without any
          per-cell vertical padding. Horizontal inset is a single 6px cell/header padding. A dark header bar
          matches the footer; there are no inter-row gridlines. -->
@@ -15,7 +15,7 @@
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="6,0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
-        <!-- Fluent's 32px min blocks the fixed 20px ColumnHeaderHeight; drop it. -->
+        <!-- Fluent's 32px min blocks the fixed ColumnHeaderHeight; drop it. -->
         <Setter Property="MinHeight" Value="0" />
     </Style>
 

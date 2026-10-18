@@ -22,7 +22,7 @@ namespace ValheimServerGUI.Game
         /// "PlayStation"/"Playstation", "Switch"), preserved verbatim so admin/ban/permit list-file entries
         /// are written with the binary's own casing (<c>ZNet.ListContainsId</c> matches non-Steam IDs
         /// case-sensitively). <see cref="Platform"/> stays the normalized value for UI/icons.
-        /// Null for records created before this field existed or added by ID without a captured token; the
+        /// Null when no token was captured (e.g. a player added by ID, or a record saved without one); the
         /// access-list service then falls back to <see cref="Platform"/>.
         /// </summary>
         [JsonProperty("platformRaw", NullValueHandling = NullValueHandling.Ignore)]
@@ -120,8 +120,8 @@ namespace ValheimServerGUI.Game
             public bool MatchConfident { get; set; }
 
             /// <summary>
-            /// The last time this character was active on the server (login or session end). Added in v3.0
-            /// and optional: characters recorded by earlier versions leave this null (a blank "Since").
+            /// The last time this character was active on the server (login or session end). Optional:
+            /// characters recorded by versions before 3.0 leave this null (a blank "Since").
             /// </summary>
             [JsonProperty("lastSeen", NullValueHandling = NullValueHandling.Ignore)]
             public DateTimeOffset? LastSeen { get; set; }

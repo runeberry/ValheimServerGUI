@@ -9,12 +9,10 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
-    /// The seam payoff: the v2.4 ValheimServerTests scenarios, migrated to drive the parser directly
-    /// via <see cref="ServerLogParser.ProcessLine"/> with a real <see cref="PlayerDataRepository"/> over
-    /// an in-memory file provider. Zero process/exe/filesystem dependency -- these run on Linux with no
-    /// Valheim install, which the old Windows-path boot hack could not. Covers the regex table, the
-    /// server-connected/world-saved/invite-code signals, and the join->online correlation heuristic
-    /// (E21-E28), including a negative ZDOID.
+    /// Drives the parser directly via <see cref="ServerLogParser.ProcessLine"/> with a real
+    /// <see cref="PlayerDataRepository"/> over an in-memory file provider: no process, exe or filesystem, so
+    /// these need no Valheim install. Covers the regex table, the server-connected/world-saved/invite-code
+    /// signals, and the join->online correlation heuristic, including a negative ZDOID.
     /// </summary>
     public class ServerLogParserTests
     {
@@ -95,7 +93,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         [Fact]
         public void UnknownCrossplayPlatform_IsNotRecorded()
         {
-            // E21: a platform the app doesn't know is ignored.
+            // A platform the app doesn't know is ignored.
             Process(MessageJoiningCrossplay, "Epic", "9999");
             Assert.Empty(_repo.Data);
         }
@@ -141,7 +139,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         [Fact]
         public void OfflineByZdoId_Crossplay_MarksOffline()
         {
-            // E27/E28: crossplay disconnect is matched by (negative) ZDOID via the Or-query.
+            // A crossplay disconnect is matched by (negative) ZDOID via the Or-query.
             Process(MessageJoiningCrossplay, PlayerPlatforms.Xbox, "5678");
             Process(MessageOnline, "Crossy", "-4242");
             Process(MessageOfflineCrossplay, "-4242");
@@ -166,7 +164,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         [Fact]
         public void MultipleJoinersAtOnce_AssignedEarliestFirst_LowConfidence()
         {
-            // E24: several join with no known names; each character online is assigned to the
+            // Several join with no known names; each character online is assigned to the
             // earliest still-joining player, flagged low-confidence.
             var ids = new[] { "123", "456", "789" };
             Process(MessageJoining, ids[0]);
@@ -191,8 +189,8 @@ namespace ValheimServerGUI.Core.Tests.Game
         [Fact]
         public void SameSteamId_RejoinsUnderNewCharacter_TracksBothCharacters()
         {
-            // E26: a rejoin reuses the most-recently-offline record (no dup); E25: a second character
-            // is added and lastStatusCharacter updated.
+            // A rejoin reuses the most-recently-offline record (no dup); a second character is added and
+            // lastStatusCharacter updated.
             Process(MessageJoining, "1234");
             Process(MessageOnline, "CharacterOne", "234");
             Process(MessageOffline, "1234");
@@ -220,9 +218,8 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(123.45m, saved);
         }
 
-        // Valheim 1.0+ multi-step save sequence (captured live, tier-4): only the final "(5/5) done. Total
-        // time [..ms]" line raises the event; the intermediate steps must not. Pins the current log format
-        // the live smoke verified against the real binary.
+        // Valheim 1.0+ multi-step save sequence (lines as the real server writes them): only the final
+        // "(5/5) done. Total time [..ms]" line raises the event; the intermediate steps must not.
         [Fact]
         public void WorldSaved_CurrentMultiStepFormat_RaisesEventOnlyOnCompletion()
         {

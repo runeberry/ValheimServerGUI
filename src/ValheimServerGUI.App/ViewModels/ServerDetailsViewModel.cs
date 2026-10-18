@@ -10,7 +10,7 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// Server Details tab (§10.2): connection details (External/Internal/Local IP + a session invite code)
+/// Server Details tab: connection details (External/Internal/Local IP + a session invite code)
 /// and statistics (uptime, last/average world-save). Read-only, refreshed while the tab is visible via a
 /// 1s timer plus the live server/IP events. The IP shown appends <c>:port</c> only for a non-default port.
 /// </summary>
@@ -49,7 +49,7 @@ public partial class ServerDetailsViewModel : ViewModelBase
     /// Re-targets the tab onto <paramref name="next"/> (profile switch): unsubscribes the previous server's
     /// events, subscribes the new one, and reseeds the derived readouts (invite code, world-save history,
     /// uptime — seeded from the server's own <see cref="ValheimServer.StartedAt"/> so an already-running
-    /// server reports its true uptime). The timer and <c>_isActive</c> survive (preferred over recreate).
+    /// server reports its true uptime). The timer and <c>_isActive</c> survive the re-target.
     /// </summary>
     public void SetServer(ValheimServer next)
     {

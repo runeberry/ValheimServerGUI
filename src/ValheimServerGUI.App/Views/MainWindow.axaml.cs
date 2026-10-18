@@ -209,7 +209,7 @@ public partial class MainWindow : Window
         await CheckServerExePathAsync();
     }
 
-    // Startup parity: warn if the configured server exe is missing and offer to open the Directories dialog.
+    // On open, warn if the configured server exe is missing and offer to open the Directories dialog.
     // Only under a real desktop lifetime — never prompt in a headless/test run.
     private async Task CheckServerExePathAsync()
     {
@@ -221,7 +221,7 @@ public partial class MainWindow : Window
             await HandleMenuActionAsync(MenuAction.SetDirectories);
     }
 
-    // Tab-visible lazy refresh (§10.2): the Details/Players 1s timers run only while their tab is shown.
+    // Tab-visible lazy refresh: the Details/Players 1s timers run only while their tab is shown.
     private void OnTabChanged(object? sender, SelectionChangedEventArgs e)
     {
         if (ViewModel is null) return;
@@ -251,15 +251,15 @@ public partial class MainWindow : Window
     // (WindowManager disposes this window's view-model on Closed, which only unsubscribes it). Closing the LAST
     // window exits the app, so App.OnMainWindowClosing asks about running servers first (see App.OnShutdownRequested).
 
-    // Tray header + tooltip wording (WinForms parity): compact "ValheimServerGUI" tooltip, "Profile: {name}"
-    // header, distinct from the window title.
+    // Tray header + tooltip wording: a compact "ValheimServerGUI" tooltip and a "Profile: {name}" header,
+    // distinct from the window title.
     private static string TrayHeader(MainWindowViewModel vm)
         => vm.CurrentProfile is { } p ? string.Format(Strings.Tray_Profile, p.ProfileName) : Strings.Tray_NoProfile;
 
     private static string TrayTooltip(MainWindowViewModel vm)
         => vm.CurrentProfile is { } p ? $"ValheimServerGUI - {p.ProfileName}" : "ValheimServerGUI";
 
-    // Tray icon + native menu (§10.4). Both buttons and tray items bind the SAME VM commands, so their
+    // Tray icon + native menu. Both buttons and tray items bind the SAME VM commands, so their
     // enablement is derived, never duplicated. Only under a desktop lifetime (skipped headless / no tray).
     private void SetUpTrayIcon()
     {
@@ -274,7 +274,7 @@ public partial class MainWindow : Window
             header.Click += (_, _) => RestoreAndActivate();
             menu.Add(header);
             menu.Add(new NativeMenuItemSeparator());
-            // Restore the WinForms control icons (header + Close stay icon-less). NativeMenuItem.Icon is a
+            // Server control icons (header + Close stay icon-less). NativeMenuItem.Icon is a
             // Bitmap, which AppIcons.Get already returns; native disabled rendering is the OS's, so no
             // grayscale hook here.
             menu.Add(new NativeMenuItem { Header = Strings.ServerAction_Start, Command = ViewModel.StartCommand, Icon = AppIcons.Get("Run_16x") });

@@ -13,9 +13,8 @@ namespace ValheimServerGUI
     public static class CoreServiceCollectionExtensions
     {
         /// <summary>
-        /// Registers the headless service layer (the Tools + Game groups of the old Program.ConfigureServices),
-        /// selecting the per-OS bucket-A implementations. The Phase 2 shell supplies the remaining
-        /// composition: the bucket-B seams (<see cref="IUserPrompt"/>, <see cref="IStartupManager"/>,
+        /// Registers the headless service layer, selecting the per-OS path resolvers. The UI shell supplies
+        /// the rest: the UI-bound seams (<see cref="IUserPrompt"/>, <see cref="IStartupManager"/>,
         /// <see cref="IShellLauncher"/>), <see cref="IStartupArgsProvider"/> (it needs the process args),
         /// and the views.
         /// </summary>
@@ -25,7 +24,7 @@ namespace ValheimServerGUI
         /// <summary>Test seam: inject the OS boundary so either resolver set can be verified on any host.</summary>
         internal static IServiceCollection AddValheimCore(this IServiceCollection services, bool onWindows)
         {
-            // Bucket A: OS-dispatched path/steam resolvers.
+            // OS-dispatched path/steam resolvers.
             if (onWindows)
             {
                 services

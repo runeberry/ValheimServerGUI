@@ -24,10 +24,9 @@ public sealed class MessageBoxButton
 }
 
 /// <summary>
-/// The single reusable modal for title + message + a row of buttons — the Avalonia replacement for WinForms
-/// <c>MessageBox.Show</c>. It carries no per-dialog styling: callers describe the buttons (caption + result)
-/// and the window closes with the chosen result. Prefer the <see cref="MessageBox"/> facade over constructing
-/// this directly.
+/// The single reusable modal for title + message + a row of buttons. It carries no per-dialog styling: callers
+/// describe the buttons (caption + result) and the window closes with the chosen result. Prefer the
+/// <see cref="MessageBox"/> facade over constructing this directly.
 /// </summary>
 public partial class MessageBoxWindow : DialogWindow
 {

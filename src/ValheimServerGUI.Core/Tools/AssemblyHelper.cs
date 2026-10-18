@@ -20,9 +20,8 @@ namespace ValheimServerGUI.Tools
         public static string GetApplicationVersion()
         {
             // The informational version carries an optional "+build<timestamp>" suffix (set as
-            // SourceRevisionId in the csproj). Guard its absence: without a build suffix (e.g. a
-            // test host, or a build that did not stamp one) IndexOf returns -1 and the range would
-            // throw. Fall back to the whole version string in that case.
+            // SourceRevisionId in the csproj). A test host or unstamped build has none, so fall back
+            // to the whole version string.
             var index = AppVersion.IndexOf(BuildPrefix);
             return index < 0 ? AppVersion : AppVersion[..index];
         }
@@ -46,7 +45,7 @@ namespace ValheimServerGUI.Tools
         /// ...the current application version.
         /// Returns -2 if either version could not be parsed.
         /// </summary>
-        /// <param name="otherVersion"></param>
+        /// <param name="version"></param>
         /// <returns></returns>
         public static int CompareVersion(string version)
         {

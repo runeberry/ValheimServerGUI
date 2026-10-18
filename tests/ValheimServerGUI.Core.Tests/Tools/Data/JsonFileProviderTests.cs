@@ -9,8 +9,8 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Tools.Data
 {
     /// <summary>
-    /// §15 #8: JSON persistence is atomic (temp file + rename, no stray temp left behind) and a
-    /// corrupt file is backed up aside rather than silently overwritten (E33, E37).
+    /// JSON persistence is atomic (temp file + rename, no stray temp left behind) and a
+    /// corrupt file is backed up aside rather than silently overwritten.
     /// </summary>
     public class JsonFileProviderTests : IDisposable
     {
@@ -60,7 +60,7 @@ namespace ValheimServerGUI.Core.Tests.Tools.Data
             Assert.Empty(Directory.GetFiles(_dir, "*.tmp"));
         }
 
-        // E33: a corrupt file must be backed up aside, not silently clobbered, and load yields default.
+        // A corrupt file must be backed up aside, not silently clobbered, and load yields default.
         [Fact]
         public async Task Load_CorruptFile_BacksItUpAndReturnsNull()
         {

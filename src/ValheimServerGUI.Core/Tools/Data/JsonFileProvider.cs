@@ -56,10 +56,9 @@ namespace ValheimServerGUI.Tools.Data
             }
             catch (Exception e)
             {
-                // §15 #8: a corrupt file must not be silently overwritten with defaults. Back it up
-                // aside so the data is recoverable, then fall through to defaults (the caller treats a
-                // null/absent file as "use defaults"). The subsequent save then writes a fresh file
-                // without destroying the corrupt original.
+                // A corrupt file must not be silently overwritten with defaults. Move it aside so the data
+                // is recoverable, then fall through to defaults (the caller treats a null file as "use
+                // defaults").
                 Logger.Error(e, "Error loading JSON data from file: {filePath}", filePath);
                 BackupCorruptFile(filePath);
             }
@@ -87,7 +86,7 @@ namespace ValheimServerGUI.Tools.Data
                     Directory.CreateDirectory(directory);
                 }
 
-                // §15 #8: write to a temp file then atomically replace the target, so a crash mid-write
+                // Write to a temp file then atomically replace the target, so a crash mid-write
                 // never leaves a half-written (corrupt) config behind.
                 var tempPath = filePath + ".tmp";
                 try

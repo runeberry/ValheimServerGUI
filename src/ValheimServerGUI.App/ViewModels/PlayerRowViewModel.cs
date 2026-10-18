@@ -8,7 +8,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.ViewModels;
 
-/// <summary>One row in the Players grid (§7.4), wrapping a <see cref="PlayerInfo"/>.</summary>
+/// <summary>One row in the Players grid, wrapping a <see cref="PlayerInfo"/>.</summary>
 public partial class PlayerRowViewModel : ObservableObject
 {
     public PlayerRowViewModel(PlayerInfo player) => Update(player);

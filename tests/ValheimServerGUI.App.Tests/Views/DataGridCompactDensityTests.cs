@@ -9,9 +9,9 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// § V3 styling: the shared grid renders at the app body font (12px, not Fluent's touch-sized 15px) with a
-// uniform 20px header/row height (content vertically centred) and a single 6px horizontal inset — no
-// vertical padding hacks. Pinned so a Fluent theme bump that re-inflates the grid is caught.
+// The shared grid renders at the app body font (12px, not Fluent's touch-sized 15px) with a uniform 20px
+// header/row height (content vertically centred) and a single 6px horizontal inset, with no vertical padding.
+// Pinned so a Fluent theme bump that re-inflates the grid is caught.
 public class DataGridCompactDensityTests
 {
     private static DataListView Realize()

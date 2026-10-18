@@ -16,7 +16,7 @@ namespace ValheimServerGUI.Integration.Tests
     }
 
     /// <summary>
-    /// Configuration for the live tier-4 smoke, read from environment variables. On Linux,
+    /// Configuration for the live server tests, read from environment variables. On Linux,
     /// <c>scripts/integration.sh</c> runs the suite in the containers built from <c>tests/integration-image</c>,
     /// whose images set the server variables; elsewhere the caller sets them.
     ///
@@ -36,7 +36,7 @@ namespace ValheimServerGUI.Integration.Tests
         public string ServerExe { get; }
 
         /// <summary>
-        /// The folder for all server output — never Nuffle's real save folder. scripts/integration.sh creates a
+        /// The folder for all server output — never a real user's save folder. scripts/integration.sh creates a
         /// fresh one per run; a run without it gets one throwaway temp folder.
         /// </summary>
         public string SaveDir { get; }

@@ -51,8 +51,7 @@ public sealed record PlayerRolesAdoptedEventArgs(string ProfileName, ReconcileRe
 public sealed class ServerManager : IServerManager
 {
     /// <summary>
-    /// Cap on the lines kept per server buffer — bounds memory/render cost the same way the Logs tab did
-    /// before this buffer moved out of the view-model. Older lines fall off the top.
+    /// Cap on the lines kept per server buffer, bounding memory and render cost. Older lines fall off the top.
     /// </summary>
     private const int MaxLogLines = 5000;
 
@@ -125,7 +124,7 @@ public sealed class ServerManager : IServerManager
 
         // Kick off a graceful stop on every server first (they shut down in parallel), then block until each
         // one reports Stopped before disposing. There is no time limit: a server saves the world on the way down
-        // and is never force-killed, so returning before Stopped would lose that save (E9), as in v2.4. Reaching
+        // and is never force-killed, so returning before Stopped would lose that save. Reaching
         // Stopped does not depend on this thread (the process Exited callback flips Status on a background
         // thread). Each server stays registered until it is disposed, so while servers are still stopping a
         // second window close sees them and offers the "close anyway" prompt rather than exiting silently.

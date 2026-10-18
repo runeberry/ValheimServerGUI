@@ -14,10 +14,10 @@ public sealed record StartupWindowPlan(ServerPreferences Profile, bool AutoStart
 public sealed record StartupSelection(IReadOnlyList<StartupWindowPlan> Windows, bool CreateDefault);
 
 /// <summary>
-/// Pure port of <c>SplashForm.PrepareMainWindows</c> (§2.3). Selection order:
+/// Pure (side-effect-free) choice of which profile windows open at startup. Selection order:
 /// <list type="number">
 /// <item>Any profile flagged <c>AutoStart</c> → one window per auto-start profile, each started.</item>
-/// <item>Else → a single window for the last-active profile (§16.2), falling back to the most-recently
+/// <item>Else → a single window for the last-active profile, falling back to the most-recently
 /// saved (<c>LastSaved</c>), not started.</item>
 /// <item>Else (no profiles) → signal <see cref="StartupSelection.CreateDefault"/>.</item>
 /// </list>

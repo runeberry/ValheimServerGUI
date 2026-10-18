@@ -271,7 +271,7 @@ public class MainWindowViewModelTests
         var current = AssemblyHelper.GetApplicationVersion();
         update.RaiseFinished(new SoftwareUpdateEventArgs(current, ReleasePage, isManualCheck: false));
 
-        Assert.Equal(string.Format(Strings.Update_StatusUpToDate, current), vm.UpdateStatusText); // version shown, WinForms-style
+        Assert.Equal(string.Format(Strings.Update_StatusUpToDate, current), vm.UpdateStatusText); // version shown
         Assert.Equal(UpdateCheckStatus.UpToDate, vm.UpdateStatus);
         Assert.False(vm.UpdateIsLink);
         Assert.False(vm.UpdateLinkCommand.CanExecute(null));

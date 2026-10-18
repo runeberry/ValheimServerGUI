@@ -1,15 +1,15 @@
 #!/usr/bin/env bash
 #
-# validate.sh — one-shot build + test + boot validation for ValheimServerGUI (v3.0 / Avalonia).
+# validate.sh — one-shot build + test + boot validation for ValheimServerGUI.
 #
-# Run with no arguments to validate the whole solution the way I (Mochi) always want it checked:
+# Run with no arguments to validate the whole solution:
 #   1. Build the solution  — MUST be 0 warnings, 0 errors.
 #   2. Run every test       — Core + App (fast: --no-build after step 1).
 #   3. Headless boot smoke  — launch the Avalonia app under Xvfb; it must boot and STAY up
 #                             with no unhandled exceptions (skipped automatically if Xvfb is absent).
 #
-# Output is deliberately terse: a per-phase [ OK ]/[FAIL]/[SKIP] plus the numbers I care about,
-# and — only on failure — the actual error / failing-test lines inline so I don't have to re-run.
+# Output is deliberately terse: a per-phase [ OK ]/[FAIL]/[SKIP] plus key counts, and — only on
+# failure — the actual error / failing-test lines inline, so a failure is readable without a re-run.
 # Full logs for the run are kept in a temp dir whose path is printed at the end.
 #
 # Flags (all optional — the intent is "just run it"):
@@ -17,7 +17,7 @@
 #   --boot    boot smoke only (skip test) — rarely needed
 #
 # Keep this script in step with the workflow: if the solution file, project layout, or the way
-# we validate changes, update this script (and the CLAUDE.local.md workflow note) in the same PR.
+# we validate changes, update this script in the same PR.
 
 set -uo pipefail
 
@@ -27,10 +27,10 @@ SOLUTION="$REPO_ROOT/ValheimServerGUI.slnx"
 APP_PROJECT="$REPO_ROOT/src/ValheimServerGUI.App/ValheimServerGUI.App.csproj"
 BOOT_TIMEOUT=20   # seconds the app must survive under Xvfb to count as a healthy boot
 
-# Hang guard for the test phase. The headless-Avalonia suite has intermittently DEADLOCKED (a test
-# that never returns), which used to hang this script indefinitely. These bound and diagnose it
-# without masking it: --blame-hang aborts a test stuck longer than TEST_HANG_TIMEOUT and writes a dump
-# + a sequence file naming the culprit, and the outer `timeout` is a hard backstop. Normal tests run
+# Hang guard for the test phase. The headless-Avalonia suite can DEADLOCK (a test that never
+# returns). These bound and diagnose it without masking it: --blame-hang aborts a test stuck longer
+# than TEST_HANG_TIMEOUT and writes a dump + a sequence file naming the culprit, and the outer
+# `timeout` is a hard backstop. Normal tests run
 # in milliseconds and the whole suite in a few seconds, so these thresholds only ever trip on a hang.
 TEST_HANG_TIMEOUT=120   # per-test seconds before --blame-hang aborts and dumps
 TEST_HARD_TIMEOUT=300   # outer wall-clock backstop if the hang guard itself wedges

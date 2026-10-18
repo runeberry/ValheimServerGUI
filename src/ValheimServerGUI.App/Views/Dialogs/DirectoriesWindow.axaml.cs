@@ -22,8 +22,6 @@ public partial class DirectoriesWindow : DialogWindow
 
     private DirectoriesViewModel Vm => (DirectoriesViewModel)DataContext!;
 
-    // Path browsing now lives inside FilenameFormField (its built-in browse button).
-
     private async void OnOk(object? sender, RoutedEventArgs e)
     {
         if (Vm.MissingPathDescription is { } missing)

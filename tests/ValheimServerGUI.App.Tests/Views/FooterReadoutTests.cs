@@ -19,9 +19,8 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// Regression: the footer update readout used to be a Button that went disabled when the status wasn't a
-// clickable link (e.g. "Up to date"), dimming the text to a near-invisible ~40%-alpha colour and the icon
-// with it. The readout must render its text at full contrast when it is not a link.
+// When the update status is not a clickable link (e.g. "Up to date"), the footer readout must still render its
+// text and icon at full contrast, not dimmed to the ~40% alpha of a disabled control.
 public class FooterReadoutTests
 {
     private static readonly System.IServiceProvider Core =

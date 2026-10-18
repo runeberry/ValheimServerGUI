@@ -7,7 +7,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Startup;
 
-// §2.3 PrepareMainWindows selection matrix.
+// Which profiles get a main window at startup (PrepareMainWindows), across each combination of inputs.
 public class StartupProfileSelectorTests
 {
     private static ServerPreferences Profile(string name, bool autoStart = false, int savedDaysAgo = 0)

@@ -32,8 +32,7 @@ echo "    install: $INSTALL_DIR"
 echo
 
 # 1. Publish (framework-dependent — the .NET 10 desktop runtime is present system-wide).
-# Build intermediates are redirected per-user by Directory.Build.props, so a shared
-# working tree never collides across users (MSB3374); -o still places the published app.
+# Build intermediates go to a per-user directory (Directory.Build.props); -o places the published app.
 echo "==> Publishing Release build..."
 rm -rf "$INSTALL_DIR"
 mkdir -p "$INSTALL_DIR"

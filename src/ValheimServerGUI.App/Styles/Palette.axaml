@@ -16,7 +16,7 @@
          here, not on a control. See Styles/Inputs.axaml for the shared styles that consume these. -->
 
     <!-- Keep the focused border a uniform 1px (Fluent's default thickens the bottom edge into a 2px accent
-         underline, which made plain text boxes look different from the shell/combo/numeric on focus). -->
+         underline, which would make plain text boxes look different from the shell/combo/numeric on focus). -->
     <Thickness x:Key="TextControlBorderThemeThicknessFocused">1</Thickness>
 
     <ResourceDictionary.ThemeDictionaries>

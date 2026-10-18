@@ -3,7 +3,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
-/// <summary>Settings icon button (WinForms <c>SettingsButton</c>): the settings glyph, no confirm flash.
+/// <summary>Settings icon button: the settings glyph, no confirm flash.
 /// Action via the bound <see cref="Avalonia.Controls.Button.Command"/>.</summary>
 public class SettingsButton : IconButton
 {

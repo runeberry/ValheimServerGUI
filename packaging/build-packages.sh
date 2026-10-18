@@ -9,7 +9,7 @@
 #   * ValheimServerGUI-<ver>-x86_64.AppImage.zsync (update data for AppImage updaters; a release asset)
 #
 # Set SELF_CONTAINED=true to bundle the .NET runtime into every artifact instead (needed if you want the
-# AppImage to run without .NET installed — see the note in scripts/package.sh / CLAUDE.local.md).
+# AppImage to run without .NET installed).
 
 set -euo pipefail
 

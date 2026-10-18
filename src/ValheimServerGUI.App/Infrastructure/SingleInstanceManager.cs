@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 namespace ValheimServerGUI.App.Infrastructure;
 
 /// <summary>
-/// Enforces single-instance, multi-window (§2.2) <b>per user</b>: an exclusive lock file in this user's
+/// Enforces single-instance, multi-window <b>per user</b>: an exclusive lock file in this user's
 /// own app config directory elects the primary process; a second launch forwards its args to the primary
 /// over a per-user named pipe (a Unix domain socket on Linux) and exits, and the primary raises
 /// <see cref="ArgsReceived"/> so it can open/focus a window. Best-effort — if the IPC fails, the second
-/// instance still exits (the MVP "block the second instance" fallback), never clobbering the user's
+/// instance still exits, never clobbering the user's
 /// <c>userprefs.json</c>.
 /// <para>
 /// A lock file (not a named <see cref="Mutex"/>) is used deliberately: a .NET named mutex on Linux is

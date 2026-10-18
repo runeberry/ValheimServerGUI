@@ -1,12 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Live (tier-4) integration tests against a REAL Valheim dedicated server (docs/V3_TARGET_STATE.md
-    §13, matrix E9). The project always builds with the solution, but it is only a TEST project when asked
-    for explicitly: `dotnet test -p:Integration=true` runs the complete suite (unit + integration), while a
-    plain `dotnet test` runs unit tests only. scripts/integration.sh is the usual way to pass the flag (it
-    loads the machine config). Once asked for, a misconfiguration is a failure, never a skip: see
-    IntegrationConfig. See CLAUDE.local.md "Integration testing".
+    Live integration tests against a REAL Valheim dedicated server. The project always builds with the
+    solution, but it is only a TEST project when asked for explicitly: `dotnet test -p:Integration=true` runs
+    the complete suite (unit + integration), while a plain `dotnet test` runs unit tests only.
+    scripts/integration.sh is the usual way to pass the flag. Once asked for, a misconfiguration is a failure,
+    never a skip: see IntegrationConfig.
   -->
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>

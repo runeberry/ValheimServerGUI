@@ -202,7 +202,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Empty(result.Backups);
         }
 
-        // A/B partner of the test above: the same drop, with the entry missing from the baseline, is backed up. So the
+        // Counterpart to the test above: the same drop, with the entry missing from the baseline, is backed up. So the
         // baseline really is what decides, not the drop itself.
         [Fact]
         public void Write_BaselineForAnotherPlayer_StillBacksUp()

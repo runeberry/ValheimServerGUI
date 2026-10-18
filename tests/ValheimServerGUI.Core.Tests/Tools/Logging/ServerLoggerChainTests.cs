@@ -12,7 +12,7 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Tools.Logging
 {
     /// <summary>
-    /// Pins the fragile server log-rule chain (E48, §5.5) and the level tagging (E49). The chain runs
+    /// Pins the fragile server log-rule chain and the level tagging. The chain runs
     /// in order: strip any native timestamp, drop Unity noise / console / blank lines (filtering on),
     /// then prepend the app's own timestamp.
     /// </summary>
@@ -84,7 +84,7 @@ namespace ValheimServerGUI.Core.Tests.Tools.Logging
             Assert.Single(captured);
         }
 
-        // E49: the level transformer tags everything except Information.
+        // The level transformer tags everything except Information.
         [Theory]
         [InlineData(LogEventLevel.Information, "hello", "hello")]
         [InlineData(LogEventLevel.Warning, "hello", "[WRN] hello")]

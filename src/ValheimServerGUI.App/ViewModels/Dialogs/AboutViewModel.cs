@@ -5,8 +5,8 @@ using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
-/// <summary>About dialog: product identity, version + build date, legal/attribution text, and external links
-/// (matches the WinForms About form).</summary>
+/// <summary>About dialog: product identity, version + build date, legal/attribution text, and external
+/// links.</summary>
 public partial class AboutViewModel : ObservableObject
 {
     private readonly IShellLauncher _shell;
@@ -25,7 +25,8 @@ public partial class AboutViewModel : ObservableObject
         }
     }
 
-    /// <summary>The About header product name (no "(Unofficial)" prefix, matching the WinForms About form).</summary>
+    /// <summary>The About header product name, without the "(Unofficial)" prefix of
+    /// <see cref="AppConstants.ProductName"/>.</summary>
     public string ProductName => "Valheim Dedicated Server GUI";
 
     public string Copyright => "© 2023-2026 Runeberry Software, LLC";

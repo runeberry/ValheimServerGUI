@@ -12,7 +12,7 @@ namespace ValheimServerGUI.App;
 
 /// <summary>
 /// The desktop shell's composition. Starts from the Core service layer (<see cref="CoreServiceCollectionExtensions.AddValheimCore"/>)
-/// and adds the bucket-B seams the Core leaves to the shell (<see cref="IUserPrompt"/>, <see cref="IStartupManager"/>,
+/// and adds the OS-integration seams the Core leaves to the shell (<see cref="IUserPrompt"/>, <see cref="IStartupManager"/>,
 /// <see cref="IShellLauncher"/>), the <see cref="IStartupArgsProvider"/> instance (it needs the process args), and the
 /// windows + view-models.
 /// </summary>
@@ -26,13 +26,13 @@ internal static class ServiceConfiguration
     {
         services.AddValheimCore();
 
-        // Startup args (bucket B: needs the process args, so it is registered here rather than in Core).
+        // Startup args (needs the process args, so it is registered here rather than in Core).
         services.AddSingleton<IStartupArgsProvider>(new StartupArgsProvider(args));
 
-        // Single-instance guard (created in Program.Main so the mutex is acquired before the app builds).
+        // Single-instance guard (created in Program.Main so the lock is acquired before the app builds).
         services.AddSingleton(singleInstance ?? new SingleInstanceManager());
 
-        // Bucket-B seams (the OS-integration the Core leaves to the shell).
+        // OS-integration seams the Core leaves to the shell.
         services.AddSingleton<ISystemShell, SystemShell>();
         services.AddSingleton<IUserPrompt, DialogUserPrompt>();
         services.AddSingleton<IShellLauncher, ShellLauncher>();

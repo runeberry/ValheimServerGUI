@@ -4,10 +4,11 @@
              x:Class="ValheimServerGUI.App.Controls.RadioFormField"
              x:Name="Root" x:CompileBindings="False">
     <UserControl.Resources>
-    <!-- Compact RadioButton theme (§ V3 styling). A full retemplate of the Fluent RadioButton, faithful to
-         Fluent (same template parts, brush keys, and pointer/checked/disabled states) but tightened for the
-         WinForms feel: 12px circle (was 20), 5px dot (was 8), 18px row (was 32), 16px glyph column (was 20)
-         + 4px content padding (was 8). Owned + scoped in this control's Resources (not an app-wide override). -->
+    <!-- Compact RadioButton theme. A full retemplate of the Fluent RadioButton, faithful to
+         Fluent (same template parts, brush keys, and pointer/checked/disabled states) but tightened for an
+         information-dense feel (Fluent's sizes in parentheses): 12px circle (20), 5px dot (8), 18px row (32),
+         16px glyph column (20) + 4px content padding (8). Owned + scoped in this control's Resources (not an
+         app-wide override). -->
 
     <x:Double x:Key="RadioButtonMinHeight">18</x:Double>
 

@@ -17,7 +17,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// The dialogs migrated to the FormField controls realize + bind without throwing. Dialogs aren't opened
+// The dialogs built on the FormField controls realize + bind without throwing. Dialogs aren't opened
 // by the boot smoke, so this is the guard that their FormField wiring (and DataContext inheritance into
 // the wrappers) is sound.
 public class DialogRenderTests

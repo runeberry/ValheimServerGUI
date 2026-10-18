@@ -11,8 +11,8 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.Services;
 
 /// <summary>
-/// Window-backed <see cref="IUserPrompt"/>. The Core seam is synchronous (it replaces a blocking WinForms
-/// <c>MessageBox</c>), while Avalonia dialogs are async, so this bridges the two: the confirmation is shown
+/// Window-backed <see cref="IUserPrompt"/>. The Core seam is synchronous while Avalonia dialogs are async,
+/// so this bridges the two: the confirmation is shown
 /// on the UI thread and the caller is blocked on a nested dispatcher frame until the user answers. Safe to
 /// call from any thread — a background caller is marshalled onto the UI thread first (which is where the
 /// exception-handler path usually originates).

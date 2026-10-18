@@ -66,9 +66,9 @@ namespace ValheimServerGUI.Tools
         public event EventHandler<string?>? InternalIpChanged;
 
         /// <summary>
-        /// Asks the app's API for the address this machine's requests arrive from (§16.2). The request goes over
-        /// IPv4 because the API host is dual-stack and players join on the IPv4 address. Anything other than an IPv4
-        /// address, or a failed request, keeps the previous value (E52).
+        /// Asks the app's API for the address this machine's requests arrive from. The request goes over IPv4
+        /// because the API host is dual-stack and players join on the IPv4 address. Anything other than an IPv4
+        /// address, or a failed request, keeps the previous value.
         /// </summary>
         public async Task LoadExternalIpAddressAsync()
         {
@@ -98,8 +98,8 @@ namespace ValheimServerGUI.Tools
             && address.ToString() == text;
 
         /// <summary>Fetches the external IP from the API's <c>/ip-check</c> route (<c>{"ip":…}</c>).</summary>
-        /// <remarks>Routed through <see cref="RestClient"/> (not a raw HttpClient) so the call is logged at the
-        /// shared HTTP chokepoint — Info on success, Error on failure — like every other external request.</remarks>
+        /// <remarks>Routed through <see cref="RestClient"/> (not a raw HttpClient) so the call is logged like every
+        /// other external request.</remarks>
         private async Task<string?> FetchExternalIpAsync()
         {
             var response = await Get($"{CoreConstants.UrlRuneberryApi}/ip-check")
@@ -127,8 +127,7 @@ namespace ValheimServerGUI.Tools
             }
 
             // Prefer addresses from the DHCP server if they're available. PrefixOrigin is a
-            // Windows-only API; the in-lambda OS guard both satisfies the platform analyzer and
-            // implements E51 (on Linux the guard is false, so we fall back to all UP IPv4 addresses).
+            // Windows-only API, so on Linux this falls back to all UP IPv4 addresses.
             var dhcpAddresses = addresses.Where(ip => OperatingSystem.IsWindows() && ip.PrefixOrigin == PrefixOrigin.Dhcp);
             var eligibleAddresses = dhcpAddresses.Any() ? dhcpAddresses : addresses;
 

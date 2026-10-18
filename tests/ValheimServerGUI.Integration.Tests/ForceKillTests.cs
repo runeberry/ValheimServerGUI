@@ -5,9 +5,9 @@ using Xunit;
 namespace ValheimServerGUI.Integration.Tests
 {
     /// <summary>
-    /// The B half of the E9 A/B (the A half is <see cref="LiveLifecycleTests.GracefulStop_FlushesWorldSave"/>):
-    /// a hard SIGKILL of a running server must NOT flush a world save. Without this negative leg, "graceful
-    /// stop flushes a save" proves nothing — the save could be happening on a timer, not because of SIGINT.
+    /// The negative counterpart to <see cref="LiveLifecycleTests.GracefulStop_FlushesWorldSave"/>: a hard SIGKILL
+    /// of a running server must NOT flush a world save. Without it, "graceful stop flushes a save" proves
+    /// nothing — the save could be happening on a timer, not because of SIGINT.
     /// </summary>
     public sealed class ForceKillTests
     {
@@ -22,7 +22,7 @@ namespace ValheimServerGUI.Integration.Tests
             using var harness = new LiveServerHarness(IntegrationConfig.Current.SaveDir, worldName);
 
             var running = await harness.BootToRunningAsync(BootTimeout);
-            Assert.True(running, "Precondition: server must reach Running before the force-kill A/B is meaningful.");
+            Assert.True(running, "Precondition: server must reach Running before the force-kill comparison is meaningful.");
 
             // Let the post-gen save settle, then snapshot the filesystem truth and the parsed-save count.
             await Task.Delay(Settle, TestContext.Current.CancellationToken);

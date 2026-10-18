@@ -3,7 +3,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
-/// <summary>Edit icon button (WinForms <c>EditButton</c>): the edit glyph, flashes a confirm check on click.
+/// <summary>Edit icon button: the edit glyph, flashes a confirm check on click.
 /// Action via the bound <see cref="Avalonia.Controls.Button.Command"/>.</summary>
 public class EditButton : IconButton
 {

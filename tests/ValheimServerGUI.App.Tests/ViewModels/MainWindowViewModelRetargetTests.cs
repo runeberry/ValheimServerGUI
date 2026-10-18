@@ -152,7 +152,7 @@ public sealed class MainWindowViewModelRetargetTests : IDisposable
         Assert.True(vm.CanStart);
     }
 
-    // Live carve-out: a role change while the server runs is committed immediately — persisted to the profile
+    // A role change while the server runs is committed immediately — persisted to the profile
     // and projected onto the running server's list files (which it re-reads within seconds).
     [Fact]
     public void Role_change_while_running_saves_immediately_and_regenerates_files()

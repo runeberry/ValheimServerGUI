@@ -30,9 +30,7 @@ namespace ValheimServerGUI.Game
             {
                 if (_status == value) return;
                 _status = value;
-                // Stamp the real start time on the Running transition (cleared once fully Stopped) so uptime
-                // derives from the server's own start, not a per-window capture — switching a window onto an
-                // already-running profile then reports the true uptime rather than resetting to zero.
+                // Uptime is measured from the server's own start, so every window showing it agrees.
                 if (value == ServerStatus.Running) StartedAt = DateTimeOffset.Now;
                 else if (value == ServerStatus.Stopped) StartedAt = null;
                 StatusChanged?.Invoke(this, value);
@@ -118,8 +116,7 @@ namespace ValheimServerGUI.Game
             {
                 if (IsRestarting)
                 {
-                    // There are no more server events to listen to after it has stopped, so
-                    // we're just going to artifically delay here to allow any shutdown actions to finish
+                    // No server events arrive after a stop, so wait briefly for shutdown actions to finish.
                     Task.Run(async () =>
                     {
                         await Task.Delay(500);
@@ -200,7 +197,7 @@ namespace ValheimServerGUI.Game
             process.StartInfo.WorkingDirectory = exeDir;
             if (!OperatingSystem.IsWindows() && exeDir is not null)
             {
-                // The indexer throws on a missing key in this runtime, so probe before reading.
+                // Unlike a plain StringDictionary, this one's indexer throws on a missing key, so check first.
                 var prior = envVars.ContainsKey("LD_LIBRARY_PATH") ? envVars["LD_LIBRARY_PATH"] : null;
                 envVars["LD_LIBRARY_PATH"] =
                     string.Join(':', new[] { exeDir, Path.Combine(exeDir, "linux64"), prior }.Where(s => !string.IsNullOrEmpty(s)));
@@ -409,9 +406,9 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// BepInEx loads through Unity Doorstop. On Windows, Doorstop is a winhttp.dll proxy in the server folder that
         /// the game loads by itself. On Linux it is a preload library that only loads when the launch environment
-        /// names it (the BepInEx pack's start_server_bepinex.sh sets these same variables), so without them a modded
-        /// server starts unmodded with no sign of why. The two files come from the configured paths (Set
-        /// Directories); when either is missing the server starts without mods and the log says which.
+        /// names it, so without these variables a modded server starts unmodded with no sign of why. The two files
+        /// come from the configured paths (Set Directories); when either is missing the server starts without mods
+        /// and the log says which.
         /// </summary>
         private void EnableBepInExLoader(StringDictionary envVars, IValheimServerOptions options)
         {
@@ -427,11 +424,9 @@ namespace ValheimServerGUI.Game
             envVars["DOORSTOP_ENABLED"] = "1";
             envVars["DOORSTOP_TARGET_ASSEMBLY"] = options.BepInExPreloaderPath;
 
-            // ld.so splits LD_PRELOAD on spaces as well as colons, with no escaping, so a full path through Steam's
-            // "Valheim dedicated server" folder would never load. LD_LIBRARY_PATH splits on colons only, so the
-            // library's folder goes there and LD_PRELOAD names just the file, which ld.so resolves through that path.
-            // The BepInEx pack's start_server_bepinex.sh does the same.
-            // The indexer throws on a missing key in this runtime, so probe before reading.
+            // LD_PRELOAD splits on spaces as well as colons, so it can't hold a path with spaces (like Steam's
+            // "Valheim dedicated server" folder). Put Doorstop's folder in LD_LIBRARY_PATH, which splits only on
+            // colons, and preload the bare file name; ld.so finds it by searching that path.
             var doorstopDir = Path.GetDirectoryName(options.DoorstopLibraryPath);
             var priorLibraryPath = envVars.ContainsKey("LD_LIBRARY_PATH") ? envVars["LD_LIBRARY_PATH"] : null;
             envVars["LD_LIBRARY_PATH"] = string.Join(':', new[] { doorstopDir, priorLibraryPath }.Where(s => !string.IsNullOrEmpty(s)));

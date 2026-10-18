@@ -53,7 +53,7 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // The app lives until the last window closes (multi-window: §2.2). The splash is shown first,
+            // The app lives until the last window closes (multi-window). The splash is shown first,
             // then closed once the main window(s) are up, so the count never hits zero mid-startup.
             desktop.ShutdownMode = ShutdownMode.OnLastWindowClose;
             // Servers are shared app-wide and outlive individual windows, so the save-flush guard lives here
@@ -68,7 +68,7 @@ public partial class App : Application
     private bool _shutdownApproved;
     private bool _exitPromptOpen;
 
-    // §2.4 "safe shutdowns", aggregated over every running server. Two entry points:
+    // Safe shutdown, aggregated over every running server. Two entry points:
     //
     // 1. OnMainWindowClosing — the user closes the last main window (title-bar X, tray Close). The question is asked
     //    HERE, while the window still exists: the close is cancelled, the prompt is owned by (and centered on) that
@@ -152,7 +152,7 @@ public partial class App : Application
     private async Task StopAllThenShutdownAsync(IClassicDesktopStyleApplicationLifetime desktop, IServerManager manager)
     {
         // Off the UI thread: block until every server reports Stopped (the graceful world-save flush
-        // completes — do not return early or §16.2/E9 regresses), then approve and re-trigger the shutdown.
+        // completes; returning early loses the save), then approve and re-trigger the shutdown.
         await Task.Run(manager.StopAllAndDispose);
         _shutdownApproved = true;
         Dispatcher.UIThread.Post(() => desktop.Shutdown());
@@ -189,7 +189,7 @@ public partial class App : Application
         }
     }
 
-    // Route the three unhandled-exception channels (§9.6) through the Core exception handler.
+    // Route the three unhandled-exception channels through the Core exception handler.
     private void RegisterGlobalExceptionHandlers()
     {
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
@@ -211,7 +211,7 @@ public partial class App : Application
         };
     }
 
-    /// <summary>Applies the user's theme preference (§16.2). Called at startup and when Preferences saves.</summary>
+    /// <summary>Applies the user's theme preference. Called at startup and when Preferences saves.</summary>
     public void ApplyTheme(AppTheme theme) => RequestedThemeVariant = theme switch
     {
         AppTheme.Light => ThemeVariant.Light,

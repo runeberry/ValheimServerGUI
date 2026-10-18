@@ -9,7 +9,7 @@ using Avalonia.Platform;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// Central registry for the restored WinForms icon set (see <c>Assets/Icons/README.md</c>). Loads each
+/// Central registry for the app's icon set (see <c>Assets/Icons/README.md</c>). Loads each
 /// PNG from the app's Avalonia resources once, caches it, and hands the same <see cref="Bitmap"/> to both
 /// XAML (via the <c>{c:Icon Name_16x}</c> markup extension) and code (converters, view-models) so there is
 /// a single source of truth for "which asset is this icon" keyed by the file's base name.
@@ -26,7 +26,7 @@ public static class AppIcons
         => Cache.GetOrAdd(name, static n => new Bitmap(AssetLoader.Open(new Uri(BaseUri + n + ".png"))));
 
     /// <summary>
-    /// Returns a cached desaturated (grey) variant of the icon — the WinForms "disabled" cue. Each pixel's
+    /// Returns a cached desaturated (grey) variant of the icon — the "disabled" cue. Each pixel's
     /// colour is replaced with its luminance while its alpha is preserved, so the glyph's silhouette and
     /// anti-aliasing stay intact. Luminance is taken directly from the premultiplied bytes: premultiplied
     /// channels already equal alpha·straight, so their luminance equals the premultiplied grey — no un/re-

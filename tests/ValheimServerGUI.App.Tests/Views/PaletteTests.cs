@@ -16,7 +16,7 @@ using Xunit;
 namespace ValheimServerGUI.App.Tests.Views;
 
 // The layered surface palette resolves in both theme variants, the three layers are distinct, and none is
-// pure black (the "no solid black anywhere" requirement). The window paints the base layer.
+// pure black (the app uses no solid black anywhere). The window paints the base layer.
 public class PaletteTests
 {
     private static readonly System.IServiceProvider Core =

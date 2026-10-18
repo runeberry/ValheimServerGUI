@@ -8,7 +8,7 @@ namespace ValheimServerGUI.Core.Tests
 {
     /// <summary>
     /// The composition root wires up: AddValheimCore registers the whole headless service graph, and
-    /// every service resolves once the shell supplies the bucket-B seams (here, a fake IUserPrompt).
+    /// every service resolves once the shell supplies the seams Core leaves to it (here, a fake IUserPrompt).
     /// The OS-dispatched resolvers are verified for both platforms through the injected OS flag, so the
     /// assertions hold on whichever OS runs the suite.
     /// </summary>
@@ -23,7 +23,7 @@ namespace ValheimServerGUI.Core.Tests
         {
             var services = new ServiceCollection();
             addCore(services);
-            // The shell supplies the bucket-B implementations; stub the one the Core graph consumes.
+            // The shell supplies the UI-side seams; stub the one the Core graph consumes.
             services.AddSingleton<IUserPrompt>(new FakeUserPrompt());
             return services.BuildServiceProvider();
         }

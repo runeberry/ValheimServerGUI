@@ -17,7 +17,7 @@ using ValheimServerGUI.Tools.Models;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// Players tab (§7.4): a live table fed by the shared player repository. Rows update from
+/// Players tab: a live table fed by the shared player repository. Rows update from
 /// <c>EntityUpdated</c>/<c>PlayerStatusChanged</c>; the relative "Since" column is recomputed every second
 /// while the tab is visible. View-Details is enabled when a row is selected; Remove only when it is Offline.
 ///
@@ -25,8 +25,8 @@ namespace ValheimServerGUI.App.ViewModels;
 /// server is its <b>override</b> (stored on <see cref="ServerFormViewModel"/>) layered over its app-global
 /// <b>default</b> (the Manage Players lists), resolved by <see cref="PlayerRoleResolver"/>. The tab shows the
 /// effective role for the current mode (with <c>(*)</c> when an override replaces a default) and edits only
-/// the override via the form — the "Set server role" submenu — (which trips the profile's dirty flag); the three list files are generated from
-/// the resolved roles at server start, not edited here.
+/// the override, through the form via the "Set server role" submenu (which trips the profile's dirty flag). The
+/// three list files are generated from the resolved roles at server start, not edited here.
 /// </summary>
 public partial class PlayersViewModel : ViewModelBase
 {
@@ -94,7 +94,7 @@ public partial class PlayersViewModel : ViewModelBase
 
     public bool CanViewDetails => SelectedPlayer is not null;
 
-    /// <summary>Remove is only allowed for an Offline player (§7.4).</summary>
+    /// <summary>Remove is only allowed for an Offline player.</summary>
     public bool CanRemove => SelectedPlayer is { IsOffline: true };
 
     // ----- "Set server role" submenu -----

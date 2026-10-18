@@ -15,7 +15,7 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
-    /// ValheimServer orchestration via a headless process provider (E1/E5/E6/E7, §5.1-5.4). Status
+    /// ValheimServer orchestration via a headless process provider. Status
     /// transitions, the GenerateArgs launch contract, the late-stop race, graceful-stop dispatch, and
     /// the restart choreography -- all with no real process, exe launch, or filesystem beyond a
     /// throwaway temp exe/savedir the validation requires.
@@ -104,7 +104,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.True(_server.CanStop);
         }
 
-        // §5.3: the GenerateArgs launch contract.
+        // The GenerateArgs launch contract.
         [Fact]
         public void Start_EmitsExpectedLaunchArgs()
         {
@@ -174,9 +174,8 @@ namespace ValheimServerGUI.Core.Tests.Game
 
         // BepInEx on Linux: its Doorstop loader is a preload library that only loads when the launch environment
         // names it, so Start sets it up whenever both configured files exist. They need not be in the server folder,
-        // and the folders may hold spaces like Steam's own "Valheim dedicated server" (a pilot user's mods silently
-        // never loaded from there). On Windows the pack's winhttp.dll proxy loads by itself and Start must leave the
-        // environment alone.
+        // and the folders may hold spaces like Steam's own "Valheim dedicated server". On Windows the pack's
+        // winhttp.dll proxy loads by itself and Start must leave the environment alone.
         [Fact]
         public void Start_WithBothBepInExFiles_EnablesItsLoaderOnLinux()
         {
@@ -310,7 +309,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Single(_processProvider.SafelyKilledKeys);
         }
 
-        // E6: stop during startup; a late "connected" must not promote Stopping -> Running.
+        // Stop during startup: a late "connected" must not promote Stopping -> Running.
         [Fact]
         public void LateConnected_AfterStop_StaysStopping()
         {
@@ -323,7 +322,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(ServerStatus.Stopping, _server.Status);
         }
 
-        // E5: the process dies unexpectedly -> Stopped, no auto-restart.
+        // The process dies unexpectedly -> Stopped, no auto-restart.
         [Fact]
         public void ProcessExit_MovesToStopped_AndAllowsRestart()
         {
@@ -348,7 +347,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Single(_processProvider.SafelyKilledKeys);
         }
 
-        // E7: a restart re-starts the server once the old process has exited.
+        // A restart re-starts the server once the old process has exited.
         [Fact]
         public void Restart_AfterProcessExits_StartsAgain()
         {
@@ -438,7 +437,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Contains("Steam_76561198000000999", ListLines("adminlist.bak.txt"));
         }
 
-        // The live carve-out: applying roles to an already-running server rewrites the files now AND updates the
+        // Applying roles to an already-running server rewrites the files now AND updates the
         // live options, so a restart (which reuses Options) keeps the change instead of reverting.
         [Fact]
         public void ApplyPlayerRoles_RewritesFiles_AndUpdatesLiveOptions()

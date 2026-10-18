@@ -9,8 +9,8 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// Regression: the compact spinner binds its inner box padding to NumericUpDown.Padding (default 0), so a
-// number field used to press the digits against the left edge. It must match the text-field padding.
+// The compact spinner binds its inner box padding to NumericUpDown.Padding (default 0, which presses the
+// digits against the left edge), so a number field must set it to match the text-field padding.
 public class NumericFieldPaddingTests
 {
     [AvaloniaFact]

@@ -15,7 +15,7 @@ using ValheimServerGUI.Tools.Logging;
 
 namespace ValheimServerGUI.App.ViewModels;
 
-/// <summary>A dialog-opening menu action the window's code-behind routes to the right (Wave 6) dialog.</summary>
+/// <summary>A dialog-opening menu action the window's code-behind routes to the right dialog.</summary>
 public enum MenuAction
 {
     NewProfile,
@@ -30,7 +30,7 @@ public enum MenuAction
     WorldPreferences,
 }
 
-/// <summary>The user's answer to the "host a cloud world?" prompt (§ Steam Cloud import).</summary>
+/// <summary>The user's answer to the "host a Steam Cloud world?" import prompt.</summary>
 public enum CloudImportChoice
 {
     Move,
@@ -40,7 +40,7 @@ public enum CloudImportChoice
 
 /// <summary>
 /// The update-check outcome shown in the status bar. The single source of truth the status text and the
-/// status-bar icon both derive from (mirrors the WinForms status icon set).
+/// status-bar icon both derive from.
 /// </summary>
 public enum UpdateCheckStatus
 {
@@ -53,7 +53,7 @@ public enum UpdateCheckStatus
 }
 
 /// <summary>
-/// One server window's view-model (§10.5). Owns a transient <see cref="ValheimServer"/> over the shared
+/// One server window's view-model. Owns a transient <see cref="ValheimServer"/> over the shared
 /// singleton providers. Exposes the chrome surface (status + the single Can*/AllowServerChanges gate,
 /// update status, profile list, menu/button commands) and the editable form (<see cref="Form"/>) plus the
 /// StartServer flow (cloud import → validate → port check → new-world checks → start → save-on-start →
@@ -141,8 +141,8 @@ public partial class MainWindowViewModel : ViewModelBase
     // --- events / delegates the code-behind routes ---
     public event Action? NewWindowRequested;
     public event Action? CloseRequested;
-    public event Action<MenuAction>? MenuActionRequested;   // dialog opens — Wave 6
-    public event Action<string>? RemoveProfileRequested;    // profile name — Wave 6
+    public event Action<MenuAction>? MenuActionRequested;   // opens a dialog
+    public event Action<string>? RemoveProfileRequested;    // profile name
 
     /// <summary>Shows the Move/Copy/Cancel cloud-import prompt. Wired by the window; returns Cancel if unset.</summary>
     public Func<string, Task<CloudImportChoice>>? CloudImportPrompt { get; set; }
@@ -153,7 +153,7 @@ public partial class MainWindowViewModel : ViewModelBase
     /// <summary>After a MANUAL update check, asks "…go to the download page?" (returns true for yes). Wired by the window.</summary>
     public Func<string, Task<bool>>? UpdateResultPrompt { get; set; }
 
-    /// <summary>Shows the Save Changes / Discard Changes / Cancel unsaved-changes prompt (§13.3). Wired by the window.</summary>
+    /// <summary>Shows the Save Changes / Discard Changes / Cancel unsaved-changes prompt. Wired by the window.</summary>
     public Func<Task<UnsavedChangesChoice>>? UnsavedChangesPrompt { get; set; }
 
     /// <summary>Shows a single-OK informational modal (title, body). Wired by the window; no-op if unset.</summary>
@@ -213,7 +213,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public bool CanStop => ServerStatus is ServerStatus.Starting or ServerStatus.Running;
     public bool CanRestart => ServerStatus == ServerStatus.Running;
 
-    /// <summary>The single "server changes allowed" gate: fields are editable only while Stopped (§10.2).</summary>
+    /// <summary>The single "server changes allowed" gate: fields are editable only while Stopped.</summary>
     public bool AllowServerChanges => ServerStatus == ServerStatus.Stopped;
 
     /// <summary>The existing-world dropdown is usable only when changes are allowed and worlds exist;
@@ -403,7 +403,7 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     /// <summary>
-    /// Binds a profile to this window: records it as last-active (§16.2), loads the form fields, and lists
+    /// Binds a profile to this window: records it as last-active, loads the form fields, and lists
     /// the worlds for its save folder.
     /// </summary>
     public void LoadProfile(ServerPreferences profile)
@@ -470,7 +470,7 @@ public partial class MainWindowViewModel : ViewModelBase
         Logs.SetServerLog(_serverManager.GetServerLog(profileName));
     }
 
-    // ===== StartServer flow (§10.3 / GetServerOptionsFromFormState + validation) =====
+    // ===== StartServer flow (options build + validation) =====
 
     public async Task StartServerAsync(bool isManual)
     {
@@ -573,14 +573,14 @@ public partial class MainWindowViewModel : ViewModelBase
             return;
         }
 
-        // Remember a just-started new world so we can reselect it as "existing" once it comes up (§10.2).
+        // Remember a just-started new world so we can reselect it as "existing" once it comes up.
         _startedNewWorld = newWorld ? worldName : null;
 
         if (_userPrefs.LoadPreferences().SaveProfileOnStart)
             _serverPrefs.SavePreferences(BuildPreferences());
     }
 
-    /// <summary>GetServerOptionsFromFormState.</summary>
+    /// <summary>Builds the server launch options from the form, the profile and the app-wide preferences.</summary>
     public ValheimServerOptions BuildOptions()
     {
         var userPrefs = _userPrefs.LoadPreferences();
@@ -803,7 +803,7 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    /// <summary>GetPrefsFromFormState — merged onto the existing/new profile prefs.</summary>
+    /// <summary>The form merged onto the current profile's saved prefs (or new prefs if it has none).</summary>
     public ServerPreferences BuildPreferences()
     {
         var profileName = CurrentProfile?.ProfileName ?? CoreConstants.DefaultServerProfileName;
@@ -910,7 +910,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void HandleServerStatusChanged(object? sender, ServerStatus status)
         => RunOnUi(() => ServerStatus = status);
 
-    // A just-started new world now exists; switch the picker back to Existing and select it (§10.2).
+    // A just-started new world now exists; switch the picker back to Existing and select it.
     partial void OnServerStatusChanged(ServerStatus value)
     {
         if (value == ServerStatus.Running && _startedNewWorld is not null)
@@ -937,7 +937,7 @@ public partial class MainWindowViewModel : ViewModelBase
         });
 
     // A manual "Check for Updates" reports its result in a dialog, offering to open the release page when the check
-    // returned one (parity); otherwise (no release qualifies, or the check failed) it just reports.
+    // returned one; otherwise (no release qualifies, or the check failed) it just reports.
     private async Task PromptManualUpdateResultAsync(SoftwareUpdateEventArgs e)
     {
         var message = BuildManualUpdateMessage(e);
@@ -979,8 +979,8 @@ public partial class MainWindowViewModel : ViewModelBase
         }
     }
 
-    // Mirror the WinForms status-bar logic: show the compared version in the text, and distinguish
-    // up-to-date / update-available / pre-release / parse-failure (CompareVersion returns 1 / 0 / -1 / -2).
+    // Show the compared version in the status text, and distinguish
+    // update-available / up-to-date / pre-release / parse-failure (CompareVersion returns 1 / 0 / -1 / -2).
     private void ApplyUpdateResult(SoftwareUpdateEventArgs e)
     {
         if (!e.IsSuccessful)

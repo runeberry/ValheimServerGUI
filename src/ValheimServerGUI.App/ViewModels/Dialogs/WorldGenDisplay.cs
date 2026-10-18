@@ -8,9 +8,8 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 /// <summary>
 /// UI display names + help text for the raw world-gen CLI tokens (presets, modifiers, modifier values, and
 /// keys). The Core model stores only the tokens Valheim's command line expects (e.g. <c>deathpenalty</c> =
-/// <c>veryhard</c>); this maps them to the friendly names and descriptions the WinForms app showed, and back,
-/// so the World Preferences dialog never surfaces raw tokens. Each mapping is one token↔display table used in
-/// both directions; the tables are built on each call so they always read the current UI culture's text.
+/// <c>veryhard</c>); this maps them to friendly names and descriptions, and back, so the World Preferences
+/// dialog never surfaces raw tokens. Each mapping is one token↔display table used in both directions; the tables are built on each call so they always read the current UI culture's text.
 /// Sentinels: a modifier set to "Normal" is the null token and persists as no value (omitted); the preset set
 /// to <see cref="WorldPreferencesViewModel.CustomPreset"/> persists as no preset.
 /// </summary>
@@ -64,7 +63,7 @@ internal static class WorldGenDisplay
         _ => string.Empty,
     };
 
-    // --- Modifier values (ordered per modifier, with the "Normal" sentinel positioned as in WinForms).
+    // --- Modifier values (ordered per modifier, with the "Normal" sentinel at its place on each scale).
     //     A null token is the "Normal" (omitted) value. ---
     private static (string Display, string? Token)[] ModifierValues(string key) => key switch
     {

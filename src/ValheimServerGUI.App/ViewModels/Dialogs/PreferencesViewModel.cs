@@ -6,7 +6,7 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// Preferences dialog (§10.1): the six app-wide booleans plus the theme (§16.2 enhancement). Applies the
+/// Preferences dialog: the six app-wide booleans plus the theme. Applies the
 /// run-on-startup registration through <see cref="IStartupManager"/> and re-applies the theme on save.
 /// </summary>
 public partial class PreferencesViewModel : ModalEditViewModel

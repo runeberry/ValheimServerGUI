@@ -9,8 +9,8 @@ using ValheimServerGUI.Game;
 namespace ValheimServerGUI.App.Converters;
 
 /// <summary>
-/// Maps a <see cref="ServerStatus"/> to its 16×16 status-bar icon, mirroring the WinForms
-/// <c>ServerStatusIconMap</c> (grey pause = stopped, unsynced arrows = transitioning, green = running).
+/// Maps a <see cref="ServerStatus"/> to its 16×16 status-bar icon
+/// (grey pause = stopped, unsynced arrows = transitioning, green = running).
 /// </summary>
 public sealed class ServerStatusToIconConverter : IValueConverter
 {

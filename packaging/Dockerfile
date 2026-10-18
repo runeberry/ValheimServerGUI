@@ -1,4 +1,4 @@
-# Reproducible, cacheable build environment for packaging ValheimServerGUI (v3.0 / Avalonia).
+# Reproducible, cacheable build environment for packaging ValheimServerGUI.
 # Everything the package build needs lives here — the host only needs Docker. Build once
 # (scripts/package.sh does this automatically and reuses the image); rebuild with --rebuild-image.
 FROM mcr.microsoft.com/dotnet/sdk:10.0

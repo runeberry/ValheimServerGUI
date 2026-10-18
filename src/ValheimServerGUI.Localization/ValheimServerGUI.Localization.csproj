@@ -17,11 +17,10 @@
   </PropertyGroup>
 
   <!-- Strings live in their own assembly so a ProjectReference forces it to build before the App's
-       XAML compiler runs (the canonical fix for the generator/XamlIl ordering race). The strongly-typed
-       `Strings` class is produced at compile time, in-memory, by the VocaDb.ResXFileCodeGenerator Roslyn
-       source generator (build-only; nothing committed). It replaces the VS ResXFileCodeGenerator custom
-       tool, which does not run under `dotnet build`, and MSBuild's built-in StronglyTyped generator,
-       which only emits an internal class.
+       XAML compiler runs (otherwise the source generator and XamlIl race). The strongly-typed `Strings`
+       class is produced at compile time by the VocaDb.ResXFileCodeGenerator Roslyn source generator
+       (nothing committed). The VS ResXFileCodeGenerator custom tool does not run under `dotnet build`,
+       and MSBuild's built-in StronglyTyped generator only emits an internal class.
 
        Strings.resx is hand-maintained. Strings.qps-ploc.resx is the key-echo TEST culture, generated
        from it by scripts/gen-test-strings.sh; it is excluded from published artifacts (see the App

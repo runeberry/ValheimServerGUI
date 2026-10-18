@@ -9,10 +9,9 @@ using ValheimServerGUI.Tools.Models;
 namespace ValheimServerGUI.Game
 {
     /// <summary>
-    /// Pure line-to-event translator for Valheim dedicated-server stdout. Extracted from
+    /// Pure line-to-event translator for Valheim dedicated-server stdout. Kept separate from
     /// <c>ValheimServer</c> so the fragile regex table and player-correlation dispatch can be tested
-    /// headlessly (feed <see cref="ProcessLine"/> lines, assert against a fake player repository) with
-    /// no process, exe, or filesystem. The parser is state-free: it raises <see cref="ServerConnected"/>,
+    /// with no process, exe, or filesystem. The parser is state-free: it raises <see cref="ServerConnected"/>,
     /// <see cref="WorldSaved"/>, and <see cref="InviteCodeReady"/> and mutates the player repository, but
     /// holds no server status itself. The "don't promote Stopping-&gt;Running" guard lives in
     /// <c>ValheimServer</c>, which subscribes to <see cref="ServerConnected"/>.
@@ -47,10 +46,9 @@ namespace ValheimServerGUI.Game
             LogBasedActions.Add(@"Game server connected", OnServerConnected);
             // Legacy world-save line (pre-1.0 dedicated server): "World saved ( 20ms )".
             LogBasedActions.Add(@"World saved \(\s*?([[\d\.]+?)\s*?ms\s*?\)\s*?$", OnWorldSaved);
-            // Valheim 1.0+ logs a 5-step save sequence instead; the "World saved ( Nms )" line is gone.
-            // Match the completion line and pull the total time from its "[<n>ms]" (tier-4 live smoke, E9). The game
-            // formats it with ToString("N0") in the server's culture, so it carries group separators: "2,760",
-            // "2.760", "2 760" (ZNet.SaveWorldThread).
+            // Valheim 1.0+ logs a 5-step save sequence instead. Match the completion line and pull the total time from
+            // its "[<n>ms]". The game formats it with ToString("N0") in the server's culture, so it carries group
+            // separators: "2,760", "2.760", "2 760" (ZNet.SaveWorldThread).
             LogBasedActions.Add(@"World save \(\d+/\d+\) done\. Total time \[([^\]]+)ms\]", OnWorldSaveDone);
             LogBasedActions.Add(@"Session "".*?"" with join code (.*?) ", OnCrossplayJoinCodeAvailable);
 

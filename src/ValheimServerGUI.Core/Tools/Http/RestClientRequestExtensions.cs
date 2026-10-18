@@ -57,8 +57,7 @@ namespace ValheimServerGUI.Tools.Http
                 var responseContent = message.Content.ReadAsStringAsync().GetAwaiter().GetResult();
                 var typed = JsonConvert.DeserializeObject<TResponse>(responseContent);
 
-                // A null/unparseable response is treated as "nothing to report" -- handlers already
-                // degrade on a null payload, so skipping the callback is behaviorally equivalent.
+                // A null/unparseable response means "nothing to report": skip the callback.
                 if (typed == null) return;
 
                 callback.Invoke(request, typed);

@@ -23,7 +23,7 @@ public enum FileSelectMode
 /// box border as end-caps — a "Browse…" button (a real file/folder picker via the window's storage provider)
 /// and, when <see cref="ShowOpenFolder"/> is set, an open-folder button bound to <see cref="OpenFolderCommand"/>.
 /// Each end-cap is optional (<see cref="ShowBrowse"/>/<see cref="ShowOpenFolder"/>) so the whole field reads as
-/// a single outlined control. Mirrors the WinForms <c>FilenameFormField</c>, which likewise owned its buttons.
+/// a single outlined control.
 /// </summary>
 public partial class FilenameFormField : FormFieldBase, IFormField<string?>
 {

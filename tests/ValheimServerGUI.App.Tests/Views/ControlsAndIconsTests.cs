@@ -6,7 +6,7 @@ using AppGroupBox = ValheimServerGUI.App.Controls.GroupBox;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// Guards the styling primitives added in the V3 look pass: the custom controls instantiate headlessly,
+// Guards the styling primitives: the custom controls instantiate headlessly,
 // and every icon the converters / menus reference resolves to a real bitmap (a bad avares name would
 // otherwise only surface when that specific menu opened or that row bound at runtime).
 public class ControlsAndIconsTests

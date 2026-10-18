@@ -52,8 +52,8 @@ namespace ValheimServerGUI.Game
             {
                 return GetRemoteFolders()
                     .SelectMany(remote => remote.GetWorldNames())
-                    // §15 #10: only list worlds that GetCloudWorldFolder can actually resolve, so the
-                    // enumeration and the import path agree (a listed world never throws on import).
+                    // Only list worlds that GetCloudWorldFolder can actually resolve, so the enumeration and
+                    // the import path agree (a listed world never throws on import).
                     .Where(name => GetCloudWorldFolder(name) != null)
                     .Distinct(StringComparer.OrdinalIgnoreCase)
                     .ToList();

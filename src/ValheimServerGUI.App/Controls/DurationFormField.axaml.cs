@@ -18,8 +18,8 @@ public enum DurationUnit
 /// <summary>
 /// A duration field for settings the server stores as a whole number of seconds (save interval, backup
 /// intervals). It presents that value through the compact spinner plus a unit dropdown so a user reads and
-/// edits it as "30 Minutes" rather than "1800" — but <see cref="Value"/> stays canonical seconds, so the
-/// binding surface is a drop-in replacement for the old <see cref="NumericFormField"/> on these fields.
+/// edits it as "30 Minutes" rather than "1800" — but <see cref="Value"/> stays canonical seconds, so it binds
+/// exactly like a <see cref="NumericFormField"/> holding seconds.
 ///
 /// <see cref="Minimum"/>/<see cref="Maximum"/> are the seconds bounds; the spinner's own bounds are derived
 /// per unit so the seconds constraint is always honoured. On an external <see cref="Value"/> change the field

@@ -7,8 +7,8 @@ using Xunit;
 
 namespace ValheimServerGUI.Core.Tests.Game;
 
-// The per-character LastSeen field (v3.0, additive) backs the Player Details "Since" column. It must be
-// optional in the cache: characters written by earlier versions have no "lastSeen" and must load as null.
+// The per-character LastSeen field backs the Player Details "Since" column. It must be optional in the cache:
+// characters written by earlier versions have no "lastSeen" and must load as null.
 public class PlayerInfoTests
 {
     [Fact]

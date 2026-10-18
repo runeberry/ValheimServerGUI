@@ -13,15 +13,15 @@ namespace ValheimServerGUI.Integration.Tests
     /// <summary>
     /// Boots the real dedicated server ONCE, captures its log, and gracefully stops it (SIGINT), recording
     /// everything the lifecycle facts assert against. A single boot covers boot→Running, the graceful
-    /// save-flush (the A half of E9), and the captured-log fixture-drift check. The force-kill B half lives
-    /// in <see cref="ForceKillTests"/> because it must kill a freshly booted server instead of stopping it.
+    /// save-flush, and the captured-log fixture-drift check. The force-kill counterpart lives in
+    /// <see cref="ForceKillTests"/> because it must kill a freshly booted server instead of stopping it.
     /// </summary>
     public sealed class LiveLifecycleFixture : IAsyncLifetime
     {
         // First boot does world-gen + a real Steam relay connect; size the timeout for a cold start.
         private static readonly TimeSpan BootTimeout = TimeSpan.FromSeconds(150);
         // The stop is sent right after Running, while a new world may still be generating. Windows defers the
-        // graceful stop until generation finishes (34 s measured on a laptop), so allow as long as a cold boot.
+        // graceful stop until generation finishes (around 34 s), so allow as long as a cold boot.
         private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(150);
         // The invite code comes once world generation is done and PlayFab has registered the session.
         private static readonly TimeSpan InviteCodeTimeout = TimeSpan.FromSeconds(120);
@@ -96,7 +96,7 @@ namespace ValheimServerGUI.Integration.Tests
         private static string Tail(IReadOnlyList<string> log, int n = 30) =>
             string.Join(Environment.NewLine, log.TakeLast(n));
 
-        // E9 / §13: the server reaches Running off the REAL "Game server connected" line, which is what
+        // The server reaches Running off the REAL "Game server connected" line, which is what
         // drives the status machine in production. Reaching Running IS the live proof that the parser's
         // connected pattern still matches the current binary's output.
         [Fact]
@@ -106,10 +106,9 @@ namespace ValheimServerGUI.Integration.Tests
                 $"Server never reached Running within the boot timeout. Check Steam connectivity. Log tail:{Environment.NewLine}{Tail(_fixture.CapturedLog)}");
         }
 
-        // E9 (A half): a graceful SIGINT stop flushes a world save to disk — proven at the filesystem
-        // boundary (the world data file's mtime advances), not just by a log line, and corroborated by the
-        // real parser raising a NEW WorldSaved after the stop. ForceKillTests is the B half that shows a
-        // hard kill does NOT advance the save, making this path meaningful.
+        // A graceful SIGINT stop flushes a world save to disk, checked at the filesystem (the world data file's
+        // mtime advances) and by the real parser raising a NEW WorldSaved after the stop. ForceKillTests shows a
+        // hard kill does NOT advance the save, which is what makes this check meaningful.
         [Fact]
         public void GracefulStop_FlushesWorldSave()
         {
@@ -190,10 +189,10 @@ namespace ValheimServerGUI.Integration.Tests
             Assert.Matches("^[0-9]{6}$", _fixture.InviteCode);
         }
 
-        // Fixture-drift / capture: the captured real log is written as a run artifact, and we re-feed it
-        // through a fresh REAL ServerLogParser to confirm the current binary still emits lines the parser's
-        // patterns match (connected + world-saved). A Valheim log-format change surfaces here; refreshing the
-        // tier-2 inline fixtures in ServerLogParserTests stays a manual follow-up.
+        // Fixture drift: the captured real log is written as a run artifact, and we re-feed it through a fresh
+        // REAL ServerLogParser to confirm the current binary still emits lines the parser's patterns match
+        // (connected + world-saved). A Valheim log-format change surfaces here; the inline fixtures in
+        // ServerLogParserTests must then be refreshed by hand.
         [Fact]
         public void CapturedLog_StillMatchesParserPatterns()
         {
@@ -219,7 +218,7 @@ namespace ValheimServerGUI.Integration.Tests
             Assert.True(connected,
                 $"ServerLogParser no longer matches the real 'connected' line — Valheim log format may have changed. Artifact: {_fixture.ArtifactPath}");
             Assert.True(saved,
-                $"ServerLogParser no longer matches the real 'World saved' line — refresh the tier-2 fixtures. Artifact: {_fixture.ArtifactPath}");
+                $"ServerLogParser no longer matches the real 'World saved' line — refresh the log fixtures in Core.Tests/Fixtures. Artifact: {_fixture.ArtifactPath}");
         }
     }
 }

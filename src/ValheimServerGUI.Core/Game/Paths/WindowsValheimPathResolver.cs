@@ -3,8 +3,7 @@
 namespace ValheimServerGUI.Game
 {
     /// <summary>
-    /// Reproduces the Windows paths existing installs already use (the values the WinForms
-    /// <c>Properties.Resources</c> carried), so upgrading in place keeps finding the same files.
+    /// Uses the same Windows paths as the WinForms 2.x app, so upgrading in place keeps finding the same files.
     /// </summary>
     public class WindowsValheimPathResolver : ValheimPathResolver
     {

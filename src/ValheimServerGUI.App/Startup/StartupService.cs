@@ -8,7 +8,7 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.Startup;
 
 /// <summary>
-/// Runs the async startup tasks the v2.4 <c>SplashForm</c> ran before opening the main windows (§2.1):
+/// Runs the async startup tasks shown under the splash screen before the main windows open:
 /// the update check and the one-time player-roster hydration (<see cref="IPlayerDataRepository.LoadAsync"/>
 /// MUST be called once at startup). Each task is isolated so a failure (e.g. no network for the update
 /// check) reports progress and continues rather than aborting the launch.

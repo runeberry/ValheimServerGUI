@@ -5,10 +5,9 @@ using Avalonia.Controls.Primitives;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// A single labelled form row: [label] [input] [help glyph]. The reusable wrapper the v2.4
-/// <c>IFormField&lt;T&gt;</c> kit maps to (§11.2) — <see cref="HeaderedContentControl.Header"/> is the
-/// label, <see cref="ContentControl.Content"/> is the input control, and <see cref="HelpText"/> drives a
-/// "?" glyph whose tooltip is collapsed when the text is empty.
+/// A single labelled form row: the label (with its "?" help glyph) above the input.
+/// <see cref="HeaderedContentControl.Header"/> is the label, <see cref="ContentControl.Content"/> is the input
+/// control, and <see cref="HelpText"/> drives a "?" glyph that is collapsed when the text is empty.
 /// </summary>
 public class FormRow : HeaderedContentControl
 {

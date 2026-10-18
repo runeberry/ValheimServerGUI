@@ -8,7 +8,7 @@ namespace ValheimServerGUI.App.Tests.Fakes;
 
 /// <summary>
 /// Minimal in-memory <see cref="IPlayerDataRepository"/>. Records <see cref="LoadAsync"/> calls and lets a
-/// test push players + raise the live-update events the Players tab (Wave 5) binds.
+/// test push players + raise the live-update events the Players tab binds.
 /// </summary>
 internal sealed class FakePlayerDataRepository : IPlayerDataRepository
 {

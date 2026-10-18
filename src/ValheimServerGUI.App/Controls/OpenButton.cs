@@ -3,7 +3,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
-/// <summary>Open-a-folder icon button (WinForms <c>OpenButton</c>): the open-folder glyph, no confirm flash.
+/// <summary>Open-a-folder icon button: the open-folder glyph, no confirm flash.
 /// Action via the bound <see cref="Avalonia.Controls.Button.Command"/>.</summary>
 public class OpenButton : IconButton
 {

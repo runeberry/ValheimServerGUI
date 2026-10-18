@@ -163,8 +163,8 @@ namespace ValheimServerGUI.Game
             player.LastStatusChange = DateTime.UtcNow;
             player.LastStatusCharacter = !string.IsNullOrWhiteSpace(query.CharacterName) ? query.CharacterName : null;
 
-            // Opportunistically capture/refresh the raw platform token so existing records created before
-            // this field existed pick it up on their next join (used for case-exact list-file writes).
+            // Refresh the raw platform token on every join so records saved without one pick it up
+            // (it is used for case-exact list-file writes).
             if (!string.IsNullOrWhiteSpace(query.PlatformRaw)) player.PlatformRaw = query.PlatformRaw;
 
             Upsert(player);

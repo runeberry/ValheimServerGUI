@@ -4,7 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
-/// <summary>One world-gen modifier (§6.5). The dropdown shows friendly names (via <see cref="WorldGenDisplay"/>);
+/// <summary>One world-gen modifier. The dropdown shows friendly names (via <see cref="WorldGenDisplay"/>);
 /// the persisted <see cref="Value"/> is the raw token, or null for the "Normal" (omitted) sentinel.</summary>
 public partial class ModifierRow : ObservableObject
 {

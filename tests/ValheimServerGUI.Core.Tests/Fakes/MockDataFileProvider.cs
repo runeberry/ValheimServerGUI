@@ -6,7 +6,7 @@ namespace ValheimServerGUI.Core.Tests.Fakes
 {
     /// <summary>
     /// In-memory <see cref="IFileProvider"/>: keeps the last-saved object and serves it back, with no
-    /// real filesystem. Ported from the v2.4 tests; matches the nullable IFileProvider contract.
+    /// real filesystem. Matches the nullable IFileProvider contract.
     /// </summary>
     public class MockDataFileProvider : IFileProvider
     {

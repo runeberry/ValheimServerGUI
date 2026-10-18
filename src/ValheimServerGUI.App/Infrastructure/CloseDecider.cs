@@ -7,7 +7,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Infrastructure;
 
-/// <summary>What the app should do about a shutdown request (§2.4).</summary>
+/// <summary>What the app should do about a shutdown request.</summary>
 public enum CloseDecision
 {
     /// <summary>Let the shutdown proceed immediately.</summary>
@@ -21,7 +21,7 @@ public enum CloseDecision
 }
 
 /// <summary>
-/// The user's exit decision when they close the last window (§2.4 "safe shutdowns"; an OS shutdown never asks, see
+/// The user's exit decision when they close the last window (an OS shutdown never asks, see
 /// <c>App.OnShutdownRequested</c>), as an <em>aggregate</em> over every running server:
 /// servers are shared app-wide and outlive individual windows, so the save-flush guard applies when the app exits,
 /// not per-window close. Side-effect-free (the caller performs the actual Stop / Shutdown) so every branch is

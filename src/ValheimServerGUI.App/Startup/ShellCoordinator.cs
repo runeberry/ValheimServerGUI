@@ -11,9 +11,8 @@ using ValheimServerGUI.Tools.Logging;
 namespace ValheimServerGUI.App.Startup;
 
 /// <summary>
-/// The v2.4 <c>SplashForm.PrepareMainWindows</c> orchestration (§2.3), minus the platform lifetime glue
-/// that <see cref="App"/> owns. Runs the async startup tasks, then creates one <see cref="MainWindow"/>
-/// per selected profile over a per-window <see cref="MainWindowViewModel"/> (a factory so each gets its
+/// Startup window orchestration, minus the platform lifetime glue that <see cref="App"/> owns. Runs the async
+/// startup tasks, then creates one <see cref="MainWindow"/> per selected profile over a per-window <see cref="MainWindowViewModel"/> (a factory so each gets its
 /// own transient <see cref="ValheimServer"/>), loads the profile, and shows it (minimized if the user
 /// preference says so). Also opens/focuses a window when a second launch forwards a profile name.
 /// </summary>
@@ -48,7 +47,7 @@ internal sealed class ShellCoordinator
     public System.Threading.Tasks.Task RunStartupTasksAsync(IProgress<StartupProgress>? progress)
         => _startupService.RunAsync(progress);
 
-    /// <summary>Creates, loads, and shows the startup windows (§2.3). Returns the windows in open order.</summary>
+    /// <summary>Creates, loads, and shows the startup windows. Returns the windows in open order.</summary>
     public IReadOnlyList<MainWindow> CreateAndShowStartupWindows()
     {
         var userPrefs = _userPrefs.LoadPreferences();
@@ -75,7 +74,7 @@ internal sealed class ShellCoordinator
         ShowWindowFor(new StartupWindowPlan(profile, AutoStart: false), startMinimized: false);
     }
 
-    /// <summary>Opens (or focuses) a window for a profile named by a forwarded second launch (§2.2).</summary>
+    /// <summary>Opens (or focuses) a window for a profile named by a forwarded second launch.</summary>
     public void OpenOrFocusProfile(string? profileName)
     {
         var existing = _windowManager.Windows
@@ -106,8 +105,7 @@ internal sealed class ShellCoordinator
         if (startMinimized)
             window.WindowState = WindowState.Minimized;
 
-        // Auto-start of the server itself is wired to the real StartServer flow in Wave 4; the plan flag
-        // (AutoStartOnLoad) is carried on the view-model for that.
+        // The window starts the server itself once it opens when AutoStartOnLoad is set (MainWindow.OnOpened).
         return window;
     }
 

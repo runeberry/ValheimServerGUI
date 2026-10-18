@@ -27,7 +27,7 @@ public sealed record DirectoryTarget(string? ProfileName)
 }
 
 /// <summary>
-/// Set Directories dialog (§10.1): the app-wide server binary, save data and (Linux) BepInEx paths, or one profile's
+/// Set Directories dialog: the app-wide server binary, save data and (Linux) BepInEx paths, or one profile's
 /// overrides of them, picked from "Set directories for:". An empty override uses the app-wide value. Edits are kept
 /// per target while switching; OK saves every changed target, Cancel none. A running profile's overrides are
 /// read-only. Restore Defaults resets the app-wide paths to the OS defaults, or clears a profile's overrides.

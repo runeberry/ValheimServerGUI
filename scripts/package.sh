@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# package.sh — one-command, containerized packaging of ValheimServerGUI (v3.0 / Avalonia).
+# package.sh — one-command, containerized packaging of ValheimServerGUI.
 #
 # Run with no arguments to produce the distributable artifacts in ./dist:
 #   * ValheimServerGUI-<ver>-win-x64.exe        (single-file Windows executable)

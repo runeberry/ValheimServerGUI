@@ -11,7 +11,7 @@ using Xunit;
 namespace ValheimServerGUI.App.Tests.ViewModels;
 
 /// <summary>
-/// The Players tab's role truth table (Nuffle's spec): for every combination of the player's default role, this
+/// The Players tab's role truth table: for every combination of the player's default role, this
 /// server's role, the permitted-list mode, and the "Show banned players" filter, whether the row is visible and
 /// what its Role column reads. Driven end to end through <see cref="PlayersViewModel"/>: the default comes from
 /// user preferences, the server role is the profile override on the form.

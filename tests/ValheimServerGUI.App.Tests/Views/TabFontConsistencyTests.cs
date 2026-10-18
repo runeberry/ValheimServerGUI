@@ -17,8 +17,8 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// The tab titles used to render in Fluent's SemiLight/13 font, visibly different from the app body. The
-// custom tab theme pins them to the app font (Normal weight, 12px) for consistency.
+// The custom tab theme pins tab titles to the app font (Normal weight, 12px) instead of Fluent's SemiLight/13,
+// which looks visibly different from the app body.
 public class TabFontConsistencyTests
 {
     private static readonly System.IServiceProvider Core =

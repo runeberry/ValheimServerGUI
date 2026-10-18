@@ -6,7 +6,7 @@ namespace ValheimServerGUI.App.Services;
 /// <summary>
 /// Linux run-on-login via an XDG autostart <c>.desktop</c> entry in <c>~/.config/autostart/</c>. Enabling
 /// writes the entry; disabling removes it. Idempotent: re-enabling with the same exec path makes no change
-/// (returns false), and re-enabling after the executable path changed rewrites the stale entry (E53).
+/// (returns false), and re-enabling after the executable path changed rewrites the stale entry.
 /// </summary>
 public sealed class LinuxAutostartStrategy : IStartupStrategy
 {

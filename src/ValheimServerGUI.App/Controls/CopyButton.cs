@@ -7,7 +7,7 @@ using ValheimServerGUI.Localization;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// A copy-to-clipboard icon button (the WinForms <c>CopyButton</c> equivalent): shows the copy glyph, and on
+/// A copy-to-clipboard icon button: shows the copy glyph, and on
 /// click copies <see cref="Text"/> then flashes a green check (StatusOK) for a couple of seconds via the
 /// <see cref="IconButton"/> confirm-flash. While the check shows the button is inert but keeps its colour.
 /// </summary>

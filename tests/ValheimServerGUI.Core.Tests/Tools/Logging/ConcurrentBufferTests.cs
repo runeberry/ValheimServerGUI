@@ -6,7 +6,7 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Tools.Logging
 {
     /// <summary>
-    /// E47: the ring buffer backing the log view evicts oldest-first, caps its count at the buffer
+    /// The ring buffer backing the log view evicts oldest-first, caps its count at the buffer
     /// size, and preserves FIFO order of the survivors.
     /// </summary>
     public class ConcurrentBufferTests

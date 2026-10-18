@@ -15,9 +15,8 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Startup;
 
-// Repro guard for the "New Window -> close it -> fatal 'A task was canceled'" report: closing a secondary
-// window must tear its view-model down cleanly, leaving the other window open and raising no unhandled or
-// unobserved exception on any channel.
+// Closing a secondary window must tear its view-model down cleanly, leaving the other window open and raising
+// no unhandled or unobserved exception (such as a canceled task) on any channel.
 public class WindowLifecycleTests
 {
     private static readonly IServiceProvider Core =

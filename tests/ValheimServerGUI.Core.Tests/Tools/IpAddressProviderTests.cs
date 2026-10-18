@@ -11,8 +11,8 @@ using Xunit;
 
 namespace ValheimServerGUI.Core.Tests.Tools
 {
-    // §16.2 external IP: one IPv4-only request to the app's API (/ip-check); a failed or non-IPv4 answer keeps the
-    // previous value (E52).
+    // External IP: one IPv4-only request to the app's API (/ip-check); a failed or non-IPv4 answer keeps the
+    // previous value.
     public class IpAddressProviderTests
     {
         private static readonly RuneberryApiKey ApiKey = new("X-Test-Api-Key", "test-key-value");

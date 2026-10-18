@@ -5,8 +5,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Services;
 
-// E53: autostart enable/disable/stale-path/idempotent — the Linux .desktop branch (Windows branch is
-// registry-only and covered by a Win-guarded test).
+// Linux autostart via an XDG autostart .desktop entry: enable, disable, stale-path repair, idempotence.
 public sealed class LinuxAutostartStrategyTests : IDisposable
 {
     private readonly string _dir;

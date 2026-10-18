@@ -66,10 +66,9 @@ namespace ValheimServerGUI.Core.Tests.Tools
             Assert.Equal(-2, AssemblyHelper.CompareVersions(current, other));
         }
 
-        // §15 #3: GetApplicationVersion crashed when the informational version carried no "+build"
-        // suffix (unguarded IndexOf -> -1 -> range throws). The test host's assembly has no build
-        // suffix, so merely calling it reproduces the old crash; the guard must return the version
-        // string unchanged instead.
+        // An informational version with no "+build" suffix must come back unchanged, not throw (an unguarded
+        // IndexOf returns -1 and the range throws). The test host's assembly has no build suffix, so calling it
+        // exercises that case.
         [Fact]
         public void GetApplicationVersion_NoBuildSuffix_DoesNotThrow()
         {

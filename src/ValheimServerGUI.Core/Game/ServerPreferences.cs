@@ -107,7 +107,7 @@ namespace ValheimServerGUI.Game
                 foreach (var (key, entry) in file.PlayerRoles)
                 {
                     if (string.IsNullOrWhiteSpace(key) || entry == null) continue;
-                    // "none" overrides (written by an earlier build) are dropped: a server never pins "no role".
+                    // A stored "none" override is dropped: a server never pins "no role".
                     if (PlayerRoleTokens.TryParse(entry.Role, out var role) && role != PlayerRole.None)
                         prefs.PlayerRoles[key] = new PlayerRoleEntry(role, entry.PlatformRaw);
                 }

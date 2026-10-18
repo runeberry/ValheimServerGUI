@@ -11,7 +11,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Tests.ViewModels.Dialogs;
 
-// §13.3: OK/Cancel/Restore-Defaults + unsaved-changes guard (dirty flag) + WorldPreferences preset↔custom.
+// Dialog view-models: OK/Cancel/Restore-Defaults + unsaved-changes guard (dirty flag) + WorldPreferences preset↔custom.
 public class DialogViewModelTests
 {
     private static readonly System.IServiceProvider Core =
@@ -249,7 +249,7 @@ public class DialogViewModelTests
         var saved = provider.LoadPreferences("W")!;
         Assert.Equal(WorldGenPresets.Hard, saved.Preset);
         Assert.Empty(saved.Modifiers);                 // modifiers not persisted under a preset
-        Assert.Contains(WorldGenKeys.All[0], saved.Keys); // keys always persist (§15 #5)
+        Assert.Contains(WorldGenKeys.All[0], saved.Keys); // keys always persist
     }
 
     [Fact]

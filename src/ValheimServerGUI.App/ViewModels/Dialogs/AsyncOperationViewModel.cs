@@ -6,7 +6,7 @@ using ValheimServerGUI.Localization;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// Generic async-operation dialog VM (§11): runs a <see cref="Task"/> behind a modal with in-progress →
+/// Generic async-operation dialog VM: runs a <see cref="Task"/> behind a modal with in-progress →
 /// success/failure states. Used for report submission.
 /// </summary>
 public partial class AsyncOperationViewModel : ObservableObject

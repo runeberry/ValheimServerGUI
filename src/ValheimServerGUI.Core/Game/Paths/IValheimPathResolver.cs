@@ -3,10 +3,8 @@
 namespace ValheimServerGUI.Game
 {
     /// <summary>
-    /// Resolves the OS-specific, path-shaped values the service layer used to read from the WinForms
-    /// <c>Properties.Resources</c> (which embedded <c>%ProgramFiles(x86)%</c>/<c>%USERPROFILE%</c> and
-    /// do not port). The Windows implementation reproduces the paths existing installs already use;
-    /// the Linux implementation uses XDG / <c>$HOME</c> conventions.
+    /// Resolves the OS-specific default paths the service layer needs. The Windows implementation keeps the
+    /// paths existing installs already use; the Linux implementation uses XDG / <c>$HOME</c> conventions.
     /// </summary>
     public interface IValheimPathResolver
     {

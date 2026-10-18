@@ -13,7 +13,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.ViewModels;
 
-// §10.3 StartServer flow: cloud import → validate → port check → new-world checks → start → save-on-start.
+// StartServer flow: cloud import → validate → port check → new-world checks → start → save-on-start.
 public sealed class StartServerFlowTests : IDisposable
 {
     private static readonly IServiceProvider Core =

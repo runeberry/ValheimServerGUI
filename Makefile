@@ -25,7 +25,7 @@ help:
 	@echo "  Launcher installs to: $(LAUNCHER_DIR)"
 
 # Build and run the app straight from source — the manual-testing entry point.
-# Build output is redirected per-user by Directory.Build.props (shared-tree collision fix).
+# Build output goes to a per-user directory (see Directory.Build.props).
 launch:
 	@dotnet run --project $(APP_PROJ)
 
@@ -33,7 +33,7 @@ launch:
 install:
 	@bash scripts/install-local.sh
 
-# The "setup part" — install just the menu shortcut into the current user's menu.
+# Install just the menu shortcut into the current user's menu.
 # Regenerates the .desktop from the committed template pointed at $(INSTALL_DIR).
 launcher:
 	@mkdir -p "$(LAUNCHER_DIR)"

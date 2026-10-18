@@ -11,7 +11,7 @@ using ValheimServerGUI.App.Infrastructure;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// The app's console log frame (the WinForms <c>LogViewer</c> equivalent): a bordered, monospace, read-only
+/// The app's console log frame: a bordered, monospace, read-only
 /// <see cref="SelectableTextBlock"/> that shows the lines from <see cref="ItemsSource"/> as one contiguous
 /// block so they copy-paste in bulk. New lines append and the view sticks to the bottom while the reader is
 /// already there; the source collection is bounded upstream, so the rendered text never grows without limit.
@@ -59,8 +59,7 @@ public partial class LogViewer : UserControl
     private void OnLinesChanged(object? sender, NotifyCollectionChangedEventArgs e)
     {
         // Re-join the (bounded) lines and re-pin to the bottom if the reader was already there. Rebuilding
-        // wholesale is simple and, with the upstream cap, cheap; it does drop any live text selection, which
-        // matches the original's append-to-end behaviour.
+        // wholesale is simple and, with the upstream cap, cheap; it does drop any live text selection.
         var stick = IsAtBottom();
         Rebuild();
         if (stick) ScrollToBottomLater();

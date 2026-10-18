@@ -5,7 +5,7 @@ using ValheimServerGUI.Tools;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
-/// <summary>Bug Report dialog (§8/§10.1): a description submitted to the Runeberry backend as source "BugReport".</summary>
+/// <summary>Bug Report dialog: a description submitted to the Runeberry backend as source "BugReport".</summary>
 public partial class BugReportViewModel : ObservableObject
 {
     private readonly IRuneberryApiClient _client;

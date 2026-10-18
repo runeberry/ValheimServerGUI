@@ -6,8 +6,8 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// The centralized owner-centering fix lives on DialogWindow. Guard the contract that every modal dialog
-// inherits it, so a newly-added dialog can't silently fall back to Avalonia's mis-centering CenterOwner.
+// DialogWindow owns owner-centering. Every modal dialog must inherit it, so a new dialog can't silently fall
+// back to Avalonia's CenterOwner, which mis-centers.
 public class DialogCenteringTests
 {
     [Fact]

@@ -3,7 +3,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Services;
 
-// E54: open folder/URL, invalid path, non-http scheme — validated + correct per-OS launcher.
+// Opening folders and URLs: inputs are validated (invalid path, non-http scheme) and the right per-OS launcher runs.
 public class ShellLauncherTests
 {
     private static ShellLauncher Make(RecordingSystemShell shell, bool isWindows)

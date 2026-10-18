@@ -10,8 +10,8 @@ namespace ValheimServerGUI.App.Controls;
 /// The single icon renderer: an <see cref="Image"/> whose glyph is an <see cref="AppIcons"/> key. It greys
 /// itself automatically whenever it sits inside disabled chrome — because <see cref="InputElement.IsEffectivelyEnabled"/>
 /// propagates from any disabled ancestor (a button, a menu item), a disabled container turns the glyph grey
-/// and an enabled one keeps it in colour, with no per-site wiring. This is the WinForms "disabled icon" cue
-/// applied universally (the status bar is never disabled, so its icons stay coloured).
+/// and an enabled one keeps it in colour, with no per-site wiring (the status bar is never disabled, so its icons
+/// stay coloured).
 /// </summary>
 public class IconImage : Image
 {

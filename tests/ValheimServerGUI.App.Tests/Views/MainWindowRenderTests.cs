@@ -17,7 +17,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
-// Tier-3: the real window renders (all tabs/menus bind cleanly) and button enablement tracks status.
+// The real window renders (all tabs/menus bind cleanly) and button enablement tracks status.
 public class MainWindowRenderTests
 {
     private static readonly System.IServiceProvider Core =
@@ -51,7 +51,7 @@ public class MainWindowRenderTests
     // call CaptureRenderedFrame(): that forces a real Skia compositor commit which, under CPU load,
     // reads a thread-affine Brush off the wrong thread (Dispatcher.VerifyAccess throws) and dead-locks
     // the synchronously-waiting headless UI thread. Layout gives the same "everything realizes + binds
-    // without throwing" coverage without the racy render. See the apptests-headless-deadlock note.
+    // without throwing" coverage without the racy render.
     [AvaloniaFact]
     public void Window_realizes_all_tabs_without_errors()
     {
@@ -84,7 +84,7 @@ public class MainWindowRenderTests
 
     private static readonly Size RenderSize = new(1280, 800);
 
-    // Regression: the File menu opens and its dynamic Load/Remove Profile submenus realize their generated
+    // The File menu opens and its dynamic Load/Remove Profile submenus realize their generated
     // items without crashing. The items must (a) bind their command across the submenu popup (Tree=Logical)
     // so they are enabled, and (b) survive CanExecute being evaluated with a non-string parameter (the
     // transient inherited DataContext during container setup) rather than throwing and killing the menu.
@@ -126,7 +126,7 @@ public class MainWindowRenderTests
             {
                 Assert.NotNull(child!.Command);                    // command resolved across the popup
                 Assert.IsType<string>(child.CommandParameter);     // parameter is the profile name, not the VM
-                Assert.True(child.IsEffectivelyEnabled);           // ungated → enabled (bug 2)
+                Assert.True(child.IsEffectivelyEnabled);           // ungated → enabled
                 Assert.Null(Record.Exception(() => child.Command!.CanExecute(vm))); // no throw on a VM param
             }
         }

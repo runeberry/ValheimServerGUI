@@ -110,9 +110,8 @@ namespace ValheimServerGUI.Game
         }
 
         /// <summary>
-        /// Fill in the OS-specific default paths (formerly hard-coded on the POCO) whenever the loaded
-        /// value is blank, so a fresh install or a file missing those keys still points at sensible
-        /// per-OS locations.
+        /// Fill in the OS-specific default paths whenever the loaded value is blank, so a fresh install or a
+        /// file missing those keys still points at sensible per-OS locations.
         /// </summary>
         private void ApplyPathDefaults(UserPreferences prefs)
         {

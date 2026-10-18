@@ -8,8 +8,7 @@ namespace ValheimServerGUI.App.ViewModels;
 /// Base for all view-models. Provides the marshal-and-guard primitive (<see cref="RunOnUi"/>) that every
 /// Core event handler must funnel through: Core events fire off the UI thread, so handlers marshal onto
 /// <see cref="Dispatcher.UIThread"/>, and any callback that arrives after the view-model is torn down is
-/// dropped. This is the Avalonia equivalent of v2.4's <c>BuildEventHandler</c> <c>InvokeRequired</c> +
-/// <c>IsDisposed</c> guard.
+/// dropped.
 /// </summary>
 public abstract class ViewModelBase : ObservableObject, IDisposable
 {

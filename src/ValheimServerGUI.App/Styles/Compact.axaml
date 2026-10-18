@@ -1,7 +1,7 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <!-- Compact density pass (§ V3 styling). Merged AFTER FluentTheme so these win. Restores the
-         WinForms 2.x information-dense feel: ~12px base font, ~23px control heights, tight margins, and
+    <!-- Compact density pass. Merged AFTER FluentTheme so these win. Gives the app an
+         information-dense, desktop feel: ~12px base font, ~23px control heights, tight margins, and
          crisp 2px corners — implemented purely as theme-resource + selector overrides so the whole tree
          (including the separate dialog Windows) inherits it and it still scales cleanly across DPIs. -->
 
@@ -16,8 +16,7 @@
         <x:Double x:Key="MenuFlyoutThemeMinHeight">26</x:Double>
     </Styles.Resources>
 
-    <!-- Base font: Segoe UI on Windows, the bundled Inter elsewhere. Inherits to every descendant.
-         Base surface is the layered app background (no pure black); menu/footer paint darker themselves. -->
+    <!-- Base font: Segoe UI on Windows, the bundled Inter elsewhere. Inherits to every descendant. -->
     <Style Selector="Window">
         <Setter Property="FontFamily" Value="Segoe UI, Inter" />
         <Setter Property="FontSize" Value="12" />
@@ -67,13 +66,13 @@
         <Setter Property="Opacity" Value="1" />
     </Style>
 
-    <!-- Text/number inputs, the field shell, and connected affixes now live in Styles/Inputs.axaml
+    <!-- Text/number inputs, the field shell, and connected affixes live in Styles/Inputs.axaml
          (colours from Styles/Palette.axaml Input* tokens). -->
 
 
-    <!-- CheckBox / RadioButton are fully retemplated (12px box/circle, tight margins) in
-         Styles/CheckBox.axaml and Styles/RadioButton.axaml — a Style pass can't shrink the box because
-         Fluent hard-codes the part sizes as local values, so we own the template instead. -->
+    <!-- CheckBox / RadioButton are fully retemplated (12px box/circle, tight margins), scoped inside
+         Controls/CheckBoxFormField.axaml and Controls/RadioFormField.axaml — a Style pass can't shrink the box
+         because Fluent hard-codes the part sizes as local values, so we own the template instead. -->
 
     <!-- TabItem/TabControl look lives in Styles/Tabs.axaml (the custom bordered tab theme, merged per window). -->
 

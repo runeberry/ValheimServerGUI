@@ -43,8 +43,7 @@ namespace ValheimServerGUI.Game
         /// <summary>
         /// The admin/ban/permit list files live directly in the save-data root (the <c>-savedir</c>),
         /// alongside <c>worlds</c>/<c>worlds_local</c>, shared by every world in that savedir -- exactly
-        /// where <c>ZNet</c> reads them from (<c>Utils.GetSaveDataPath()/adminlist.txt</c> etc.). These
-        /// mirror the <see cref="GetWorldsFolders"/> savedir-root pattern.
+        /// where <c>ZNet</c> reads them from (<c>Utils.GetSaveDataPath()/adminlist.txt</c> etc.).
         /// </summary>
         public static FileInfo GetAdminListFile(this DirectoryInfo saveDataFolder)
             => GetSaveDataRootFile(saveDataFolder, "adminlist.txt");
@@ -114,7 +113,7 @@ namespace ValheimServerGUI.Game
                 return saveDataFolder.GetWorldsFolders()
                     .Where(info => Directory.Exists(info.FullName))
                     .SelectMany(GetWorldNamesInFolder)
-                    // §15 #6: a world present in both "worlds" and "worlds_local" is one world, not two.
+                    // A world present in both "worlds" and "worlds_local" is one world, not two.
                     .Distinct(System.StringComparer.OrdinalIgnoreCase)
                     .ToList();
             }
@@ -129,9 +128,9 @@ namespace ValheimServerGUI.Game
         {
             if (string.IsNullOrWhiteSpace(worldName)) return false;
 
-            // §15 #4: availability derives from the SAME backup-excluded enumeration used to list
-            // worlds, so the two can never disagree -- a backup file is not a world and must not make
-            // the name unavailable. Comparison is case-insensitive (one world across both OSes, E20).
+            // Availability derives from the SAME backup-excluded enumeration used to list worlds, so the two
+            // can never disagree -- a backup file is not a world and must not make the name unavailable.
+            // Comparison is case-insensitive so a name means one world on every OS.
             return !saveDataFolder.GetWorldNames().Contains(worldName, System.StringComparer.OrdinalIgnoreCase);
         }
 

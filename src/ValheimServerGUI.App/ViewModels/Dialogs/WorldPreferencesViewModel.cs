@@ -9,10 +9,9 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// World Preferences editor (§6.5). Preset OR modifiers (never both): choosing a preset persists as
-/// <c>-preset</c> only; editing any modifier reverts the preset to Custom (the v2.4 feedback-loop guard,
-/// applied without a binding storm via a suppression flag). Keys persist independently of the preset
-/// (§15 #5 — matches what GenerateArgs emits).
+/// World Preferences editor. Preset OR modifiers (never both): choosing a preset persists as <c>-preset</c>
+/// only; editing any modifier reverts the preset to Custom (a suppression flag keeps loads and Restore Defaults
+/// from triggering that revert). Keys persist independently of the preset, matching what GenerateArgs emits.
 /// </summary>
 public partial class WorldPreferencesViewModel : ModalEditViewModel
 {
@@ -63,7 +62,7 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
     /// <summary>True when a real preset is selected (modifiers are then ignored on save).</summary>
     public bool IsPresetSelected => SelectedPreset != CustomPreset;
 
-    // World Preferences wiki links (parity with the WinForms LinkLabels).
+    // World Preferences wiki links.
     [RelayCommand] private void OpenWorldModifiersWiki() => _shell.OpenWebAddress(AppConstants.UrlValheimWikiWorldModifiers);
     [RelayCommand] private void OpenWorldModifiersHelp() => _shell.OpenWebAddress(AppConstants.UrlHelpWorldModifiers);
 
@@ -122,13 +121,13 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
                 .ToDictionary(m => m.Key, m => m.Value!);
         }
 
-        // Keys always persist, regardless of preset/custom (§15 #5).
+        // Keys always persist, regardless of preset/custom.
         prefs.Keys = Keys.Where(k => k.IsSet).Select(k => k.Key).ToHashSet();
 
         _provider.SavePreferences(prefs);
     }
 
-    // Editing a modifier reverts the preset to Custom (feedback-loop guarded against load/defaults).
+    // Editing a modifier reverts the preset to Custom, except while a load or Restore Defaults is applying values.
     private void OnModifierChanged()
     {
         if (_suppressRevert) return;

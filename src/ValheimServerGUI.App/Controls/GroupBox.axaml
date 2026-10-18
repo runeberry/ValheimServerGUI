@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:c="using:ValheimServerGUI.App.Controls">
 
-    <!-- Classic etched group box (§ V3 styling): a 1px inset frame with the title notching the top-left
+    <!-- Classic etched group box: a 1px inset frame with the title notching the top-left
          edge. The frame is dropped ~8px so the title's vertical centre lands on the border line, and the
          title's own opaque background (the box's Background) paints over the line to make the notch. -->
     <ControlTheme x:Key="{x:Type c:GroupBox}" TargetType="c:GroupBox">

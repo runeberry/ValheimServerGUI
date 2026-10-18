@@ -8,7 +8,7 @@ using Avalonia.Threading;
 namespace ValheimServerGUI.App.Controls;
 
 /// <summary>
-/// The app's standard 16×16 icon button (the WinForms <c>IconButton</c> equivalent): a <see cref="Button"/>
+/// The app's standard 16×16 icon button: a <see cref="Button"/>
 /// styled with the <c>icon</c> class whose glyph is an <see cref="AppIcons"/> key. When
 /// <see cref="ConfirmIconName"/> is set, clicking flashes that confirm glyph for a couple of seconds — inert
 /// to the pointer while it shows, but not disabled (it keeps its colour). The action itself runs through the

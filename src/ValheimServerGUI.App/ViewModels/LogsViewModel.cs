@@ -13,7 +13,7 @@ using ValheimServerGUI.Tools.Logging;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// Logs tab (§10.2): a view selector (Server / Application, default Server) over two buffers. The Server
+/// Logs tab: a view selector (Server / Application, default Server) over two buffers. The Server
 /// buffer is owned by the selected profile's server entry (re-pointed on switch via <see cref="SetServerLog"/>),
 /// so server lines land there regardless of which window started the server; application lines come from the
 /// app logger's buffer + <c>LogReceived</c>. Clear/Save act on the current view only; Save warns when empty.

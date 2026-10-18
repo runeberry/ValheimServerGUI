@@ -6,10 +6,10 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.Services;
 
 /// <summary>
-/// Opens folders and web addresses in the OS shell (§12). Windows shell-executes; Linux uses
+/// Opens folders and web addresses in the OS shell. Windows shell-executes; Linux uses
 /// <c>xdg-open</c> with a <c>gio open</c> fallback. Inputs are validated first — a URL must be
 /// http/https and a directory/file path must actually exist — so a malformed value is logged and dropped
-/// rather than handed to the shell (E54). The OS boundary is injected (<see cref="ISystemShell"/>) so both
+/// rather than handed to the shell. The OS boundary is injected (<see cref="ISystemShell"/>) so both
 /// per-OS branches are assertable in tests.
 /// </summary>
 internal sealed class ShellLauncher : IShellLauncher
@@ -38,7 +38,7 @@ internal sealed class ShellLauncher : IShellLauncher
             return;
         }
 
-        // Accept a file too: open its containing directory (parity with the v2.4 open-folder buttons).
+        // Accept a file too: open its containing directory.
         string? target = _shell.DirectoryExists(path)
             ? path
             : _shell.FileExists(path)

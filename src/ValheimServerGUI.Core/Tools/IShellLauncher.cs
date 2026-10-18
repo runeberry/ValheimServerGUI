@@ -2,8 +2,7 @@
 {
     /// <summary>
     /// Opens folders and web addresses in the OS shell (Windows: <c>explorer.exe</c>; Linux:
-    /// <c>xdg-open</c>). Bucket B: the interface lives in Core as the contract; the OS-specific
-    /// implementation is supplied by the Phase 2 desktop shell.
+    /// <c>xdg-open</c>). The OS-specific implementation is supplied by the desktop app.
     /// </summary>
     public interface IShellLauncher
     {

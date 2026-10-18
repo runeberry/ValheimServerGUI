@@ -14,7 +14,7 @@ using Xunit;
 
 namespace ValheimServerGUI.App.Tests.Startup;
 
-// §2.3 orchestration: selection → window creation → show → profile load → minimized.
+// Startup orchestration: selection → window creation → show → profile load → minimized.
 public class ShellCoordinatorTests
 {
     // A real transient ValheimServer over the Core singletons (XDG is redirected suite-wide), so each
@@ -75,7 +75,7 @@ public class ShellCoordinatorTests
 
         Assert.Equal("Solo", window.ViewModel!.CurrentProfile!.ProfileName);
         Assert.False(window.ViewModel.AutoStartOnLoad);
-        Assert.Equal("Solo", userPrefs.LoadPreferences().LastActiveProfile); // last-active recorded (§16.2)
+        Assert.Equal("Solo", userPrefs.LoadPreferences().LastActiveProfile); // last-active recorded
     }
 
     [AvaloniaFact]

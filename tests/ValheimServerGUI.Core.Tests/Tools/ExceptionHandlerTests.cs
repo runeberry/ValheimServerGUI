@@ -7,7 +7,7 @@ namespace ValheimServerGUI.Core.Tests.Tools
 {
     /// <summary>
     /// The exception handler builds a crash report and sends it only with the user's consent, through
-    /// the IUserPrompt seam (formerly a WinForms MessageBox). ExceptionHandled fires either way.
+    /// the IUserPrompt seam. ExceptionHandled fires either way.
     /// </summary>
     public class ExceptionHandlerTests
     {
@@ -49,7 +49,7 @@ namespace ValheimServerGUI.Core.Tests.Tools
             Assert.True(handled);
         }
 
-        // Every fault is logged before the crash-report prompt (WinForms parity — SplashForm.HandleException).
+        // Every fault is logged before the crash-report prompt.
         [Fact]
         public void HandleException_LogsTheFault()
         {
@@ -61,7 +61,7 @@ namespace ValheimServerGUI.Core.Tests.Tools
         }
 
         // A cancelled task/operation reaching a global handler is benign: it is logged, but never surfaces the
-        // fatal crash-report prompt (regression: this used to pop a fatal "A task was canceled" dialog).
+        // fatal crash-report prompt.
         [Theory]
         [InlineData(true)]
         [InlineData(false)]

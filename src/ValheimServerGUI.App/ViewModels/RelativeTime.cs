@@ -5,7 +5,7 @@ namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
 /// Formats a timestamp relative to now ("just now", "5 minutes ago", "in 2 hours") for the "Since" columns.
-/// Replaces the v2.4 <c>TimeAgo</c> helper; each view model re-formats on its own 1s tick while visible.
+/// Each view model re-formats on its own 1s tick while visible.
 /// </summary>
 internal static class RelativeTime
 {

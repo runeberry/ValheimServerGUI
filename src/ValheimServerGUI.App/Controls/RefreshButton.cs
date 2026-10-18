@@ -3,7 +3,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Controls;
 
-/// <summary>Refresh icon button (WinForms <c>RefreshButton</c>): the restart glyph, flashes a confirm check
+/// <summary>Refresh icon button: the restart glyph, flashes a confirm check
 /// on click. Action via the bound <see cref="Avalonia.Controls.Button.Command"/>.</summary>
 public class RefreshButton : IconButton
 {

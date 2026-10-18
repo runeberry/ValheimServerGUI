@@ -14,8 +14,8 @@ namespace ValheimServerGUI.Integration.Tests
     /// <summary>
     /// An <see cref="IProcessProvider"/> decorator over the real <see cref="ProcessProvider"/> that keeps a
     /// handle on the launched server process, so a test can force-kill it (SIGKILL) without going through
-    /// <see cref="ValheimServer.Stop"/> (which sends SIGINT). This is the B half of the E9 A/B: a hard kill
-    /// must NOT flush a save, which is what makes the graceful SIGINT flush meaningful.
+    /// <see cref="ValheimServer.Stop"/> (which sends SIGINT). A hard kill must NOT flush a save, which is what
+    /// makes the graceful SIGINT flush meaningful.
     /// </summary>
     internal sealed class CapturingProcessProvider : IProcessProvider
     {
@@ -46,7 +46,7 @@ namespace ValheimServerGUI.Integration.Tests
     /// Drives a REAL <see cref="ValheimServer"/> (built from <see cref="CoreServiceCollectionExtensions.AddValheimCore"/>)
     /// against the real dedicated-server binary: boot to Running off the live "Game server connected" line,
     /// capture the full log stream, and stop either gracefully (SIGINT) or hard (SIGKILL). All server output
-    /// goes to the caller-supplied mochi-owned savedir.
+    /// goes to the caller-supplied savedir.
     /// </summary>
     internal sealed class LiveServerHarness : IDisposable
     {
@@ -111,12 +111,12 @@ namespace ValheimServerGUI.Integration.Tests
             Name = "VSG Integration Smoke",
             WorldName = WorldName,
             Password = "vsgsmoke",
-            // §13: run public so the server goes through the real Steam relay path to "connected".
+            // Run public so the server goes through the real Steam relay path to "connected".
             Public = true,
             Port = 2700,
             // Crossplay, as a new profile defaults to: the server also registers with PlayFab and gets an invite code.
             Crossplay = true,
-            // Keep the auto-save interval long so no background save muddies the stop A/B window.
+            // Keep the auto-save interval long so no background save muddies the stop-vs-kill save comparison.
             SaveInterval = 1800,
             Backups = 1,
             BackupShort = 7200,

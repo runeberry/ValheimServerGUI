@@ -13,7 +13,7 @@ internal static class Program
     {
         ConfigureCulture();
 
-        // Single-instance, multi-window (§2.2): a second launch forwards its args to the primary and exits.
+        // Single-instance, multi-window: a second launch forwards its args to the primary and exits.
         var singleInstance = new SingleInstanceManager();
         if (!singleInstance.TryAcquire())
         {

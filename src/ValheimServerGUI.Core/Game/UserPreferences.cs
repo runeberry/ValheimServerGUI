@@ -7,8 +7,8 @@ namespace ValheimServerGUI.Game
     {
         public static UserPreferences GetDefault() => new();
 
-        // Default paths are OS-specific and no longer hard-coded here: UserPreferencesProvider fills
-        // these from IValheimPathResolver when a loaded value is blank (see ApplyPathDefaults).
+        // Default paths are OS-specific: UserPreferencesProvider fills these from IValheimPathResolver
+        // when a loaded value is blank (see ApplyPathDefaults).
         public string ServerExePath { get; set; } = string.Empty;
 
         public string SaveDataFolderPath { get; set; } = string.Empty;
@@ -30,12 +30,12 @@ namespace ValheimServerGUI.Game
         public bool EnablePasswordValidation { get; set; } = true;
 
         /// <summary>
-        /// Profile name last loaded/saved in a window. Preferred by the startup profile selection (§2.3
-        /// / §16.2) over the most-recently-saved fallback, so relaunch reopens where the user left off.
+        /// Profile name last loaded/saved in a window. Preferred by the startup profile selection over the
+        /// most-recently-saved fallback, so relaunch reopens where the user left off.
         /// </summary>
         public string? LastActiveProfile { get; set; }
 
-        /// <summary>UI theme (§16.2 enhancement). Defaults to following the OS.</summary>
+        /// <summary>UI theme. Defaults to following the OS.</summary>
         public AppTheme Theme { get; set; } = AppTheme.System;
 
         public List<ServerPreferences> Servers { get; set; } = new();

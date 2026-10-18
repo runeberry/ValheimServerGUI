@@ -6,10 +6,10 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
-    /// World detection against a temp-dir fixture (E11-E15, E20). Both formats (legacy "&lt;World&gt;.fwl"
-    /// and Valheim 1.0+ "&lt;World&gt;/*.fwl2"), backup exclusion, cross-folder dedup, non-recursive
-    /// .fwl2, and case-insensitivity. §15 #4: availability derives from the same backup-excluded
-    /// enumeration, so a backup file never makes a name unavailable.
+    /// World detection against a temp-dir fixture. Both formats (legacy "&lt;World&gt;.fwl" and Valheim 1.0+
+    /// "&lt;World&gt;/*.fwl2"), backup exclusion, cross-folder dedup, non-recursive .fwl2, and
+    /// case-insensitivity. Availability derives from the same backup-excluded enumeration, so a backup file
+    /// never makes a name unavailable.
     /// </summary>
     public class WorldDetectionTests : IDisposable
     {
@@ -40,7 +40,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             File.WriteAllText(Path.Join(dir.FullName, "_main.1.fwl2"), "");
         }
 
-        // E14: legacy .fwl files and new-format folders are listed uniformly.
+        // Legacy .fwl files and new-format folders are listed uniformly.
         [Fact]
         public void GetWorldNames_ReturnsLegacyAndFolderWorlds()
         {
@@ -53,7 +53,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Contains("FolderWorld", names);
         }
 
-        // E12: both backup naming schemes are excluded from the listing.
+        // Both backup naming schemes are excluded from the listing.
         [Theory]
         [InlineData("MyWorld_backup_20240604-183113")]
         [InlineData("MyWorld_backup_auto-20240205174838")]
@@ -68,7 +68,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.DoesNotContain(backupName, names);
         }
 
-        // E13 / §15 #6: a world present in both "worlds" and "worlds_local" is one world, not two.
+        // A world present in both "worlds" and "worlds_local" is one world, not two.
         [Fact]
         public void GetWorldNames_DedupsAcrossWorldsAndWorldsLocal()
         {
@@ -80,7 +80,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Single(names, n => n == "SharedWorld");
         }
 
-        // E15: a .fwl2 nested below the world folder does not count (non-recursive).
+        // A .fwl2 nested below the world folder does not count (non-recursive).
         [Fact]
         public void GetWorldNames_DoesNotCountNestedFwl2()
         {
@@ -97,7 +97,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Empty(empty.GetWorldNames());
         }
 
-        // E11: a cache-only folder (minimap cache, no .fwl2) is not a world; the name stays available.
+        // A cache-only folder (minimap cache, no .fwl2) is not a world; the name stays available.
         [Fact]
         public void IsWorldNameAvailable_TrueForCacheOnlyFolder()
         {
@@ -115,7 +115,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.False(SaveFolder.IsWorldNameAvailable("RealWorld"));
         }
 
-        // E20: the same world differing only in case is one world; the name is unavailable either way.
+        // The same world differing only in case is one world; the name is unavailable either way.
         [Fact]
         public void IsWorldNameAvailable_IsCaseInsensitive()
         {
@@ -124,7 +124,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.False(SaveFolder.IsWorldNameAvailable("myworld"));
         }
 
-        // §15 #4: a backup file is not a world, so it must not make the base name unavailable -- the
+        // A backup file is not a world, so it must not make the base name unavailable -- the
         // enumeration and the availability check agree.
         [Fact]
         public void IsWorldNameAvailable_BackupNameDoesNotBlockItsOwnName()

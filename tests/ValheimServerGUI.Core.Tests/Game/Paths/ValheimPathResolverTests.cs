@@ -5,9 +5,8 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game.Paths
 {
     /// <summary>
-    /// E53-adjacent: the per-OS path resolvers replace the WinForms <c>Properties.Resources</c> path
-    /// members. The Linux resolver uses XDG / <c>$HOME</c> (fully exercised here since we run on Linux);
-    /// the Windows resolver's paths are OS-skipped, but its binary name is asserted everywhere.
+    /// The per-OS path resolvers. The Linux resolver uses XDG / <c>$HOME</c>; the Windows resolver takes its
+    /// environment-variable expansion as a parameter, so both are pinned on every OS.
     /// </summary>
     public class ValheimPathResolverTests
     {
@@ -52,8 +51,8 @@ namespace ValheimServerGUI.Core.Tests.Game.Paths
             Assert.Equal(Join(Home, ".config", "unity3d", "IronGate", "Valheim"), resolver.DefaultSaveDataFolder);
         }
 
-        // derive-never-mirror: the named path members must be GetAppDataPath(<relative name>), not a
-        // second copy of the layout kept in step.
+        // The named path members must be derived from GetAppDataPath(<relative name>), not a second copy of the
+        // layout kept in step.
         [Fact]
         public void NamedPaths_DeriveFromGetAppDataPath()
         {

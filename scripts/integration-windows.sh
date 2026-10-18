@@ -2,7 +2,7 @@
 #
 # integration-windows.sh — the COMPLETE test suite on Windows: the build + unit tests (scripts/validate.sh --quick)
 # on the host, then the whole solution with -p:Integration=true inside a disposable Windows 11 VM per server
-# configuration, in parallel. The Windows counterpart of scripts/integration.sh (docs/WINDOWS_INTEGRATION_PLAN.md).
+# configuration, in parallel. The Windows counterpart of scripts/integration.sh.
 #
 # Every run boots a fresh VM from a copy-on-write overlay of a read-only image and deletes it afterwards, so no run
 # sees another's state. The image has two layers, like the container image:
@@ -31,8 +31,8 @@
 #   --control <config>  negative control: run the suite over SSH in session 0; passes only if lifecycle tests fail
 #   config...           run only these configurations (default: all)
 #
-# Keep this script + tests/integration-vm/* + the CLAUDE.local.md note in step with the test project as the
-# workflow evolves (same rule as validate.sh and integration.sh).
+# Keep this script + tests/integration-vm/* in step with the test project as the workflow evolves (same rule as
+# validate.sh and integration.sh).
 
 set -uo pipefail
 

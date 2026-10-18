@@ -4,7 +4,7 @@
 #
 #   vanilla           - .NET 10 SDK + the Valheim dedicated server (Steam app 896660, current public build)
 #   bepinex           - vanilla + BepInExPack_Valheim + the plugins in server-configs.env, pinned by version and sha256
-#   bepinex-external  - the same pack + plugin outside the server folder, loaded via the configured paths
+#   bepinex-external  - the same pack + plugins outside the server folder, loaded via the configured paths
 #
 # The server download is cached as a layer; scripts/integration.sh --update-server re-runs it to pick up a
 # new Valheim build. The bepinex pins live in server-configs.env (shared with the Windows VM image) and arrive
@@ -46,7 +46,7 @@ ENV VSG_IT_SERVER_EXE="${SERVER_DIR}/valheim_server.x86_64" \
     VSG_IT_BEPINEX_PRELOADER="${SERVER_DIR}/BepInEx/core/BepInEx.Preloader.dll" \
     VSG_IT_DOORSTOP_LIBRARY="${SERVER_DIR}/doorstop_libs/libdoorstop_x64.so"
 
-# The pack and plugin, downloaded and verified once for both bepinex configurations.
+# The pack and plugins, downloaded and verified once for both bepinex configurations.
 FROM vanilla AS bepinex-files
 # Values come from server-configs.env, which documents each one.
 ARG BEPINEX_PACK_URL

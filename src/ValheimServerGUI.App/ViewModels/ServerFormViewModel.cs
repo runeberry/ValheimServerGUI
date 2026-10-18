@@ -9,9 +9,8 @@ using ValheimServerGUI.Game;
 namespace ValheimServerGUI.App.ViewModels;
 
 /// <summary>
-/// The editable Server Controls + Advanced Controls form state, plus the form↔prefs mappers (the v2.4
-/// <c>GetPrefsFromFormState</c>/<c>SetFormStateFromPrefs</c>). Kept a passive data holder: the owning
-/// <see cref="MainWindowViewModel"/> drives world listing and the options build (which need the providers).
+/// The editable Server Controls + Advanced Controls form state, plus the form↔prefs mappers. Kept a passive
+/// data holder: the owning <see cref="MainWindowViewModel"/> drives world listing and the options build (which need the providers).
 /// The <c>" (cloud)"</c> suffix is view-only — <see cref="SelectedWorldName"/> strips it so it never reaches
 /// prefs/options/validation.
 /// </summary>
@@ -191,7 +190,8 @@ public partial class ServerFormViewModel : ObservableObject
             ? world[..^AppConstants.CloudWorldSuffix.Length]
             : world;
 
-    /// <summary>SetFormStateFromPrefs (scalar fields only; the owner drives world listing + selection).</summary>
+    /// <summary>Loads the form from a profile's prefs, except the world (the owner drives world listing +
+    /// selection). Leaves the form clean.</summary>
     public void LoadFieldsFrom(ServerPreferences prefs)
     {
         RunClean(() =>
@@ -219,7 +219,7 @@ public partial class ServerFormViewModel : ObservableObject
         RoleStateChanged?.Invoke(this, EventArgs.Empty); // let the Players tab re-render for the new profile
     }
 
-    /// <summary>GetPrefsFromFormState: merges the form into the (existing or new) profile prefs.</summary>
+    /// <summary>Merges the form into the (existing or new) profile prefs.</summary>
     public ServerPreferences ToPreferences(ServerPreferences prefs)
     {
         prefs.Name = Name;

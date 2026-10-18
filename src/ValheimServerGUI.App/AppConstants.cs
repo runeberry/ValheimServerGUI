@@ -13,7 +13,7 @@ internal static class AppConstants
 
     /// <summary>
     /// View-only marker for a world that lives only in Steam Cloud. Applied and stripped exclusively by the
-    /// world-select surface — it never reaches saved prefs, server options, or validation (§ locked decisions).
+    /// world-select surface — it never reaches saved prefs, server options, or validation.
     /// Localized, so it is read from Strings rather than being a compile-time constant.
     /// </summary>
     public static string CloudWorldSuffix => Strings.ServerControls_CloudWorldSuffix;
@@ -21,7 +21,7 @@ internal static class AppConstants
     /// <summary>Root of the online manual (the vsg-docs site). Every help link below is derived from it.</summary>
     public const string UrlDocs = "https://runeberry.com/valheim-server-gui/";
 
-    // External links (parity with the v2.4 Resources URLs).
+    // External links.
     public const string UrlHelp = UrlDocs;
     public const string UrlPortForwarding = UrlDocs + "docs/connecting-to-your-server/";
     public const string UrlDiscord = "https://discord.gg/HBsNJTY";

@@ -5,12 +5,12 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
-    /// Config defaulting + round-trip (E32, E36, E38, E39, E40 / §15 #7). The nullable "*File" model
+    /// Config defaulting + round-trip. The nullable "*File" model
     /// coalesces each missing key to the typed default; ToFile drops blank-named entries and de-dups.
     /// </summary>
     public class ConfigRoundTripTests
     {
-        // E36 / E32: an empty file yields the typed defaults (from CoreConstants).
+        // An empty file yields the typed defaults (from CoreConstants).
         [Fact]
         public void ServerPreferences_FromEmptyFile_UsesDefaults()
         {
@@ -181,8 +181,8 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.False(restored.ToFile().PlayerDefaults!.ContainsKey("Steam:4"));
         }
 
-        // Files written by the earlier My Accounts/Friends/Banned build still load: the old "category" key is
-        // ignored and Banned entries already carried defaultRole "banned".
+        // Files with the legacy "category" key still load: the key is ignored, and Banned entries already carry
+        // defaultRole "banned".
         [Fact]
         public void UserPreferences_LegacyCategoryKey_IsIgnored()
         {
@@ -196,7 +196,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(PlayerRole.Permitted, restored.PlayerDefaults["Steam:2"].DefaultRole);
         }
 
-        // E38 / E39: ToFile drops blank-named profiles and de-dups by profile name.
+        // ToFile drops blank-named profiles and de-dups by profile name.
         [Fact]
         public void UserPreferences_ToFile_DropsBlankNamesAndDedups()
         {
@@ -211,7 +211,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal("Dup", file.Servers!.Single().ProfileName);
         }
 
-        // §15 #7 / E40: a file with null "keys"/"modifiers" must not NPE; collections default to empty.
+        // A file with null "keys"/"modifiers" must not throw; the collections default to empty.
         [Fact]
         public void WorldPreferences_FromFileWithNullKeysAndModifiers_DoesNotThrow()
         {
@@ -247,7 +247,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Equal(WorldGenModifiers.Values.CombatHard, restored.Modifiers[WorldGenModifiers.Combat]);
         }
 
-        // §16.2 enhancement: LastActiveProfile round-trips, and an empty file leaves it null (so the
+        // LastActiveProfile round-trips, and an empty file leaves it null (so the
         // startup selection falls back to most-recently-saved).
         [Fact]
         public void UserPreferences_LastActiveProfile_RoundTrips()
@@ -263,7 +263,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Null(UserPreferences.FromFile(new UserPreferencesFile()).LastActiveProfile);
         }
 
-        // §16.2 theme enhancement: round-trips, defaults to System.
+        // Theme round-trips and defaults to System.
         [Fact]
         public void UserPreferences_Theme_RoundTrips()
         {

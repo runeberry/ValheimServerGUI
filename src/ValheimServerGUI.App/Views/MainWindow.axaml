@@ -130,8 +130,8 @@
                     <TextBlock Text="{Binding StatusText}" VerticalAlignment="Center" />
                 </StackPanel>
                 <!-- Icon + text always render at full contrast; only the text turns into a clickable link
-                     when there is somewhere to go (UpdateIsLink). Previously the whole readout was a Button
-                     that went disabled when not a link, dimming the icon and text to near-invisibility. -->
+                     when there is somewhere to go (UpdateIsLink). Don't wrap the readout in a Button: a
+                     disabled Button dims the icon and text to near-invisibility. -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
                     <Image Width="16" Height="16" VerticalAlignment="Center"
                            RenderOptions.BitmapInterpolationMode="HighQuality"

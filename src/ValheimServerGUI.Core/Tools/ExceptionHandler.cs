@@ -17,8 +17,7 @@ namespace ValheimServerGUI.Tools
 
     /// <summary>
     /// Builds a crash report from an exception and, with the user's consent, sends it to the Runeberry
-    /// backend. The consent prompt is the <see cref="IUserPrompt"/> seam (formerly a WinForms MessageBox);
-    /// the progress dialog that the WinForms shell showed while sending is a Phase 2 shell concern.
+    /// backend. The consent prompt goes through the <see cref="IUserPrompt"/> seam.
     /// </summary>
     public class ExceptionHandler : IExceptionHandler
     {
@@ -55,8 +54,8 @@ namespace ValheimServerGUI.Tools
                 return;
             }
 
-            // Always log the fault first (WinForms parity — SplashForm.HandleException), guarded so a logging
-            // failure can never take the process down on the global exception path.
+            // Always log the fault first, guarded so a logging failure can never take the process down on the
+            // global exception path.
             TryLog(() => Logger.Error(
                 "Encountered exception ({context}) - {typeName}: {message}{newline}{stackTrace}",
                 contextMessage, e.GetType().Name, e.Message, Environment.NewLine, e.StackTrace ?? string.Empty));

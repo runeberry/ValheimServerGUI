@@ -11,7 +11,7 @@
       cosmetic. SourceRevisionId appends a "+build<date>" suffix to the informational version (parsed by
       AssemblyHelper.GetApplicationBuildDate); GetApplicationVersion strips it before comparison.
     -->
-    <Version>3.0.0-rc.2</Version>
+    <Version>3.0.0-rc.3</Version>
     <SourceRevisionId Condition="'$(SourceRevisionId)' == ''">build$([System.DateTime]::UtcNow.ToString("yyyy-MM-dd"))</SourceRevisionId>
   </PropertyGroup>
 

@@ -12,7 +12,8 @@
     <StackPanel Margin="20" Spacing="6">
         <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_CheckForUpdates_Label}" Value="{Binding CheckForUpdates}"
                              HelpText="{x:Static loc:Strings.Preferences_CheckForUpdates_Help}" />
-        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartWithOs_Label}" Value="{Binding StartWithWindows}"
+        <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartWithOs_Label}" Value="{Binding StartWithOs}"
+                             AutomationProperties.AutomationId="Preferences_StartWithOs"
                              HelpText="{x:Static loc:Strings.Preferences_StartWithOs_Help}" />
         <c:CheckBoxFormField LabelText="{x:Static loc:Strings.Preferences_StartMinimized_Label}" Value="{Binding StartMinimized}"
                              HelpText="{x:Static loc:Strings.Preferences_StartMinimized_Help}" />
@@ -28,7 +29,8 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8" Margin="0,12,0,0">
             <Button Content="{x:Static loc:Strings.Common_RestoreDefaults}" Click="OnRestoreDefaults" HorizontalAlignment="Left" />
-            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk" />
+            <Button Content="{x:Static loc:Strings.Common_OK}" MinWidth="80" IsDefault="True" Click="OnOk"
+                    AutomationProperties.AutomationId="Preferences_OK" />
             <Button Content="{x:Static loc:Strings.Common_Cancel}" MinWidth="80" IsCancel="True" Click="OnCancel" />
         </StackPanel>
     </StackPanel>

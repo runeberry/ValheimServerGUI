@@ -26,9 +26,6 @@ namespace ValheimServerGUI.Game
         [JsonProperty("doorstopLibraryPath")]
         public string? DoorstopLibraryPath { get; set; }
 
-        [JsonProperty("startWithWindows")]
-        public bool? StartWithWindows { get; set; }
-
         [JsonProperty("startServerAutomatically"), Obsolete("Moved to server preferences", true)]
         public bool? StartServerAutomatically { get; set; }
 

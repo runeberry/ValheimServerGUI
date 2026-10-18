@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Avalonia.Automation;
 using Avalonia.Controls;
 
 namespace ValheimServerGUI.App.Views.Dialogs;
@@ -50,6 +51,8 @@ public partial class MessageBoxWindow : DialogWindow
                 IsCancel = spec.IsCancel,
             };
             var result = spec.Result;
+            // A stable, non-localized hook for UI automation, e.g. MessageBox_True / MessageBox_Cancel.
+            AutomationProperties.SetAutomationId(button, $"MessageBox_{result ?? "OK"}");
             button.Click += (_, _) =>
             {
                 Result = result;

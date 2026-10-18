@@ -278,8 +278,10 @@
     </ControlTheme>
     </UserControl.Resources>
 
+    <!-- The field's AutomationId is forwarded to the CheckBox, the element UI automation toggles. -->
     <StackPanel Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
-        <CheckBox IsEnabled="{Binding #Root.IsEnabled}" Content="{Binding #Root.LabelText}" IsChecked="{Binding #Root.Value, Mode=TwoWay}" />
+        <CheckBox IsEnabled="{Binding #Root.IsEnabled}" Content="{Binding #Root.LabelText}" IsChecked="{Binding #Root.Value, Mode=TwoWay}"
+                  AutomationProperties.AutomationId="{Binding #Root.(AutomationProperties.AutomationId)}" />
         <c:HelpLabel HelpText="{Binding #Root.HelpText}" />
     </StackPanel>
 </UserControl>

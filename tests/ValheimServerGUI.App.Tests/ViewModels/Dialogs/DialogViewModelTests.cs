@@ -28,18 +28,67 @@ public class DialogViewModelTests
     }
 
     [Fact]
-    public void Preferences_save_persists_and_applies_startup()
+    public void Preferences_save_persists_the_stored_preferences()
     {
         var prefs = new FakeUserPreferencesProvider();
-        var startup = new FakeStartupManager();
-        var vm = new PreferencesViewModel(prefs, startup) { StartWithWindows = true, Theme = AppTheme.Dark };
+        var vm = new PreferencesViewModel(prefs, new FakeStartupManager()) { Theme = AppTheme.Dark };
 
         vm.Save();
 
-        Assert.True(prefs.LoadPreferences().StartWithWindows);
         Assert.Equal(AppTheme.Dark, prefs.LoadPreferences().Theme);
-        Assert.Equal(new[] { true }, startup.Applied);
         Assert.Equal(AppTheme.Dark, vm.SavedTheme);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Preferences_start_with_os_loads_from_the_os_registration(bool enabled)
+    {
+        var vm = new PreferencesViewModel(new FakeUserPreferencesProvider(), new FakeStartupManager { Enabled = enabled });
+
+        Assert.Equal(enabled, vm.StartWithOs);
+        Assert.False(vm.IsDirty);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Preferences_save_without_toggling_start_with_os_never_touches_the_registration(bool enabled)
+    {
+        var startup = new FakeStartupManager { Enabled = enabled };
+        var vm = new PreferencesViewModel(new FakeUserPreferencesProvider(), startup) { Theme = AppTheme.Dark };
+
+        vm.Save();
+
+        Assert.Empty(startup.Applied);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void Preferences_toggling_start_with_os_applies_it_once(bool enabled)
+    {
+        var startup = new FakeStartupManager { Enabled = enabled };
+        var vm = new PreferencesViewModel(new FakeUserPreferencesProvider(), startup);
+
+        vm.StartWithOs = !enabled;
+        vm.Save();
+        vm.Save();
+
+        Assert.Equal(new[] { !enabled }, startup.Applied);
+    }
+
+    [Fact]
+    public void Preferences_toggling_start_with_os_back_before_saving_applies_nothing()
+    {
+        var startup = new FakeStartupManager { Enabled = true };
+        var vm = new PreferencesViewModel(new FakeUserPreferencesProvider(), startup);
+
+        vm.StartWithOs = false;
+        vm.StartWithOs = true;
+        vm.Save();
+
+        Assert.Empty(startup.Applied);
     }
 
     [Fact]

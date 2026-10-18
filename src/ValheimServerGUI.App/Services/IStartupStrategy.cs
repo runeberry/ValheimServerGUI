@@ -8,6 +8,12 @@ namespace ValheimServerGUI.App.Services;
 public interface IStartupStrategy
 {
     /// <summary>
+    /// True if the OS will launch this executable at login. Anything else (no entry, an entry for another
+    /// path, an entry the user disabled outside the app) reads as false.
+    /// </summary>
+    bool IsEnabled();
+
+    /// <summary>
     /// Brings the run-on-startup registration in line with <paramref name="runOnStartup"/>, including
     /// repairing a stale entry that points at the wrong executable. Returns true if a change was made.
     /// </summary>

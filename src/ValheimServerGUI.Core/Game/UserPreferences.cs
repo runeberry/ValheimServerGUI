@@ -19,8 +19,6 @@ namespace ValheimServerGUI.Game
 
         public bool CheckForUpdates { get; set; } = true;
 
-        public bool StartWithWindows { get; set; }
-
         public bool StartMinimized { get; set; }
 
         public bool SaveProfileOnStart { get; set; } = true;
@@ -60,7 +58,6 @@ namespace ValheimServerGUI.Game
             prefs.BepInExPreloaderPath = file.BepInExPreloaderPath ?? prefs.BepInExPreloaderPath;
             prefs.DoorstopLibraryPath = file.DoorstopLibraryPath ?? prefs.DoorstopLibraryPath;
             prefs.CheckForUpdates = file.CheckForUpdates ?? prefs.CheckForUpdates;
-            prefs.StartWithWindows = file.StartWithWindows ?? prefs.StartWithWindows;
             prefs.StartMinimized = file.StartMinimized ?? prefs.StartMinimized;
             prefs.SaveProfileOnStart = file.SaveProfileOnStart ?? prefs.SaveProfileOnStart;
             prefs.WriteApplicationLogsToFile = file.WriteApplicationLogsToFile ?? prefs.WriteApplicationLogsToFile;
@@ -110,7 +107,6 @@ namespace ValheimServerGUI.Game
                 BepInExPreloaderPath = BepInExPreloaderPath,
                 DoorstopLibraryPath = DoorstopLibraryPath,
                 CheckForUpdates = CheckForUpdates,
-                StartWithWindows = StartWithWindows,
                 StartMinimized = StartMinimized,
                 SaveProfileOnStart = SaveProfileOnStart,
                 WriteApplicationLogsToFile = WriteApplicationLogsToFile,

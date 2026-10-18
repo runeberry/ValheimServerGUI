@@ -5,8 +5,8 @@ namespace ValheimServerGUI.App.Services;
 
 /// <summary>
 /// Linux run-on-login via an XDG autostart <c>.desktop</c> entry in <c>~/.config/autostart/</c>. Enabling
-/// writes the entry; disabling removes it. Idempotent: re-enabling with the same exec path makes no change
-/// (returns false), and re-enabling after the executable path changed rewrites the stale entry.
+/// writes the entry; disabling removes it. Enabled means the entry is exactly the one this executable writes, so
+/// an external edit (such as <c>Hidden=true</c>) or a stale exec path reads as disabled and re-enabling rewrites it.
 /// </summary>
 public sealed class LinuxAutostartStrategy : IStartupStrategy
 {
@@ -25,6 +25,8 @@ public sealed class LinuxAutostartStrategy : IStartupStrategy
 
     private string FilePath => Path.Combine(_autostartDir, _fileName);
 
+    public bool IsEnabled() => File.Exists(FilePath) && File.ReadAllText(FilePath) == BuildEntry();
+
     public bool Apply(bool runOnStartup)
     {
         var path = FilePath;
@@ -36,12 +38,11 @@ public sealed class LinuxAutostartStrategy : IStartupStrategy
             return true;
         }
 
-        var desired = BuildEntry();
-        if (File.Exists(path) && File.ReadAllText(path) == desired)
+        if (IsEnabled())
             return false; // already correct — idempotent no-op
 
         Directory.CreateDirectory(_autostartDir);
-        File.WriteAllText(path, desired);
+        File.WriteAllText(path, BuildEntry());
         return true;
     }
 

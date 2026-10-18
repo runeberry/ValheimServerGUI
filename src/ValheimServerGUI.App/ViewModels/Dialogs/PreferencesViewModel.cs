@@ -6,8 +6,9 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// Preferences dialog: the six app-wide booleans plus the theme. Applies the
-/// run-on-startup registration through <see cref="IStartupManager"/> and re-applies the theme on save.
+/// Preferences dialog: the six app-wide booleans plus the theme. Start-with-OS is not a stored preference: it
+/// is read from and written to the OS registration through <see cref="IStartupManager"/>. The theme is
+/// re-applied by the caller on save.
 /// </summary>
 public partial class PreferencesViewModel : ModalEditViewModel
 {
@@ -22,7 +23,7 @@ public partial class PreferencesViewModel : ModalEditViewModel
     }
 
     [ObservableProperty] private bool _checkForUpdates;
-    [ObservableProperty] private bool _startWithWindows;
+    [ObservableProperty] private bool _startWithOs;
     [ObservableProperty] private bool _startMinimized;
     [ObservableProperty] private bool _saveProfileOnStart;
     [ObservableProperty] private bool _writeApplicationLogsToFile;
@@ -34,11 +35,14 @@ public partial class PreferencesViewModel : ModalEditViewModel
     /// <summary>Set on save so the caller can re-apply the theme to the running app.</summary>
     public AppTheme SavedTheme { get; private set; }
 
+    // The registration as read on open; Save only touches the OS when the checkbox moved away from it.
+    private bool _loadedStartWithOs;
+
     private void Load() => LoadClean(() =>
     {
         var p = _userPrefs.LoadPreferences();
         CheckForUpdates = p.CheckForUpdates;
-        StartWithWindows = p.StartWithWindows;
+        StartWithOs = _loadedStartWithOs = _startupManager.IsStartupEnabled();
         StartMinimized = p.StartMinimized;
         SaveProfileOnStart = p.SaveProfileOnStart;
         WriteApplicationLogsToFile = p.WriteApplicationLogsToFile;
@@ -50,7 +54,7 @@ public partial class PreferencesViewModel : ModalEditViewModel
     {
         var d = UserPreferences.GetDefault();
         CheckForUpdates = d.CheckForUpdates;
-        StartWithWindows = d.StartWithWindows;
+        StartWithOs = false;
         StartMinimized = d.StartMinimized;
         SaveProfileOnStart = d.SaveProfileOnStart;
         WriteApplicationLogsToFile = d.WriteApplicationLogsToFile;
@@ -58,12 +62,11 @@ public partial class PreferencesViewModel : ModalEditViewModel
         Theme = d.Theme;
     }
 
-    /// <summary>Flush to the store (OK). Applies the startup registration; theme is re-applied by the caller.</summary>
+    /// <summary>Flush to the store (OK). Applies a changed startup registration; theme is re-applied by the caller.</summary>
     public void Save()
     {
         var p = _userPrefs.LoadPreferences();
         p.CheckForUpdates = CheckForUpdates;
-        p.StartWithWindows = StartWithWindows;
         p.StartMinimized = StartMinimized;
         p.SaveProfileOnStart = SaveProfileOnStart;
         p.WriteApplicationLogsToFile = WriteApplicationLogsToFile;
@@ -71,7 +74,11 @@ public partial class PreferencesViewModel : ModalEditViewModel
         p.Theme = Theme;
         _userPrefs.SavePreferences(p);
 
-        _startupManager.ApplyStartupSetting(StartWithWindows);
+        if (StartWithOs != _loadedStartWithOs)
+        {
+            _startupManager.ApplyStartupSetting(StartWithOs);
+            _loadedStartWithOs = StartWithOs;
+        }
         SavedTheme = Theme;
     }
 }

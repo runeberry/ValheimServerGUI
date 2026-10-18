@@ -43,7 +43,7 @@
             <c:IconButton IconName="Stop_16x" ToolTip.Tip="{x:Static loc:Strings.ServerAction_Stop}" Command="{Binding StopCommand}" />
         </StackPanel>
         <Menu>
-            <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_File}">
+            <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_File}" AutomationProperties.AutomationId="Menu_File">
                 <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_NewWindow}" Command="{Binding NewWindowCommand}">
                     <MenuItem.Icon><c:IconImage IconName="AddImmediateWindow_16x" /></MenuItem.Icon>
                 </MenuItem>
@@ -84,7 +84,8 @@
                     </MenuItem.Styles>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Preferences}" Command="{Binding PreferencesCommand}">
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Preferences}" Command="{Binding PreferencesCommand}"
+                          AutomationProperties.AutomationId="Menu_Preferences">
                     <MenuItem.Icon><c:IconImage IconName="Settings_16x" /></MenuItem.Icon>
                 </MenuItem>
                 <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_SetDirectories}" Command="{Binding SetDirectoriesCommand}">
@@ -94,7 +95,8 @@
                     <MenuItem.Icon><c:IconImage IconName="OpenFolder_16x" /></MenuItem.Icon>
                 </MenuItem>
                 <Separator />
-                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Close}" Command="{Binding CloseCommand}" />
+                <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Close}" Command="{Binding CloseCommand}"
+                          AutomationProperties.AutomationId="Menu_Close" />
             </MenuItem>
             <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_Help}">
                 <MenuItem Header="{x:Static loc:Strings.MainWindow_Menu_OnlineManual}" Command="{Binding OnlineManualCommand}">

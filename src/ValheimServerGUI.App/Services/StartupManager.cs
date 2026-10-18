@@ -19,6 +19,19 @@ internal sealed class StartupManager : IStartupManager
         _logger = logger;
     }
 
+    public bool IsStartupEnabled()
+    {
+        try
+        {
+            return _strategy.IsEnabled();
+        }
+        catch (System.Exception ex)
+        {
+            _logger.Error(ex, "Failed to read the run-on-startup registration");
+            return false;
+        }
+    }
+
     public bool ApplyStartupSetting(bool runOnStartup)
     {
         try

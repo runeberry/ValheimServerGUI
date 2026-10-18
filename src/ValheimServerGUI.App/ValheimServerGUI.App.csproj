@@ -9,6 +9,10 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <!-- Windows .exe icon (the app/window/tray icon is the PNG below, loaded as an Avalonia resource). -->
     <ApplicationIcon>Assets/ApplicationIcon.ico</ApplicationIcon>
+    <!-- The exe's FileDescription and ProductName, which Windows shows in Settings > Startup apps and Task
+         Manager. Must equal AppConstants.ProductName (a test checks). -->
+    <AssemblyTitle>(Unofficial) Valheim Dedicated Server GUI</AssemblyTitle>
+    <Product>(Unofficial) Valheim Dedicated Server GUI</Product>
   </PropertyGroup>
 
   <ItemGroup>

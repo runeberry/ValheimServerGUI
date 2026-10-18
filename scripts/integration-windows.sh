@@ -9,7 +9,7 @@
 #   OS layer      Windows 11 Enterprise evaluation (unattended install from Microsoft's ISO), OpenSSH, .NET 10
 #                 SDK, permanent auto-logon, the vsg-runner task. Rebuilt every IMAGE_MAX_AGE_DAYS (the evaluation
 #                 licence lasts 90 days from install) or on --rebuild-image. Takes 30-60 minutes, unattended.
-#   server layer  steamcmd + C:\valheim\vanilla + C:\valheim\bepinex (pins from
+#   server layer  steamcmd + vanilla and bepinex in real Steam library folders (see bake-server.ps1; pins from
 #                 tests/integration-image/server-configs.env). Rebuilt with the OS layer, on --update-server, or
 #                 when server-configs.env or bake-server.ps1 changes.
 #
@@ -257,7 +257,7 @@ build_server_layer() {
     -Plugins \"$PLUGINS\"" >"$RUNLOG/bake-server.log" 2>&1 \
     || { fail "bake-server.ps1"; tail -n 30 "$RUNLOG/bake-server.log"; return 1; }
   vm_ssh "$ip" "del C:\\bake-server.ps1" >/dev/null
-  buildid="$(vm_ssh "$ip" "type C:\\valheim\\buildid.txt" | tr -dc '0-9')"
+  buildid="$(vm_ssh "$ip" "powershell -NoProfile -Command \"(Get-Content C:\\vsg-servers.json -Raw | ConvertFrom-Json).buildid\"" | tr -dc '0-9')"
 
   shutdown_vm "$dom" "$ip" || { fail "the server build VM did not shut down"; return 1; }
   "${VIRSH[@]}" undefine --nvram "$dom" >/dev/null

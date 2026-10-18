@@ -33,7 +33,7 @@ Set-ItemProperty 'HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU' No
 
 Step 'Defender exclusions'
 # Real-time scanning of build output is the main Windows slowdown. Tamper Protection prevents turning Defender off.
-Add-MpPreference -ExclusionPath 'C:\dotnet', 'C:\vsg', 'C:\valheim', 'C:\steamcmd', "C:\Users\$User\.nuget", "C:\Users\$User\.cache"
+Add-MpPreference -ExclusionPath 'C:\dotnet', 'C:\vsg', 'C:\steamcmd', "C:\Users\$User\.nuget", "C:\Users\$User\.cache"
 
 Step '.NET 10 SDK'
 Invoke-WebRequest https://dot.net/v1/dotnet-install.ps1 -OutFile C:\dotnet-install.ps1 -UseBasicParsing

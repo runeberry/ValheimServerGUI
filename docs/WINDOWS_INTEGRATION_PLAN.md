@@ -40,7 +40,9 @@ Linux in containers. No dependency on Nuffle's laptop, no real Valheim data or p
 2. **Two image layers, mirroring the Dockerfile's `server` stage:**
    - `vsg-win11-os.qcow2`: Windows + OpenSSH + .NET 10 SDK + auto-logon + runner task + Defender exclusions.
      Slow (~30-60 min, unattended). Rebuilt only on `--rebuild-image`, or when older than the eval window.
-   - `vsg-win11-server.qcow2` (overlay on `os`): steamcmd + `C:\valheim\vanilla` + `C:\valheim\bepinex`.
+   - `vsg-win11-server.qcow2` (overlay on `os`): steamcmd + vanilla in `C:\Program Files (x86)\Steam\steamapps\common\Valheim dedicated server`
+     + bepinex in `C:\SteamLibrary\steamapps\common\Valheim dedicated server` (real Steam library layouts; recorded in
+     `C:\vsg-servers.json` for `run.ps1`; their Defender exclusions are added by the server bake).
      ~3 min. Rebuilt on `--update-server`, or automatically when the `os` layer is rebuilt (backing chain).
    - Run overlays (`vsg-it-<cfg>-<pid>.qcow2`) back onto `server`.
 3. **Single source for mod pins: `tests/integration-image/server-configs.env`** (BepInEx pack URL/sha256, plugin
@@ -58,7 +60,7 @@ Linux in containers. No dependency on Nuffle's laptop, no real Valheim data or p
    Winlogon `DefaultPassword` (required for auto-logon) and a gitignored file next to the image metadata. The VMs
    sit on libvirt's NAT network, not reachable from the LAN.
 7. **Windows Update off, Defender exclusions** (not disabled; Tamper Protection blocks that) for `C:\dotnet`,
-   `C:\vsg`, `C:\valheim`, `C:\Users\vsg\.nuget`, `C:\Users\vsg\.cache`. Build-time scanning is the main Windows
+   `C:\vsg`, `C:\Users\vsg\.nuget`, `C:\Users\vsg\.cache` (server folders: added by the server bake). Build-time scanning is the main Windows
    slowdown.
 8. **Keep the session-0 negative control as a flag (`--control <cfg>`)** so the A/B can be re-proven after harness
    changes. Not part of the default run.

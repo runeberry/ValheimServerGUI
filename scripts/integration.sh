@@ -103,7 +103,8 @@ done < <(grep -oP '^[A-Z][A-Z0-9_]*(?==)' "$IMAGE_DIR/server-configs.env")
 for config in "${CONFIGS[@]}"; do
   if docker build --target "$config" -t "vsg-integration:$config" "${BUILD_ARGS[@]}" \
       "$IMAGE_DIR" >"$RUNLOG/image-$config.log" 2>&1; then
-    buildid="$(docker run --rm "vsg-integration:$config" cat /opt/valheim/vsg-buildid.txt 2>/dev/null)"
+    buildid="$(docker run --rm "vsg-integration:$config" \
+      grep -E '"buildid"' /opt/steam/steamapps/appmanifest_896660.acf 2>/dev/null | tr -dc '0-9')"
     ok "$config (server build ${buildid:-unknown})"
   else
     fail "$config image build failed"

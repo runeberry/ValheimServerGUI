@@ -18,7 +18,9 @@ try {
     if ($session -eq 0 -and -not $AllowServicesSession) { throw 'Running in session 0, where a graceful stop cannot work.' }
 
     $cfg = (Get-Content C:\vsg\config.txt -Raw).Trim()
-    $env:VSG_IT_SERVER_EXE = "C:\valheim\$cfg\valheim_server.exe"
+    # Where bake-server.ps1 installed each configuration (a real Steam library layout) and which build.
+    $servers = Get-Content C:\vsg-servers.json -Raw | ConvertFrom-Json
+    $env:VSG_IT_SERVER_EXE = Join-Path $servers.servers.$cfg 'valheim_server.exe'
     $env:VSG_IT_SERVER_CONFIG = $cfg
     if ($cfg -eq 'bepinex') {
         $line = Select-String -Path "$src\tests\integration-image\server-configs.env" -Pattern '^EXPECTED_PLUGINS=(.*)$'
@@ -27,7 +29,7 @@ try {
     $env:VSG_IT_SAVEDIR = "$out\savedir"
     $env:VSG_IT_ARTIFACT_DIR = "$out\artifacts"
     New-Item -ItemType Directory -Force $env:VSG_IT_SAVEDIR, $env:VSG_IT_ARTIFACT_DIR | Out-Null
-    "config: $cfg  server build: $(Get-Content C:\valheim\buildid.txt)"
+    "config: $cfg  server build: $($servers.buildid)  folder: $($servers.servers.$cfg)"
 
     # Windows PowerShell turns a native command's stderr into a terminating error under 'Stop'.
     $ErrorActionPreference = 'Continue'

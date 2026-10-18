@@ -140,6 +140,8 @@ public sealed class WindowsRunKeyStrategyTests
     }
 
     [Theory]
+    [InlineData(new byte[] { 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, false)]
+    [InlineData(new byte[] { 0x01, 0, 0, 0, 0x95, 0x96, 0x8b, 0x57, 0x2e, 0x5f, 0xdd, 0x01 }, true)]
     [InlineData(new byte[] { 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, false)]
     [InlineData(new byte[] { 0x06, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, false)]
     [InlineData(new byte[] { 0x03, 0x1f, 0x2e, 0, 0, 0, 0, 0, 0, 0, 0, 0 }, true)]
@@ -150,8 +152,9 @@ public sealed class WindowsRunKeyStrategyTests
         Assert.Equal(disabled, StartupApproval.IsDisabled(data));
     }
 
-    private static readonly byte[] TaskManagerDisabled = { 0x03, 0x8a, 0x41, 0x2c, 0x5e, 0x3f, 0xdb, 0x01, 0, 0, 0, 0 };
-    private static readonly byte[] TaskManagerEnabled = { 0x02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+    // As written by Windows 11 Settings > Apps > Startup: a flag byte, three zero bytes, then the FILETIME of the change.
+    private static readonly byte[] TaskManagerDisabled = { 0x01, 0, 0, 0, 0x95, 0x96, 0x8b, 0x57, 0x2e, 0x5f, 0xdd, 0x01 };
+    private static readonly byte[] TaskManagerEnabled = { 0x00, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
     private sealed class FakeRunKey : IRunKey
     {

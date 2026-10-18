@@ -1,0 +1,94 @@
+#cloud-config
+# First boot of the Linux reboot-test desktop image (scripts/validate-reboot-linux.sh): Ubuntu 24.04 desktop with
+# GNOME on Wayland (the default session), the user logged on automatically, the .NET runtime from the Ubuntu
+# archive, and what the UI driver uses (AT-SPI bindings, xdotool). @@SSH_KEY@@ is filled in by the script.
+# Ends powered off.
+hostname: vsg-ubuntu
+users:
+  - name: vsg
+    gecos: VSG Reboot Test
+    shell: /bin/bash
+    groups: [sudo]
+    sudo: "ALL=(ALL) NOPASSWD:ALL"
+    lock_passwd: true
+    ssh_authorized_keys:
+      - "@@SSH_KEY@@"
+package_update: true
+packages:
+  - ubuntu-desktop-minimal
+  - dotnet-runtime-10.0
+  - libfuse2t64
+  - python3-gi
+  - gir1.2-atspi-2.0
+  - xdotool
+write_files:
+  - path: /etc/gdm3/custom.conf
+    content: |
+      [daemon]
+      AutomaticLoginEnable=true
+      AutomaticLogin=vsg
+  # Accessibility on (the driver reads the app through AT-SPI); no screen lock, blanking or suspend mid-run.
+  - path: /etc/dconf/profile/user
+    content: |
+      user-db:user
+      system-db:local
+  - path: /etc/dconf/db/local.d/00-vsg-reboot-test
+    content: |
+      [org/gnome/desktop/interface]
+      toolkit-accessibility=true
+
+      [org/gnome/desktop/session]
+      idle-delay=uint32 0
+
+      [org/gnome/desktop/screensaver]
+      lock-enabled=false
+
+      [org/gnome/settings-daemon/plugins/power]
+      sleep-inactive-ac-type='nothing'
+  # Every test VM is a copy of this disk with a new MAC and the same machine-id: match any NIC, and identify to
+  # DHCP by MAC so VMs running side by side get different addresses.
+  - path: /etc/netplan/60-vsg.yaml
+    permissions: '0600'
+    content: |
+      network:
+        version: 2
+        ethernets:
+          nics:
+            match:
+              name: "en*"
+            dhcp4: true
+            dhcp-identifier: mac
+  - path: /etc/apt/apt.conf.d/99vsg-no-periodic
+    content: |
+      APT::Periodic::Update-Package-Lists "0";
+      APT::Periodic::Unattended-Upgrade "0";
+  # The canary autostart entry's command: records when the login's autostart pass ran.
+  - path: /usr/local/bin/vsg-canary
+    permissions: '0755'
+    content: |
+      #!/bin/sh
+      date +%s.%N >> "$HOME/canary.txt"
+runcmd:
+  - [dconf, update]
+  - [rm, -f, /etc/netplan/50-cloud-init.yaml]
+  # Popups that would sit on top of the app: first-login wizard, update and crash notifiers.
+  - [apt-get, purge, -y, update-notifier, apport]
+  - [install, -d, -o, vsg, -g, vsg, /home/vsg/.config, /home/vsg/.config/autostart]
+  - [sh, -c, 'echo yes > /home/vsg/.config/gnome-initial-setup-done']
+  - |
+    cat > /home/vsg/.config/autostart/vsg-canary.desktop <<'ENTRY'
+    [Desktop Entry]
+    Type=Application
+    Name=VSG canary
+    Exec=/usr/local/bin/vsg-canary
+    X-GNOME-Autostart-enabled=true
+    ENTRY
+  - [chown, -R, 'vsg:vsg', /home/vsg/.config]
+  - [systemctl, set-default, graphical.target]
+  # Later boots are test boots: nothing may re-run.
+  - [touch, /etc/cloud/cloud-init.disabled]
+power_state:
+  mode: poweroff
+  message: vsg desktop image configured
+  timeout: 30
+  condition: true

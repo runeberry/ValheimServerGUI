@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using Serilog;
 using ValheimServerGUI.Core.Tests.Fakes;
@@ -157,14 +159,29 @@ namespace ValheimServerGUI.Core.Tests.Game
             return path;
         }
 
+        // What ld.so preloads for this environment: LD_PRELOAD entries split on spaces and colons (no escaping), a name
+        // with a slash used as a path, a bare name looked up in the LD_LIBRARY_PATH folders. Null for an entry that
+        // does not resolve to a file, which ld.so reports as "cannot be preloaded" and skips.
+        private static List<string?> PreloadsAsLdSoResolvesThem(StringDictionary env)
+        {
+            var libraryDirs = (env["LD_LIBRARY_PATH"] ?? "").Split(':', StringSplitOptions.RemoveEmptyEntries);
+            return env["LD_PRELOAD"]!.Split(new[] { ' ', ':' }, StringSplitOptions.RemoveEmptyEntries)
+                .Select(entry => entry.Contains('/')
+                    ? (File.Exists(entry) ? entry : null)
+                    : libraryDirs.Select(dir => Path.Join(dir, entry)).FirstOrDefault(File.Exists))
+                .ToList();
+        }
+
         // BepInEx on Linux: its Doorstop loader is a preload library that only loads when the launch environment
-        // names it, so Start sets it up whenever both configured files exist. They need not be in the server folder.
-        // On Windows the pack's winhttp.dll proxy loads by itself and Start must leave the environment alone.
+        // names it, so Start sets it up whenever both configured files exist. They need not be in the server folder,
+        // and the folders may hold spaces like Steam's own "Valheim dedicated server" (a pilot user's mods silently
+        // never loaded from there). On Windows the pack's winhttp.dll proxy loads by itself and Start must leave the
+        // environment alone.
         [Fact]
         public void Start_WithBothBepInExFiles_EnablesItsLoaderOnLinux()
         {
-            var preloader = CreateFile("mods", "BepInEx", "core", "BepInEx.Preloader.dll");
-            var doorstop = CreateFile("mods", "doorstop_libs", "libdoorstop_x64.so");
+            var preloader = CreateFile("steamapps", "common", "Valheim dedicated server", "BepInEx", "core", "BepInEx.Preloader.dll");
+            var doorstop = CreateFile("steamapps", "common", "Valheim dedicated server", "doorstop_libs", "libdoorstop_x64.so");
 
             _server.Start(Options(o =>
             {
@@ -182,7 +199,9 @@ namespace ValheimServerGUI.Core.Tests.Game
             {
                 Assert.Equal("1", env["DOORSTOP_ENABLED"]);
                 Assert.Equal(preloader, env["DOORSTOP_TARGET_ASSEMBLY"]);
-                Assert.Equal(doorstop, env["LD_PRELOAD"]!.Split(':')[0]);
+                var preloads = PreloadsAsLdSoResolvesThem(env);
+                Assert.DoesNotContain(null, preloads);
+                Assert.Equal(doorstop, preloads[0]);
                 Assert.Contains(_appLogger.Messages, m => m.Contains("Loading BepInEx") && m.Contains(preloader));
             }
         }
@@ -241,8 +260,9 @@ namespace ValheimServerGUI.Core.Tests.Game
             }
             else
             {
-                Assert.Equal(new[] { doorstop, "/opt/libmine.so" }, env["LD_PRELOAD"]!.Split(':'));
-                Assert.Equal(new[] { _dir, Path.Join(_dir, "linux64"), "/opt/lib" }, env["LD_LIBRARY_PATH"]!.Split(':'));
+                Assert.Equal(new[] { Path.GetFileName(doorstop), "/opt/libmine.so" }, env["LD_PRELOAD"]!.Split(':'));
+                Assert.Equal(new[] { Path.GetDirectoryName(doorstop), _dir, Path.Join(_dir, "linux64"), "/opt/lib" },
+                    env["LD_LIBRARY_PATH"]!.Split(':'));
             }
         }
 

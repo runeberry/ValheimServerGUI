@@ -426,9 +426,18 @@ namespace ValheimServerGUI.Game
 
             envVars["DOORSTOP_ENABLED"] = "1";
             envVars["DOORSTOP_TARGET_ASSEMBLY"] = options.BepInExPreloaderPath;
+
+            // ld.so splits LD_PRELOAD on spaces as well as colons, with no escaping, so a full path through Steam's
+            // "Valheim dedicated server" folder would never load. LD_LIBRARY_PATH splits on colons only, so the
+            // library's folder goes there and LD_PRELOAD names just the file, which ld.so resolves through that path.
+            // The BepInEx pack's start_server_bepinex.sh does the same.
             // The indexer throws on a missing key in this runtime, so probe before reading.
-            var prior = envVars.ContainsKey("LD_PRELOAD") ? envVars["LD_PRELOAD"] : null;
-            envVars["LD_PRELOAD"] = string.Join(':', new[] { options.DoorstopLibraryPath, prior }.Where(s => !string.IsNullOrEmpty(s)));
+            var doorstopDir = Path.GetDirectoryName(options.DoorstopLibraryPath);
+            var priorLibraryPath = envVars.ContainsKey("LD_LIBRARY_PATH") ? envVars["LD_LIBRARY_PATH"] : null;
+            envVars["LD_LIBRARY_PATH"] = string.Join(':', new[] { doorstopDir, priorLibraryPath }.Where(s => !string.IsNullOrEmpty(s)));
+
+            var priorPreload = envVars.ContainsKey("LD_PRELOAD") ? envVars["LD_PRELOAD"] : null;
+            envVars["LD_PRELOAD"] = string.Join(':', new[] { Path.GetFileName(options.DoorstopLibraryPath), priorPreload }.Where(s => !string.IsNullOrEmpty(s)));
         }
 
         private static string GenerateArgs(IValheimServerOptions options)

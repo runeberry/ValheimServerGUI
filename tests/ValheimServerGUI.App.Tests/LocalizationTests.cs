@@ -73,7 +73,7 @@ public class LocalizationTests
     };
 
     // Literal values that are not copy: the help glyph and brand names.
-    private static readonly HashSet<string> AllowedLiterals = new() { "?", "Discord", "Valheim Server GUI" };
+    private static readonly HashSet<string> AllowedLiterals = new() { "?", "Discord" };
 
     private static readonly Regex LiteralStringFormat = new(@"StringFormat\s*=\s*'?[^{'\s]");
 

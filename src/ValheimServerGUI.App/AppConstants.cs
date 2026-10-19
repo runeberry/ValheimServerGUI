@@ -5,8 +5,8 @@ namespace ValheimServerGUI.App;
 /// <summary>Shell-level constants (product identity used by the OS-integration seams).</summary>
 internal static class AppConstants
 {
-    /// <summary>Product name used for the window title, autostart entries, and the tray tooltip.</summary>
-    public const string ProductName = "(Unofficial) Valheim Dedicated Server GUI";
+    /// <summary>Product name used for the window title, splash, About header, autostart entries, and the tray tooltip.</summary>
+    public const string ProductName = "ValheimServerGUI";
 
     /// <summary>Stable identifier used as the autostart registration key / <c>.desktop</c> file name.</summary>
     public const string StartupKey = "ValheimServerGUI";

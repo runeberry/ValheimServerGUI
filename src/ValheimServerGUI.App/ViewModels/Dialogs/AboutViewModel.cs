@@ -25,9 +25,7 @@ public partial class AboutViewModel : ObservableObject
         }
     }
 
-    /// <summary>The About header product name, without the "(Unofficial)" prefix of
-    /// <see cref="AppConstants.ProductName"/>.</summary>
-    public string ProductName => "Valheim Dedicated Server GUI";
+    public string ProductName => AppConstants.ProductName;
 
     public string Copyright => "© 2023-2026 Runeberry Software, LLC";
 

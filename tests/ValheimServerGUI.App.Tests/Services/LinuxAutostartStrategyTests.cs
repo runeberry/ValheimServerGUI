@@ -22,7 +22,7 @@ public sealed class LinuxAutostartStrategyTests : IDisposable
     }
 
     private LinuxAutostartStrategy Make(string exec = "/opt/vsg/app")
-        => new(_dir, exec, "Valheim Server GUI", "ValheimServerGUI");
+        => new(_dir, exec, "ValheimServerGUI", "ValheimServerGUI");
 
     private string FilePath => Path.Combine(_dir, "ValheimServerGUI.desktop");
 

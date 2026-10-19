@@ -44,7 +44,7 @@ write_desktop() { # <exec> <out-path>
     cat > "$2" <<EOF
 [Desktop Entry]
 Type=Application
-Name=Valheim Server GUI
+Name=ValheimServerGUI
 Comment=Manage a Valheim dedicated server
 Exec=$1
 Icon=valheim-server-gui

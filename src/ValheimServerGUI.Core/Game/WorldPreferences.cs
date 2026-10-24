@@ -10,8 +10,6 @@ namespace ValheimServerGUI.Game
 
         public DateTime LastSaved { get; set; } = DateTime.UnixEpoch;
 
-        public string? Preset { get; set; }
-
         public Dictionary<string, string> Modifiers { get; set; } = new();
 
         public HashSet<string> Keys { get; set; } = new();
@@ -24,13 +22,23 @@ namespace ValheimServerGUI.Game
 
             prefs.WorldName = file.WorldName;
             prefs.LastSaved = file.LastSaved ?? prefs.LastSaved;
-            prefs.Preset = file.Preset;
             // A JSON file with null "modifiers"/"keys" (absent or explicitly null) must not NPE.
             prefs.Modifiers = file.Modifiers ?? prefs.Modifiers;
             prefs.Keys = file.Keys?.ToHashSet() ?? prefs.Keys;
 
+            // Older files store a chosen preset by name instead of its values; expand it so the fields hold the truth.
+            // Keys saved alongside it are kept.
+            if (WorldGenPresets.Find(file.Preset) is { } preset)
+            {
+                foreach (var (modifier, value) in preset.Settings.Modifiers) prefs.Modifiers.TryAdd(modifier, value);
+                prefs.Keys.UnionWith(preset.Settings.Keys);
+            }
+
             return prefs;
         }
+
+        /// <summary>The world settings these preferences launch the server with.</summary>
+        public WorldGenSettings ToSettings() => new(Modifiers, Keys);
 
         public WorldPreferencesFile ToFile()
         {
@@ -38,7 +46,6 @@ namespace ValheimServerGUI.Game
             {
                 WorldName = WorldName,
                 LastSaved = LastSaved,
-                Preset = Preset,
                 Modifiers = Modifiers,
                 Keys = Keys.ToList(),
             };

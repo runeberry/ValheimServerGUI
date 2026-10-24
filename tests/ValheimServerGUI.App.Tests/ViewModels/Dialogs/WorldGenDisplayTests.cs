@@ -47,7 +47,10 @@ public class WorldGenDisplayTests
             foreach (var display in displays)
                 Assert.Equal(display, WorldGenDisplay.PresetDisplay(WorldGenDisplay.PresetToken(display)));
 
-            Assert.Equal(WorldPreferencesViewModel.CustomPreset, WorldGenDisplay.PresetToken(displays[0]));
+            // Every preset the game has is offered, and nothing else.
+            Assert.Equal(
+                WorldGenPresets.All.Select(p => p.Token).OrderBy(t => t),
+                displays.Select(WorldGenDisplay.PresetToken).OrderBy(t => t));
         });
     }
 

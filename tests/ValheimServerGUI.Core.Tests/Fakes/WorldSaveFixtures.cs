@@ -17,6 +17,11 @@ namespace ValheimServerGUI.Core.Tests.Fakes
         /// <summary>A real save with one Steam player and a starting global key (identities replaced).</summary>
         public const string WithGlobalKey = "TWReleaseWorld.fwl2";
 
+        /// <summary>The one starting global key in <see cref="WithGlobalKey"/>: the game's marker for a world made with
+        /// every modifier at Normal.</summary>
+        public const string WithGlobalKeyStoredKey =
+            "preset combat_default:deathpenalty_default:resources_default:raids_default:portals_default";
+
         public static byte[] ReadFixture(string name)
             => File.ReadAllBytes(Path.Join(AppContext.BaseDirectory, "Fixtures", "WorldSaves", name));
 
@@ -26,7 +31,7 @@ namespace ValheimServerGUI.Core.Tests.Fakes
         /// </summary>
         public static byte[] Build(
             IEnumerable<WorldPlayerHistoryEntry> history,
-            int version = WorldPlayerHistory.PlayerHistoryVersion,
+            int version = WorldMetadataReader.PlayerHistoryVersion,
             IReadOnlyList<string>? globalKeys = null,
             Action<BinaryWriter>? extraField = null)
         {

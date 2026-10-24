@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Services;
@@ -43,6 +44,9 @@ public sealed class StartServerFlowTests : IDisposable
         public required FakeSteamCloudWorldProvider Cloud { get; init; }
         public required FakeServerPreferencesProvider ServerPrefs { get; init; }
         public required FakeIpAddressProvider Ip { get; init; }
+        public required FakeWorldPreferencesProvider WorldPrefs { get; init; }
+        public List<string> WorldSettingsPrompts { get; } = new();
+        public bool WorldSettingsAnswer { get; set; } = true;
         public List<string> Errors { get; } = new();
         public List<IValheimServerOptions> Started { get; } = new();
     }
@@ -52,6 +56,7 @@ public sealed class StartServerFlowTests : IDisposable
         var cloud = new FakeSteamCloudWorldProvider(cloudWorlds);
         var serverPrefs = new FakeServerPreferencesProvider();
         var ip = new FakeIpAddressProvider();
+        var worldPrefs = new FakeWorldPreferencesProvider();
         var shell = new ShellLauncher(new Services.RecordingSystemShell(), TestLog.Silent);
 
         var manager = new ServerManager(
@@ -62,7 +67,7 @@ public sealed class StartServerFlowTests : IDisposable
             // The directories come from the app-wide paths (the profile has no overrides).
             new FakeUserPreferencesProvider(new UserPreferences { ServerExePath = _exe, SaveDataFolderPath = _saveDir }),
             serverPrefs,
-            Core.GetRequiredService<IWorldPreferencesProvider>(),
+            worldPrefs,
             cloud,
             ip,
             Core.GetRequiredService<IPlayerDataRepository>(),
@@ -74,10 +79,15 @@ public sealed class StartServerFlowTests : IDisposable
 
         vm.LoadProfile(new ServerPreferences { ProfileName = "Test" });
 
-        var harness = new Harness { Vm = vm, Cloud = cloud, ServerPrefs = serverPrefs, Ip = ip };
+        var harness = new Harness { Vm = vm, Cloud = cloud, ServerPrefs = serverPrefs, Ip = ip, WorldPrefs = worldPrefs };
         vm.ErrorReported = harness.Errors.Add;
         vm.CloudImportPrompt = _ => Task.FromResult(cloudChoice);
         vm.StartAction = harness.Started.Add; // don't actually launch
+        vm.WorldSettingsChangePrompt = body =>
+        {
+            harness.WorldSettingsPrompts.Add(body);
+            return Task.FromResult(harness.WorldSettingsAnswer);
+        };
 
         // A valid baseline configuration; individual tests tweak the form.
         vm.Form.Name = "MyServer";
@@ -88,6 +98,122 @@ public sealed class StartServerFlowTests : IDisposable
 
     private void CreateLocalWorld(string name)
         => File.WriteAllText(Path.Combine(_saveDir, "worlds", name + ".fwl"), string.Empty);
+
+    /// <summary>Writes a committed 1.0+ world save storing <paramref name="storedKeys"/>, laid out like the game's.</summary>
+    private void CreateLocalWorldSave(string name, IEnumerable<string> storedKeys)
+    {
+        var folder = Path.Combine(_saveDir, "worlds_local", name);
+        Directory.CreateDirectory(folder);
+
+        using var payload = new MemoryStream();
+        using (var writer = new BinaryWriter(payload))
+        {
+            writer.Write(WorldMetadataReader.PlayerHistoryVersion);
+            writer.Write(name);
+            writer.Write("seed");
+            writer.Write(1);
+            writer.Write(2L);
+            writer.Write(2); // worldGenVersion
+            writer.Write(true); // needsDB
+            var keys = storedKeys.ToList();
+            writer.Write(keys.Count);
+            foreach (var key in keys) writer.Write(key);
+            writer.Write(0); // player history
+        }
+
+        var bytes = payload.ToArray(); // the writer closed the stream; ToArray still works
+        using (var file = new BinaryWriter(File.Create(Path.Combine(folder, "_main.1.fwl2"))))
+        {
+            file.Write(bytes.Length);
+            file.Write(bytes);
+        }
+        File.WriteAllBytes(Path.Combine(folder, "_main.1.ok"), Array.Empty<byte>());
+    }
+
+    private Harness BuildExistingWorld(string name, WorldGenSettings stored, WorldGenSettings preferred)
+    {
+        CreateLocalWorldSave(name, stored.ToGameKeys().Append("preset " + name.ToLowerInvariant()));
+        var h = Build();
+        h.WorldPrefs.SavePreferences(new WorldPreferences
+        {
+            WorldName = name,
+            Modifiers = new(preferred.Modifiers),
+            Keys = preferred.Keys.ToHashSet(),
+        });
+        h.Vm.RefreshWorldsCommand.Execute(null);
+        h.Vm.Form.UseNewWorld = false;
+        h.Vm.Form.ExistingWorld = name;
+        return h;
+    }
+
+    private static readonly WorldGenSettings CombatHard =
+        new(new Dictionary<string, string> { [WorldGenModifiers.Combat] = WorldGenModifiers.Values.CombatHard });
+
+    // ----- World settings: the launch makes the world match World Preferences; changing what it stores asks first -----
+
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Existing_world_with_a_setting_the_launch_changes_asks_first(bool answer)
+    {
+        var h = BuildExistingWorld("Hardworld", stored: CombatHard, preferred: new WorldGenSettings());
+        h.WorldSettingsAnswer = answer;
+
+        await h.Vm.StartServerAsync(isManual: true);
+
+        var prompt = Assert.Single(h.WorldSettingsPrompts);
+        Assert.Contains(string.Format(Strings.WorldGen_Change_Modifier,
+            Strings.WorldGen_Combat_Name, Strings.WorldGen_Combat_Hard, Strings.WorldGen_Value_Normal), prompt);
+        Assert.Contains("Hardworld", prompt);
+        Assert.Equal(answer ? 1 : 0, h.Started.Count);
+    }
+
+    [Fact]
+    public async Task Existing_world_that_already_matches_starts_without_asking()
+    {
+        var h = BuildExistingWorld("Hardworld", stored: CombatHard, preferred: CombatHard);
+
+        await h.Vm.StartServerAsync(isManual: true);
+
+        Assert.Empty(h.WorldSettingsPrompts);
+        Assert.Single(h.Started);
+    }
+
+    [Fact]
+    public async Task Existing_world_that_only_gains_settings_starts_without_asking()
+    {
+        var hardcore = WorldGenPresets.Find(WorldGenPresets.Hardcore)!.Settings;
+        var h = BuildExistingWorld("Plainworld", stored: new WorldGenSettings(), preferred: hardcore);
+
+        await h.Vm.StartServerAsync(isManual: true);
+
+        Assert.Empty(h.WorldSettingsPrompts);
+        Assert.Single(h.Started);
+    }
+
+    // Like the list files, auto-start has nobody to ask and applies World Preferences.
+    [Fact]
+    public async Task Auto_start_applies_world_settings_without_asking()
+    {
+        var h = BuildExistingWorld("Hardworld", stored: CombatHard, preferred: new WorldGenSettings());
+
+        await h.Vm.StartServerAsync(isManual: false);
+
+        Assert.Empty(h.WorldSettingsPrompts);
+        Assert.Single(h.Started);
+    }
+
+    [Fact]
+    public async Task Unreadable_world_save_starts_without_asking()
+    {
+        var h = BuildExistingWorld("Hardworld", stored: CombatHard, preferred: new WorldGenSettings());
+        File.WriteAllBytes(Path.Combine(_saveDir, "worlds_local", "Hardworld", "_main.1.fwl2"), new byte[] { 1, 2, 3 });
+
+        await h.Vm.StartServerAsync(isManual: true);
+
+        Assert.Empty(h.WorldSettingsPrompts);
+        Assert.Single(h.Started);
+    }
 
     [Fact]
     public async Task New_world_valid_starts_and_saves_profile()

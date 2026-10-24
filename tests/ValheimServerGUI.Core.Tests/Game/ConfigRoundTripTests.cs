@@ -234,17 +234,43 @@ namespace ValheimServerGUI.Core.Tests.Game
             var original = new WorldPreferences
             {
                 WorldName = "W",
-                Preset = WorldGenPresets.Hard,
                 Keys = new() { WorldGenKeys.NoMap },
                 Modifiers = new() { { WorldGenModifiers.Combat, WorldGenModifiers.Values.CombatHard } },
             };
 
-            var restored = WorldPreferences.FromFile(original.ToFile());
+            var file = original.ToFile();
+            var restored = WorldPreferences.FromFile(file);
 
+            Assert.Null(file.Preset);
             Assert.Equal("W", restored.WorldName);
-            Assert.Equal(WorldGenPresets.Hard, restored.Preset);
             Assert.Contains(WorldGenKeys.NoMap, restored.Keys);
             Assert.Equal(WorldGenModifiers.Values.CombatHard, restored.Modifiers[WorldGenModifiers.Combat]);
+        }
+
+        // Older files name a preset instead of storing its values (v2.4: preset only; v3.0: preset + keys).
+        [Fact]
+        public void WorldPreferences_FromLegacyPresetFile_ExpandsThePresetIntoFields()
+        {
+            var restored = WorldPreferences.FromFile(new WorldPreferencesFile
+            {
+                Preset = WorldGenPresets.Hardcore,
+                Keys = new() { WorldGenKeys.Fire },
+            });
+
+            var hardcore = WorldGenPresets.Find(WorldGenPresets.Hardcore)!.Settings;
+            Assert.Equal(hardcore.Modifiers, restored.Modifiers);
+            Assert.Equal(hardcore.Keys.Append(WorldGenKeys.Fire).ToHashSet(), restored.Keys);
+            Assert.Null(restored.ToFile().Preset);
+        }
+
+        [Theory]
+        [InlineData(WorldGenPresets.Normal)]
+        [InlineData("bogus")]
+        public void WorldPreferences_FromLegacyPresetFile_WithNoValues_LeavesFieldsDefault(string preset)
+        {
+            var restored = WorldPreferences.FromFile(new WorldPreferencesFile { Preset = preset });
+
+            Assert.True(restored.ToSettings().IsDefault);
         }
 
         // LastActiveProfile round-trips, and an empty file leaves it null (so the

@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Tools;
@@ -9,18 +8,18 @@ using ValheimServerGUI.Tools;
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
 /// <summary>
-/// World Preferences editor. Preset OR modifiers (never both): choosing a preset persists as <c>-preset</c>
-/// only; editing any modifier reverts the preset to Custom (a suppression flag keeps loads and Restore Defaults
-/// from triggering that revert). Keys persist independently of the preset, matching what GenerateArgs emits.
+/// World Preferences editor. The modifier and key fields are the truth, and they are what Save persists. The preset
+/// dropdown is derived from them: it selects the preset the fields match exactly, and otherwise shows the game-style
+/// name ("Hard+", "Custom (No Preset)") as its empty-state text. Choosing a preset sets every field to its values.
 /// </summary>
 public partial class WorldPreferencesViewModel : ModalEditViewModel
 {
-    public const string CustomPreset = "Custom";
-
     private readonly IWorldPreferencesProvider _provider;
     private readonly IShellLauncher _shell;
     private readonly string _worldName;
-    private bool _suppressRevert;
+
+    // Set while several fields change together, so the preset is derived once from the finished values.
+    private bool _applying;
 
     public WorldPreferencesViewModel(IWorldPreferencesProvider provider, string worldName, IShellLauncher shell)
     {
@@ -28,116 +27,88 @@ public partial class WorldPreferencesViewModel : ModalEditViewModel
         _shell = shell;
         _worldName = worldName;
 
-        Presets = new ObservableCollection<string>(WorldGenDisplay.PresetDisplays);
+        Presets = WorldGenDisplay.PresetDisplays;
 
         Modifiers = new ObservableCollection<ModifierRow>(
-            WorldGenModifiers.All.Select(key => new ModifierRow(key, OnModifierChanged)));
+            WorldGenModifiers.All.Select(key => new ModifierRow(key, OnFieldChanged)));
         Keys = new ObservableCollection<WorldKeyToggle>(
-            WorldGenKeys.All.Select(key => new WorldKeyToggle(key, OnKeyChanged)));
+            WorldGenKeys.All.Select(key => new WorldKeyToggle(key, OnFieldChanged)));
 
         Load();
     }
 
-    /// <summary>Friendly preset names shown in the dropdown (see <see cref="SelectedPresetDisplay"/>).</summary>
-    public ObservableCollection<string> Presets { get; }
+    /// <summary>Friendly preset names shown in the dropdown. "Custom" is never one of them.</summary>
+    public IReadOnlyList<string> Presets { get; }
     public ObservableCollection<ModifierRow> Modifiers { get; }
     public ObservableCollection<WorldKeyToggle> Keys { get; }
 
     public string WorldName => _worldName;
 
-    /// <summary>The selected preset TOKEN (or <see cref="CustomPreset"/>); the dialog binds the friendly
-    /// <see cref="SelectedPresetDisplay"/> instead.</summary>
-    [ObservableProperty]
-    [NotifyPropertyChangedFor(nameof(IsPresetSelected))]
-    [NotifyPropertyChangedFor(nameof(SelectedPresetDisplay))]
-    private string _selectedPreset = CustomPreset;
-
-    /// <summary>Friendly preset name for the dropdown, mapped to/from the token in <see cref="SelectedPreset"/>.</summary>
-    public string SelectedPresetDisplay
+    /// <summary>The preset the fields match exactly, or null. Setting a preset applies its values to the fields.</summary>
+    public string? SelectedPresetDisplay
     {
-        get => WorldGenDisplay.PresetDisplay(SelectedPreset);
-        set => SelectedPreset = WorldGenDisplay.PresetToken(value);
+        get => PresetLabel is { HasExtras: false } label ? WorldGenDisplay.PresetDisplay(label.Preset) : null;
+        set
+        {
+            if (WorldGenPresets.Find(WorldGenDisplay.PresetToken(value)) is { } preset) Apply(preset.Settings);
+        }
     }
 
-    /// <summary>True when a real preset is selected (modifiers are then ignored on save).</summary>
-    public bool IsPresetSelected => SelectedPreset != CustomPreset;
+    /// <summary>The dropdown's text when no preset matches exactly: "Hard+" or "Custom (No Preset)".</summary>
+    public string PresetPlaceholder => WorldGenDisplay.PresetLabelText(PresetLabel);
 
-    // World Preferences wiki links.
+    private WorldGenPresetLabel PresetLabel => WorldGenPresets.Label(CurrentSettings());
+
+    /// <summary>The settings the fields currently show.</summary>
+    public WorldGenSettings CurrentSettings() => new(
+        Modifiers.Where(m => m.Value is not null).ToDictionary(m => m.Key, m => m.Value!),
+        Keys.Where(k => k.IsSet).Select(k => k.Key));
+
     [RelayCommand] private void OpenWorldModifiersWiki() => _shell.OpenWebAddress(AppConstants.UrlValheimWikiWorldModifiers);
-    [RelayCommand] private void OpenWorldModifiersHelp() => _shell.OpenWebAddress(AppConstants.UrlHelpWorldModifiers);
 
     private void Load() => LoadClean(() =>
-    {
-        _suppressRevert = true;
-        try
-        {
-            var prefs = _provider.LoadPreferences(_worldName) ?? new WorldPreferences { WorldName = _worldName };
-
-            SelectedPreset = string.IsNullOrEmpty(prefs.Preset) ? CustomPreset : prefs.Preset;
-
-            foreach (var row in Modifiers)
-                row.SetSelectedQuiet(prefs.Modifiers.TryGetValue(row.Key, out var v) ? v : null);
-
-            var keys = prefs.Keys ?? new HashSet<string>();
-            foreach (var toggle in Keys)
-                toggle.IsSet = keys.Contains(toggle.Key);
-        }
-        finally
-        {
-            _suppressRevert = false;
-        }
-    });
+        Apply((_provider.LoadPreferences(_worldName) ?? new WorldPreferences()).ToSettings()));
 
     public override void ApplyDefaults()
     {
-        _suppressRevert = true;
-        try
-        {
-            SelectedPreset = CustomPreset;
-            foreach (var row in Modifiers) row.SetSelectedQuiet(null);
-            foreach (var toggle in Keys) toggle.IsSet = false;
-        }
-        finally
-        {
-            _suppressRevert = false;
-        }
+        Apply(new WorldGenSettings());
         IsDirty = true;
     }
 
     public void Save()
     {
         var prefs = _provider.LoadPreferences(_worldName) ?? new WorldPreferences { WorldName = _worldName };
+        var settings = CurrentSettings();
 
-        if (IsPresetSelected)
-        {
-            prefs.Preset = SelectedPreset;
-            prefs.Modifiers = new Dictionary<string, string>(); // a preset persists as -preset only
-        }
-        else
-        {
-            prefs.Preset = null;
-            prefs.Modifiers = Modifiers
-                .Where(m => m.Value is not null)
-                .ToDictionary(m => m.Key, m => m.Value!);
-        }
-
-        // Keys always persist, regardless of preset/custom.
-        prefs.Keys = Keys.Where(k => k.IsSet).Select(k => k.Key).ToHashSet();
+        prefs.Modifiers = new Dictionary<string, string>(settings.Modifiers);
+        prefs.Keys = settings.Keys.ToHashSet();
 
         _provider.SavePreferences(prefs);
     }
 
-    // Editing a modifier reverts the preset to Custom, except while a load or Restore Defaults is applying values.
-    private void OnModifierChanged()
+    private void Apply(WorldGenSettings settings)
     {
-        if (_suppressRevert) return;
-        SelectedPreset = CustomPreset;
-        IsDirty = true;
+        _applying = true;
+        try
+        {
+            foreach (var row in Modifiers)
+                row.SetSelectedQuiet(settings.Modifiers.TryGetValue(row.Key, out var value) ? value : null);
+            foreach (var toggle in Keys)
+                toggle.IsSet = settings.Keys.Contains(toggle.Key);
+        }
+        finally
+        {
+            _applying = false;
+        }
+        OnFieldChanged();
     }
 
-    private void OnKeyChanged()
+    // The fields live on the row objects, so their edits are reported here: re-derive the preset, which also marks
+    // the dialog dirty (outside a load).
+    private void OnFieldChanged()
     {
-        if (_suppressRevert) return;
-        IsDirty = true;
+        if (_applying) return;
+        OnPropertyChanged(nameof(SelectedPresetDisplay));
+        OnPropertyChanged(nameof(PresetPlaceholder));
     }
 }

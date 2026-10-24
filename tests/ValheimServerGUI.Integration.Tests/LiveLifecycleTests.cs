@@ -67,8 +67,8 @@ namespace ValheimServerGUI.Integration.Tests
                 WorldSavesAfterStop = harness.WorldSaves.Count;
 
                 var worldFolder = new DirectoryInfo(harness.SaveDir).GetLocalWorldFolder(worldName);
-                CommittedSaveAfterStop = WorldPlayerHistory.FindLatestCompleteSave(worldFolder)?.FullName;
-                try { HistoryAfterStop = WorldPlayerHistory.ReadFromWorldFolder(worldFolder); }
+                CommittedSaveAfterStop = WorldMetadataReader.FindLatestCompleteSave(worldFolder)?.FullName;
+                try { HistoryAfterStop = WorldMetadataReader.ReadFromWorldFolder(worldFolder).PlayerHistory; }
                 catch (Exception e) { HistoryReadError = e; }
             }
 

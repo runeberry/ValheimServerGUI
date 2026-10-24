@@ -49,8 +49,6 @@ namespace ValheimServerGUI.Game
 
         public Action<string>? LogMessageHandler { get; set; }
 
-        public string? WorldPreset { get; set; }
-
         public Dictionary<string, string>? WorldModifiers { get; set; }
 
         public HashSet<string>? WorldKeys { get; set; }
@@ -98,12 +96,7 @@ namespace ValheimServerGUI.Game
             if (BackupShort > BackupLong) throw new ArgumentException(Strings.Validation_BackupIntervalOrder);
 
             // World generation settings
-            if (WorldPreset != null)
-            {
-                if (!WorldGenPresets.All.Contains(WorldPreset)) throw new ArgumentException(string.Format(Strings.Validation_WorldPresetInvalid, WorldPreset, string.Join(", ", WorldGenPresets.All)));
-                if (WorldModifiers != null && WorldModifiers.Count > 0) throw new ArgumentException(Strings.Validation_WorldModifiersWithPreset);
-            }
-            else if (WorldModifiers != null)
+            if (WorldModifiers != null)
             {
                 foreach (var (key, value) in WorldModifiers)
                 {
@@ -183,8 +176,6 @@ namespace ValheimServerGUI.Game
         bool LogFilteringDisabled { get; }
 
         Action<string>? LogMessageHandler { get; }
-
-        public string? WorldPreset { get; }
 
         public Dictionary<string, string>? WorldModifiers { get; }
 

@@ -11,7 +11,7 @@ using ValheimServerGUI.Localization;
 
 namespace ValheimServerGUI.App.Tests.ViewModels.Dialogs;
 
-// Dialog view-models: OK/Cancel/Restore-Defaults + unsaved-changes guard (dirty flag) + WorldPreferences preset↔custom.
+// Dialog view-models: OK/Cancel/Restore-Defaults + unsaved-changes guard (dirty flag) + WorldPreferences fields and derived preset.
 public class DialogViewModelTests
 {
     private static readonly System.IServiceProvider Core =
@@ -270,69 +270,111 @@ public class DialogViewModelTests
         Directory.Delete(dir);
     }
 
-    // ----- WorldPreferences (preset ↔ custom, keys always persist) -----
+    // ----- WorldPreferences (fields are the truth; the preset is derived from them) -----
+    private static WorldPreferencesViewModel WorldVm(FakeWorldPreferencesProvider? provider = null)
+        => new(provider ?? new FakeWorldPreferencesProvider(), "W", new RecordingShellLauncher());
+
+    private static ModifierRow Row(WorldPreferencesViewModel vm, string key) => vm.Modifiers.Single(m => m.Key == key);
+
+    private static WorldKeyToggle Toggle(WorldPreferencesViewModel vm, string key) => vm.Keys.Single(k => k.Key == key);
+
     [Fact]
-    public void World_editing_a_modifier_reverts_preset_to_custom()
+    public void World_choosing_a_preset_sets_every_field_to_its_values()
     {
-        var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "W", new RecordingShellLauncher())
-            { SelectedPreset = WorldGenPresets.Hard };
-        Assert.True(vm.IsPresetSelected);
+        var vm = WorldVm();
+        Row(vm, WorldGenModifiers.Resources).SetSelectedQuiet(WorldGenModifiers.Values.ResourcesMost); // not in Hardcore
+        Toggle(vm, WorldGenKeys.Fire).IsSet = true;                                                     // not in Hardcore
 
-        vm.Modifiers[0].Selected = vm.Modifiers[0].Options[1]; // any non-Normal value
+        vm.SelectedPresetDisplay = Strings.WorldGen_Preset_Hardcore;
 
-        Assert.Equal(WorldPreferencesViewModel.CustomPreset, vm.SelectedPreset);
-        Assert.False(vm.IsPresetSelected);
+        var hardcore = WorldGenPresets.Find(WorldGenPresets.Hardcore)!.Settings;
+        Assert.Equal(hardcore.Modifiers, vm.CurrentSettings().Modifiers);
+        Assert.Equal(hardcore.Keys, vm.CurrentSettings().Keys);
+        Assert.Equal(Strings.WorldGen_Preset_Hardcore, vm.SelectedPresetDisplay);
+        Assert.True(vm.IsDirty);
     }
 
     [Fact]
-    public void World_preset_persists_as_preset_only_but_keys_still_persist()
+    public void World_editing_a_field_after_a_preset_shows_the_game_style_name()
+    {
+        var vm = WorldVm();
+        vm.SelectedPresetDisplay = Strings.WorldGen_Preset_Hard;
+        var changed = new List<string?>();
+        vm.PropertyChanged += (_, e) => changed.Add(e.PropertyName);
+
+        Row(vm, WorldGenModifiers.DeathPenalty).SetSelectedQuiet(WorldGenModifiers.Values.DeathPenaltyEasy);
+
+        Assert.Null(vm.SelectedPresetDisplay);
+        Assert.Equal(string.Format(Strings.WorldGen_Preset_Extras, Strings.WorldGen_Preset_Hard), vm.PresetPlaceholder);
+        Assert.Contains(nameof(vm.SelectedPresetDisplay), changed);
+        Assert.Contains(nameof(vm.PresetPlaceholder), changed);
+
+        Row(vm, WorldGenModifiers.DeathPenalty).SetSelectedQuiet(null); // back to Normal
+        Assert.Equal(Strings.WorldGen_Preset_Hard, vm.SelectedPresetDisplay);
+
+        Toggle(vm, WorldGenKeys.NoMap).IsSet = true; // a key counts too
+        Assert.Null(vm.SelectedPresetDisplay);
+        Assert.Equal(string.Format(Strings.WorldGen_Preset_Extras, Strings.WorldGen_Preset_Hard), vm.PresetPlaceholder);
+    }
+
+    [Fact]
+    public void World_fields_containing_no_preset_show_custom_which_is_never_an_option()
+    {
+        var vm = WorldVm();
+
+        Row(vm, WorldGenModifiers.Combat).SetSelectedQuiet(WorldGenModifiers.Values.CombatHard);
+
+        Assert.Null(vm.SelectedPresetDisplay);
+        Assert.Equal(Strings.WorldGen_Preset_Custom, vm.PresetPlaceholder);
+        Assert.DoesNotContain(Strings.WorldGen_Preset_Custom, vm.Presets);
+    }
+
+    [Fact]
+    public void World_save_persists_the_fields()
     {
         var provider = new FakeWorldPreferencesProvider();
-        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher())
-            { SelectedPreset = WorldGenPresets.Hard };
-        vm.Keys[0].IsSet = true; // a key
-        Assert.Equal(WorldGenPresets.Hard, vm.SelectedPreset); // toggling a key does NOT revert the preset
+        var vm = WorldVm(provider);
+        vm.SelectedPresetDisplay = Strings.WorldGen_Preset_Casual;
 
         vm.Save();
 
         var saved = provider.LoadPreferences("W")!;
-        Assert.Equal(WorldGenPresets.Hard, saved.Preset);
-        Assert.Empty(saved.Modifiers);                 // modifiers not persisted under a preset
-        Assert.Contains(WorldGenKeys.All[0], saved.Keys); // keys always persist
+        var casual = WorldGenPresets.Find(WorldGenPresets.Casual)!.Settings;
+        Assert.Equal(casual.Modifiers, saved.Modifiers);
+        Assert.Equal(casual.Keys, saved.Keys);
+        Assert.Null(saved.ToFile().Preset);
     }
 
     [Fact]
-    public void World_custom_persists_modifiers()
-    {
-        var provider = new FakeWorldPreferencesProvider();
-        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher());
-        var combat = vm.Modifiers[0];
-        combat.Selected = combat.Options[1]; // a friendly display name
-
-        vm.Save();
-
-        var saved = provider.LoadPreferences("W")!;
-        Assert.Null(saved.Preset);
-        // The dropdown shows friendly names but the raw token is what persists.
-        Assert.Equal(combat.Value, saved.Modifiers[combat.Key]);
-    }
-
-    [Fact]
-    public void World_loads_existing_preferences()
+    public void World_loads_fields_and_derives_the_preset()
     {
         var provider = new FakeWorldPreferencesProvider();
         provider.SavePreferences(new WorldPreferences
         {
             WorldName = "W",
-            Preset = WorldGenPresets.Casual,
+            Modifiers = new(WorldGenPresets.Find(WorldGenPresets.Hard)!.Settings.Modifiers),
             Keys = new() { WorldGenKeys.NoMap },
         });
 
-        var vm = new WorldPreferencesViewModel(provider, "W", new RecordingShellLauncher());
+        var vm = WorldVm(provider);
 
-        Assert.Equal(WorldGenPresets.Casual, vm.SelectedPreset);
         Assert.False(vm.IsDirty); // loaded clean
-        Assert.Contains(vm.Keys, k => k.Key == WorldGenKeys.NoMap && k.IsSet);
+        Assert.True(Toggle(vm, WorldGenKeys.NoMap).IsSet);
+        Assert.Null(vm.SelectedPresetDisplay);
+        Assert.Equal(string.Format(Strings.WorldGen_Preset_Extras, Strings.WorldGen_Preset_Hard), vm.PresetPlaceholder);
+    }
+
+    [Fact]
+    public void World_restore_defaults_returns_every_field_to_normal()
+    {
+        var vm = WorldVm();
+        vm.SelectedPresetDisplay = Strings.WorldGen_Preset_Immersive;
+
+        vm.ApplyDefaults();
+
+        Assert.True(vm.CurrentSettings().IsDefault);
+        Assert.Equal(Strings.WorldGen_Preset_Normal, vm.SelectedPresetDisplay);
+        Assert.True(vm.IsDirty);
     }
 
     [Fact]
@@ -355,17 +397,14 @@ public class DialogViewModelTests
     }
 
     [Fact]
-    public void World_wiki_links_open_the_expected_urls()
+    public void World_wiki_link_opens_the_expected_url()
     {
         var shell = new RecordingShellLauncher();
         var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "W", shell);
 
         vm.OpenWorldModifiersWikiCommand.Execute(null);
-        vm.OpenWorldModifiersHelpCommand.Execute(null);
 
-        Assert.Equal(
-            new[] { AppConstants.UrlValheimWikiWorldModifiers, AppConstants.UrlHelpWorldModifiers },
-            shell.OpenedWebAddresses);
+        Assert.Equal(new[] { AppConstants.UrlValheimWikiWorldModifiers }, shell.OpenedWebAddresses);
     }
 
     // ----- KnownCharacters -----

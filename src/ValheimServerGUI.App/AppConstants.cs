@@ -36,8 +36,4 @@ internal static class AppConstants
 
     /// <summary>The Valheim wiki's World Modifiers page (World Preferences "Valheim Wiki." link).</summary>
     public const string UrlValheimWikiWorldModifiers = "https://valheim.fandom.com/wiki/World_Modifiers";
-
-    /// <summary>FAQ entry about world modifiers set in-game (World Preferences "Read more here." link).</summary>
-    public const string UrlHelpWorldModifiers =
-        UrlDocs + "docs/frequently-asked-questions/#valheimservergui-isnt-correctly-displaying-my-world-modifiers";
 }

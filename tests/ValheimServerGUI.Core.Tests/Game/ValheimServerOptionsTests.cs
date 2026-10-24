@@ -33,7 +33,6 @@ public class ValheimServerOptionsTests
 
     public static IEnumerable<object[]> InvalidWorldGen() => new[]
     {
-        new object[] { (Action<ValheimServerOptions>)(o => o.WorldPreset = "bogus"), "bogus", WorldGenPresets.Normal },
         new object[] { (Action<ValheimServerOptions>)(o => o.WorldModifiers = new() { ["bogus"] = "x" }), "bogus", WorldGenModifiers.Combat },
         new object[] { (Action<ValheimServerOptions>)(o => o.WorldModifiers = new() { [WorldGenModifiers.Combat] = "bogus" }), "bogus", WorldGenModifiers.Values.CombatHard },
         new object[] { (Action<ValheimServerOptions>)(o => o.WorldKeys = new() { "bogus" }), "bogus", WorldGenKeys.NoMap },

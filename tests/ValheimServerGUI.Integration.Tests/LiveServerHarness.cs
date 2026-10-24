@@ -129,11 +129,16 @@ namespace ValheimServerGUI.Integration.Tests
             LogMessageHandler = line => { lock (_lock) Log.Add(line); },
         };
 
-        /// <summary>Starts the server and waits for the real "connected" line to promote it to Running.</summary>
-        public async Task<bool> BootToRunningAsync(TimeSpan timeout)
+        /// <summary>
+        /// Starts the server and waits for the real "connected" line to promote it to Running.
+        /// <paramref name="configure"/> adjusts the launch options first (world settings, additional args).
+        /// </summary>
+        public async Task<bool> BootToRunningAsync(TimeSpan timeout, Action<ValheimServerOptions>? configure = null)
         {
             _runningTcs = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-            Server.Start(BuildOptions());
+            var options = BuildOptions();
+            configure?.Invoke(options);
+            Server.Start(options);
 
             var completed = await Task.WhenAny(_runningTcs.Task, Task.Delay(timeout));
             return completed == _runningTcs.Task && Server.Status == ServerStatus.Running;
@@ -182,6 +187,10 @@ namespace ValheimServerGUI.Integration.Tests
                 Server.StatusChanged -= OnStatus;
             }
         }
+
+        /// <summary>The world settings stored in the newest committed save of <see cref="WorldName"/>.</summary>
+        public IReadOnlyList<string> ReadStoredWorldKeys()
+            => WorldMetadataReader.ReadFromWorldFolder(new DirectoryInfo(SaveDir).GetLocalWorldFolder(WorldName)).StartingGlobalKeys;
 
         /// <summary>
         /// Newest write time (UTC) of this run's world data files, scoped to <see cref="WorldName"/> across

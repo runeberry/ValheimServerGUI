@@ -10,8 +10,7 @@ namespace ValheimServerGUI.App.ViewModels.Dialogs;
 /// keys). The Core model stores only the tokens Valheim's command line expects (e.g. <c>deathpenalty</c> =
 /// <c>veryhard</c>); this maps them to friendly names and descriptions, and back, so the World Preferences
 /// dialog never surfaces raw tokens. Each mapping is one token↔display table used in both directions; the tables are built on each call so they always read the current UI culture's text.
-/// Sentinels: a modifier set to "Normal" is the null token and persists as no value (omitted); the preset set
-/// to <see cref="WorldPreferencesViewModel.CustomPreset"/> persists as no preset.
+/// Sentinel: a modifier set to "Normal" is the null token and persists as no value (omitted).
 /// </summary>
 internal static class WorldGenDisplay
 {
@@ -21,7 +20,6 @@ internal static class WorldGenDisplay
     // --- Presets (ordered as shown; display <-> token) ---
     private static (string Display, string Token)[] PresetPairs() => new[]
     {
-        (Strings.WorldGen_Preset_Custom, WorldPreferencesViewModel.CustomPreset),
         (Strings.WorldGen_Preset_Easy, WorldGenPresets.Easy),
         (Strings.WorldGen_Preset_Normal, WorldGenPresets.Normal),
         (Strings.WorldGen_Preset_Hard, WorldGenPresets.Hard),
@@ -33,14 +31,15 @@ internal static class WorldGenDisplay
 
     public static IReadOnlyList<string> PresetDisplays => PresetPairs().Select(p => p.Display).ToList();
 
-    public static string PresetDisplay(string token)
-    {
-        var pairs = PresetPairs();
-        return pairs.FirstOrDefault(p => p.Token == token).Display ?? pairs[0].Display;
-    }
+    public static string? PresetDisplay(string? token) => PresetPairs().FirstOrDefault(p => p.Token == token).Display;
 
-    public static string PresetToken(string display) =>
-        PresetPairs().FirstOrDefault(p => p.Display == display).Token ?? WorldPreferencesViewModel.CustomPreset;
+    public static string? PresetToken(string? display) => PresetPairs().FirstOrDefault(p => p.Display == display).Token;
+
+    /// <summary>The game-style name for settings that are not exactly a preset: "Hard+" or "Custom (No Preset)".</summary>
+    public static string PresetLabelText(WorldGenPresetLabel label)
+        => PresetDisplay(label.Preset) is { } preset
+            ? (label.HasExtras ? string.Format(Strings.WorldGen_Preset_Extras, preset) : preset)
+            : Strings.WorldGen_Preset_Custom;
 
     // --- Modifier names + help ---
     public static string ModifierName(string key) => key switch
@@ -150,5 +149,14 @@ internal static class WorldGenDisplay
         WorldGenKeys.NoMap => Strings.WorldGen_NoMap_Help,
         WorldGenKeys.Fire => Strings.WorldGen_Fire_Help,
         _ => string.Empty,
+    };
+
+    // --- Changes a server start makes to a world's stored settings ---
+    public static string ChangeText(WorldGenChange change) => change.Kind switch
+    {
+        WorldGenChangeKind.Modifier => string.Format(Strings.WorldGen_Change_Modifier,
+            ModifierName(change.Name), ModifierValueDisplay(change.Name, change.From), ModifierValueDisplay(change.Name, change.To)),
+        WorldGenChangeKind.Key => string.Format(Strings.WorldGen_Change_KeyOff, KeyName(change.Name)),
+        _ => string.Format(Strings.WorldGen_Change_Unrecognized, change.Name),
     };
 }

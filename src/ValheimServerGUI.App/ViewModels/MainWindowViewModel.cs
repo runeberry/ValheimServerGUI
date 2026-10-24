@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using ValheimServerGUI.App.Converters;
+using ValheimServerGUI.App.ViewModels.Dialogs;
 using ValheimServerGUI.App.Views.Dialogs;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Localization;
@@ -161,6 +162,9 @@ public partial class MainWindowViewModel : ViewModelBase
 
     /// <summary>Shows the Continue/Cancel import confirmation (returns true for Continue). Wired by the window.</summary>
     public Func<string, Task<bool>>? ImportConfirmPrompt { get; set; }
+
+    /// <summary>Shows the OK/Cancel prompt listing the world settings a start would change (true = OK). Wired by the window.</summary>
+    public Func<string, Task<bool>>? WorldSettingsChangePrompt { get; set; }
 
     /// <summary>Shows the 3-way role-conflict prompt. Wired by the window; treated as UseServerProfile if unset.</summary>
     public Func<string, Task<RoleConflictChoice>>? ConflictPrompt { get; set; }
@@ -556,6 +560,9 @@ public partial class MainWindowViewModel : ViewModelBase
         // List-file safety runs BEFORE Core writes the files: adopt changes made to them since VSG's last write,
         // resolve conflicts, and guard a stray permitted-list file. It may change the form's roles, so rebuild the
         // options afterwards so both the launch and save-on-start reflect the merged config.
+        // Asked before the list-file safety step, which may move files: a Cancel here must leave nothing changed.
+        if (!newWorld && !await ConfirmWorldSettingsChangesAsync(options, saveFolder, isManual)) return;
+
         if (!await ResolveListSafetyBeforeStartAsync(options, isManual)) return;
         options = BuildOptions();
 
@@ -578,6 +585,41 @@ public partial class MainWindowViewModel : ViewModelBase
 
         if (_userPrefs.LoadPreferences().SaveProfileOnStart)
             _serverPrefs.SavePreferences(BuildPreferences());
+    }
+
+    /// <summary>
+    /// The server is launched to make the world's stored modifiers and keys match World Preferences. When that would
+    /// change or remove a setting the world already has (for example one chosen in the game), a manual start asks
+    /// first; Cancel aborts the start. Once a start has been saved the world matches, so the next start does not ask.
+    /// Auto-start applies the change without asking, like the list files. An unreadable save never blocks the start.
+    /// </summary>
+    private async Task<bool> ConfirmWorldSettingsChangesAsync(ValheimServerOptions options, DirectoryInfo saveFolder, bool isManual)
+    {
+        var worldName = options.WorldName ?? string.Empty;
+        IReadOnlyList<string> storedKeys;
+        try
+        {
+            storedKeys = WorldMetadataReader.ReadFromWorldFolder(saveFolder.GetLocalWorldFolder(worldName)).StartingGlobalKeys;
+        }
+        catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException)
+        {
+            _logger.Warning(e, "Could not read the stored settings of world {world}: {message}", worldName, e.Message);
+            return true;
+        }
+
+        var changes = new WorldGenSettings(options.WorldModifiers, options.WorldKeys).ChangesFrom(storedKeys);
+        if (changes.Count == 0) return true;
+
+        foreach (var change in changes)
+            _logger.Information("Starting world {world} changes a stored setting: {change}", worldName, change);
+
+        if (!isManual || WorldSettingsChangePrompt is null) return true;
+
+        var lines = string.Join(Environment.NewLine, changes.Select(WorldGenDisplay.ChangeText));
+        if (await WorldSettingsChangePrompt(string.Format(Strings.Prompt_WorldSettingsChange_Message, worldName, lines))) return true;
+
+        _logger.Information("Server start cancelled at the world settings prompt.");
+        return false;
     }
 
     /// <summary>Builds the server launch options from the form, the profile and the app-wide preferences.</summary>
@@ -623,11 +665,7 @@ public partial class MainWindowViewModel : ViewModelBase
             var worldPrefs = _worldPrefs.LoadPreferences(worldName);
             if (worldPrefs is not null)
             {
-                if (!string.IsNullOrEmpty(worldPrefs.Preset))
-                    options.WorldPreset = worldPrefs.Preset;
-                else
-                    options.WorldModifiers = worldPrefs.Modifiers;
-
+                options.WorldModifiers = worldPrefs.Modifiers;
                 options.WorldKeys = worldPrefs.Keys;
             }
         }

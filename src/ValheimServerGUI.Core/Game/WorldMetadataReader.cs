@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -102,7 +102,7 @@ namespace ValheimServerGUI.Game
 
         /// <summary>
         /// Reads a <c>.fwl2</c> stream, front to back without buffering the file. Worlds saved before
-        /// <see cref="PlayerHistoryVersion"/> predate the <c>.fwl2</c> format and return <see cref="WorldMetadata.Empty"/>. Throws
+        /// <see cref="PlayerHistoryVersion"/> are not read and return <see cref="WorldMetadata.Empty"/>. Throws
         /// <see cref="InvalidDataException"/> when the data is truncated or does not match the layout.
         /// </summary>
         public static WorldMetadata Read(Stream stream)

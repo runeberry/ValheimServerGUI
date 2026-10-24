@@ -12,8 +12,9 @@ namespace ValheimServerGUI.Game
         [JsonProperty("lastSaved")]
         public DateTime? LastSaved { get; set; }
 
-        [JsonProperty("preset")]
-        public string?Preset { get; set; }
+        /// <summary>A preset token, written only by older versions; read and expanded into the modifiers and keys.</summary>
+        [JsonProperty("preset", NullValueHandling = NullValueHandling.Ignore)]
+        public string? Preset { get; set; }
 
         [JsonProperty("modifiers")]
         public Dictionary<string, string>? Modifiers { get; set; }

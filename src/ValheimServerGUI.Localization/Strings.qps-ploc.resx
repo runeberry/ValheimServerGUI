@@ -585,6 +585,12 @@
   <data name="Prompt_ExitWhileStopping" xml:space="preserve">
     <value>⟦Prompt_ExitWhileStopping⟧</value>
   </data>
+  <data name="Prompt_WorldSettingsChange_Title" xml:space="preserve">
+    <value>⟦Prompt_WorldSettingsChange_Title⟧</value>
+  </data>
+  <data name="Prompt_WorldSettingsChange_Message" xml:space="preserve">
+    <value>⟦Prompt_WorldSettingsChange_Message {0} {1}⟧</value>
+  </data>
   <!-- Tray -->
   <data name="Tray_Profile" xml:space="preserve">
     <value>⟦Tray_Profile {0}⟧</value>
@@ -815,12 +821,6 @@
   <data name="WorldPreferences_Modifiers_Header" xml:space="preserve">
     <value>⟦WorldPreferences_Modifiers_Header⟧</value>
   </data>
-  <data name="WorldPreferences_NotWorking" xml:space="preserve">
-    <value>⟦WorldPreferences_NotWorking⟧</value>
-  </data>
-  <data name="WorldPreferences_NotWorkingLink" xml:space="preserve">
-    <value>⟦WorldPreferences_NotWorkingLink⟧</value>
-  </data>
   <data name="WorldPreferences_Keys_Header" xml:space="preserve">
     <value>⟦WorldPreferences_Keys_Header⟧</value>
   </data>
@@ -850,6 +850,18 @@
   </data>
   <data name="WorldGen_Preset_Immersive" xml:space="preserve">
     <value>⟦WorldGen_Preset_Immersive⟧</value>
+  </data>
+  <data name="WorldGen_Preset_Extras" xml:space="preserve">
+    <value>⟦WorldGen_Preset_Extras {0}⟧</value>
+  </data>
+  <data name="WorldGen_Change_Modifier" xml:space="preserve">
+    <value>⟦WorldGen_Change_Modifier {0} {1} {2}⟧</value>
+  </data>
+  <data name="WorldGen_Change_KeyOff" xml:space="preserve">
+    <value>⟦WorldGen_Change_KeyOff {0}⟧</value>
+  </data>
+  <data name="WorldGen_Change_Unrecognized" xml:space="preserve">
+    <value>⟦WorldGen_Change_Unrecognized {0}⟧</value>
   </data>
   <data name="WorldGen_Value_Normal" xml:space="preserve">
     <value>⟦WorldGen_Value_Normal⟧</value>
@@ -1181,12 +1193,6 @@
   </data>
   <data name="Validation_BackupIntervalOrder" xml:space="preserve">
     <value>⟦Validation_BackupIntervalOrder⟧</value>
-  </data>
-  <data name="Validation_WorldPresetInvalid" xml:space="preserve">
-    <value>⟦Validation_WorldPresetInvalid {0} {1}⟧</value>
-  </data>
-  <data name="Validation_WorldModifiersWithPreset" xml:space="preserve">
-    <value>⟦Validation_WorldModifiersWithPreset⟧</value>
   </data>
   <data name="Validation_WorldModifierKeyInvalid" xml:space="preserve">
     <value>⟦Validation_WorldModifierKeyInvalid {0} {1}⟧</value>

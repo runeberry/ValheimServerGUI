@@ -48,6 +48,8 @@ public partial class MainWindow : Window
         viewModel.MessagePrompt = ShowMessageAsync;
         viewModel.ImportConfirmPrompt = body =>
             MessageBox.ConfirmAsync(this, Strings.Import_Title, body, Strings.Common_Continue, Strings.Common_Cancel);
+        viewModel.WorldSettingsChangePrompt = body =>
+            MessageBox.ConfirmAsync(this, Strings.Prompt_WorldSettingsChange_Title, body, Strings.Common_OK, Strings.Common_Cancel);
         viewModel.ConflictPrompt = body => MessageBox.ChooseAsync<RoleConflictChoice>(
             this, Strings.Import_RoleConflict_Title, body,
             new MessageBoxButton(Strings.Prompt_RoleConflict_UseServerProfile, RoleConflictChoice.UseServerProfile, isDefault: true),

@@ -3,8 +3,8 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace ValheimServerGUI.App.ViewModels.Dialogs;
 
-/// <summary>One world-gen key toggle. Keys persist independently of the preset. The checkbox
-/// shows a friendly name + help (via <see cref="WorldGenDisplay"/>); <see cref="Key"/> is the raw token.</summary>
+/// <summary>One world-gen key toggle. The checkbox shows a friendly name + help (via
+/// <see cref="WorldGenDisplay"/>); <see cref="Key"/> is the raw token.</summary>
 public partial class WorldKeyToggle : ObservableObject
 {
     private readonly Action _onChanged;

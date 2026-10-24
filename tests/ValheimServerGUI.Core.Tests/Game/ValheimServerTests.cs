@@ -112,7 +112,6 @@ namespace ValheimServerGUI.Core.Tests.Game
             {
                 o.Public = true;
                 o.Crossplay = true;
-                o.WorldPreset = WorldGenPresets.Hard;
             }));
 
             var args = _processProvider.LastProcess!.StartInfo.Arguments;
@@ -124,7 +123,37 @@ namespace ValheimServerGUI.Core.Tests.Game
             Assert.Contains("-public 1", args);
             Assert.Contains("-password \"hunter2\"", args);
             Assert.Contains("-crossplay", args);
-            Assert.Contains("-preset hard", args);
+        }
+
+        // The world stores its modifiers and keys and -modifier/-setkey only add to them, so the stored ones are
+        // cleared first; otherwise a modifier set back to Normal (omitted) would keep the world's stored value.
+        // Additional args come last so the user can still append their own world arguments.
+        [Fact]
+        public void Start_ClearsStoredWorldSettings_BeforeApplyingThem()
+        {
+            _server.Start(Options(o =>
+            {
+                o.WorldModifiers = new() { [WorldGenModifiers.Combat] = WorldGenModifiers.Values.CombatHard };
+                o.WorldKeys = new() { WorldGenKeys.NoMap };
+                o.AdditionalArgs = "-instanceid 1";
+            }));
+
+            var args = _processProvider.LastProcess!.StartInfo.Arguments;
+            var reset = args.IndexOf(" -resetmodifiers", StringComparison.Ordinal);
+            var modifier = args.IndexOf(" -modifier combat hard", StringComparison.Ordinal);
+            var key = args.IndexOf(" -setkey nomap", StringComparison.Ordinal);
+            var additional = args.IndexOf(" -instanceid 1", StringComparison.Ordinal);
+
+            Assert.True(reset >= 0 && reset < modifier && modifier < key && key < additional, args);
+            Assert.DoesNotContain("-preset", args);
+        }
+
+        [Fact]
+        public void Start_ClearsStoredWorldSettings_WhenNoneAreConfigured()
+        {
+            _server.Start(Options());
+
+            Assert.Contains(" -resetmodifiers", _processProvider.LastProcess!.StartInfo.Arguments);
         }
 
         // Linux launch contract: the server binary resolves steamclient.so from its own directory

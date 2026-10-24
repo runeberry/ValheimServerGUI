@@ -50,6 +50,35 @@ public class DialogRenderTests
         => Realize(new WorldPreferencesWindow(new WorldPreferencesViewModel(
             Core.GetRequiredService<IWorldPreferencesProvider>(), "TestWorld", new RecordingShellLauncher())));
 
+    // The preset dropdown only lists real presets: it selects the one the fields match, and otherwise shows the
+    // derived name as its empty-state text. The null it then pushes back must not touch the fields.
+    [AvaloniaFact]
+    public void WorldPreferences_preset_dropdown_follows_the_fields()
+    {
+        var vm = new WorldPreferencesViewModel(new FakeWorldPreferencesProvider(), "TestWorld", new RecordingShellLauncher());
+        var window = new WorldPreferencesWindow(vm);
+        window.Show();
+        Dispatcher.UIThread.RunJobs();
+        var presets = window.GetVisualDescendants().OfType<ComboBox>().First();
+
+        vm.SelectedPresetDisplay = Strings.WorldGen_Preset_Hard;
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(Strings.WorldGen_Preset_Hard, presets.SelectedItem);
+
+        vm.Modifiers.Single(m => m.Key == WorldGenModifiers.DeathPenalty).SetSelectedQuiet(WorldGenModifiers.Values.DeathPenaltyEasy);
+        Dispatcher.UIThread.RunJobs();
+        Assert.Null(presets.SelectedItem);
+        Assert.Equal(string.Format(Strings.WorldGen_Preset_Extras, Strings.WorldGen_Preset_Hard), presets.PlaceholderText);
+        Assert.Equal(WorldGenModifiers.Values.DeathPenaltyEasy, vm.CurrentSettings().Modifiers[WorldGenModifiers.DeathPenalty]);
+
+        presets.SelectedItem = Strings.WorldGen_Preset_Casual; // the user picks a preset
+        Dispatcher.UIThread.RunJobs();
+        Assert.Equal(WorldGenPresets.Find(WorldGenPresets.Casual)!.Settings.Modifiers, vm.CurrentSettings().Modifiers);
+        Assert.Equal(Strings.WorldGen_Preset_Casual, presets.SelectedItem);
+
+        window.Close();
+    }
+
     [AvaloniaFact]
     public void AddPlayerWindow_realizes()
         => Realize(new AddPlayerWindow(ValheimServerGUI.App.ViewModels.Dialogs.AddPlayerOptions.ForServer(usePermittedList: true)));

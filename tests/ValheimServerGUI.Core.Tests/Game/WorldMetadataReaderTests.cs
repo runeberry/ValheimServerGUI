@@ -7,11 +7,11 @@ using Xunit;
 namespace ValheimServerGUI.Core.Tests.Game
 {
     /// <summary>
-    /// Reading the player history out of a world's <c>.fwl2</c> save: the real game-written files, layouts the real
-    /// files don't cover, hostile input (which must fail as <see cref="InvalidDataException"/>, never crash or
+    /// Reading the starting global keys and the player history out of a world's <c>.fwl2</c> save: the real
+    /// game-written files, layouts the real files don't cover, hostile input (which must fail as <see cref="InvalidDataException"/>, never crash or
     /// over-allocate), and choosing the newest committed save in a world folder.
     /// </summary>
-    public class WorldPlayerHistoryTests : IDisposable
+    public class WorldMetadataReaderTests : IDisposable
     {
         private readonly DirectoryInfo WorldFolder =
             new(Path.Join(Path.GetTempPath(), "vsg_world_" + Guid.NewGuid().ToString("N")));
@@ -25,7 +25,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             => new(id, name, name, playFabId);
 
         private static System.Collections.Generic.IReadOnlyList<WorldPlayerHistoryEntry> Read(byte[] bytes)
-            => WorldPlayerHistory.Read(new MemoryStream(bytes));
+            => WorldMetadataReader.Read(new MemoryStream(bytes)).PlayerHistory;
 
         #region Real saves
 
@@ -44,13 +44,14 @@ namespace ValheimServerGUI.Core.Tests.Game
         }
 
         [Fact]
-        public void Read_RealSaveWithGlobalKey_SkipsTheKey()
+        public void Read_RealSaveWithGlobalKey_ReturnsTheKeyAndTheHistory()
         {
-            var history = Read(WorldSaveFixtures.ReadFixture(WorldSaveFixtures.WithGlobalKey));
+            var metadata = WorldMetadataReader.Read(new MemoryStream(WorldSaveFixtures.ReadFixture(WorldSaveFixtures.WithGlobalKey)));
 
+            Assert.Equal(new[] { WorldSaveFixtures.WithGlobalKeyStoredKey }, metadata.StartingGlobalKeys);
             Assert.Equal(
                 new[] { new WorldPlayerHistoryEntry("Steam_76561198000000001", "Viking", "Viking", "AAAA000000000001") },
-                history);
+                metadata.PlayerHistory);
         }
 
         #endregion
@@ -68,9 +69,11 @@ namespace ValheimServerGUI.Core.Tests.Game
                 new WorldPlayerHistoryEntry("Steam_76561198000000003", "Viking", "Viking#2", ""),
             };
 
-            var history = Read(WorldSaveFixtures.Build(entries, globalKeys: new[] { "nomap", "playerdamage 50", "" }));
+            var keys = new[] { "nomap", "playerdamage 50", "" };
+            var metadata = WorldMetadataReader.Read(new MemoryStream(WorldSaveFixtures.Build(entries, globalKeys: keys)));
 
-            Assert.Equal(entries, history);
+            Assert.Equal(keys, metadata.StartingGlobalKeys);
+            Assert.Equal(entries, metadata.PlayerHistory);
         }
 
         [Fact]
@@ -85,7 +88,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             var bytes = WorldSaveFixtures.Build(
                 new[] { Entry("Steam_76561198000000001", "Viking") },
-                version: WorldPlayerHistory.PlayerHistoryVersion - 1);
+                version: WorldMetadataReader.PlayerHistoryVersion - 1);
 
             Assert.Empty(Read(bytes));
         }
@@ -95,7 +98,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             var entries = new[] { Entry("Steam_76561198000000001", "Viking") };
 
-            var history = Read(WorldSaveFixtures.Build(entries, version: WorldPlayerHistory.PlayerHistoryVersion + 1));
+            var history = Read(WorldSaveFixtures.Build(entries, version: WorldMetadataReader.PlayerHistoryVersion + 1));
 
             Assert.Equal(entries, history);
         }
@@ -106,7 +109,7 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             var bytes = WorldSaveFixtures.Build(
                 new[] { Entry("Steam_76561198000000001", "Viking") },
-                version: WorldPlayerHistory.PlayerHistoryVersion + 1,
+                version: WorldMetadataReader.PlayerHistoryVersion + 1,
                 extraField: w => w.Write(7));
 
             Assert.Throws<InvalidDataException>(() => Read(bytes));
@@ -216,7 +219,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             WorldSaveFixtures.WriteSave(WorldFolder, 9, SaveNaming("Nine"));
             WorldSaveFixtures.WriteSave(WorldFolder, 10, SaveNaming("Ten"));
 
-            var history = WorldPlayerHistory.ReadFromWorldFolder(WorldFolder);
+            var history = WorldMetadataReader.ReadFromWorldFolder(WorldFolder).PlayerHistory;
 
             Assert.Equal("Ten", Assert.Single(history).DisplayName);
         }
@@ -228,7 +231,7 @@ namespace ValheimServerGUI.Core.Tests.Game
             WorldSaveFixtures.WriteSave(WorldFolder, 4, SaveNaming("Committed"));
             WorldSaveFixtures.WriteSave(WorldFolder, 5, new byte[] { 1, 2, 3 }, committed: false);
 
-            var history = WorldPlayerHistory.ReadFromWorldFolder(WorldFolder);
+            var history = WorldMetadataReader.ReadFromWorldFolder(WorldFolder).PlayerHistory;
 
             Assert.Equal("Committed", Assert.Single(history).DisplayName);
         }
@@ -238,13 +241,13 @@ namespace ValheimServerGUI.Core.Tests.Game
         {
             WorldSaveFixtures.WriteSave(WorldFolder, 0, SaveNaming("Uncommitted"), committed: false);
 
-            Assert.Empty(WorldPlayerHistory.ReadFromWorldFolder(WorldFolder));
+            Assert.Empty(WorldMetadataReader.ReadFromWorldFolder(WorldFolder).PlayerHistory);
         }
 
         [Fact]
         public void ReadFromWorldFolder_MissingFolder_ReturnsEmpty()
         {
-            Assert.Empty(WorldPlayerHistory.ReadFromWorldFolder(WorldFolder));
+            Assert.Empty(WorldMetadataReader.ReadFromWorldFolder(WorldFolder).PlayerHistory);
         }
 
         #endregion

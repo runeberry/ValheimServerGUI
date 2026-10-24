@@ -394,7 +394,7 @@ namespace ValheimServerGUI.Game
             try
             {
                 var worldFolder = options.GetValidatedSaveDataFolder().GetLocalWorldFolder(options.WorldName ?? string.Empty);
-                PlayerDataRepository.ApplyWorldPlayerHistory(WorldPlayerHistory.ReadFromWorldFolder(worldFolder));
+                PlayerDataRepository.ApplyWorldPlayerHistory(WorldMetadataReader.ReadFromWorldFolder(worldFolder).PlayerHistory);
             }
             catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException)
             {
@@ -451,11 +451,11 @@ namespace ValheimServerGUI.Game
                 processArgs += " -crossplay";
             }
 
-            if (!string.IsNullOrWhiteSpace(options.WorldPreset))
-            {
-                processArgs += $" -preset {options.WorldPreset}";
-            }
-            else if (options.WorldModifiers != null)
+            // The world stores its modifiers and keys, and -modifier/-setkey only add to them, so a value set back to
+            // Normal (omitted) would keep the stored one. Clearing them first makes the world match these options.
+            processArgs += " -resetmodifiers";
+
+            if (options.WorldModifiers != null)
             {
                 foreach (var (key, value) in options.WorldModifiers)
                 {

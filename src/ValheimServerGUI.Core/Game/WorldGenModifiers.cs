@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ValheimServerGUI.Game
 {
@@ -49,60 +51,60 @@ namespace ValheimServerGUI.Game
             Portals,
         };
 
-        public static readonly IReadOnlyDictionary<string, string[]> AllowedValues = new Dictionary<string, string[]>()
-        {
+        /// <summary>
+        /// The world keys each modifier value stores, in the game's slider order, copied from the game's start scene
+        /// (the <c>KeySlider</c> settings under <c>StartGui_ServerOptions</c>). "Normal" stores no keys, so it is not
+        /// listed. Keys are lowercase, as the game writes them.
+        /// </summary>
+        public static readonly IReadOnlyDictionary<string, IReadOnlyList<(string Value, string[] GameKeys)>> Settings =
+            new Dictionary<string, IReadOnlyList<(string, string[])>>
             {
-                Combat,
-                new[]
+                [Combat] = new (string, string[])[]
                 {
-                    Values.CombatVeryEasy,
-                    Values.CombatEasy,
-                    Values.CombatHard,
-                    Values.CombatVeryHard,
-                }
-            },
-            {
-                DeathPenalty,
-                new[]
+                    (Values.CombatVeryEasy, new[] { "playerdamage 125", "enemydamage 50", "enemyspeedsize 90" }),
+                    (Values.CombatEasy, new[] { "playerdamage 110", "enemydamage 75", "enemyspeedsize 95" }),
+                    (Values.CombatHard, new[] { "playerdamage 85", "enemydamage 150", "enemyspeedsize 110", "enemyleveluprate 120" }),
+                    (Values.CombatVeryHard, new[] { "playerdamage 70", "enemydamage 200", "enemyspeedsize 120", "enemyleveluprate 140" }),
+                },
+                [DeathPenalty] = new (string, string[])[]
                 {
-                    Values.DeathPenaltyCasual,
-                    Values.DeathPenaltyVeryEasy,
-                    Values.DeathPenaltyEasy,
-                    Values.DeathPenaltyHard,
-                    Values.DeathPenaltyHardcore,
-                }
-            },
-            {
-                Resources,
-                new[]
+                    (Values.DeathPenaltyCasual, new[] { "deathkeepequip", "skillreductionrate 15" }),
+                    (Values.DeathPenaltyVeryEasy, new[] { "skillreductionrate 15" }),
+                    (Values.DeathPenaltyEasy, new[] { "skillreductionrate 50" }),
+                    (Values.DeathPenaltyHard, new[] { "deathdeleteunequipped", "skillreductionrate 150" }),
+                    (Values.DeathPenaltyHardcore, new[] { "deathdeleteitems", "deathskillsreset" }),
+                },
+                [Resources] = new (string, string[])[]
                 {
-                    Values.ResourcesMuchLess,
-                    Values.ResourcesLess,
-                    Values.ResourcesMore,
-                    Values.ResourcesMuchMore,
-                    Values.ResourcesMost,
-                }
-            },
-            {
-                Raids,
-                new[]
+                    (Values.ResourcesMuchLess, new[] { "resourcerate 50" }),
+                    (Values.ResourcesLess, new[] { "resourcerate 75" }),
+                    (Values.ResourcesMore, new[] { "resourcerate 150" }),
+                    (Values.ResourcesMuchMore, new[] { "resourcerate 200" }),
+                    (Values.ResourcesMost, new[] { "resourcerate 300" }),
+                },
+                [Raids] = new (string, string[])[]
                 {
-                    Values.RaidsNone,
-                    Values.RaidsMuchLess,
-                    Values.RaidsLess,
-                    Values.RaidsMore,
-                    Values.RaidsMuchMore,
-                }
-            },
-            {
-                Portals,
-                new[]
+                    (Values.RaidsNone, new[] { "eventrate 0" }),
+                    (Values.RaidsMuchLess, new[] { "eventrate 200" }),
+                    (Values.RaidsLess, new[] { "eventrate 150" }),
+                    (Values.RaidsMore, new[] { "eventrate 60" }),
+                    (Values.RaidsMuchMore, new[] { "eventrate 30" }),
+                },
+                [Portals] = new (string, string[])[]
                 {
-                    Values.PortalsCasual,
-                    Values.PortalsHard,
-                    Values.PortalsVeryHard,
-                }
-            },
-        };
+                    (Values.PortalsCasual, new[] { "teleportall" }),
+                    (Values.PortalsHard, new[] { "nobossportals" }),
+                    (Values.PortalsVeryHard, new[] { "noportals" }),
+                },
+            };
+
+        public static readonly IReadOnlyDictionary<string, string[]> AllowedValues =
+            Settings.ToDictionary(s => s.Key, s => s.Value.Select(v => v.Value).ToArray());
+
+        /// <summary>The world keys one modifier value stores (empty for "Normal" or an unknown value).</summary>
+        public static IReadOnlyList<string> GameKeys(string modifier, string? value)
+            => Settings.TryGetValue(modifier, out var settings)
+                ? settings.FirstOrDefault(s => s.Value == value).GameKeys ?? Array.Empty<string>()
+                : Array.Empty<string>();
     }
 }

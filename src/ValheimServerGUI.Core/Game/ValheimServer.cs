@@ -162,7 +162,7 @@ namespace ValheimServerGUI.Game
             ApplicationLogger.Information("Starting server: {name}", options.Name);
 
             var exePath = options.GetValidatedServerExe().FullName;
-            var processArgs = GenerateArgs(options);
+            var processArgs = GenerateArgs(options, ReadStoredWorldKeys(options));
             // Parsed before anything launches, so malformed input stops the start here.
             var profileEnvironment = EnvironmentVariableParser.Parse(options.EnvironmentVariables);
 
@@ -435,7 +435,28 @@ namespace ValheimServerGUI.Game
             envVars["LD_PRELOAD"] = string.Join(':', new[] { Path.GetFileName(options.DoorstopLibraryPath), priorPreload }.Where(s => !string.IsNullOrEmpty(s)));
         }
 
-        private static string GenerateArgs(IValheimServerOptions options)
+        // The world's stored modifier and world keys, or null when they cannot be known; the launch then leaves them
+        // as they are rather than risk clearing settings it cannot carry over.
+        private IReadOnlyList<string>? ReadStoredWorldKeys(IValheimServerOptions options)
+        {
+            try
+            {
+                var keys = WorldMetadataReader.ReadStoredWorldKeys(options.GetValidatedSaveDataFolder(), options.WorldName ?? string.Empty);
+                if (keys is null)
+                {
+                    ApplicationLogger.Warning("World {world} has only a pre-1.0 save; launching without -resetmodifiers.", options.WorldName);
+                }
+                return keys;
+            }
+            catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException)
+            {
+                ApplicationLogger.Warning(e, "Could not read the stored settings of world {world}; launching without -resetmodifiers: {message}",
+                    options.WorldName, e.Message);
+                return null;
+            }
+        }
+
+        private static string GenerateArgs(IValheimServerOptions options, IReadOnlyList<string>? storedWorldKeys)
         {
             var saveDataFolder = options.GetValidatedSaveDataFolder().FullName;
             var publicFlag = options.Public ? 1 : 0;
@@ -452,8 +473,12 @@ namespace ValheimServerGUI.Game
             }
 
             // The world stores its modifiers and keys, and -modifier/-setkey only add to them, so a value set back to
-            // Normal (omitted) would keep the stored one. Clearing them first makes the world match these options.
-            processArgs += " -resetmodifiers";
+            // Normal (omitted) would keep the stored one. Clearing them first makes the world match these options; the
+            // stored keys VSG does not own are set again below so the clear never loses them.
+            if (storedWorldKeys != null)
+            {
+                processArgs += " -resetmodifiers";
+            }
 
             if (options.WorldModifiers != null)
             {
@@ -468,6 +493,14 @@ namespace ValheimServerGUI.Game
                 foreach (var key in options.WorldKeys)
                 {
                     processArgs += $" -setkey {key}";
+                }
+            }
+
+            if (storedWorldKeys != null)
+            {
+                foreach (var key in WorldGenSettings.KeysVsgDoesNotOwn(storedWorldKeys))
+                {
+                    processArgs += @$" -setkey ""{key}""";
                 }
             }
 

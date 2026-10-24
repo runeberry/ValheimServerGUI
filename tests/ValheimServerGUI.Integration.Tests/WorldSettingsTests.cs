@@ -10,8 +10,8 @@ namespace ValheimServerGUI.Integration.Tests
 {
     /// <summary>
     /// The world settings the real server stores after VSG launches it. The game only adds or replaces stored settings
-    /// on <c>-modifier</c>, so VSG launches with <c>-resetmodifiers</c> to make the world match World Preferences; the
-    /// first test proves a stored value set back to Normal does not survive. The preset rows compare the binary's own
+    /// on <c>-modifier</c>, so VSG launches with <c>-resetmodifiers</c> to make the world match World Preferences and
+    /// sets the stored keys it does not own again; the first test proves both. The preset rows compare the binary's own
     /// <c>-preset</c> with VSG's preset table, so a game update that changes a preset fails here.
     /// </summary>
     public sealed class WorldSettingsTests : IClassFixture<WorldSettingsTests.PresetWorld>
@@ -20,6 +20,10 @@ namespace ValheimServerGUI.Integration.Tests
         private static readonly TimeSpan BootTimeout = TimeSpan.FromSeconds(150);
         private static readonly TimeSpan StopTimeout = TimeSpan.FromSeconds(150);
         private static readonly TimeSpan SaveCommitTimeout = TimeSpan.FromSeconds(30);
+        // On Windows Running ("Game server connected") can come before the world loads; a stop sent then quits with
+        // nothing to save. The game logs its world load ("Load world:" for a new world, "ZNet.LoadWorld:" for a saved
+        // one) before it can save, so the stop waits for that line.
+        private static readonly TimeSpan WorldLoadTimeout = TimeSpan.FromSeconds(120);
 
         private readonly PresetWorld _presetWorld;
 
@@ -54,6 +58,8 @@ namespace ValheimServerGUI.Integration.Tests
             {
                 if (!await harness.BootToRunningAsync(BootTimeout, configure))
                     throw new InvalidOperationException($"World {worldName} never reached Running.{Tail(harness.Log)}");
+                if (!await harness.WaitForLogLineAsync(WorldLoadTimeout, "Load world:", "ZNet.LoadWorld:"))
+                    throw new InvalidOperationException($"World {worldName} never started loading.{Tail(harness.Log)}");
                 if (!await harness.StopGracefullyAsync(StopTimeout))
                     throw new InvalidOperationException($"World {worldName} did not stop gracefully.{Tail(harness.Log)}");
 
@@ -87,25 +93,29 @@ namespace ValheimServerGUI.Integration.Tests
                 .Select(k => k.ToLowerInvariant())
                 .OrderBy(k => k);
 
+        // VSG's own settings are replaced (a stored Combat Hard set back to Normal does not survive), while a stored
+        // key VSG does not own (here one an admin would set with the console) survives every launch.
         [Fact]
-        public async Task A_stored_modifier_set_back_to_normal_does_not_survive_a_launch()
+        public async Task A_launch_replaces_vsg_settings_and_keeps_every_other_stored_key()
         {
             var worldName = "ITReset" + Guid.NewGuid().ToString("n")[..6];
             var normal = new WorldGenSettings();
 
-            // A world storing Combat Hard, as one set up in the game would.
-            var hard = await BootAndStopAsync(worldName, o => o.WorldModifiers = new()
+            // A world storing Combat Hard, as one set up in the game would, and NoCraftCost, which VSG has no setting for.
+            var hard = await BootAndStopAsync(worldName, o =>
             {
-                [WorldGenModifiers.Combat] = WorldGenModifiers.Values.CombatHard,
+                o.WorldModifiers = new() { [WorldGenModifiers.Combat] = WorldGenModifiers.Values.CombatHard };
+                o.AdditionalArgs = "-setkey nocraftcost";
             });
             Assert.Contains("enemydamage 150", hard.StoredKeys, StringComparer.OrdinalIgnoreCase);
+            Assert.Contains("nocraftcost", hard.StoredKeys, StringComparer.OrdinalIgnoreCase);
             Assert.NotEmpty(normal.ChangesFrom(hard.StoredKeys)); // starting with all Normal asks first
 
-            var reset = await BootAndStopAsync(worldName);
+            var launched = await BootAndStopAsync(worldName);
 
-            Assert.Empty(WithoutPresetMarker(reset.StoredKeys));
-            Assert.Empty(normal.ChangesFrom(reset.StoredKeys)); // the next start does not ask again
-            Assert.Contains(reset.Log, line => line.Contains("Resetting world modifiers"));
+            Assert.Equal(new[] { "nocraftcost" }, WithoutPresetMarker(launched.StoredKeys));
+            Assert.Empty(normal.ChangesFrom(launched.StoredKeys)); // the next start does not ask again
+            Assert.Contains(launched.Log, line => line.Contains("Resetting world modifiers"));
         }
 
         // The game's name for each preset, and VSG's. VSG's Normal is the game's "default".

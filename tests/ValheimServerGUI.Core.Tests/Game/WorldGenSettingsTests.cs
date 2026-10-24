@@ -129,12 +129,14 @@ public class WorldGenSettingsTests
         Assert.Equal(new[] { "PlayerDamage 137", "nocraftcost" }, unrecognized);
     }
 
+    // Keys VSG doesn't own (dungeonbuild) are carried over, so they are not changes; a custom value of a key VSG does
+    // own (eventrate, set by Raids) is replaced, so it is.
     [Fact]
-    public void Changes_list_stored_settings_the_launch_changes_or_removes()
+    public void Changes_list_stored_settings_the_launch_changes_or_replaces()
     {
-        var stored = Settings(new() { ["combat"] = "hard", ["raids"] = "more", ["portals"] = "casual" }, "nomap", "fire")
-            .ToGameKeys().Append("dungeonbuild").Append("preset combat_hard");
-        var target = Settings(new() { ["combat"] = "veryhard", ["raids"] = "more", ["resources"] = "more" }, "fire", "passivemobs");
+        var stored = Settings(new() { ["combat"] = "hard", ["portals"] = "casual" }, "nomap", "fire")
+            .ToGameKeys().Append("eventrate 42").Append("dungeonbuild").Append("preset combat_hard");
+        var target = Settings(new() { ["combat"] = "veryhard", ["resources"] = "more" }, "fire", "passivemobs");
 
         var changes = target.ChangesFrom(stored);
 
@@ -144,9 +146,22 @@ public class WorldGenSettingsTests
                 new WorldGenChange(WorldGenChangeKind.Modifier, "combat", "hard", "veryhard"),
                 new WorldGenChange(WorldGenChangeKind.Modifier, "portals", "casual", null),
                 new WorldGenChange(WorldGenChangeKind.Key, "nomap"),
-                new WorldGenChange(WorldGenChangeKind.Unrecognized, "dungeonbuild"),
+                new WorldGenChange(WorldGenChangeKind.CustomValue, "eventrate 42"),
             },
             changes);
+    }
+
+    // Console keys, mod keys and anything a newer game adds are the world's own; VSG's keys and the preset marker
+    // (which the game re-derives) are not carried over.
+    [Fact]
+    public void Keys_vsg_does_not_own_are_everything_its_settings_cannot_write()
+    {
+        var stored = Preset(WorldGenPresets.Casual).ToGameKeys()
+            .Concat(new[] { "PlayerDamage 137", "nocraftcost", "NoWorkbench", "somefuturekey 50", "preset casual", "nocraftcost" });
+
+        Assert.Equal(
+            new[] { "nocraftcost", "NoWorkbench", "somefuturekey 50" },
+            WorldGenSettings.KeysVsgDoesNotOwn(stored));
     }
 
     // A Normal world only gains settings: nothing to confirm.

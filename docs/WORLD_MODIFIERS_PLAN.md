@@ -87,6 +87,23 @@ table matches all 7 exactly.
 - **D4 Remove** the "Modifiers not working like you expected?…" notice + its FAQ link (and the FAQ URL constant).
 - **D5 Leave the wiki.**
 
+## Amendment (Nuffle, 2026-10-24): key ownership
+
+`-resetmodifiers` clears EVERY stored key, so the first version wiped keys VSG has no field for (console `setkey
+nocraftcost`, mods, keys a future game version adds) on every launch. Writing the `.fwl2` directly was considered and
+rejected: it makes VSG a writer of the save format (player history, commit protocol, preset marker), which is more
+fragile across game updates and still needs the same ownership rule.
+
+- VSG owns only the key NAMES its fields can write (derived from `WorldGenModifiers.Settings` + `WorldGenKeys.All`).
+- Launch: `-resetmodifiers`, VSG's `-modifier`/`-setkey`, then `-setkey "<key>"` for every stored key VSG does not own
+  (`WorldGenSettings.KeysVsgDoesNotOwn`), then Additional Args. The preset marker is never carried (game re-derives it).
+- Stored keys are read by ONE accessor, `WorldMetadataReader.ReadStoredWorldKeys` (launch + prompt): `[]` for a world
+  with no save, null for a world with only a pre-1.0 `.fwl`; unreadable throws. Null/unreadable → launch WITHOUT
+  `-resetmodifiers` (old behavior; never loses data) and no prompt.
+- Prompt lists only owned changes: modifiers, VSG keys, and owned names with custom values ("playerdamage 137 (custom
+  value; will be replaced)"). A future update adding a VALUE to an existing slider lands there until supported.
+- Live A/B 2026-10-24: carry-over disabled → stored `nocraftcost` wiped (red); restored green.
+
 ## Design
 
 - **Fields are the truth.** Persist modifiers + keys only. Preset is never persisted.

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -186,6 +186,21 @@ namespace ValheimServerGUI.Integration.Tests
             {
                 Server.StatusChanged -= OnStatus;
             }
+        }
+
+        /// <summary>Waits until a captured log line contains any of <paramref name="texts"/>. False if none does in time.</summary>
+        public async Task<bool> WaitForLogLineAsync(TimeSpan timeout, params string[] texts)
+        {
+            var deadline = DateTime.UtcNow + timeout;
+            while (DateTime.UtcNow < deadline)
+            {
+                lock (_lock)
+                {
+                    if (Log.Any(line => texts.Any(line.Contains))) return true;
+                }
+                await Task.Delay(TimeSpan.FromMilliseconds(250));
+            }
+            return false;
         }
 
         /// <summary>The world settings stored in the newest committed save of <see cref="WorldName"/>.</summary>

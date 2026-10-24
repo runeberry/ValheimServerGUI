@@ -860,8 +860,8 @@
   <data name="WorldGen_Change_KeyOff" xml:space="preserve">
     <value>⟦WorldGen_Change_KeyOff {0}⟧</value>
   </data>
-  <data name="WorldGen_Change_Unrecognized" xml:space="preserve">
-    <value>⟦WorldGen_Change_Unrecognized {0}⟧</value>
+  <data name="WorldGen_Change_CustomValue" xml:space="preserve">
+    <value>⟦WorldGen_Change_CustomValue {0}⟧</value>
   </data>
   <data name="WorldGen_Value_Normal" xml:space="preserve">
     <value>⟦WorldGen_Value_Normal⟧</value>

@@ -13,12 +13,13 @@ namespace ValheimServerGUI.Game
         /// <summary>A world key (<see cref="WorldGenKeys"/>); the world has it set and the new settings do not.</summary>
         Key,
 
-        /// <summary>A stored world key that no VSG setting can express (e.g. set with a console command).</summary>
-        Unrecognized,
+        /// <summary>A stored key a VSG setting controls, holding a value no setting expresses (e.g. a console-set
+        /// <c>playerdamage 137</c>); the launch replaces it.</summary>
+        CustomValue,
     }
 
     /// <summary>One world setting that starting the server with new settings would change or remove.</summary>
-    /// <param name="Name">The modifier token, the world key token, or the raw stored key.</param>
+    /// <param name="Name">The modifier token, the world key token, or the raw stored key (CustomValue).</param>
     /// <param name="From">The world's current modifier value (Modifier only).</param>
     /// <param name="To">The new modifier value, or null for Normal (Modifier only).</param>
     public record WorldGenChange(WorldGenChangeKind Kind, string Name, string? From = null, string? To = null);
@@ -26,12 +27,23 @@ namespace ValheimServerGUI.Game
     /// <summary>
     /// A world's modifier and key settings: one value per modifier (absent = Normal) and the set world keys. These are
     /// exactly what World Preferences shows, and the server is launched to match them.
+    ///
+    /// <para>VSG owns only the stored keys its settings can write (by key name, e.g. <c>playerdamage</c>, <c>nomap</c>).
+    /// Every other stored key, from a console command, a mod or a newer game version, is the world's own: a launch
+    /// carries it over unchanged (<see cref="KeysVsgDoesNotOwn"/>) and never asks about it.</para>
     /// </summary>
     public sealed class WorldGenSettings
     {
-        // The game also stores a "preset <name>" key recording how the modifiers were chosen. It is re-derived from
-        // the other keys on every launch, so it is never compared.
+        // The game also stores a "preset <name>" key recording how the modifiers were chosen. The game re-derives it
+        // from the other keys on every launch, so it is neither compared nor carried over.
         private const string PresetMarkerKey = "preset";
+
+        private static readonly HashSet<string> OwnedKeyNames = WorldGenModifiers.Settings.Values
+            .SelectMany(values => values.SelectMany(v => v.GameKeys))
+            .Concat(WorldGenKeys.All)
+            .Select(KeyName)
+            .Append(PresetMarkerKey)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
         public WorldGenSettings(IReadOnlyDictionary<string, string>? modifiers = null, IEnumerable<string>? keys = null)
         {
@@ -85,6 +97,10 @@ namespace ValheimServerGUI.Game
             return new WorldGenSettings(modifiers, keys);
         }
 
+        /// <summary>The stored keys no VSG setting controls, which a launch must carry over unchanged.</summary>
+        public static IReadOnlyList<string> KeysVsgDoesNotOwn(IEnumerable<string> storedKeys)
+            => storedKeys.Where(k => !OwnedKeyNames.Contains(KeyName(k))).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
+
         /// <summary>
         /// The world's existing settings that launching with these settings would change or remove. Turning a Normal
         /// modifier or an unset key ON only adds to the world, so it is not a change.
@@ -106,11 +122,15 @@ namespace ValheimServerGUI.Game
                 if (world.Keys.Contains(key) && !Keys.Contains(key)) changes.Add(new WorldGenChange(WorldGenChangeKind.Key, key));
             }
 
-            changes.AddRange(unrecognized.Select(k => new WorldGenChange(WorldGenChangeKind.Unrecognized, k)));
+            changes.AddRange(unrecognized
+                .Where(k => OwnedKeyNames.Contains(KeyName(k)))
+                .Select(k => new WorldGenChange(WorldGenChangeKind.CustomValue, k)));
             return changes;
         }
 
-        private static bool IsPresetMarker(string gameKey)
-            => gameKey.Split(' ')[0].Equals(PresetMarkerKey, StringComparison.OrdinalIgnoreCase);
+        private static bool IsPresetMarker(string gameKey) => KeyName(gameKey).Equals(PresetMarkerKey, StringComparison.OrdinalIgnoreCase);
+
+        // A stored key is "<name>" or "<name> <value>".
+        private static string KeyName(string gameKey) => gameKey.Split(' ')[0];
     }
 }

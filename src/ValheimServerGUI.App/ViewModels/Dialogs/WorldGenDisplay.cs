@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using ValheimServerGUI.Game;
 using ValheimServerGUI.Localization;
@@ -157,6 +157,6 @@ internal static class WorldGenDisplay
         WorldGenChangeKind.Modifier => string.Format(Strings.WorldGen_Change_Modifier,
             ModifierName(change.Name), ModifierValueDisplay(change.Name, change.From), ModifierValueDisplay(change.Name, change.To)),
         WorldGenChangeKind.Key => string.Format(Strings.WorldGen_Change_KeyOff, KeyName(change.Name)),
-        _ => string.Format(Strings.WorldGen_Change_Unrecognized, change.Name),
+        _ => string.Format(Strings.WorldGen_Change_CustomValue, change.Name),
     };
 }

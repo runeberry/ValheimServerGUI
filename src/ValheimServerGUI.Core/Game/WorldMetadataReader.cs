@@ -65,6 +65,21 @@ namespace ValheimServerGUI.Game
         private static readonly Regex SaveFileRegex = new(@"^_main\.(\d+)\.fwl2$", RegexOptions.Compiled);
 
         /// <summary>
+        /// The modifier and world keys a world stores, as the server will read them at launch: empty for a world with no
+        /// save yet, and null when they cannot be known because the world exists only as a pre-1.0 <c>.fwl</c> save,
+        /// which this reader does not parse. Throws like <see cref="ReadFromWorldFolder"/> when the save is unreadable.
+        /// </summary>
+        public static IReadOnlyList<string>? ReadStoredWorldKeys(DirectoryInfo saveDataFolder, string worldName)
+        {
+            var worldFolder = saveDataFolder.GetLocalWorldFolder(worldName);
+            if (FindLatestCompleteSave(worldFolder) is not null) return ReadFromWorldFolder(worldFolder).StartingGlobalKeys;
+
+            var legacySaves = new[] { "worlds", "worlds_local" }
+                .Select(folder => Path.Join(saveDataFolder.FullName, folder, worldName + ".fwl"));
+            return legacySaves.Any(File.Exists) ? null : Array.Empty<string>();
+        }
+
+        /// <summary>
         /// Reads the newest <b>complete</b> save in a world folder. Returns <see cref="WorldMetadata.Empty"/> when the
         /// folder has no complete save. Throws <see cref="IOException"/> or <see cref="InvalidDataException"/>
         /// when the save cannot be read.

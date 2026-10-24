@@ -898,8 +898,8 @@ If you select a preset and change any individual settings, then the preset will 
   <data name="WorldGen_Change_KeyOff" xml:space="preserve">
     <value>{0}: On → Off</value>
   </data>
-  <data name="WorldGen_Change_Unrecognized" xml:space="preserve">
-    <value>{0} (not a VSG setting; will be removed)</value>
+  <data name="WorldGen_Change_CustomValue" xml:space="preserve">
+    <value>{0} (custom value; will be replaced)</value>
   </data>
   <data name="WorldGen_Value_Normal" xml:space="preserve">
     <value>Normal</value>

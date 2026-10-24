@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Diagnostics;
@@ -622,6 +622,48 @@ namespace ValheimServerGUI.Core.Tests.Game
 
             Assert.Equal(ServerStatus.Starting, _server.Status);
             Assert.DoesNotContain(_appLogger.Messages, m => m.Contains("Could not read player names"));
+        }
+
+        // World settings from the save: -resetmodifiers clears every stored key, so the stored keys VSG does not own
+        // (console keys, mods, newer game versions) are set again after VSG's own; VSG's own are replaced.
+        [Fact]
+        public void Start_CarriesOverStoredKeysVsgDoesNotOwn()
+        {
+            var stored = new[] { "nocraftcost", "somefuturekey 50", "enemydamage 150", "preset combat_hard" };
+            WorldSaveFixtures.WriteSave(WorldFolder, 3, WorldSaveFixtures.Build(Array.Empty<WorldPlayerHistoryEntry>(), globalKeys: stored));
+
+            _server.Start(Options(o => o.WorldKeys = new() { WorldGenKeys.NoMap }));
+
+            var args = _processProvider.LastProcess!.StartInfo.Arguments;
+            var reset = args.IndexOf(" -resetmodifiers", StringComparison.Ordinal);
+            var vsgKey = args.IndexOf(" -setkey nomap", StringComparison.Ordinal);
+            var carried = args.IndexOf(@" -setkey ""nocraftcost""", StringComparison.Ordinal);
+            Assert.True(reset >= 0 && reset < vsgKey && vsgKey < carried, args);
+            Assert.Contains(@" -setkey ""somefuturekey 50""", args);
+            Assert.DoesNotContain("enemydamage", args);
+            Assert.DoesNotContain("preset", args);
+        }
+
+        // Without the stored keys VSG cannot carry them over, so it leaves them as they are rather than clear them.
+        [Fact]
+        public void Start_WithAnUnreadableWorldSave_LeavesStoredSettingsAlone()
+        {
+            WorldSaveFixtures.WriteSave(WorldFolder, 3, new byte[] { 0xFF, 0xFF });
+
+            _server.Start(Options());
+
+            Assert.DoesNotContain("-resetmodifiers", _processProvider.LastProcess!.StartInfo.Arguments);
+        }
+
+        [Fact]
+        public void Start_WithOnlyAPre10WorldSave_LeavesStoredSettingsAlone()
+        {
+            Directory.CreateDirectory(Path.Join(_saveDir, "worlds"));
+            File.WriteAllBytes(Path.Join(_saveDir, "worlds", "MyWorld.fwl"), new byte[] { 1, 2, 3 });
+
+            _server.Start(Options());
+
+            Assert.DoesNotContain("-resetmodifiers", _processProvider.LastProcess!.StartInfo.Arguments);
         }
     }
 }

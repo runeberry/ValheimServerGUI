@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
@@ -591,15 +591,18 @@ public partial class MainWindowViewModel : ViewModelBase
     /// The server is launched to make the world's stored modifiers and keys match World Preferences. When that would
     /// change or remove a setting the world already has (for example one chosen in the game), a manual start asks
     /// first; Cancel aborts the start. Once a start has been saved the world matches, so the next start does not ask.
-    /// Auto-start applies the change without asking, like the list files. An unreadable save never blocks the start.
+    /// Auto-start applies the change without asking, like the list files. Stored keys VSG does not own are carried
+    /// over, so they are never asked about. An unreadable save never blocks the start (and is left as it is).
     /// </summary>
     private async Task<bool> ConfirmWorldSettingsChangesAsync(ValheimServerOptions options, DirectoryInfo saveFolder, bool isManual)
     {
         var worldName = options.WorldName ?? string.Empty;
-        IReadOnlyList<string> storedKeys;
+        IReadOnlyList<string>? storedKeys;
         try
         {
-            storedKeys = WorldMetadataReader.ReadFromWorldFolder(saveFolder.GetLocalWorldFolder(worldName)).StartingGlobalKeys;
+            // Null: the launch will leave the stored settings as they are, so nothing changes.
+            storedKeys = WorldMetadataReader.ReadStoredWorldKeys(saveFolder, worldName);
+            if (storedKeys is null) return true;
         }
         catch (Exception e) when (e is IOException or UnauthorizedAccessException or InvalidDataException or ArgumentException)
         {

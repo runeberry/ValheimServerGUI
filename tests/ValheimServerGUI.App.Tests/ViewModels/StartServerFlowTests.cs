@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -184,6 +184,22 @@ public sealed class StartServerFlowTests : IDisposable
     {
         var hardcore = WorldGenPresets.Find(WorldGenPresets.Hardcore)!.Settings;
         var h = BuildExistingWorld("Plainworld", stored: new WorldGenSettings(), preferred: hardcore);
+
+        await h.Vm.StartServerAsync(isManual: true);
+
+        Assert.Empty(h.WorldSettingsPrompts);
+        Assert.Single(h.Started);
+    }
+
+    // A key VSG does not own (console, mod, newer game) is carried over by the launch, so there is nothing to confirm.
+    [Fact]
+    public async Task Existing_world_with_only_keys_vsg_does_not_own_starts_without_asking()
+    {
+        CreateLocalWorldSave("Moddedworld", new[] { "nocraftcost", "somefuturekey 50" });
+        var h = Build();
+        h.Vm.RefreshWorldsCommand.Execute(null);
+        h.Vm.Form.UseNewWorld = false;
+        h.Vm.Form.ExistingWorld = "Moddedworld";
 
         await h.Vm.StartServerAsync(isManual: true);
 

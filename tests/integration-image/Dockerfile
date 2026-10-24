@@ -20,9 +20,15 @@ FROM steamcmd/steamcmd:ubuntu-24 AS server
 ARG STEAM_LIBRARY
 ARG SERVER_DIR
 # Changing this value invalidates the cached download (integration.sh --update-server passes a timestamp).
+# Steam intermittently fails app_update with "Missing configuration" (the same command succeeds on a later try), so
+# the download is retried a few times before the build fails.
 ARG SERVER_CACHE_BUST=0
 RUN echo "server download ${SERVER_CACHE_BUST}" \
-    && steamcmd +force_install_dir "$SERVER_DIR" +login anonymous +app_update 896660 validate +quit \
+    && for attempt in 1 2 3 4 5; do \
+         steamcmd +force_install_dir "$SERVER_DIR" +login anonymous +app_update 896660 validate +quit && break; \
+         if [ "$attempt" = 5 ]; then exit 1; fi; \
+         echo "steamcmd attempt $attempt failed; retrying"; sleep 10; \
+       done \
     && mv "$SERVER_DIR/steamapps/appmanifest_896660.acf" "$STEAM_LIBRARY/steamapps/" \
     && rm -rf "$SERVER_DIR/steamapps"
 

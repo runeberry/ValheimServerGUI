@@ -23,8 +23,17 @@ namespace ValheimServerGUI.Game
         string PlayFabId);
 
     /// <summary>
-    /// Reads the player history from a world's metadata save (<c>worlds_local/&lt;World&gt;/_main.&lt;N&gt;.fwl2</c>).
-    /// The server adds every player who joins and never removes anyone, and rewrites the file on every world save.
+    /// What VSG reads from a world's metadata save: the starting global keys (the world's modifiers and world keys,
+    /// as the game stores them) and the player history (every player who has joined; the server never removes one).
+    /// </summary>
+    public record WorldMetadata(IReadOnlyList<string> StartingGlobalKeys, IReadOnlyList<WorldPlayerHistoryEntry> PlayerHistory)
+    {
+        public static readonly WorldMetadata Empty = new(Array.Empty<string>(), Array.Empty<WorldPlayerHistoryEntry>());
+    }
+
+    /// <summary>
+    /// Reads a world's metadata save (<c>worlds_local/&lt;World&gt;/_main.&lt;N&gt;.fwl2</c>), which the server rewrites on
+    /// every world save.
     ///
     /// <para>Layout, from <c>World.SaveWorldFWLData</c> / <c>World.LoadWorldMeta</c> (BinaryWriter encoding:
     /// little-endian ints, 7-bit length-prefixed UTF-8 strings, 1-byte bools):</para>
@@ -42,7 +51,7 @@ namespace ValheimServerGUI.Game
     /// what lets a newer, unknown version be read best-effort: if the layout changed, the bytes will not line up
     /// and the read fails instead of returning garbage.</para>
     /// </summary>
-    public static class WorldPlayerHistory
+    public static class WorldMetadataReader
     {
         /// <summary>The first world version that saves the player history (<c>Version.World.DeepNorth</c>).</summary>
         public const int PlayerHistoryVersion = 41;
@@ -56,14 +65,14 @@ namespace ValheimServerGUI.Game
         private static readonly Regex SaveFileRegex = new(@"^_main\.(\d+)\.fwl2$", RegexOptions.Compiled);
 
         /// <summary>
-        /// Reads the player history from the newest <b>complete</b> save in a world folder. Returns an empty list when
-        /// the folder has no complete save. Throws <see cref="IOException"/> or <see cref="InvalidDataException"/>
+        /// Reads the newest <b>complete</b> save in a world folder. Returns <see cref="WorldMetadata.Empty"/> when the
+        /// folder has no complete save. Throws <see cref="IOException"/> or <see cref="InvalidDataException"/>
         /// when the save cannot be read.
         /// </summary>
-        public static IReadOnlyList<WorldPlayerHistoryEntry> ReadFromWorldFolder(DirectoryInfo worldFolder)
+        public static WorldMetadata ReadFromWorldFolder(DirectoryInfo worldFolder)
         {
             var save = FindLatestCompleteSave(worldFolder);
-            if (save == null) return Array.Empty<WorldPlayerHistoryEntry>();
+            if (save == null) return WorldMetadata.Empty;
 
             // Share delete as well as write: the server deletes the previous save's files right after it commits a
             // new one, and on Windows an open handle without FileShare.Delete would make that delete fail.
@@ -92,11 +101,11 @@ namespace ValheimServerGUI.Game
         }
 
         /// <summary>
-        /// Reads the player history from a <c>.fwl2</c> stream, front to back without buffering the file. Worlds
-        /// saved before <see cref="PlayerHistoryVersion"/> have no history and return an empty list. Throws
+        /// Reads a <c>.fwl2</c> stream, front to back without buffering the file. Worlds saved before
+        /// <see cref="PlayerHistoryVersion"/> predate the <c>.fwl2</c> format and return <see cref="WorldMetadata.Empty"/>. Throws
         /// <see cref="InvalidDataException"/> when the data is truncated or does not match the layout.
         /// </summary>
-        public static IReadOnlyList<WorldPlayerHistoryEntry> Read(Stream stream)
+        public static WorldMetadata Read(Stream stream)
         {
             if (!stream.CanSeek) throw new ArgumentException("The stream must be seekable.", nameof(stream));
 
@@ -115,9 +124,9 @@ namespace ValheimServerGUI.Game
                 var reader = new PayloadReader(binary, payloadEnd);
 
                 var version = reader.ReadInt32();
-                if (version < PlayerHistoryVersion) return Array.Empty<WorldPlayerHistoryEntry>();
+                if (version < PlayerHistoryVersion) return WorldMetadata.Empty;
 
-                // Every field below is present from PlayerHistoryVersion on; only the history is kept.
+                // Every field below is present from PlayerHistoryVersion on.
                 reader.ReadString(); // name
                 reader.ReadString(); // seedName
                 reader.ReadInt32(); // seed
@@ -126,7 +135,8 @@ namespace ValheimServerGUI.Game
                 reader.ReadBoolean(); // needsDB
 
                 var globalKeyCount = reader.ReadCount(MinGlobalKeyBytes);
-                for (var i = 0; i < globalKeyCount; i++) reader.ReadString();
+                var globalKeys = new List<string>(globalKeyCount);
+                for (var i = 0; i < globalKeyCount; i++) globalKeys.Add(reader.ReadString());
 
                 var historyCount = reader.ReadCount(MinEntryBytes);
                 var history = new List<WorldPlayerHistoryEntry>(historyCount);
@@ -145,7 +155,7 @@ namespace ValheimServerGUI.Game
                         $"World save (version {version}) has {reader.Remaining} unread bytes after the player history; the layout is not recognized.");
                 }
 
-                return history;
+                return new WorldMetadata(globalKeys, history);
             }
             catch (Exception e) when (e is EndOfStreamException or FormatException)
             {

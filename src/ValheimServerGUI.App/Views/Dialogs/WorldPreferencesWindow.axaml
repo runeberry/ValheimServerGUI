@@ -17,7 +17,7 @@
 
         <StackPanel Orientation="Horizontal" Spacing="4">
             <TextBlock Text="{x:Static loc:Strings.WorldPreferences_WikiPrefix}"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                       Foreground="{DynamicResource PanelL0TextSecondaryBrush}" />
             <c:HyperlinkLabel Text="{x:Static loc:Strings.WorldPreferences_WikiLink}" Command="{Binding OpenWorldModifiersWikiCommand}" />
         </StackPanel>
 

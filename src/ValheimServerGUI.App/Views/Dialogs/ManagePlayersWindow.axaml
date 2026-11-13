@@ -9,15 +9,6 @@
         SizeToContent="Height" Width="560"
         WindowStartupLocation="CenterOwner" CanResize="False" ShowInTaskbar="False">
 
-    <Window.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <!-- The shared WinForms-style tab theme (window-scoped, same as the main window). -->
-                <ResourceInclude Source="avares://ValheimServerGUI.App/Styles/Tabs.axaml" />
-            </ResourceDictionary.MergedDictionaries>
-        </ResourceDictionary>
-    </Window.Resources>
-
     <StackPanel Margin="12" Spacing="12">
         <TabControl SelectedIndex="{Binding SelectedTabIndex}">
             <TabItem Header="{x:Static loc:Strings.ManagePlayers_Tab_Accounts}">

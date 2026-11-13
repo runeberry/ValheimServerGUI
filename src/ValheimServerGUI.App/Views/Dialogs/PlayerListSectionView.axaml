@@ -55,7 +55,7 @@
                                 <TextBlock Text="{Binding AccountName}" VerticalAlignment="Center"
                                            IsVisible="{Binding HasAccountName}" />
                                 <TextBlock Text="{x:Static loc:Strings.ManagePlayers_NameUnknown}" VerticalAlignment="Center" FontStyle="Italic"
-                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                           Foreground="{DynamicResource TabL1TextSecondaryBrush}"
                                            IsVisible="{Binding !HasAccountName}" />
                             </StackPanel>
                         </DataTemplate>

@@ -8,6 +8,8 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Styling;
 using Avalonia.Threading;
+using Caprilyn.UI;
+using Caprilyn.UI.Theming;
 using Microsoft.Extensions.DependencyInjection;
 using ValheimServerGUI.App.Infrastructure;
 using ValheimServerGUI.App.Startup;
@@ -45,6 +47,16 @@ public partial class App : Application
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
+        UseAppThemes(Styles.OfType<CaprilynTheme>().Single());
+    }
+
+    /// <summary>The built-in Caprilyn themes, each following the desktop's accent color.</summary>
+    private static void UseAppThemes(CaprilynTheme theme)
+    {
+        var accent = ThemeSchema.RootKey(LitStyles.Accent);
+        var light = ThemeData.Derive("ValheimServerGUI Light", ThemeSet.Light).With(accent, ThemeSchema.SystemAccent);
+        var dark = ThemeData.Derive("ValheimServerGUI Dark", ThemeSet.Dark).With(accent, ThemeSchema.SystemAccent);
+        theme.Use(ThemeSet.BuiltIn.With(light).With(dark), light.Name, dark.Name);
     }
 
     public override void OnFrameworkInitializationCompleted()

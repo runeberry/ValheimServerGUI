@@ -1,12 +1,21 @@
 # ValheimServerGUI — project notes
 
-## UI: prefer our specialized controls over stock Fluent controls
+## UI: the theme is Caprilyn UI
+
+The app's only theme is [Caprilyn UI](https://forge.nuffle.me/runeberry/caprilyn-ui), built from the `lib/caprilyn-ui`
+git submodule (clone with `--recurse-submodules`, or run `git submodule update --init`). It themes every stock control;
+there is no Fluent theme, so Fluent resource keys (`SystemControl*`, `TextControl*`, …) resolve to nothing. A look value
+in the app reads a Caprilyn token by the surface it sits on: `PanelL0TextSecondaryBrush` on the window,
+`TabL1TextSecondaryBrush` inside a tab, `LinkTextBrush` for links. `ResourceKeyTests` fails on any key the app reads that
+no theme supplies. A look the library cannot express is a library change, not an app-local restyle.
+
+## UI: prefer our specialized controls over stock controls
 
 The app ships a family of custom, data-bound controls in `./src/ValheimServerGUI.App/Controls`
-(namespace `ValheimServerGUI.App.Controls`, conventionally aliased `c:` in XAML). They carry the app's
-styling, the consistent label + help-glyph layout, and the `IFormField<T>` binding contract. **Always
-reach for the specialized control instead of the stock Avalonia/Fluent one** when adding or editing views;
-a raw Fluent control in a data-bound view is a smell and breaks visual consistency.
+(namespace `ValheimServerGUI.App.Controls`, conventionally aliased `c:` in XAML). They carry the
+consistent label + help-glyph layout and the `IFormField<T>` binding contract. **Always reach for the
+specialized control instead of the stock Avalonia one** when adding or editing views; a raw stock input in a
+data-bound view is a smell and breaks visual consistency.
 
 Common replacements (stock → ours):
 
@@ -16,12 +25,12 @@ Common replacements (stock → ours):
 | `TextBox` | `c:TextFormField` | `LabelText`/`Watermark`/`MaxLength`; `Value` |
 | `TextBox` (file/folder path) | `c:FilenameFormField` | `TextFormField` with a built-in browse end-cap |
 | `ComboBox` | `c:DropdownFormField` | `ItemsSource` + `Value`; `PlaceholderText` empty state |
-| `NumericUpDown` | `c:NumericFormField` | `Minimum`/`Maximum`; compact spinner skin |
+| `NumericUpDown` | `c:NumericFormField` | `Minimum`/`Maximum` |
 | `NumericUpDown` (seconds) | `c:DurationFormField` | shows amount + unit, binds seconds |
 | `RadioButton` | `c:RadioFormField` | `GroupName` + `Value` |
 | `DataGrid` / `ListBox` | `c:DataListView` | header/footer-capable data list |
 | `Label` / caption `TextBlock` | `c:LabelField` | field-style label |
-| bordered/`HeaderedContentControl` section | `c:GroupBox` | etched WinForms-style group |
+| bordered/`HeaderedContentControl` section | `GroupBox` | the stock group box, themed by Caprilyn UI |
 | link `Button`/`HyperlinkButton` | `c:HyperlinkLabel` | clickable link text |
 | link with an icon | `c:IconHyperlinkLabel` | `IconName` + `Text`; icon and text click as one link, no pressed state |
 | icon `Image` | `c:IconImage` | app icon lookup |

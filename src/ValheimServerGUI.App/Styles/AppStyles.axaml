@@ -1,21 +1,53 @@
 <Styles xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:cui="urn:caprilyn:ui"
         xmlns:c="using:ValheimServerGUI.App.Controls">
 
-    <!-- HyperlinkLabel: a real text label (TextBlock subclass) that reads as an underlined accent-coloured
-         hyperlink with a hand cursor. The click behaviour lives in the control; this is only its look. -->
+    <!-- HyperlinkLabel: a real text label (TextBlock subclass) that reads as an underlined hyperlink with a hand cursor.
+         The click behaviour lives in the control; this is only its look. -->
     <Style Selector="c|HyperlinkLabel">
         <!-- Transparent (not null) background so the whole label rect is clickable, not just the glyphs. -->
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColor}" />
+        <Setter Property="Foreground" Value="{DynamicResource LinkTextBrush}" />
         <Setter Property="TextDecorations" Value="Underline" />
         <Setter Property="Cursor" Value="Hand" />
     </Style>
-    <Style Selector="c|HyperlinkLabel:pointerover">
-        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight1}" />
+    <Style Selector="c|HyperlinkLabel:disabled">
+        <Setter Property="Foreground" Value="{DynamicResource PanelL0TextDisabledBrush}" />
     </Style>
-    <!-- IconHyperlinkLabel: hovering the icon highlights the text too, since both are one link. -->
-    <Style Selector="c|IconHyperlinkLabel:pointerover c|HyperlinkLabel">
-        <Setter Property="Foreground" Value="{DynamicResource SystemAccentColorLight1}" />
+
+    <!-- Icon-only button: a square toolbar button, no chrome until hovered or pressed. -->
+    <Style Selector="Button.icon">
+        <Setter Property="cui:ButtonChrome.Variant" Value="Transparent" />
+        <Setter Property="Width" Value="{DynamicResource ControlHeight}" />
+        <Setter Property="Height" Value="{DynamicResource ControlHeight}" />
+        <Setter Property="Padding" Value="0" />
+        <Setter Property="Cursor" Value="Hand" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+    </Style>
+
+    <!-- A text field drawn as one box around a borderless text box and its end-cap buttons, which are its siblings rather
+         than its inner content, so locking the input (IsInputEnabled) leaves them usable. Drawn from the text box's own
+         container tokens; the parts inside wear the library's inner text box and input button themes. -->
+    <Style Selector="Border.fieldShell">
+        <Setter Property="Background" Value="{DynamicResource TextBoxContainerFillBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource TextBoxContainerEdgeBrush}" />
+        <Setter Property="BorderThickness" Value="{DynamicResource HairlineThickness}" />
+        <Setter Property="CornerRadius" Value="{DynamicResource TextBoxContainerCornerRadius}" />
+        <Setter Property="MinHeight" Value="{DynamicResource ControlHeight}" />
+        <Setter Property="ClipToBounds" Value="True" />
+        <Setter Property="cui:PixelSnap.BoxShadow" Value="{DynamicResource TextBoxContainerShadow}" />
+    </Style>
+    <Style Selector="Border.fieldShell TextBox">
+        <Setter Property="Theme" Value="{DynamicResource CaprilynInnerTextBox}" />
+        <Setter Property="Padding" Value="{DynamicResource InputPadding}" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+    <Style Selector="Border.fieldShell Button">
+        <Setter Property="Theme" Value="{DynamicResource CaprilynInputButton}" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+    </Style>
+    <Style Selector="Border.fieldShell Button.icon">
+        <Setter Property="Height" Value="NaN" />
     </Style>
 </Styles>

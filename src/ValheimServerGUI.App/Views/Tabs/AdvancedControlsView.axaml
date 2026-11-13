@@ -13,7 +13,7 @@
             </StackPanel>
 
             <StackPanel Grid.Row="1" Grid.Column="0" Spacing="2">
-                <c:GroupBox Header="{x:Static loc:Strings.AdvancedControls_OtherSettings_Header}">
+                <GroupBox Header="{x:Static loc:Strings.AdvancedControls_OtherSettings_Header}">
                     <StackPanel Spacing="4">
                         <c:CheckBoxFormField LabelText="{x:Static loc:Strings.AdvancedControls_AutoStart_Label}"
                                              HelpText="{x:Static loc:Strings.AdvancedControls_AutoStart_Help}"
@@ -30,10 +30,10 @@
                                          Value="{Binding Form.EnvironmentVariables}" MaxLength="32767"
                                          IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>
-                </c:GroupBox>
+                </GroupBox>
             </StackPanel>
 
-            <c:GroupBox Grid.Row="1" Grid.Column="2" Header="{x:Static loc:Strings.AdvancedControls_SavingBackups_Header}" VerticalAlignment="Top">
+            <GroupBox Grid.Row="1" Grid.Column="2" Header="{x:Static loc:Strings.AdvancedControls_SavingBackups_Header}" VerticalAlignment="Top">
                 <StackPanel Spacing="2" Width="190">
                     <c:NumericFormField LabelText="{x:Static loc:Strings.AdvancedControls_Backups_Label}" Value="{Binding Form.BackupCount}"
                                         Minimum="1" Maximum="1000" IsEnabled="{Binding AllowServerChanges}"
@@ -48,7 +48,7 @@
                                          Minimum="300" Maximum="2592000" IsEnabled="{Binding AllowServerChanges}"
                                          HelpText="{x:Static loc:Strings.AdvancedControls_LongBackup_Help}" />
                 </StackPanel>
-            </c:GroupBox>
+            </GroupBox>
         </Grid>
     </ScrollViewer>
 </UserControl>

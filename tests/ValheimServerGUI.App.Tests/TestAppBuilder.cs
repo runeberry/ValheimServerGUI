@@ -14,7 +14,7 @@ using Avalonia.Headless;
 namespace ValheimServerGUI.App.Tests;
 
 /// <summary>
-/// Boots the real <see cref="global::ValheimServerGUI.App.App"/> (Fluent theme and all) on the in-process
+/// Boots the real <see cref="global::ValheimServerGUI.App.App"/> (its theme and all) on the in-process
 /// headless platform. <c>UseHeadlessDrawing = false</c> + Skia means rendered frames are real pixels, so
 /// the display path can be asserted.
 /// </summary>

@@ -22,10 +22,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Avalonia" Version="12.1.2" />
-    <PackageReference Include="Avalonia.Desktop" Version="12.1.2" />
-    <PackageReference Include="Avalonia.Themes.Fluent" Version="12.1.2" />
-    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.2" />
+    <PackageReference Include="Avalonia" Version="12.1.5" />
+    <PackageReference Include="Avalonia.Desktop" Version="12.1.5" />
+    <PackageReference Include="Avalonia.Fonts.Inter" Version="12.1.5" />
     <PackageReference Include="Avalonia.Controls.DataGrid" Version="12.1.2" />
     <PackageReference Include="AvaloniaUI.DiagnosticsSupport" Version="2.2.3">
       <IncludeAssets Condition="'$(Configuration)' != 'Debug'">None</IncludeAssets>
@@ -38,6 +37,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\ValheimServerGUI.Core\ValheimServerGUI.Core.csproj" />
+    <!-- The app's theme and stock control styling, built from the lib/caprilyn-ui submodule. -->
+    <ProjectReference Include="..\..\lib\caprilyn-ui\src\Caprilyn.UI\Caprilyn.UI.csproj" />
     <!-- Referenced directly (not only through Core) so it is guaranteed to build before XamlIl
          resolves {x:Static loc:Strings.*}. -->
     <ProjectReference Include="..\ValheimServerGUI.Localization\ValheimServerGUI.Localization.csproj" />

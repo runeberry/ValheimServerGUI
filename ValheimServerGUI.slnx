@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/lib/">
+    <Project Path="lib/caprilyn-ui/src/Caprilyn.UI/Caprilyn.UI.csproj" />
+  </Folder>
   <Folder Name="/src/">
     <Project Path="src/ValheimServerGUI.App/ValheimServerGUI.App.csproj" />
     <Project Path="src/ValheimServerGUI.Core/ValheimServerGUI.Core.csproj" />

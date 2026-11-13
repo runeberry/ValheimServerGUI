@@ -2,7 +2,6 @@ using Avalonia.Controls;
 using Avalonia.Headless.XUnit;
 using ValheimServerGUI.App.Controls;
 using Xunit;
-using AppGroupBox = ValheimServerGUI.App.Controls.GroupBox;
 
 namespace ValheimServerGUI.App.Tests.Views;
 
@@ -12,12 +11,8 @@ namespace ValheimServerGUI.App.Tests.Views;
 public class ControlsAndIconsTests
 {
     [AvaloniaFact]
-    public void GroupBox_and_FormRow_instantiate_with_header_and_content()
+    public void FormRow_instantiates_with_header_and_content()
     {
-        var group = new AppGroupBox { Header = "World", Content = new TextBox() };
-        Assert.Equal("World", group.Header);
-        Assert.IsType<TextBox>(group.Content);
-
         var row = new FormRow { Header = "Server Name", HelpText = "help", Content = new TextBox() };
         Assert.Equal("Server Name", row.Header);
         Assert.Equal("help", row.HelpText);

@@ -13,7 +13,7 @@
                 <TextBlock Text="?"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           Foreground="{DynamicResource HelpGlyphBrush}"
+                           Foreground="{DynamicResource LinkTextBrush}"
                            ToolTip.Tip="{TemplateBinding HelpText}" />
             </ControlTemplate>
         </Setter>

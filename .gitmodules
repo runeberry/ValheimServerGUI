@@ -1,0 +1,3 @@
+[submodule "lib/caprilyn-ui"]
+	path = lib/caprilyn-ui
+	url = https://forge.nuffle.me/runeberry/caprilyn-ui.git

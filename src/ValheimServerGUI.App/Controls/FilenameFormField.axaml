@@ -5,21 +5,19 @@
              x:Class="ValheimServerGUI.App.Controls.FilenameFormField"
              x:Name="Root" x:CompileBindings="False">
     <c:FormRow Header="{Binding #Root.LabelText}" HelpText="{Binding #Root.HelpText}">
-        <!-- One outlined shell around a chromeless text box; the Browse / open-folder buttons are
-             connected end-caps inside the same border (left divider only). See Styles/Compact.axaml. -->
+        <!-- The input and its Browse / open-folder end-caps in one field shell (Styles/AppStyles.axaml). -->
         <Border Classes="fieldShell" IsEnabled="{Binding #Root.IsEnabled}">
             <Grid ColumnDefinitions="*,Auto">
-                <TextBox Grid.Column="0" Classes="chromeless" VerticalAlignment="Stretch"
+                <TextBox Grid.Column="0" VerticalAlignment="Stretch"
                          IsEnabled="{Binding #Root.IsInputEnabled}"
-                         VerticalContentAlignment="Center" Text="{Binding #Root.Value, Mode=TwoWay}"
+                         Text="{Binding #Root.Value, Mode=TwoWay}"
                          PlaceholderText="{Binding #Root.Watermark}" />
                 <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Stretch">
-                    <Button Classes="affix" Content="{x:Static loc:Strings.Controls_Browse}"
+                    <Button Content="{x:Static loc:Strings.Controls_Browse}"
                             IsVisible="{Binding #Root.ShowBrowse}"
                             IsEnabled="{Binding #Root.IsInputEnabled}"
                             ToolTip.Tip="{x:Static loc:Strings.Controls_Browse_Tip}" Click="Browse" />
-                    <Button Classes="affix"
-                            IsVisible="{Binding #Root.ShowOpenFolder}"
+                    <Button IsVisible="{Binding #Root.ShowOpenFolder}"
                             Command="{Binding #Root.OpenFolderCommand}"
                             ToolTip.Tip="{x:Static loc:Strings.Controls_OpenThisFolder_Tip}">
                         <c:IconImage IconName="OpenFolder_16x" />

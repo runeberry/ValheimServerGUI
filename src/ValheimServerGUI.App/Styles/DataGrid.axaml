@@ -8,10 +8,10 @@
 
     <!-- Header: dark bar (matches the footer), app body font, 6px inset, content centred. -->
     <Style Selector="DataGridColumnHeadersPresenter">
-        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+        <Setter Property="Background" Value="{DynamicResource TableViewHeaderFillBrush}" />
     </Style>
     <Style Selector="DataGridColumnHeader">
-        <Setter Property="Background" Value="{DynamicResource LayerDarkest}" />
+        <Setter Property="Background" Value="{DynamicResource TableViewHeaderFillBrush}" />
         <Setter Property="FontSize" Value="12" />
         <Setter Property="Padding" Value="6,0" />
         <Setter Property="VerticalContentAlignment" Value="Center" />

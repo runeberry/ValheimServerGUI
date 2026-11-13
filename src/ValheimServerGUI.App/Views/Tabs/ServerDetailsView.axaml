@@ -9,7 +9,7 @@
 
     <ScrollViewer>
         <StackPanel Margin="8" Spacing="4">
-            <c:GroupBox Header="{x:Static loc:Strings.ServerDetails_Connection_Header}" HorizontalAlignment="Left" Width="350">
+            <GroupBox Header="{x:Static loc:Strings.ServerDetails_Connection_Header}" HorizontalAlignment="Left" Width="350">
                 <StackPanel Spacing="2">
                     <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_ExternalIp_Label}" Value="{Binding Details.ExternalIp}"
                                   HelpText="{x:Static loc:Strings.ServerDetails_ExternalIp_Help}">
@@ -44,12 +44,12 @@
                     </c:LabelField>
 
                     <TextBlock Margin="0,4,0,0" FontStyle="Italic"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               Foreground="{DynamicResource TabL1TextSecondaryBrush}"
                                Text="{x:Static loc:Strings.ServerDetails_TroubleConnecting}" />
                 </StackPanel>
-            </c:GroupBox>
+            </GroupBox>
 
-            <c:GroupBox Header="{x:Static loc:Strings.ServerDetails_Statistics_Header}" HorizontalAlignment="Left" Width="350">
+            <GroupBox Header="{x:Static loc:Strings.ServerDetails_Statistics_Header}" HorizontalAlignment="Left" Width="350">
                 <StackPanel Spacing="2">
                     <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_Uptime_Label}" Value="{Binding Details.Uptime}" />
                     <c:LabelField LabelText="{x:Static loc:Strings.ServerDetails_LastWorldSave_Label}" Value="{Binding Details.LastWorldSave}" />
@@ -61,7 +61,7 @@
                         </c:LabelField.TrailingContent>
                     </c:LabelField>
                 </StackPanel>
-            </c:GroupBox>
+            </GroupBox>
         </StackPanel>
     </ScrollViewer>
 </UserControl>

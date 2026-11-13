@@ -27,12 +27,12 @@
                 <c:TextFormField.Affix>
                     <StackPanel Orientation="Horizontal" VerticalAlignment="Stretch">
                         <!-- Eye toggle (left of copy): open eye when shown, struck-through when hidden. -->
-                        <Button Classes="affix" Command="{Binding Form.ToggleShowPasswordCommand}"
+                        <Button Command="{Binding Form.ToggleShowPasswordCommand}"
                                 ToolTip.Tip="{x:Static loc:Strings.ServerControls_ShowPassword_Tip}">
                             <Image Width="16" Height="16"
                                    Source="{Binding Form.ShowPassword, Converter={x:Static conv:ShowPasswordToIconConverter.Instance}}" />
                         </Button>
-                        <c:CopyButton Classes="affix" Text="{Binding Form.Password}"
+                        <c:CopyButton Text="{Binding Form.Password}"
                                       ToolTip.Tip="{x:Static loc:Strings.ServerControls_CopyPassword_Tip}" />
                     </StackPanel>
                 </c:TextFormField.Affix>
@@ -40,7 +40,7 @@
 
             <!-- World | Join Options -->
             <Grid ColumnDefinitions="*,8,*" Margin="0,4,0,0">
-                <c:GroupBox Grid.Column="0" Header="{x:Static loc:Strings.ServerControls_World_Header}">
+                <GroupBox Grid.Column="0" Header="{x:Static loc:Strings.ServerControls_World_Header}">
                     <StackPanel Spacing="4">
                         <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
                             <c:RadioFormField Grid.Column="0" GroupName="World" LabelText="{x:Static loc:Strings.ServerControls_ExistingWorld_Label}"
@@ -65,9 +65,9 @@
                                          Value="{Binding Form.NewWorldName}" MaxLength="20"
                                          IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>
-                </c:GroupBox>
+                </GroupBox>
 
-                <c:GroupBox Grid.Column="2" Header="{x:Static loc:Strings.ServerControls_JoinOptions_Header}">
+                <GroupBox Grid.Column="2" Header="{x:Static loc:Strings.ServerControls_JoinOptions_Header}">
                     <StackPanel Spacing="6">
                         <c:CheckBoxFormField LabelText="{x:Static loc:Strings.ServerControls_Public_Label}"
                                              HelpText="{x:Static loc:Strings.ServerControls_Public_Help}"
@@ -76,7 +76,7 @@
                                              HelpText="{x:Static loc:Strings.ServerControls_Crossplay_Help}"
                                              Value="{Binding Form.Crossplay}" IsEnabled="{Binding AllowServerChanges}" />
                     </StackPanel>
-                </c:GroupBox>
+                </GroupBox>
             </Grid>
 
             <!-- Start / Restart / Stop -->

@@ -11,19 +11,19 @@
         ShowInTaskbar="False"
         Title="{x:Static app:AppConstants.ProductName}">
 
-    <Border Background="{DynamicResource SystemChromeMediumColor}" Padding="24">
+    <Border Background="{DynamicResource PanelL0FillMiddleBrush}" Padding="24">
         <Grid RowDefinitions="*,Auto,Auto">
             <StackPanel Grid.Row="0" VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="4">
                 <TextBlock Text="{x:Static app:AppConstants.ProductName}" FontSize="22" FontWeight="SemiBold"
                            HorizontalAlignment="Center" />
                 <TextBlock Text="{Binding Version}" HorizontalAlignment="Center"
-                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                           Foreground="{DynamicResource PanelL0TextSecondaryBrush}" />
             </StackPanel>
 
             <ProgressBar Grid.Row="1" Minimum="0" Maximum="100"
                          Value="{Binding ProgressPercent}" Height="6" Margin="0,0,0,8" />
             <TextBlock Grid.Row="2" Text="{Binding StatusText}"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                       Foreground="{DynamicResource PanelL0TextSecondaryBrush}" />
         </Grid>
     </Border>
 </Window>

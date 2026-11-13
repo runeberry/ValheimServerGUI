@@ -20,13 +20,13 @@
 
         <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="0,6,0,0">
             <TextBlock Text="{Binding Copyright}" HorizontalAlignment="Center" TextAlignment="Center"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                       Foreground="{DynamicResource PanelL0TextSecondaryBrush}" />
             <TextBlock Text="{Binding License}" HorizontalAlignment="Center" TextAlignment="Center"
-                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                       Foreground="{DynamicResource PanelL0TextSecondaryBrush}" />
         </StackPanel>
 
         <TextBlock Text="{Binding Disclaimer}" TextWrapping="Wrap" TextAlignment="Center" Margin="0,8,0,0"
-                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}" />
+                   Foreground="{DynamicResource PanelL0TextSecondaryBrush}" />
 
         <StackPanel Spacing="0" HorizontalAlignment="Center" Margin="0,8,0,0">
             <TextBlock Text="{Binding Version, StringFormat={x:Static loc:Strings.About_Version}}"

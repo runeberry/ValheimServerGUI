@@ -20,13 +20,13 @@
                      VerticalContentAlignment="{Binding #Root.Multiline, Converter={x:Static conv:MultilineToVerticalAlignmentConverter.Instance}}"
                      PasswordChar="{Binding #Root.ShowValue, Converter={x:Static conv:PasswordCharConverter.Instance}}" />
 
-            <!-- Affix box: a chromeless box in the outlined shell, with Affix as a connected end-cap. -->
+            <!-- Affix box: the input and its end-caps in one field shell (Styles/AppStyles.axaml). -->
             <Border Grid.Column="0" Classes="fieldShell"
                     IsVisible="{Binding #Root.Affix, Converter={x:Static ObjectConverters.IsNotNull}}">
                 <Grid ColumnDefinitions="*,Auto">
-                    <TextBox Grid.Column="0" Classes="chromeless"
+                    <TextBox Grid.Column="0"
                              IsEnabled="{Binding #Root.IsInputEnabled}"
-                             VerticalAlignment="Stretch" VerticalContentAlignment="Center"
+                             VerticalAlignment="Stretch"
                              Text="{Binding #Root.Value, Mode=TwoWay}"
                              MaxLength="{Binding #Root.MaxLength}"
                              PlaceholderText="{Binding #Root.Watermark}"

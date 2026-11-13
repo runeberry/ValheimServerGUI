@@ -147,7 +147,7 @@ public class DataListView : TemplatedControl
         // header is taller than a row (HeaderFooterHeight) to match the footer's extra padding.
         _grid.ColumnHeaderHeight = HeaderFooterHeight;
         _grid.RowHeight = RowUnitHeight;
-        _grid.Bind(BackgroundProperty, _grid.GetResourceObservable("LayerBase"));
+        _grid.Bind(BackgroundProperty, _grid.GetResourceObservable("ListContainerFillMiddleBrush"));
 
         // Forward the consumer-declared columns into the real grid.
         _grid.Columns.Clear();

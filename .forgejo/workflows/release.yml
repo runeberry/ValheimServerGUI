@@ -58,6 +58,7 @@ jobs:
         with:
           ref: refs/tags/${{ needs.check.outputs.tag }}
           path: src
+          submodules: true
 
       - name: Install tools
         shell: bash

@@ -8,13 +8,14 @@
         <!-- The 'help' cursor (arrow + ?) is the semantically correct hover for a help hint. -->
         <Setter Property="Cursor" Value="Help" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <!-- The tip hangs on the label, not the glyph: a tooltip inherits its host's font, and only the glyph is bold. -->
+        <Setter Property="ToolTip.Tip" Value="{Binding HelpText, RelativeSource={RelativeSource Self}}" />
         <Setter Property="Template">
             <ControlTemplate>
                 <TextBlock Text="?"
                            FontWeight="Bold"
                            VerticalAlignment="Center"
-                           Foreground="{DynamicResource LinkTextBrush}"
-                           ToolTip.Tip="{TemplateBinding HelpText}" />
+                           Foreground="{DynamicResource LinkTextBrush}" />
             </ControlTemplate>
         </Setter>
     </ControlTheme>

@@ -49,16 +49,16 @@ public class HelpGlyphTooltipTests
         window.Show();
         Dispatcher.UIThread.RunJobs();
 
-        var glyph = field.GetVisualDescendants().OfType<HelpLabel>().Single()
-            .GetVisualDescendants().OfType<TextBlock>().Single();
+        var label = field.GetVisualDescendants().OfType<HelpLabel>().Single();
+        var glyph = label.GetVisualDescendants().OfType<TextBlock>().Single();
         var center = glyph.TranslatePoint(new Point(glyph.Bounds.Width / 2, glyph.Bounds.Height / 2), window)!.Value;
 
         // The headless dispatcher does not run the show-delay timer; open immediately instead.
-        ToolTip.SetShowDelay(glyph, 0);
+        ToolTip.SetShowDelay(label, 0);
         window.MouseMove(center, RawInputModifiers.None);
         Dispatcher.UIThread.RunJobs();
 
-        var result = new Hover(glyph.IsPointerOver, ToolTip.GetIsOpen(glyph), glyph.IsEffectivelyEnabled,
+        var result = new Hover(glyph.IsPointerOver, ToolTip.GetIsOpen(label), glyph.IsEffectivelyEnabled,
             Inputs(field).Any(c => c.IsEffectivelyEnabled));
         window.Close();
         return result;

@@ -23,6 +23,7 @@
     <Application.Styles>
         <!-- The app's themes, which follow the desktop's accent color, are set in App.Initialize. -->
         <cui:CaprilynTheme />
+        <cui:CaprilynDataGridTheme />
         <StyleInclude Source="avares://ValheimServerGUI.App/Styles/AppStyles.axaml" />
         <StyleInclude Source="avares://ValheimServerGUI.App/Styles/DataGrid.axaml" />
     </Application.Styles>

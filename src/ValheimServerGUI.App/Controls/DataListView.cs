@@ -142,12 +142,10 @@ public class DataListView : TemplatedControl
         _grid.IsReadOnly = true;
         _grid.CanUserReorderColumns = false;
         _grid.GridLinesVisibility = DataGridGridLinesVisibility.None;
-        // Fixed header + row heights (content vertically centred in DataGrid.axaml) so a 16px icon rests
-        // naturally and every row is the same height, with no per-cell padding needed to align content. The
-        // header is taller than a row (HeaderFooterHeight) to match the footer's extra padding.
+        // Fixed header + row heights (the theme centres cell content) so a 16px icon rests naturally and every
+        // row is the same height. The header is taller than a row (HeaderFooterHeight) to match the footer.
         _grid.ColumnHeaderHeight = HeaderFooterHeight;
         _grid.RowHeight = RowUnitHeight;
-        _grid.Bind(BackgroundProperty, _grid.GetResourceObservable("ListContainerFillMiddleBrush"));
 
         // Forward the consumer-declared columns into the real grid.
         _grid.Columns.Clear();

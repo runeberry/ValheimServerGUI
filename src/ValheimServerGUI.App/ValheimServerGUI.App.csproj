@@ -39,6 +39,7 @@
     <ProjectReference Include="..\ValheimServerGUI.Core\ValheimServerGUI.Core.csproj" />
     <!-- The app's theme and stock control styling, built from the lib/caprilyn-ui submodule. -->
     <ProjectReference Include="..\..\lib\caprilyn-ui\src\Caprilyn.UI\Caprilyn.UI.csproj" />
+    <ProjectReference Include="..\..\lib\caprilyn-ui\src\Caprilyn.UI.DataGrid\Caprilyn.UI.DataGrid.csproj" />
     <!-- Referenced directly (not only through Core) so it is guaranteed to build before XamlIl
          resolves {x:Static loc:Strings.*}. -->
     <ProjectReference Include="..\ValheimServerGUI.Localization\ValheimServerGUI.Localization.csproj" />

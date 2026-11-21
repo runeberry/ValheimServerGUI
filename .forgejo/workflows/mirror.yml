@@ -12,6 +12,7 @@ concurrency:
 jobs:
   mirror:
     runs-on: ubuntu-latest
+    enable-openid-connect: true
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
@@ -20,5 +21,3 @@ jobs:
           targets: |
             forge:runeberry/ValheimServerGUI
             github:runeberry/ValheimServerGUI
-          forge-token: ${{ secrets.FORGE_MIRROR_TOKEN }}
-          github-token: ${{ secrets.GH_MIRROR_TOKEN }}

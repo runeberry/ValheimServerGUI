@@ -22,6 +22,7 @@ env:
 jobs:
   check:
     runs-on: ubuntu-latest
+    enable-openid-connect: true
     outputs:
       tag: ${{ steps.check.outputs.tag }}
       version: ${{ steps.check.outputs.version }}
@@ -35,18 +36,22 @@ jobs:
         shell: bash
         run: apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
 
+      - uses: https://forge.nuffle.dev/homelab/act-runner/actions/secrets@main
+        with:
+          secrets: FORGE_MIRROR_TOKEN GH_MIRROR_TOKEN
       - name: Check the tag and existing releases
         id: check
         shell: bash
         env:
           TAG: ${{ inputs.tag || github.ref_name }}
-          GH_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
-          FORGE_TOKEN: ${{ secrets.FORGE_MIRROR_TOKEN }}
+          GH_TOKEN: ${{ env.GH_MIRROR_TOKEN }}
+          FORGE_TOKEN: ${{ env.FORGE_MIRROR_TOKEN }}
         run: ci/release-check.sh
 
   release:
     needs: check
     runs-on: ubuntu-latest
+    enable-openid-connect: true
     env:
       TAG: ${{ needs.check.outputs.tag }}
       SHA: ${{ needs.check.outputs.sha }}
@@ -70,18 +75,24 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - uses: https://forge.nuffle.dev/homelab/act-runner/actions/secrets@main
+        with:
+          secrets: RUNEBERRY_API_KEY_HEADER RUNEBERRY_CLIENT_API_KEY
       - name: Build
         shell: bash
         working-directory: src
         env:
-          RUNEBERRY_API_KEY_HEADER: ${{ secrets.RUNEBERRY_API_KEY_HEADER }}
-          RUNEBERRY_CLIENT_API_KEY: ${{ secrets.RUNEBERRY_CLIENT_API_KEY }}
+          RUNEBERRY_API_KEY_HEADER: ${{ env.RUNEBERRY_API_KEY_HEADER }}
+          RUNEBERRY_CLIENT_API_KEY: ${{ env.RUNEBERRY_CLIENT_API_KEY }}
         run: ../ci/release-build.sh
 
+      - uses: https://forge.nuffle.dev/homelab/act-runner/actions/secrets@main
+        with:
+          secrets: CS_SIGNER_KEY
       - uses: https://forge.nuffle.dev/homelab/act-runner/actions/sign@main
         with:
           files: dist/*-win-x64.exe
-          credentials: ${{ secrets.CS_SIGNER_KEY }}
+          credentials: ${{ env.CS_SIGNER_KEY }}
 
       - name: Zip the Windows exe
         shell: bash
@@ -89,10 +100,13 @@ jobs:
           ASSET_DIR: dist
         run: ci/release-zip.sh
 
+      - uses: https://forge.nuffle.dev/homelab/act-runner/actions/secrets@main
+        with:
+          secrets: FORGE_MIRROR_TOKEN GH_MIRROR_TOKEN
       - name: Create draft releases
         shell: bash
         env:
           ASSET_DIR: dist
-          GH_TOKEN: ${{ secrets.GH_MIRROR_TOKEN }}
-          FORGE_TOKEN: ${{ secrets.FORGE_MIRROR_TOKEN }}
+          GH_TOKEN: ${{ env.GH_MIRROR_TOKEN }}
+          FORGE_TOKEN: ${{ env.FORGE_MIRROR_TOKEN }}
         run: ci/release-draft.sh
